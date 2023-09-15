@@ -5,28 +5,29 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 import { NavigationProp } from '@react-navigation/native';
 
 interface RouterProps {
-  navigation: NavigationProp<any, any>;
+    navigation: NavigationProp<any, any>;
 }
 
-const Login = ({navigation}: RouterProps) => {
+const Registration = ({navigation}: RouterProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const auth = FIREBASE_AUTH;
 
-  const signIn =async () => {
+
+  const signUp =async () => {
     setLoading(true);
     try {
-      const response = await signInWithEmailAndPassword(auth, email,password);
+      const response = await createUserWithEmailAndPassword(auth, email,password);
       console.log(response);
-    }catch (error: any) {
+      alert('Check your emails!');
+    }catch (error:any) {
       console.log(error);
-      alert('Sign In failed: ' + error.message);
+      alert('Registration failed: ' + error.message);
     } finally{
       setLoading(false);
     }
   }
-
 
   return (
     <View style={styles.container}>
@@ -47,15 +48,15 @@ const Login = ({navigation}: RouterProps) => {
 
           { loading ? <ActivityIndicator size="large" color="#0000ff"/>
           : <>
-          <Button title="Login" onPress={signIn}/>
-          <Button onPress={() => navigation.navigate('Register')} title="Register here"/>
+          <Button title="Create new account" onPress={signUp}/>
+          <Button onPress={() => navigation.navigate('Login')} title="Login here"/>
           </> }
         </KeyboardAvoidingView>
     </View>
   );
 };
 
-export default Login
+export default Registration
 
 const styles = StyleSheet.create({
   container: {
