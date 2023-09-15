@@ -17,23 +17,24 @@ import ActivityLevel from './app/screens/ActivityLevel';
 
 const Stack = createNativeStackNavigator();
 
-const InsideStack = createNativeStackNavigator();
+const SetupStack = createNativeStackNavigator();
 
 function InsideLayout() {
   return( 
-    <InsideStack.Navigator>
-      <InsideStack.Screen name="gender" component={Gender} options={{ headerShown: false }}/>
-      <InsideStack.Screen name="age" component={Age} options={{ headerShown: false }}/>
-      <InsideStack.Screen name="weight" component={Weight} options={{ headerShown: false }} />
-      <InsideStack.Screen name="height" component={Height} options={{ headerShown: false }} />
-      <InsideStack.Screen name="activityLevel" component={ActivityLevel} options={{ headerShown: false }} />
-    </InsideStack.Navigator>
+    <SetupStack.Navigator>
+      <SetupStack.Screen name="gender" component={Gender} options={{ headerShown: false }}/>
+      <SetupStack.Screen name="age" component={Age} options={{ headerShown: false }}/>
+      <SetupStack.Screen name="weight" component={Weight} options={{ headerShown: false }} />
+      <SetupStack.Screen name="height" component={Height} options={{ headerShown: false }} />
+      <SetupStack.Screen name="activityLevel" component={ActivityLevel} options={{ headerShown: false }} />
+    </SetupStack.Navigator>
   );
 }
 
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
+  
 
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, (user)=>{
