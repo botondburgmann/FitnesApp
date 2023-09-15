@@ -9,6 +9,8 @@ import { useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { FIREBASE_AUTH } from './FirebaseConfig';
 import Registration from './app/screens/Registration';
+import Age from './app/screens/Age';
+import Weight from './app/screens/Weight';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,8 +19,8 @@ const InsideStack = createNativeStackNavigator();
 function InsideLayout() {
   return( 
     <InsideStack.Navigator>
-      <InsideStack.Screen name="My todos" component={List} />
-      <InsideStack.Screen name="details" component={Details} />
+      <InsideStack.Screen name="age" component={Age} options={{ headerShown: false }}/>
+      <InsideStack.Screen name="weight" component={Weight} options={{ headerShown: false }} />
     </InsideStack.Navigator>
   );
 }
