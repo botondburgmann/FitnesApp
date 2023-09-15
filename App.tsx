@@ -11,6 +11,9 @@ import { FIREBASE_AUTH } from './FirebaseConfig';
 import Registration from './app/screens/Registration';
 import Age from './app/screens/Age';
 import Weight from './app/screens/Weight';
+import Gender from './app/screens/Gender';
+import Height from './app/screens/Height';
+import ActivityLevel from './app/screens/ActivityLevel';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,8 +22,11 @@ const InsideStack = createNativeStackNavigator();
 function InsideLayout() {
   return( 
     <InsideStack.Navigator>
+      <InsideStack.Screen name="gender" component={Gender} options={{ headerShown: false }}/>
       <InsideStack.Screen name="age" component={Age} options={{ headerShown: false }}/>
       <InsideStack.Screen name="weight" component={Weight} options={{ headerShown: false }} />
+      <InsideStack.Screen name="height" component={Height} options={{ headerShown: false }} />
+      <InsideStack.Screen name="activityLevel" component={ActivityLevel} options={{ headerShown: false }} />
     </InsideStack.Navigator>
   );
 }

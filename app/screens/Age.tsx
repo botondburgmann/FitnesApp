@@ -38,6 +38,7 @@ const Age = ({navigation}: RouterProps) => {
                 onChange={onChange}
             />
       )}
+        <Button onPress={() => navigation.navigate('gender')} title="Go back"/>
         <Button onPress={() => navigation.navigate('weight')} title="Next"/>
     </View>
   )
