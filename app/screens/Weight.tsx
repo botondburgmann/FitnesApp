@@ -1,13 +1,42 @@
 import { View, Text, Button, TextInput, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp, useRoute } from '@react-navigation/native';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../FirebaseConfig';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
+interface RouteParams {
+  userID: string;
+}
+
 const Weight = ({navigation}: RouterProps) => {
+  const route = useRoute();
+
     const [weight, setWeight] = useState('');
+    const [loading, setLoading] = useState(false);
+    const {userID} = route.params as RouteParams;
+
+    const handleData =async (weight) => {
+        setLoading(true);
+        try {
+            const usersCollection = collection(FIRESTORE_DB, 'users');
+            const q = query(usersCollection, where("userID", '==',userID));
+              const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(async (docSnapshot) => {
+                const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
+                const newData = { weight: Number(weight) }; 
+                await updateDoc(userDocRef, newData);
+              });        
+              navigation.navigate('height');
+        }catch (error:any) {
+        alert('Adding data has failed: ' + error.message);
+        } finally{
+        setLoading(false);
+        }
+    }
 
     return (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -19,7 +48,7 @@ const Weight = ({navigation}: RouterProps) => {
                 autoCapitalize='none' 
                 onChangeText={(text) => setWeight(text)}/>
         <Button onPress={() => navigation.navigate('age')} title="Go back"/>
-        <Button onPress={() => navigation.navigate('height')} title="Next"/>
+        <Button onPress={() => handleData(weight)} title="Next"/>
     </View>
   )
 }

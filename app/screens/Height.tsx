@@ -1,14 +1,46 @@
 import { View, Text, Button, TextInput, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp, useRoute } from '@react-navigation/native';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../FirebaseConfig';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
-const Height = ({navigation}: RouterProps) => {
-    const [height, setHeight] = useState('');
+interface RouteParams {
+  userID: string;
+}
 
+
+const Height = ({navigation}: RouterProps) => {
+    const route = useRoute();
+
+    const [height, setHeight] = useState('');
+    const [loading, setLoading] = useState(false);
+    const {userID} = route.params as RouteParams;
+
+    const handleData =async (height) => {
+        setLoading(true);
+        try {
+          console.log("works");
+          
+            const usersCollection = collection(FIRESTORE_DB, 'users');
+            const q = query(usersCollection, where("userID", '==',userID));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(async (docSnapshot) => {
+                const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
+                const newData = { height: Number(height) }; 
+                await updateDoc(userDocRef, newData);
+              });        
+              navigation.navigate('activityLevel');
+        }catch (error:any) {
+        console.log(error);
+        alert('Adding data has failed: ' + error.message);
+        } finally{
+        setLoading(false);
+        }
+    }
     return (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <TextInput 
@@ -19,7 +51,7 @@ const Height = ({navigation}: RouterProps) => {
                 autoCapitalize='none' 
                 onChangeText={(text) => setHeight(text)}/>
         <Button onPress={() => navigation.navigate('weight')} title="Go back"/>
-        <Button onPress={() => navigation.navigate('activityLevel')} title="Next"/>
+        <Button onPress={() => handleData(height)} title="Next"/>
     </View>
   )
 }

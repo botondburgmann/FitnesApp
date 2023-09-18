@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
 import React, { useState } from 'react'
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { NavigationProp } from '@react-navigation/native';
+import { addDoc, collection } from 'firebase/firestore';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -16,14 +17,13 @@ const Registration = ({navigation}: RouterProps) => {
     const auth = FIREBASE_AUTH;
 
 
-    const signUp =async () => {
+    const signUp =async (name) => {
         setLoading(true);
         try {
-        const response = await createUserWithEmailAndPassword(auth, email,password);
-        console.log(response);
+            await createUserWithEmailAndPassword(auth, email,password);
+
         alert('Check your emails!');
         }catch (error:any) {
-        console.log(error);
         alert('Registration failed: ' + error.message);
         } finally{
         setLoading(false);
@@ -55,7 +55,7 @@ const Registration = ({navigation}: RouterProps) => {
 
             { loading ? <ActivityIndicator size="large" color="#0000ff"/>
             : <>
-            <Button title="Create new account" onPress={signUp}/>
+            <Button title="Create new account" onPress={() => signUp(name)}/>
             <Button onPress={() => navigation.navigate('Login')} title="Login here"/>
             </> }
             </KeyboardAvoidingView>

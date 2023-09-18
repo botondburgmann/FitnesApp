@@ -18,9 +18,9 @@ const Login = ({navigation}: RouterProps) => {
     setLoading(true);
     try {
       const response = await signInWithEmailAndPassword(auth, email,password);
-      console.log(response);
+        (response);
     }catch (error: any) {
-      console.log(error);
+        (error);
       alert('Sign In failed: ' + error.message);
     } finally{
       setLoading(false);
