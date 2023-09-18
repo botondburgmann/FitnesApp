@@ -1,4 +1,4 @@
-import { View, Text, Button, TextInput, StyleSheet } from 'react-native'
+import { View, Button, TextInput, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 import { NavigationProp, useRoute } from '@react-navigation/native';
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
@@ -16,11 +16,9 @@ const Weight = ({navigation}: RouterProps) => {
   const route = useRoute();
 
     const [weight, setWeight] = useState('');
-    const [loading, setLoading] = useState(false);
     const {userID} = route.params as RouteParams;
 
     const handleData =async (weight) => {
-        setLoading(true);
         try {
             const usersCollection = collection(FIRESTORE_DB, 'users');
             const q = query(usersCollection, where("userID", '==',userID));
@@ -33,8 +31,6 @@ const Weight = ({navigation}: RouterProps) => {
               navigation.navigate('height');
         }catch (error:any) {
         alert('Adding data has failed: ' + error.message);
-        } finally{
-        setLoading(false);
         }
     }
 

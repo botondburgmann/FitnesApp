@@ -1,4 +1,4 @@
-import { View, Text, Button, TextInput, StyleSheet } from 'react-native'
+import { View, Button, TextInput, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 import { NavigationProp, useRoute } from '@react-navigation/native';
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
@@ -17,11 +17,9 @@ const Height = ({navigation}: RouterProps) => {
     const route = useRoute();
 
     const [height, setHeight] = useState('');
-    const [loading, setLoading] = useState(false);
     const {userID} = route.params as RouteParams;
 
     const handleData =async (height) => {
-        setLoading(true);
         try {
           console.log("works");
           
@@ -37,8 +35,6 @@ const Height = ({navigation}: RouterProps) => {
         }catch (error:any) {
         console.log(error);
         alert('Adding data has failed: ' + error.message);
-        } finally{
-        setLoading(false);
         }
     }
     return (
