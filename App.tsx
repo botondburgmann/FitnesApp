@@ -44,7 +44,7 @@ export default function App() {
       if(user)
         setAlreadySetUpValue(user.uid); 
       else
-        setAlreadySetUp(false);
+        setAlreadySetUp(true);
     });
   }, [])
 
