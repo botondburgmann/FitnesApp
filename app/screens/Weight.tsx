@@ -14,37 +14,40 @@ interface RouteParams {
 
 const Weight = ({navigation}: RouterProps) => {
   const route = useRoute();
+  const [weight, setWeight] = useState('');
+  const {userID} = route.params as RouteParams;
 
-    const [weight, setWeight] = useState('');
-    const {userID} = route.params as RouteParams;
-
-    const handleData =async (weight) => {
-        try {
-            const usersCollection = collection(FIRESTORE_DB, 'users');
-            const q = query(usersCollection, where("userID", '==',userID));
-              const querySnapshot = await getDocs(q);
-            querySnapshot.forEach(async (docSnapshot) => {
-                const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
-                const newData = { weight: Number(weight) }; 
-                await updateDoc(userDocRef, newData);
-              });        
-              navigation.navigate('height');
-        }catch (error:any) {
-        alert('Adding data has failed: ' + error.message);
-        }
+  const handleData =async (weight) => {
+    try {
+      // Set the weight field's value of the current's user's document     
+      const usersCollection = collection(FIRESTORE_DB, 'users');
+      const q = query(usersCollection, where("userID", '==',userID));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (docSnapshot) => {
+        const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
+        const newData = { weight: Number(weight) }; 
+        await updateDoc(userDocRef, newData);
+      });        
+      // Navigate to the next page (Height)
+      navigation.navigate('height');
     }
+    catch (error:any) {
+      alert('Adding data has failed: ' + error.message);
+    }
+  }
 
-    return (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <TextInput 
-                keyboardType='numeric'
-                value={weight}
-                style={styles.input} 
-                placeholder='Weight (kg)' 
-                autoCapitalize='none' 
-                onChangeText={(text) => setWeight(text)}/>
-        <Button onPress={() => navigation.navigate('age')} title="Go back"/>
-        <Button onPress={() => handleData(weight)} title="Next"/>
+  return (
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <TextInput 
+        keyboardType='numeric'
+        value={weight}
+        style={styles.input} 
+        placeholder='Weight (kg)' 
+        autoCapitalize='none' 
+        onChangeText={(text) => setWeight(text)}/>
+        
+      <Button onPress={() => navigation.navigate('age')} title="Go back"/>
+      <Button onPress={() => handleData(weight)} title="Next"/>
     </View>
   )
 }

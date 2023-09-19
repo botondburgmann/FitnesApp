@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
+import { View, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
 import React, { useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { NavigationProp } from '@react-navigation/native';
 
 interface RouterProps {
@@ -17,10 +17,8 @@ const Login = ({navigation}: RouterProps) => {
   const signIn =async () => {
     setLoading(true);
     try {
-      const response = await signInWithEmailAndPassword(auth, email,password);
-        (response);
+      await signInWithEmailAndPassword(auth, email,password);
     }catch (error: any) {
-        (error);
       alert('Sign In failed: ' + error.message);
     } finally{
       setLoading(false);
@@ -36,21 +34,26 @@ const Login = ({navigation}: RouterProps) => {
           style={styles.input} 
           placeholder='Email' 
           autoCapitalize='none' 
-          onChangeText={(text) => setEmail(text)}/>
+          onChangeText={(text) => setEmail(text)}
+        />
         <TextInput 
           value={password}
           secureTextEntry={true}
           style={styles.input} 
           placeholder='Password' 
           autoCapitalize='none' 
-          onChangeText={(text) => setPassword(text)}/>
+          onChangeText={(text) => setPassword(text)}
+        />
 
-          { loading ? <ActivityIndicator size="large" color="#0000ff"/>
-          : <>
-          <Button title="Login" onPress={signIn}/>
-          <Button onPress={() => navigation.navigate('Register')} title="Register here"/>
-          </> }
-        </KeyboardAvoidingView>
+        { loading ? 
+          <ActivityIndicator size="large" color="#0000ff"/>
+        : 
+          <>
+            <Button title="Login" onPress={signIn}/>
+            <Button onPress={() => navigation.navigate('Register')} title="Register here"/>
+          </> 
+        }
+      </KeyboardAvoidingView>
     </View>
   );
 };

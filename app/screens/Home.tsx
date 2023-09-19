@@ -4,11 +4,8 @@ import { FIREBASE_AUTH } from '../../FirebaseConfig'
 
 const Home = () => {
   return (
-
-<View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-
-              <Button onPress={() => FIREBASE_AUTH.signOut()} title="Log out"/>
-
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Button onPress={() => FIREBASE_AUTH.signOut()} title="Log out"/>
     </View>
   )
 }

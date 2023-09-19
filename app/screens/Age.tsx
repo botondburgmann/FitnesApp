@@ -1,4 +1,4 @@
-import { View, Text, Button, TextInput, StyleSheet } from 'react-native'
+import { View, Text, Button, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 import { NavigationProp, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -16,60 +16,54 @@ interface RouteParams {
 const Age = ({navigation}: RouterProps) => {
   const route = useRoute();
 
-  const [loading, setLoading] = useState(false);
   const {userID} = route.params as RouteParams;
-  const [age, setAge] = useState("");
+  
   const handleData =async (birthDate) => {
-      setLoading(true);
-      try {
-          const usersCollection = collection(FIRESTORE_DB, 'users');
-          const q = query(usersCollection, where("userID", '==', userID));
-          const querySnapshot = await getDocs(q);
-          querySnapshot.forEach(async (docSnapshot) => {
-              const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
-              const today = new Date().getFullYear();      
-              const age =  today-birthDate.getFullYear();      
-              const newData = { age: age  }; 
-              await updateDoc(userDocRef, newData);
-            });        
-            navigation.navigate('weight');
-      }catch (error:any) {
+    try {
+      // Set the age field's value of the current's user's document      
+      const usersCollection = collection(FIRESTORE_DB, 'users');
+      const q = query(usersCollection, where("userID", '==', userID));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (docSnapshot) => {
+        const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
+        const today = new Date().getFullYear();      
+        const age =  today-birthDate.getFullYear();      
+        const newData = { age: age  }; 
+        await updateDoc(userDocRef, newData);
+      });     
+         
+      // Navigate to the next page (Weight)      
+      navigation.navigate('weight');
+    }
+    catch (error:any) {
       alert('Adding data has failed: ' + error.message);
-      } finally{
-      setLoading(false);
-      }
+    }
   }
 
-    const [birthDate, setDate] = useState(new Date(1598051730000));
-    const [mode, setMode] = useState<any>('date');
-    const [show, setShow] = useState(false);
-    const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate;
-        setShow(false);
-        setDate(currentDate);
-      };
-
-      const showMode = (currentMode) => {
-        setShow(true);
-        setMode(currentMode);
-      };
+  const [birthDate, setBirthDate] = useState(new Date(1598051730000));
+  const [show, setShow] = useState(false);
+  const onChange = (selectedDate) => {
+    const currentDate = selectedDate;
+    setShow(false);
+    setBirthDate(currentDate);
+  };
 
 
-      const showDatepicker = () => {
-        showMode('date');
-      };
+
+
+
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Button onPress={showDatepicker} title="Show date picker!" />
-        <Text>selected: {birthDate.toLocaleDateString()}</Text>
-        {show && (
+        <Button onPress={()=> {setShow(true)}} title="Show date picker!" />
+          {show && (
             <DateTimePicker
-                testID="dateTimePicker"
-                value={birthDate}
-                mode={mode}
-                onChange={onChange}
+              testID="dateTimePicker"
+              value={birthDate}
+              mode='date'
+              onChange={onChange}
             />
-      )}
+          )}
+
         <Button onPress={() => navigation.navigate('gender')} title="Go back"/>
         <Button onPress={() => handleData(birthDate)} title="Next"/>
     </View>

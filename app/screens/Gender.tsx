@@ -17,26 +17,27 @@ interface RouteParams {
 
 
 const Gender = ( {navigation}: RouterProps) => {
-    const route = useRoute(); // Use the useRoute hook to get the route object
-
-
-   const {userID} = route.params as RouteParams;
-
+    const route = useRoute();
     const [gender, setGender] = useState("");
+    const {userID} = route.params as RouteParams;
+
     const handleData =async (gender) => {
         try {
+            // Set the gender field's value of the current's user's document      
             const usersCollection = collection(FIRESTORE_DB, 'users');
-            
             const q = query(usersCollection, where("userID", '==',userID));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach(async (docSnapshot) => {
                 const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
                 const newData = { gender: gender }; 
                 await updateDoc(userDocRef, newData);
-              });        
-              navigation.navigate('age');
-        }catch (error:any) {
-        alert('Adding data has failed: ' + error.message);
+            });  
+
+            // Navigate to the next page (Age)        
+            navigation.navigate('age');
+        }
+        catch (error:any) {
+            alert('Adding data has failed: ' + error.message);
         }
     }
 
@@ -46,11 +47,12 @@ const Gender = ( {navigation}: RouterProps) => {
                 containerStyle={{ marginBottom: 10 }}
                 selected={gender}
                 onSelected={(value) => setGender(value)}
-                radioBackground="green"
-            >
+                radioBackground="green">
+
                 <RadioButtonItem value="male" label="Male" />
                 <RadioButtonItem value="female" label="Female"/>
-      </RadioButtonGroup>
+            </RadioButtonGroup>
+            
         <Button onPress={() =>handleData(gender) } title="Next"/>
     </View>
   )

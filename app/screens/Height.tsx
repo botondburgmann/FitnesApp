@@ -5,7 +5,7 @@ import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/fire
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 
 interface RouterProps {
-    navigation: NavigationProp<any, any>;
+  navigation: NavigationProp<any, any>;
 }
 
 interface RouteParams {
@@ -14,39 +14,41 @@ interface RouteParams {
 
 
 const Height = ({navigation}: RouterProps) => {
-    const route = useRoute();
+  const route = useRoute();
+  const [height, setHeight] = useState('');
+  const {userID} = route.params as RouteParams;
 
-    const [height, setHeight] = useState('');
-    const {userID} = route.params as RouteParams;
-
-    const handleData =async (height) => {
-        try {
-          
-            const usersCollection = collection(FIRESTORE_DB, 'users');
-            const q = query(usersCollection, where("userID", '==',userID));
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach(async (docSnapshot) => {
-                const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
-                const newData = { height: Number(height) }; 
-                await updateDoc(userDocRef, newData);
-              });        
-              navigation.navigate('activityLevel');
-        }catch (error:any) {
-        console.log(error);
-        alert('Adding data has failed: ' + error.message);
-        }
+  const handleData =async (height) => {
+    try {    
+      // Set the height field's value of the current's user's document     
+      const usersCollection = collection(FIRESTORE_DB, 'users');
+      const q = query(usersCollection, where("userID", '==',userID));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (docSnapshot) => {
+        const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
+        const newData = { height: Number(height) }; 
+        await updateDoc(userDocRef, newData);
+      });        
+        
+      // Navigate to the next page (Activity Level)
+      navigation.navigate('activityLevel');
+    } 
+    catch (error:any) {
+      alert('Adding data has failed: ' + error.message);
     }
-    return (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <TextInput 
-                keyboardType='numeric'
-                value={height}
-                style={styles.input} 
-                placeholder='Height (kg)' 
-                autoCapitalize='none' 
-                onChangeText={(text) => setHeight(text)}/>
-        <Button onPress={() => navigation.navigate('weight')} title="Go back"/>
-        <Button onPress={() => handleData(height)} title="Next"/>
+  }
+  return (
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <TextInput 
+        keyboardType='numeric'
+        value={height}
+        style={styles.input} 
+        placeholder='Height (kg)' 
+        autoCapitalize='none' 
+        onChangeText={(text) => setHeight(text)}/>
+        
+      <Button onPress={() => navigation.navigate('weight')} title="Go back"/>
+      <Button onPress={() => handleData(height)} title="Next"/>
     </View>
   )
 }
