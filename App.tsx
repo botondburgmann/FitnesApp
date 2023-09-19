@@ -56,8 +56,7 @@ export default function App() {
       const userDocSnapshot = querySnapshot.docs[0];
       const alreadySetUpValue = userDocSnapshot.data().set;
       setAlreadySetUp(alreadySetUpValue);
-    } 
-    catch (error) {
+    } catch (error) {
       alert("Couldn't find set field : " + error.message);
     }
   };

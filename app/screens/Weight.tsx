@@ -30,8 +30,7 @@ const Weight = ({navigation}: RouterProps) => {
       });        
       // Navigate to the next page (Height)
       navigation.navigate('height');
-    }
-    catch (error:any) {
+    } catch (error:any) {
       alert('Adding data has failed: ' + error.message);
     }
   }

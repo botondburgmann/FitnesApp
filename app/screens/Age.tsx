@@ -31,11 +31,10 @@ const Age = ({navigation}: RouterProps) => {
         const newData = { age: age  }; 
         await updateDoc(userDocRef, newData);
       });     
-         
+
       // Navigate to the next page (Weight)      
       navigation.navigate('weight');
-    }
-    catch (error:any) {
+    } catch (error:any) {
       alert('Adding data has failed: ' + error.message);
     }
   }

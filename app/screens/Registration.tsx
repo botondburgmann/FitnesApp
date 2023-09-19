@@ -23,11 +23,9 @@ const Registration = ({navigation}: RouterProps) => {
             await addDoc(collection(FIRESTORE_DB, 'users'), {userID: response.user.uid, name: name, gender: "", age: 0, weight: 0, height: 0, activityLevel: "", set: false});
             
             alert('Registered successfully!');
-        }
-        catch (error:any) {
+        }   catch (error:any) {
             alert('Registration failed: ' + error.message);
-        } 
-        finally{
+        }   finally{
             setLoading(false);
         }
     }

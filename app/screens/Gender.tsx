@@ -35,8 +35,7 @@ const Gender = ( {navigation}: RouterProps) => {
 
             // Navigate to the next page (Age)        
             navigation.navigate('age');
-        }
-        catch (error:any) {
+        }   catch (error:any) {
             alert('Adding data has failed: ' + error.message);
         }
     }
@@ -52,7 +51,7 @@ const Gender = ( {navigation}: RouterProps) => {
                 <RadioButtonItem value="male" label="Male" />
                 <RadioButtonItem value="female" label="Female"/>
             </RadioButtonGroup>
-            
+
         <Button onPress={() =>handleData(gender) } title="Next"/>
     </View>
   )

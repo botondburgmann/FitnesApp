@@ -38,8 +38,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
       
       // Navigate to the next page (Home)
       navigation.navigate('home');
-    }
-    catch (error:any) {
+    } catch (error:any) {
       alert('Adding data has failed: ' + error.message);
     }
   }
