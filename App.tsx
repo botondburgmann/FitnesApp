@@ -14,7 +14,7 @@ import Weight from './app/screens/Weight';
 import Gender from './app/screens/Gender';
 import Height from './app/screens/Height';
 import ActivityLevel from './app/screens/ActivityLevel';
-import { addDoc, collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import Home from './app/screens/Home';
 
 const Stack = createNativeStackNavigator();
@@ -39,25 +39,72 @@ function InsideLayout({route}) {
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [alreadySetUp, setAlreadySetUp] = useState<boolean | null>(null);
+
   
     useEffect(() => {
       onAuthStateChanged(FIREBASE_AUTH, (user)=>{
       setUser(user);
-
+      if(user){
+        fetchAlreadySetUpValue(user.uid);
+        console.log(alreadySetUp);
+        
+      } else {
+        setAlreadySetUp(false);
+      }
     });
   }, [])
-  
+  const fetchAlreadySetUpValue = async (uid: string) => {
+    try {
+      // Create a reference to the 'users' collection in Firestore
+      const usersCollectionRef = collection(FIRESTORE_DB, 'users');
+
+      // Create a query to find the user's document by 'uid'
+      const q = query(usersCollectionRef, where('userID', '==', uid));
+
+      // Fetch the documents matching the query from Firestore
+      const querySnapshot = await getDocs(q);
+
+      
+        // Assuming there's only one matching document (usually there should be)
+        const userDocSnapshot = querySnapshot.docs[0];
+        
+        // Access the 'alreadySetUp' field value from the Firestore document
+        const alreadySetUpValue = userDocSnapshot.data().set;
+        setAlreadySetUp(alreadySetUpValue);
+    
+    } catch (error) {
+      console.error('Error fetching alreadySetUp value:', error);
+      // Handle any errors appropriately
+    }
+  };
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Registration'>
-        {user ? (
+      {user && alreadySetUp ? (
+          <Stack.Screen name='Home' component={ Home} options={{ headerShown: false }}/>
+          )
+        : user && !alreadySetUp ?(
+          <Stack.Screen name='Inside' component={ InsideLayout} initialParams={{userID: user.uid} } options={{ headerShown: false } }/>       
+          ) 
+        : (
+          <>
+          <Stack.Screen name='Login' component={ Login} options={{ headerShown: false }}/>
+          <Stack.Screen name='Register' component={ Registration} options={{ headerShown: false }}/>
+          </>
+        )
+          
+
+      }
+        {/* {user && alreadySetUp? (
           <Stack.Screen name='Inside' component={ InsideLayout} initialParams={{userID: user.uid} } options={{ headerShown: false } }/>       
         ) : (
           <>
           <Stack.Screen name='Login' component={ Login} options={{ headerShown: false }}/>
           <Stack.Screen name='Register' component={ Registration} options={{ headerShown: false }}/>
           </>
-        )}
+        )} */}
       </Stack.Navigator>
     </NavigationContainer>
   );
