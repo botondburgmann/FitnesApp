@@ -1,19 +1,62 @@
 import { View, Text, Button, TextInput, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp, useRoute } from '@react-navigation/native';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../FirebaseConfig';
+
+
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
-const ActivityLevel = ({navigation}: RouterProps) => {
-    const [height, setHeight] = useState('');
+interface RouteParams {
+  userID: string;
+}
 
-    return (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
- 
-            <Button onPress={() => navigation.navigate('height')} title="Go back"/>
-            <Button onPress={() => navigation.navigate('home')} title="Complete"/>
+const ActivityLevel = ({navigation}: RouterProps) => {
+  const route = useRoute();
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+    {label: 'Beginner', value: 'beginner'},
+    {label: 'Intermediate', value: 'intermediate'},
+    {label: 'Advanced', value: 'advanced'}
+  ]);
+  const {userID} = route.params as RouteParams;
+
+  const handleData =async (level) => {
+    try {
+      
+        const usersCollection = collection(FIRESTORE_DB, 'users');
+        const q = query(usersCollection, where("userID", '==',userID));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(async (docSnapshot) => {
+            const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
+            const newData = { activityLevel: level, set: true }; 
+            await updateDoc(userDocRef, newData);
+          });        
+          navigation.navigate('home');
+    }catch (error:any) {
+    console.log(error);
+    alert('Adding data has failed: ' + error.message);
+    }
+}
+
+  return (
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <DropDownPicker
+        open={open}
+        value={value}
+        items={items}
+        setOpen={setOpen}
+        setValue={setValue}
+        setItems={setItems}
+      />
+      <Button onPress={() => navigation.navigate('height')} title="Go back"/>
+      <Button onPress={() => handleData(value)} title="Complete"/>
     </View>
   )
 }

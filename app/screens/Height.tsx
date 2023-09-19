@@ -21,7 +21,6 @@ const Height = ({navigation}: RouterProps) => {
 
     const handleData =async (height) => {
         try {
-          console.log("works");
           
             const usersCollection = collection(FIRESTORE_DB, 'users');
             const q = query(usersCollection, where("userID", '==',userID));

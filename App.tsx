@@ -14,7 +14,7 @@ import Weight from './app/screens/Weight';
 import Gender from './app/screens/Gender';
 import Height from './app/screens/Height';
 import ActivityLevel from './app/screens/ActivityLevel';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import Home from './app/screens/Home';
 
 const Stack = createNativeStackNavigator();
@@ -30,7 +30,7 @@ function InsideLayout({route}) {
       <SetupStack.Screen name="age" component={Age} initialParams={{userID: userID} } options={{ headerShown: false }}/>
       <SetupStack.Screen name="weight" component={Weight} initialParams={{userID: userID} }  options={{ headerShown: false }} />
       <SetupStack.Screen name="height" component={Height} initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <SetupStack.Screen name="activityLevel" component={ActivityLevel} options={{ headerShown: false }} />
+      <SetupStack.Screen name="activityLevel" component={ActivityLevel } initialParams={{userID: userID} } options={{ headerShown: false }} />
       <SetupStack.Screen name="home" component={Home} options={{ headerShown: false }} />
     </SetupStack.Navigator>
   );
@@ -40,15 +40,9 @@ function InsideLayout({route}) {
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   
-    let alreadyInitialized = false;
     useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, (user)=>{
-      
+      onAuthStateChanged(FIREBASE_AUTH, (user)=>{
       setUser(user);
-       if(!alreadyInitialized){
-        addDoc(collection(FIRESTORE_DB, 'users'), {userID: user.uid, name: "name", gender: "", age: 0, weight: 0, height: 0, activityLevel: ""});
-        alreadyInitialized = true;
-      } 
 
     });
   }, [])

@@ -20,7 +20,9 @@ const Registration = ({navigation}: RouterProps) => {
     const signUp =async (name) => {
         setLoading(true);
         try {
-            await createUserWithEmailAndPassword(auth, email,password);
+            const response = await createUserWithEmailAndPassword(auth, email,password);
+            await addDoc(collection(FIRESTORE_DB, 'users'), {userID: response.user.uid, name: name, gender: "", age: 0, weight: 0, height: 0, activityLevel: "", set: false});
+            
 
         alert('Check your emails!');
         }catch (error:any) {
