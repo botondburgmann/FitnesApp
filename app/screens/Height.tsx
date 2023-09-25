@@ -20,6 +20,9 @@ const Height = ({navigation}: RouterProps) => {
 
   const handleData =async (height) => {
     try {    
+      if (height === '')
+        throw new Error("Height must be set");
+
       // Set the height field's value of the current's user's document     
       const usersCollection = collection(FIRESTORE_DB, 'users');
       const q = query(usersCollection, where("userID", '==',userID));

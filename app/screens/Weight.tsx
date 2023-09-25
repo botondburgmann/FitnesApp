@@ -19,6 +19,9 @@ const Weight = ({navigation}: RouterProps) => {
 
   const handleData =async (weight) => {
     try {
+      if (weight === '')
+        throw new Error("Weight must be set");
+
       // Set the weight field's value of the current's user's document     
       const usersCollection = collection(FIRESTORE_DB, 'users');
       const q = query(usersCollection, where("userID", '==',userID));

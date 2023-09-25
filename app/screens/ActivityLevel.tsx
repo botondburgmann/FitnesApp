@@ -26,6 +26,10 @@ const ActivityLevel = ({navigation}: RouterProps) => {
 
   const handleData =async (level) => {
     try {
+      if (level === null)
+        throw new Error("Please select one of the following levels");
+
+      
       // Set the activityLevel field's value of the current's user's document      
       const usersCollection = collection(FIRESTORE_DB, 'users');
       const q = query(usersCollection, where("userID", '==',userID));

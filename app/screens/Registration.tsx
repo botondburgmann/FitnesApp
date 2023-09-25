@@ -19,6 +19,8 @@ const Registration = ({navigation}: RouterProps) => {
     const signUp =async (name) => {
         setLoading(true);
         try {
+            if (name === '')
+                throw new Error('Name must be set'); 
             const response = await createUserWithEmailAndPassword(auth, email,password);
             await addDoc(collection(FIRESTORE_DB, 'users'), {userID: response.user.uid, name: name, gender: "", age: 0, weight: 0, height: 0, activityLevel: "", set: false});
             

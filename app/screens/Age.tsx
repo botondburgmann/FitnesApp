@@ -20,18 +20,23 @@ const Age = ({navigation}: RouterProps) => {
   
   const handleData =async (birthDate) => {
     try {
+      const today = new Date()      
+      const age =  today.getFullYear()-birthDate.getFullYear();      
+  
+
+      if (age === 0)
+        throw new Error("Damn bro, you just got born and you wanna train?");
+
       // Set the age field's value of the current's user's document      
-      const usersCollection = collection(FIRESTORE_DB, 'users');
+       const usersCollection = collection(FIRESTORE_DB, 'users');
       const q = query(usersCollection, where("userID", '==', userID));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach(async (docSnapshot) => {
         const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
-        const today = new Date().getFullYear();      
-        const age =  today-birthDate.getFullYear();      
         const newData = { age: age  }; 
         await updateDoc(userDocRef, newData);
       });     
-
+ 
       // Navigate to the next page (Weight)      
       navigation.navigate('weight');
     } catch (error:any) {
@@ -39,35 +44,32 @@ const Age = ({navigation}: RouterProps) => {
     }
   }
 
-  const [birthDate, setBirthDate] = useState(new Date(1598051730000));
+  const [birthDate, setBirthDate] = useState(new Date());
   const [show, setShow] = useState(false);
+
   const onChange = (selectedDate) => {
-    const currentDate = selectedDate;
+    const currentDate = selectedDate || birthDate; 
     setShow(false);
     setBirthDate(currentDate);
   };
 
-
-
-
-
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Button onPress={()=> {setShow(true)}} title="Show date picker!" />
-          {show && (
-            <DateTimePicker
-              testID="dateTimePicker"
-              value={birthDate}
-              mode='date'
-              onChange={onChange}
-            />
-          )}
-
-        <Button onPress={() => navigation.navigate('gender')} title="Go back"/>
-        <Button onPress={() => handleData(birthDate)} title="Next"/>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Button onPress={() => setShow(true)} title="Show date picker!" />
+      {show && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={birthDate}
+          mode='date'
+          onChange={(event, selectedDate) => onChange(selectedDate)}
+        />
+      )}
+      <Button onPress={() => navigation.navigate('gender')} title="Go back" />
+      <Button onPress={() => handleData(birthDate)} title="Next" />
     </View>
-  )
-}
+  );
+};
+
 
 export default Age
 

@@ -23,7 +23,9 @@ const Gender = ( {navigation}: RouterProps) => {
 
     const handleData =async (gender) => {
         try {
-            // Set the gender field's value of the current's user's document      
+            // Set the gender field's value of the current's user's document    
+            if (gender === '')
+                throw new Error('Gender must be set');   
             const usersCollection = collection(FIRESTORE_DB, 'users');
             const q = query(usersCollection, where("userID", '==',userID));
             const querySnapshot = await getDocs(q);
