@@ -2,8 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig';
 import { collection, query, getDocs } from 'firebase/firestore';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import AddWorkout from './AddWorkout';
 
 const Home: React.FC = () => {
+  const Stack = createNativeStackNavigator();
+
   /* const [exercises, setExercises] = useState<string[]>([]);
 
   useEffect(() => {
@@ -25,18 +30,14 @@ const Home: React.FC = () => {
     getData();
   }, []); */
 
-  const [accountContainerStyle, setAccountContainerStyle] = useState(false);
 
 
   return (
-    <View style={styles.container}>
-      
-      <View style={accountContainerStyle ? styles.accountContainerShown : styles.accountContainerHidden}>
-        <Button  title="Profile Settings" />
-        <Button onPress={() => FIREBASE_AUTH.signOut()} title="Log out" />
-      </View>
-      <View style={styles.navbar}><Button onPress={() => setAccountContainerStyle(!accountContainerStyle)} title="Account" /></View>
-    </View>
+      <Stack.Navigator initialRouteName='AddWorkout'>
+        <Stack.Screen name='AddWorkout' component={ AddWorkout} options={{ headerShown: false }}/>
+      </Stack.Navigator>
+    
+
   );
 };
 
