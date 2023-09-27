@@ -1,66 +1,44 @@
-import { Button, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { collection, query, getDocs } from 'firebase/firestore';
-import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import DropDownPicker from 'react-native-dropdown-picker';
+import BilateralSet from '../components/BilateralSet';
+import UnilateralSet from '../components/UnilateralSet';
 
-const AddWorkout: React.FC = () => {
 
- const [exercises, setExercises] = useState<string[]>([]);
+const AddWorkout = () => {
+    const [date, setDate] = useState(new Date());
+    const [showDate, setShowDate] = useState(false);
 
-  useEffect(() => {
-    const getData = async () => {
-      let data: string[] = [];
-      try {
-        const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
-        const q = query(exercisesCollection);
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach(async (docSnapshot) => {
-          data.push(docSnapshot.data().name); 
-        });
-        setExercises(data);
-      } catch (error: any) {
-        alert('Fetching data has failed: ' + error.message);
-      }
+    const [showSelect, setShowSelect] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState(null);
+    const [exercises, setExercises] = useState([
+        {label: 'Bench press', value: 'benchPress'},
+        {label: 'Lunge', value: 'lunge'},
+      ]);
+  
+    const onChange = (selectedDate) => {
+      const currentDate = selectedDate || date; 
+      setDate(currentDate);
+      setShowDate(false);
+      
     };
+    useEffect(() => {
+        console.log("Date: ", date);
+      }, [date]);
 
-    getData();
-  }, []); 
-
-  const [accountContainerStyle, setAccountContainerStyle] = useState(false);
-
-  const [date, setDate] = useState(new Date());
-  const [show, setShow] = useState(false);
-
-  const onChange = (selectedDate) => {
-    const currentDate = selectedDate || date; 
-    setShow(false);
-    setDate(currentDate);
-  };
-
-  function handleButtonClick(){
-
-  }
+    function handleNewExerciseButtonPress(): void {
+        setShowSelect(true)
+    }
 
   return (
     <View style={styles.container}>
-        <View style={styles.navbar}>
-            <Pressable style={styles.button} onPress={() =>setAccountContainerStyle(!accountContainerStyle)}>
-                <Text style={styles.text}>Account</Text>
-            </Pressable>
-        </View>
-        <View style={accountContainerStyle ? styles.accountContainerShown : styles.accountContainerHidden}>
-            <Pressable style={styles.button}>
-                <Text style={styles.text}>Profile Settings</Text>
-            </Pressable>
-            <Pressable style={styles.button}>
-                <Text style={styles.text} onPress={() => FIREBASE_AUTH.signOut()}>Logout</Text>
-            </Pressable>
-        </View>
-        <Pressable style={styles.button} onPress={() => setShow(true)}>
+      <Text>Select date</Text>
+      <Pressable style={styles.button} onPress={() => setShowDate(true)}>
                 <Text style={styles.text}>Show date picker!</Text>
         </Pressable>
-        {show && (
+        {showDate && (
                 <DateTimePicker
                 testID="dateTimePicker"
                 value={date}
@@ -68,9 +46,34 @@ const AddWorkout: React.FC = () => {
                 onChange={(event, selectedDate) => onChange(selectedDate)}
                 />
             )}
-        <Pressable style={styles.button}>
-                <Text style={styles.text}>Add new set</Text>
+        <Pressable style={styles.button} onPress={handleNewExerciseButtonPress}>
+                <Text style={styles.text}>Add new exercise</Text>
         </Pressable>
+        {showSelect && (
+                              <DropDownPicker
+                              open={open}
+                              value={value}
+                              items={exercises}
+                              setOpen={setOpen}
+                              setValue={setValue}
+                              setItems={setExercises} />
+                              )}
+                              {value === 'lunge'? 
+                                <>
+                                    <UnilateralSet />
+                                    <Pressable style={styles.button} onPress={()=>{setShowSelect(false); setValue(null)}}>
+                                         <Text style={styles.text}>Add</Text>
+                                    </Pressable>
+                                </>
+                              : value === 'benchPress' ?
+                                <>
+                                    <BilateralSet />
+                                    <Pressable style={styles.button} onPress={()=>{setShowSelect(false); setValue(null)}}>
+                                        <Text style={styles.text}>Add</Text>
+                                    </Pressable>
+                                </>
+                                : <></>
+                                }
     </View>
   )
 }
@@ -78,20 +81,8 @@ const AddWorkout: React.FC = () => {
 export default AddWorkout
 
 const styles = StyleSheet.create({
-    container: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        flex: 1,
-    },
-    navbar:{
-        backgroundColor: 'blue',
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        zIndex: 1,
-        width: '100%',
-        alignItems: 'flex-end',
-        justifyContent: 'flex-end'
+    container:{
+        backgroundColor: 'coral'
     },
     button: {
         alignItems: 'center',
@@ -107,18 +98,4 @@ const styles = StyleSheet.create({
         letterSpacing: 0.25,
         color: 'white',
       },
-      accountContainerShown:{
-        display: 'flex',
-        backgroundColor: '#1E2D3E',
-        position: 'absolute',
-        bottom: 35,
-        right: 0,
-        zIndex: 1,
-        height: '100%',
-        width: 200,
-        justifyContent: 'flex-end'
-      },
-      accountContainerHidden:{
-        display: 'none',
-      }
-  });
+})
