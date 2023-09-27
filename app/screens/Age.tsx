@@ -38,15 +38,7 @@ const Age = ({navigation}: RouterProps) => {
         />
       )}
       <Button onPress={() => navigation.navigate('gender')} title="Go back" />
-      <Button onPress={() => {
-                              // Set the age value of the profile                              
-                              setUpProfile('age', birthDate, userID);      
-                              // Navigate to the next page (Weight)      
-                              navigation.navigate('weight');
-                              }
-                      } 
-              title="Next" 
-      />
+      <Button onPress={() => setUpProfile('age', birthDate, userID, navigation, 'weight')} title="Next" />
     </View>
   );
 };

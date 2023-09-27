@@ -3,6 +3,7 @@ import { addDoc, collection, doc, getDocs, query, updateDoc, where } from "fireb
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 
 
+
 export const signUp =async (name, setLoading, auth, email, password) => {
     setLoading(true);
     try {
@@ -19,27 +20,45 @@ export const signUp =async (name, setLoading, auth, email, password) => {
     }
 }
 
-export const setUpProfile =async (field, value, userID) => {
+export const setUpProfile =async (field, value, userID, navigation, nextPage) => {
     try {
-
-        // Check for empty value
-        if (value === '')
-            throw new Error(`${field} must be set`);
-
-        // If the field is age then calculate it from date of birth
+        if(field === 'gender')
+            if(!(value === 'male' || value === 'female'))
+                throw new Error(`Gender must be set to either male or female`);
+            
+            // If the field is age then calculate it from date of birth
         if (field === 'age'){
             const today = new Date()      
             const age =  today.getFullYear()-value.getFullYear();      
-            
-            // Users can't be 0 years old
+                
+            if(typeof(age) !== 'number')
+                throw new Error("Age must be a number");
+
+            if (age < 0)
+                throw new Error("Dude, how  the fuck are you negative years old");
+
             if (age === 0)
                 throw new Error("Damn bro, you just got born and you wanna train?");
         }
 
-        if (field === 'activityLevel')
-            if (value === null)
-                throw new Error("Please select one of the following levels");
-        const usersCollection = collection(FIRESTORE_DB, 'users');
+        if (field === 'weight' || field === 'height') {
+            if(Number.isNaN(value))
+                throw new Error(`${field} must be set`);
+            
+            if(typeof(value) !== 'number')
+                throw new Error(`${field} must be a number`);
+            if(value < 0)
+                throw new Error(`${field} can't be a negative number`);
+
+        }
+
+        if (field === 'activityLevel'){
+            if(!(value === 'beginner' || value === 'intermediate' || value === 'advanced') )
+                throw new Error(`Please select one of the options`);
+
+        }
+
+    const usersCollection = collection(FIRESTORE_DB, 'users');
         const q = query(usersCollection, where("userID", '==',userID));
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach(async (docSnapshot) => {
@@ -53,6 +72,8 @@ export const setUpProfile =async (field, value, userID) => {
                 const newData = { [field]: value}; 
                 await updateDoc(userDocRef, newData);
             }
+            // Navigate to the next page        
+            navigation.navigate(nextPage);
         });  
     }   catch (error:any) {
         alert('Adding data has failed: ' + error.message);

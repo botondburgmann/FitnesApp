@@ -28,15 +28,7 @@ const Weight = ({navigation}: RouterProps) => {
         onChangeText={(text) => setWeight(text)}/>
         
       <Button onPress={() => navigation.navigate('age')} title="Go back"/>
-      <Button onPress={() => {
-                              // Set the weight value of the profile                                                            
-                              setUpProfile('weight', Number(weight), userID);
-                              // Navigate to the next page (Height)      
-                              navigation.navigate('height');                          
-                              }
-                      } 
-              title="Next"
-      />
+      <Button onPress={() => setUpProfile('weight', Number(weight), userID, navigation, 'height')} title="Next"/>
     </View>
   )
 }

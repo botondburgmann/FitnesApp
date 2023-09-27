@@ -35,15 +35,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
       />
       
       <Button onPress={() => navigation.navigate('height')} title="Go back"/>
-      <Button onPress={() => {
-                              // Set the weight value of the profile                                                            
-                              setUpProfile('activityLevel', value, userID);
-                              // Navigate to the next page (Height)      
-                              navigation.navigate('home');                          
-                              }
-                      } 
-              title="Complete"
-      />
+      <Button onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'home')} title="Complete"/>
     </View>
   )
 }

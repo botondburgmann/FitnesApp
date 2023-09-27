@@ -32,14 +32,7 @@ const Gender = ( {navigation}: RouterProps) => {
                 <RadioButtonItem value="female" label="Female"/>
             </RadioButtonGroup>
 
-        <Button onPress={() => {
-                                // Set the gender value of the profile
-                                setUpProfile('gender', gender, userID);
-                                // Navigate to the next page (Age)        
-                                navigation.navigate('age');
-                                } } 
-                title="Next"
-        />
+        <Button onPress={() => setUpProfile('gender', gender, userID, navigation, 'age')} title="Next"/>
     </View>
   )
 }

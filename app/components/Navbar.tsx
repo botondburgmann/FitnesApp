@@ -7,7 +7,7 @@ const Navbar = ({toggleAccountVisibility}) => {
 
       <View style={styles.navbar}>
             <Pressable style={styles.button}>
-                <Text style={styles.text}>Add workout</Text>
+                <Text style={styles.text}>Add</Text>
             </Pressable>
             <Pressable style={styles.button} onPress={toggleAccountVisibility}>
                 <Text style={styles.text}>Account</Text>
