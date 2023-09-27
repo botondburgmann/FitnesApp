@@ -4,33 +4,21 @@ import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { NavigationProp } from '@react-navigation/native';
 import { addDoc, collection } from 'firebase/firestore';
+import { signUp } from '../functions/databaseQueries';
+
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
 const Registration = ({navigation}: RouterProps) => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+   
+    const [name, setName] = useState<string>();
+    const [email, setEmail] = useState<string>();
+    const [password, setPassword] = useState<string>();
+    const [loading, setLoading] = useState<boolean>(false);
     const auth = FIREBASE_AUTH;
-
-    const signUp =async (name) => {
-        setLoading(true);
-        try {
-            if (name === '')
-                throw new Error('Name must be set'); 
-            const response = await createUserWithEmailAndPassword(auth, email,password);
-            await addDoc(collection(FIRESTORE_DB, 'users'), {userID: response.user.uid, name: name, gender: "", age: 0, weight: 0, height: 0, activityLevel: "", set: false});
-            
-            alert('Registered successfully!');
-        }   catch (error:any) {
-            alert('Registration failed: ' + error.message);
-        }   finally{
-            setLoading(false);
-        }
-    }
+    
 
     return (
         <View style={styles.container}>
@@ -59,7 +47,7 @@ const Registration = ({navigation}: RouterProps) => {
                     <ActivityIndicator size="large" color="#0000ff"/>
                 : 
                     <>
-                        <Button title="Create new account" onPress={() => signUp(name)}/>
+                        <Button title="Create new account" onPress={() => signUp(name, setLoading, auth, email, password )}/>
                         <Button onPress={() => navigation.navigate('Login')} title="Login here"/>
                     </> 
                 }

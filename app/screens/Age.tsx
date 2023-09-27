@@ -2,8 +2,7 @@ import { View, Text, Button, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 import { NavigationProp, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { FIRESTORE_DB } from '../../FirebaseConfig';
+import { setUpProfile } from '../functions/databaseQueries';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -18,37 +17,11 @@ const Age = ({navigation}: RouterProps) => {
 
   const {userID} = route.params as RouteParams;
   
-  const handleData =async (birthDate) => {
-    try {
-      const today = new Date()      
-      const age =  today.getFullYear()-birthDate.getFullYear();      
-  
-
-      if (age === 0)
-        throw new Error("Damn bro, you just got born and you wanna train?");
-
-      // Set the age field's value of the current's user's document      
-       const usersCollection = collection(FIRESTORE_DB, 'users');
-      const q = query(usersCollection, where("userID", '==', userID));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(async (docSnapshot) => {
-        const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
-        const newData = { age: age  }; 
-        await updateDoc(userDocRef, newData);
-      });     
- 
-      // Navigate to the next page (Weight)      
-      navigation.navigate('weight');
-    } catch (error:any) {
-      alert('Adding data has failed: ' + error.message);
-    }
-  }
-
-  const [birthDate, setBirthDate] = useState(new Date());
-  const [show, setShow] = useState(false);
+  const [birthDate, setBirthDate] = useState<Date>(new Date());
+  const [show, setShow] = useState<boolean>(false);
 
   const onChange = (selectedDate) => {
-    const currentDate = selectedDate || birthDate; 
+    const currentDate: Date = selectedDate || birthDate; 
     setShow(false);
     setBirthDate(currentDate);
   };
@@ -65,7 +38,15 @@ const Age = ({navigation}: RouterProps) => {
         />
       )}
       <Button onPress={() => navigation.navigate('gender')} title="Go back" />
-      <Button onPress={() => handleData(birthDate)} title="Next" />
+      <Button onPress={() => {
+                              // Set the age value of the profile                              
+                              setUpProfile('age', birthDate, userID);      
+                              // Navigate to the next page (Weight)      
+                              navigation.navigate('weight');
+                              }
+                      } 
+              title="Next" 
+      />
     </View>
   );
 };
