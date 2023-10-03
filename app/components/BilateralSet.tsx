@@ -1,12 +1,12 @@
 import { View, Text, TextInput } from 'react-native'
 import React, { useState } from 'react'
 
-const BilateralSet = () => {
-    const [weight, setWeight] = useState("");
-    const [reps, setReps] = useState("");
-    const [time, setTime] = useState("");
-    const [restTime, setRestTime] = useState("");
-    
+const BilateralSet = (props) => {
+    const {weight, setWeight} = props.weight;    
+    const {reps, setReps} = props.reps;    
+    const {time, setTime} = props.time;    
+    const {restTime, setRestTime} = props.restTime;    
+
   return (
     <View>
         <TextInput

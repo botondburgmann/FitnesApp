@@ -14,6 +14,10 @@ interface RouteParams {
 const AddWorkout = () => {
     const [date, setDate] = useState(new Date());
     const [showDate, setShowDate] = useState(false);
+    const [weight, setWeight] = useState("");
+    const [reps, setReps] = useState("");
+    const [time, setTime] = useState("");
+    const [restTime, setRestTime] = useState("");
 
     const [showSelect, setShowSelect] = useState(false);
     const [open, setOpen] = useState(false);
@@ -22,8 +26,8 @@ const AddWorkout = () => {
     //getExercises(userID)
 
     const [exercises, setExercises] = useState([
-        {label: 'Bench press', value: 'benchPress'},
-        {label: 'Lunge', value: 'lunge'},
+        {label: 'Bench press', value: 'Bench Press'},
+        {label: 'Lunge', value: 'Lunge'},
       ]);
   
     const onChange = (selectedDate) => {
@@ -47,6 +51,10 @@ const AddWorkout = () => {
         "restTime" : [restTime]
       }
       addExercise("sdfdfsf", date, exercises, sets);
+      setWeight("");
+      setReps("");
+      setTime("");
+      setRestTime("");
     }
 
   return (
@@ -67,29 +75,35 @@ const AddWorkout = () => {
                 <Text style={styles.text}>Add new exercise</Text>
         </Pressable>
         {showSelect && (
-                              <DropDownPicker
-                              open={open}
-                              value={value}
-                              items={exercises}
-                              setOpen={setOpen}
-                              setValue={setValue}
-                              setItems={setExercises} />
-                              )}
-                              {value === 'lunge'? 
-                                <>
-                                    <UnilateralSet />
-                                    <Pressable style={styles.button} onPress={()=>{setShowSelect(false); setValue(null)}}>
-                                         <Text style={styles.text}>Add</Text>
-                                    </Pressable>
-                                </>
-                              : value === 'benchPress' ?
-                                <>
-                                    <BilateralSet/>
-                                    <Pressable style={styles.button} onPress={() => handleAddButtonPress(value, Number("80"), Number("4"), Number(""), Number("180"))}>
-                                        <Text style={styles.text}>Add</Text>
-                                    </Pressable>
-                                </>
-                                : <></>
+                <DropDownPicker
+                open={open}
+                value={value}
+                items={exercises}
+                setOpen={setOpen}
+                setValue={setValue}
+                setItems={setExercises} />
+                )}
+                {value === 'Lunge'? 
+                  <>
+                      <UnilateralSet />
+                      <Pressable style={styles.button} onPress={()=>{setShowSelect(false); setValue(null)}}>
+                            <Text style={styles.text}>Add</Text>
+                      </Pressable>
+                  </>
+                : value === 'Bench Press' ?
+                  <>
+                      <BilateralSet 
+                        weight={{ weight: weight, setWeight: setWeight }}
+                        reps={{ reps: reps, setReps: setReps }}
+                        time={{ time: time, setTime: setTime }}
+                        restTime={{ restTime: restTime, setRestTime: setRestTime }}
+                      
+                      />
+                      <Pressable style={styles.button} onPress={() => handleAddButtonPress(value, Number(weight), Number(reps), Number(time), Number(restTime))}>
+                          <Text style={styles.text}>Add</Text>
+                      </Pressable>
+                  </>
+                  : <></>
                                 }
     </View>
   )

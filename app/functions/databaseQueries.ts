@@ -1,5 +1,5 @@
 import { Auth, createUserWithEmailAndPassword } from "firebase/auth";
-import { addDoc, collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 
@@ -81,6 +81,7 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
     }
 }
 
+// In works
 export const getExercises =async (userID) => {
     const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
     const q = query(exercisesCollection, where("availableTo", '==', userID), where("avilableTo", '==', 'all'));
@@ -92,20 +93,40 @@ export const getExercises =async (userID) => {
 }
 
 export const addExercise =async (userID:string, date: Date, exercises:(string | Array<string>), sets: Object) => {
+    const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
+    const q = query(workoutsCollection, where("date", '==', date.toDateString()), where("userID", '==', userID) );
+
     try {
-        const docRef = await addDoc(collection(FIRESTORE_DB, "Workouts"),{
-            "date": date,
-            "userID": userID
-        });
-        const setsCollectionRef = collection(docRef, "Sets");
-        const setsDocRef = await addDoc(setsCollectionRef, {
-            "exercises": exercises,
-            "sets": sets,
-            "typeofset": "straight"
-          });
-        console.log("Document written with ID: ", docRef.id);
+        const querySnapshot = await getDocs(q);
+        if(querySnapshot.empty){
+            const newDocRef = await addDoc(workoutsCollection, {
+                date: date.toDateString(),
+                userID: userID
+            });
+            
+            const setsRef = collection(newDocRef, 'Sets');
+
+            await addDoc(setsRef, {
+                exercise: exercises,
+                sets: sets,
+                typeOfSet: "straight",
+                createdAt: serverTimestamp()
+              });
+        } else {
+            querySnapshot.forEach(async (doc) => {
+                const setsRef = collection(doc.ref, 'Sets');
+                
+                await addDoc(setsRef, {
+                    exercise: exercises,
+                    sets: sets,
+                    typeOfSet: "straight",
+                    createdAt: serverTimestamp()
+                });
+            }); 
+        }
+
     } catch (error) {
-        console.error("Error adding document: ", error);
+        alert(error)
     }
     
 }
