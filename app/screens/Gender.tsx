@@ -12,8 +12,6 @@ interface RouterProps {
 interface RouteParams {
     userID: string;
   }
-  
-
 
 const Gender = ( {navigation}: RouterProps) => {
     const route = useRoute();

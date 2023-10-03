@@ -1,10 +1,11 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { Auth, createUserWithEmailAndPassword } from "firebase/auth";
 import { addDoc, collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../FirebaseConfig";
+import { NavigationProp } from "@react-navigation/native";
 
 
 
-export const signUp =async (name, setLoading, auth, email, password) => {
+export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStateAction<boolean>>, auth:Auth, email:string, password:string) => {
     setLoading(true);
     try {
         if (name === '')
@@ -20,7 +21,7 @@ export const signUp =async (name, setLoading, auth, email, password) => {
     }
 }
 
-export const setUpProfile =async (field, value, userID, navigation, nextPage) => {
+export const setUpProfile =async (field:string, value:any, userID:string, navigation:NavigationProp<any, any>, nextPage:string) => {
     try {
         if(field === 'gender')
             if(!(value === 'male' || value === 'female'))
@@ -80,3 +81,31 @@ export const setUpProfile =async (field, value, userID, navigation, nextPage) =>
     }
 }
 
+export const getExercises =async (userID) => {
+    const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
+    const q = query(exercisesCollection, where("availableTo", '==', userID), where("avilableTo", '==', 'all'));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (docSnapshot) => {
+        console.log(docSnapshot);
+        
+    })
+}
+
+export const addExercise =async (userID:string, date: Date, exercises:(string | Array<string>), sets: Object) => {
+    try {
+        const docRef = await addDoc(collection(FIRESTORE_DB, "Workouts"),{
+            "date": date,
+            "userID": userID
+        });
+        const setsCollectionRef = collection(docRef, "Sets");
+        const setsDocRef = await addDoc(setsCollectionRef, {
+            "exercises": exercises,
+            "sets": sets,
+            "typeofset": "straight"
+          });
+        console.log("Document written with ID: ", docRef.id);
+    } catch (error) {
+        console.error("Error adding document: ", error);
+    }
+    
+}

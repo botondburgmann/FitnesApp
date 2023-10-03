@@ -27,7 +27,7 @@ function InsideLayout({route}) {
       <SetupStack.Screen name="weight" component={Weight} initialParams={{userID: userID} }  options={{ headerShown: false }} />
       <SetupStack.Screen name="height" component={Height} initialParams={{userID: userID} } options={{ headerShown: false }} />
       <SetupStack.Screen name="activityLevel" component={ActivityLevel } initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <SetupStack.Screen name="home" component={Home} options={{ headerShown: false }} />
+      <SetupStack.Screen name="home" component={Home} initialParams={{userID: userID} } options={{ headerShown: false }} />
     </SetupStack.Navigator>
   );
 }

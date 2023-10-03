@@ -4,6 +4,11 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import BilateralSet from '../components/BilateralSet';
 import UnilateralSet from '../components/UnilateralSet';
+import { addExercise, getExercises } from '../functions/databaseQueries';
+
+interface RouteParams {
+  userID: string;
+}
 
 
 const AddWorkout = () => {
@@ -13,6 +18,9 @@ const AddWorkout = () => {
     const [showSelect, setShowSelect] = useState(false);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(null);
+
+    //getExercises(userID)
+
     const [exercises, setExercises] = useState([
         {label: 'Bench press', value: 'benchPress'},
         {label: 'Lunge', value: 'lunge'},
@@ -24,12 +32,21 @@ const AddWorkout = () => {
       setShowDate(false);
       
     };
-    useEffect(() => {
-        console.log("Date: ", date);
-      }, [date]);
 
     function handleNewExerciseButtonPress(): void {
         setShowSelect(true)
+    }
+
+    function handleAddButtonPress(exercises: (string | Array<string>), weight: Number, reps: Number, time: Number, restTime: Number) {
+      setShowSelect(false); 
+      setValue(null);
+      const sets = {
+        "weights" : [weight],
+        "reps" : [reps],
+        "time" : [time],
+        "restTime" : [restTime]
+      }
+      addExercise("sdfdfsf", date, exercises, sets);
     }
 
   return (
@@ -67,8 +84,8 @@ const AddWorkout = () => {
                                 </>
                               : value === 'benchPress' ?
                                 <>
-                                    <BilateralSet />
-                                    <Pressable style={styles.button} onPress={()=>{setShowSelect(false); setValue(null)}}>
+                                    <BilateralSet/>
+                                    <Pressable style={styles.button} onPress={() => handleAddButtonPress(value, Number("80"), Number("4"), Number(""), Number("180"))}>
                                         <Text style={styles.text}>Add</Text>
                                     </Pressable>
                                 </>
