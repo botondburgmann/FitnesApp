@@ -83,6 +83,14 @@ const AddWorkout = ({navigation}: RouterProps) => {
     fetchData();    
   }, [])
 
+  function resetArrays() {
+    setWeights([]); 
+    setReps([]); 
+    setTimes([]); 
+    setRestTimes([]); 
+    setNumOfSet(0);
+  }
+
   function addUnilateralSet(leftWeight: number, leftRep: number, leftTime: number, leftRestTime: number, 
                             rightWeight: number, rightRep: number, rightTime: number, rightRestTime: number) {
 
@@ -153,12 +161,8 @@ const AddWorkout = ({navigation}: RouterProps) => {
         addExercise(userID, date, selectedExercise, sets);
       }    
   
-      setWeights([]); 
-      setReps([]); 
-      setTimes([]); 
-      setRestTimes([]); 
+      resetArrays()
       setSelectedExercise("");
-      setNumOfSet(0);
     } 
     else 
       alert("Not enough data");
@@ -168,7 +172,11 @@ const AddWorkout = ({navigation}: RouterProps) => {
     <View style={styles.container}>
       <Datepicker date={date} changeDate={date => setDate(date)} />
       <Text>{date.toDateString()}</Text>
-      <SelectMenu data={exercises} changeSelectedExercise={selectedExercise => setSelectedExercise(selectedExercise)}/>
+      <SelectMenu 
+        data={exercises} 
+        selectedExercise={{ selectedExercise: selectedExercise, setSelectedExercise: setSelectedExercise }}
+        resetArrays={resetArrays}
+        />
       {exercises.find((exercise) => exercise.value === selectedExercise)?.unilateral === true
       ?  <>
           <UnilateralSet

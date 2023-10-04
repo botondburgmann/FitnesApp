@@ -4,6 +4,10 @@ import { Dropdown } from 'react-native-element-dropdown';
 
 const SelectMenu = (props) => {
 
+    const {selectedExercise, setSelectedExercise} = props.selectedExercise;    
+    const data = props.data
+    const resetArrays = props.resetArrays;
+
     const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
 
@@ -14,14 +18,15 @@ const SelectMenu = (props) => {
         <Dropdown 
             search
             placeholder={!isFocus ? 'Exercise' : '...'}
-          data={props.data}
-          labelField="label"
-          valueField="value"
-          onChange={item => {
-            setValue(item.value);
-            setIsFocus(false);
-            props.changeSelectedExercise(item.value);
-          }}
+            data={data}
+            labelField="label"
+            valueField="value"
+            onChange={item => {
+              setValue(item.value);
+              setIsFocus(false);
+              setSelectedExercise(item.value);
+              resetArrays();
+            }}
         />
       
     </View>
