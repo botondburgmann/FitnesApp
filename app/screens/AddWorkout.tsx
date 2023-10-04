@@ -25,12 +25,21 @@ const AddWorkout = (props) => {
 
 
   // For unilateral sets
+  const [leftWeights, setLeftWeights] = useState([]);
+  const [leftReps, setLeftReps] = useState([]);
+  const [leftTimes, setLeftTimes] = useState([]);
+  const [leftRestTimes, setLeftRestTimes] = useState([]);
+  const [rightWeights, setRightWeights] = useState([]);
+  const [rightReps, setRightReps] = useState([]);
+  const [rightTimes, setRightTimes] = useState([]);
+  const [rightRestTimes  , setRightRestTimes] = useState([]);
+
   const [leftWeight, setLeftWeight] = useState("");
-  const [leftReps, setLeftReps] = useState("");
+  const [leftRep, setLeftRep] = useState("");
   const [leftTime, setLeftTime] = useState("");
   const [leftRestTime, setLeftRestTime] = useState("");
   const [rightWeight, setRightWeight] = useState("");
-  const [rightReps, setRightReps] = useState("");
+  const [rightRep, setRightRep] = useState("");
   const [rightTime, setRightTime] = useState("");
   const [rightRestTime  , setRightRestTime] = useState("");
 
@@ -53,25 +62,25 @@ const AddWorkout = (props) => {
     fetchData();
   }, [])
 
-  function addUnilateralSet(exercises: (string | Array<string>), leftWeight: Number, leftReps: Number, leftTime: Number, leftRestTime: Number, 
-                                                                rightWeight: Number, rightReps: Number, rightTime: Number, rightRestTime: Number) {
-    const sets = {
-      "leftWeights" : [leftWeight],
-      "leftReps" : [leftReps],
-      "leftTime" : [leftTime],
-      "leftRestTime" : [leftRestTime],
-      "rightWeights" : [rightWeight],
-      "rightReps" : [rightReps],
-      "rightTime" : [rightTime],
-      "rightRestTime" : [rightRestTime]
-    }
-    addExercise(props.userID, date, exercises, sets);
+  function addUnilateralSet(exercises: (string | Array<string>), leftWeight: Number, leftRep: Number, leftTime: Number, leftRestTime: Number, 
+                                                                rightWeight: Number, rightRep: Number, rightTime: Number, rightRestTime: Number) {
+
+
+    setLeftWeights([...leftWeights, leftWeight]);
+    setLeftReps([...leftReps, leftRep]);
+    setLeftTimes([...leftTimes, leftTime]);
+    setLeftRestTimes([...leftRestTimes, leftRestTime]);
+    setRightWeights([...rightWeights, rightWeight]);
+    setRightReps([...rightReps, rightRep]);
+    setRightTimes([...rightTimes, rightTime]);
+    setRightRestTimes([...rightRestTimes, rightRestTime]);
+
     setLeftWeight("");
-    setLeftReps("");
+    setLeftRep("");
     setLeftTime("");
     setLeftRestTime("");
     setRightWeight("");
-    setRightReps("");
+    setRightRep("");
     setRightTime("");
     setRightRestTime("");
   }
@@ -83,8 +92,6 @@ const AddWorkout = (props) => {
     setReps([...reps,rep]); 
     setTimes([...times,time]); 
     setRestTimes([...restTimes,restTime]); 
-
-    console.log(weights);
     
     setWeight("");
     setRep("");
@@ -92,17 +99,30 @@ const AddWorkout = (props) => {
     setRestTime("");
   }
 
-  function addSetToDatabase() {
-    const sets = {
-      "weights" : weights,
-      "reps" : reps,
-      "time" : times,
-      "restTime" : restTimes
-      }
-
-    console.log(sets);
+  function addSetToDatabase(unilateral:boolean) {
+    if (unilateral) {
+      const sets = {
+        "leftWeights" : leftWeights,
+        "leftReps" : leftReps,
+        "leftTime" : leftTimes,
+        "leftRestTime" : leftRestTimes,
+        "rightWeights" : rightWeights,
+        "rightReps" : rightReps,
+        "rightTime" : rightTimes,
+        "rightRestTime" : rightRestTimes
     
-    addExercise(props.userID, date, selectedExercise, sets);
+      }
+      addExercise(props.userID, date, selectedExercise, sets);
+    }else{
+      const sets = {
+        "weights" : weights,
+        "reps" : reps,
+        "time" : times,
+        "restTime" : restTimes
+        }
+        addExercise(props.userID, date, selectedExercise, sets);
+    }    
+
     setWeights([]); 
     setReps([]); 
     setTimes([]); 
@@ -118,20 +138,19 @@ const AddWorkout = (props) => {
       ?  <>
           <UnilateralSet
             leftWeight={{ leftWeight: leftWeight, setLeftWeight: setLeftWeight }}
-            leftReps={{ leftReps: leftReps, setLeftReps: setLeftReps }}
+            leftRep={{ leftRep: leftRep, setLeftRep: setLeftRep }}
             leftTime={{ leftTime: leftTime, setLeftTime: setLeftTime }}
             leftRestTime={{ leftRestTime: leftRestTime, setLeftRestTime: setLeftRestTime }} 
             rightWeight={{ rightWeight: rightWeight, setRightWeight: setRightWeight }}
-            rightReps={{ rightReps: rightReps, setRightReps: setRightReps }}
-            rightTime={{ rightTime: rightTime, setTime: setTime }}
+            rightRep={{ rightRep: rightRep, setRightRep: setRightRep }}
+            rightTime={{ rightTime: rightTime, setRightTime: setRightTime }}
             rightRestTime={{ rightRestTime: rightRestTime, setRightRestTime: setRightRestTime }} 
           />
-          <Pressable onPress={() => addUnilateralSet(selectedExercise, Number(leftWeight), Number(leftReps), Number(leftTime), Number(leftRestTime),
-                                                                      Number(rightWeight), Number(rightReps), Number(rightTime), Number(rightRestTime))}>
+          <Pressable onPress={() => addUnilateralSet(selectedExercise, Number(leftWeight), Number(leftRep), Number(leftTime), Number(leftRestTime),
+                                                                      Number(rightWeight), Number(rightRep), Number(rightTime), Number(rightRestTime))}>
             <Text>Add another</Text>
           </Pressable>
-          <Pressable onPress={() => addUnilateralSet(selectedExercise, Number(leftWeight), Number(leftReps), Number(leftTime), Number(leftRestTime),
-                                                                      Number(rightWeight), Number(rightReps), Number(rightTime), Number(rightRestTime))}>
+          <Pressable onPress={() => addSetToDatabase(true)}>
             <Text>Finish set</Text>
           </Pressable>
         </>
@@ -146,7 +165,7 @@ const AddWorkout = (props) => {
           <Pressable onPress={() => addBilateralSet(Number(weight), Number(rep), Number(time), Number(restTime))}>
             <Text>Add new set</Text>
           </Pressable>
-          <Pressable onPress={() => addSetToDatabase()}>
+          <Pressable onPress={() => addSetToDatabase(false)}>
             <Text>Finish set</Text>
           </Pressable>
         </>

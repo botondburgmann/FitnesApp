@@ -3,11 +3,11 @@ import React from 'react'
 
 const UnilateralSet = (props) => {
     const {leftWeight, setLeftWeight} = props.leftWeight;    
-    const {leftReps, setLeftReps} = props.leftReps;    
+    const {leftRep, setLeftRep} = props.leftRep;    
     const {leftTime, setLeftTime} = props.leftTime;    
     const {leftRestTime, setLeftRestTime} = props.leftRestTime;    
     const {rightWeight, setRightWeight} = props.rightWeight;    
-    const {rightReps, setRightReps} = props.rightReps;    
+    const {rightRep, setRightRep} = props.rightRep;    
     const {rightTime, setRightTime} = props.rightTime;    
     const {rightRestTime, setRightRestTime} = props.rightRestTime;    
 
@@ -22,8 +22,8 @@ const UnilateralSet = (props) => {
             />
             <TextInput
                 keyboardType='numeric'
-                value={leftReps}
-                onChangeText={(text) => setLeftReps(text)}
+                value={leftRep}
+                onChangeText={(text) => setLeftRep(text)}
                 placeholder='Reps left'
                 autoCapitalize='none'
             />
@@ -50,8 +50,8 @@ const UnilateralSet = (props) => {
             />
             <TextInput
                 keyboardType='numeric'
-                value={rightReps}
-                onChangeText={(text) => setRightReps(text)}
+                value={rightRep}
+                onChangeText={(text) => setRightRep(text)}
                 placeholder='Reps right'
                 autoCapitalize='none'
             />
