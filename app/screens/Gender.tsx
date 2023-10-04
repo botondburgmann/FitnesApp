@@ -20,7 +20,6 @@ const Gender = ( {navigation}: RouterProps) => {
 
     return (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>{userID}</Text>
             <RadioButtonGroup
                 containerStyle={{ marginBottom: 10 }}
                 selected={gender}

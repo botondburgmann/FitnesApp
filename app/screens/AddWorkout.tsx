@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Datepicker from '../components/Datepicker'
 import SelectMenu from '../components/SelectMenu'
@@ -12,12 +12,16 @@ const AddWorkout = (props) => {
   const [exercises, setExercises] = useState([]);
   const [selectedExercise, setSelectedExercise] = useState("");
 
+  const [numOfSet, setNumOfSet] = useState(0);
+
   // For bilateral sets
+  // Arrays of the whole set
   const [weights, setWeights] = useState([])
   const [reps, setReps] = useState([])
   const [times, setTimes] = useState([])
   const [restTimes, setRestTimes] = useState([])
 
+  // Variables for the current set
   const [weight, setWeight] = useState("");
   const [rep, setRep] = useState("");
   const [time, setTime] = useState("");
@@ -25,6 +29,7 @@ const AddWorkout = (props) => {
 
 
   // For unilateral sets
+  // Arrays of the whole set
   const [leftWeights, setLeftWeights] = useState([]);
   const [leftReps, setLeftReps] = useState([]);
   const [leftTimes, setLeftTimes] = useState([]);
@@ -34,6 +39,7 @@ const AddWorkout = (props) => {
   const [rightTimes, setRightTimes] = useState([]);
   const [rightRestTimes  , setRightRestTimes] = useState([]);
 
+  // Variables for the current set
   const [leftWeight, setLeftWeight] = useState("");
   const [leftRep, setLeftRep] = useState("");
   const [leftTime, setLeftTime] = useState("");
@@ -62,71 +68,85 @@ const AddWorkout = (props) => {
     fetchData();
   }, [])
 
-  function addUnilateralSet(exercises: (string | Array<string>), leftWeight: Number, leftRep: Number, leftTime: Number, leftRestTime: Number, 
-                                                                rightWeight: Number, rightRep: Number, rightTime: Number, rightRestTime: Number) {
+  function addUnilateralSet(leftWeight: number, leftRep: number, leftTime: number, leftRestTime: number, 
+                            rightWeight: number, rightRep: number, rightTime: number, rightRestTime: number) {
 
+    if (leftRep === 0 && rightRep === 0)
+      alert("Error: Reps fields cannot be empty. Please fill at least one of them");
+    else {
+      setLeftWeights([...leftWeights, leftWeight]);
+      setLeftReps([...leftReps, leftRep]);
+      setLeftTimes([...leftTimes, leftTime]);
+      setLeftRestTimes([...leftRestTimes, leftRestTime]);
+      setRightWeights([...rightWeights, rightWeight]);
+      setRightReps([...rightReps, rightRep]);
+      setRightTimes([...rightTimes, rightTime]);
+      setRightRestTimes([...rightRestTimes, rightRestTime]);
 
-    setLeftWeights([...leftWeights, leftWeight]);
-    setLeftReps([...leftReps, leftRep]);
-    setLeftTimes([...leftTimes, leftTime]);
-    setLeftRestTimes([...leftRestTimes, leftRestTime]);
-    setRightWeights([...rightWeights, rightWeight]);
-    setRightReps([...rightReps, rightRep]);
-    setRightTimes([...rightTimes, rightTime]);
-    setRightRestTimes([...rightRestTimes, rightRestTime]);
-
-    setLeftWeight("");
-    setLeftRep("");
-    setLeftTime("");
-    setLeftRestTime("");
-    setRightWeight("");
-    setRightRep("");
-    setRightTime("");
-    setRightRestTime("");
+      setLeftWeight("");
+      setLeftRep("");
+      setLeftTime("");
+      setLeftRestTime("");
+      setRightWeight("");
+      setRightRep("");
+      setRightTime("");
+      setRightRestTime("");
+      setNumOfSet((numOfSet) => {return numOfSet + 1});
+    }
   }
 
-  function addBilateralSet(weight: Number, rep: Number, time: Number, restTime: Number) {
+  function addBilateralSet(weight: number, rep: number, time: number, restTime: number) {
 
-    //addExercise(props.userID, date, exercises, sets);
-    setWeights([...weights,weight]); 
-    setReps([...reps,rep]); 
-    setTimes([...times,time]); 
-    setRestTimes([...restTimes,restTime]); 
-    
-    setWeight("");
-    setRep("");
-    setTime("");
-    setRestTime("");
+    if (rep === 0)
+      alert("Error: reps field cannot be empty");
+    else{
+      setWeights([...weights,weight]); 
+      setReps([...reps,rep]); 
+      setTimes([...times,time]); 
+      setRestTimes([...restTimes,restTime]); 
+      
+      setWeight("");
+      setRep("");
+      setTime("");
+      setRestTime("");
+      setNumOfSet((numOfSet) => {return numOfSet + 1});
+    }
   }
 
-  function addSetToDatabase(unilateral:boolean) {
-    if (unilateral) {
-      const sets = {
-        "leftWeights" : leftWeights,
-        "leftReps" : leftReps,
-        "leftTime" : leftTimes,
-        "leftRestTime" : leftRestTimes,
-        "rightWeights" : rightWeights,
-        "rightReps" : rightReps,
-        "rightTime" : rightTimes,
-        "rightRestTime" : rightRestTimes
-    
-      }
-      addExercise(props.userID, date, selectedExercise, sets);
-    }else{
-      const sets = {
-        "weights" : weights,
-        "reps" : reps,
-        "time" : times,
-        "restTime" : restTimes
+  function addSetToDatabase(unilateral:boolean, numOfSet:number) {
+    if (numOfSet > 0) {
+      if (unilateral) {
+        const sets = {
+          "leftWeights" : leftWeights,
+          "leftReps" : leftReps,
+          "leftTime" : leftTimes,
+          "leftRestTime" : leftRestTimes,
+          "rightWeights" : rightWeights,
+          "rightReps" : rightReps,
+          "rightTime" : rightTimes,
+          "rightRestTime" : rightRestTimes
         }
         addExercise(props.userID, date, selectedExercise, sets);
-    }    
-
-    setWeights([]); 
-    setReps([]); 
-    setTimes([]); 
-    setRestTimes([]); 
+      }
+      else{
+        const sets = {
+          "weights" : weights,
+          "reps" : reps,
+          "time" : times,
+          "restTime" : restTimes
+        }
+        addExercise(props.userID, date, selectedExercise, sets);
+      }    
+  
+      setWeights([]); 
+      setReps([]); 
+      setTimes([]); 
+      setRestTimes([]); 
+      setSelectedExercise("");
+      setNumOfSet(0);
+    } 
+    else 
+      alert("Not enough data");
   }
 
   return (
@@ -146,11 +166,11 @@ const AddWorkout = (props) => {
             rightTime={{ rightTime: rightTime, setRightTime: setRightTime }}
             rightRestTime={{ rightRestTime: rightRestTime, setRightRestTime: setRightRestTime }} 
           />
-          <Pressable onPress={() => addUnilateralSet(selectedExercise, Number(leftWeight), Number(leftRep), Number(leftTime), Number(leftRestTime),
-                                                                      Number(rightWeight), Number(rightRep), Number(rightTime), Number(rightRestTime))}>
+          <Pressable onPress={() => addUnilateralSet(Number(leftWeight), Number(leftRep), Number(leftTime), Number(leftRestTime),
+                                                    Number(rightWeight), Number(rightRep), Number(rightTime), Number(rightRestTime))}>
             <Text>Add another</Text>
           </Pressable>
-          <Pressable onPress={() => addSetToDatabase(true)}>
+          <Pressable onPress={() => addSetToDatabase(true, numOfSet)}>
             <Text>Finish set</Text>
           </Pressable>
         </>
@@ -165,9 +185,10 @@ const AddWorkout = (props) => {
           <Pressable onPress={() => addBilateralSet(Number(weight), Number(rep), Number(time), Number(restTime))}>
             <Text>Add new set</Text>
           </Pressable>
-          <Pressable onPress={() => addSetToDatabase(false)}>
+          <Pressable onPress={() => addSetToDatabase(false, numOfSet)}>
             <Text>Finish set</Text>
           </Pressable>
+          <Text>Current set: {numOfSet}</Text>
         </>
       :<></>}
     </View>
