@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 const BilateralSet = (props) => {
     const {weight, setWeight} = props.weight;    
-    const {reps, setReps} = props.reps;    
+    const {rep, setRep} = props.rep;    
     const {time, setTime} = props.time;    
     const {restTime, setRestTime} = props.restTime;    
 
@@ -18,8 +18,8 @@ const BilateralSet = (props) => {
         />
         <TextInput
             keyboardType='numeric'
-            value={reps}
-            onChangeText={(text) => setReps(text)}
+            value={rep}
+            onChangeText={(text) => setRep(text)}
             placeholder='Reps'
             autoCapitalize='none'
         />

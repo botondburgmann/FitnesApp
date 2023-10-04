@@ -8,19 +8,12 @@ const SelectMenu = (props) => {
     const [isFocus, setIsFocus] = useState(false);
 
     const [showSelect, setShowSelect] = useState(false);
-    const [open, setOpen] = useState(false);
 
-    function handleNewExerciseButtonPress(): void {
-        setShowSelect(true)
-    }
   return (
     <View>
-      <Pressable onPress={handleNewExerciseButtonPress}>
-        <Text >Add new exercise</Text>
-      </Pressable>
-      {showSelect && (
         <Dropdown 
             search
+            placeholder={!isFocus ? 'Exercise' : '...'}
           data={props.data}
           labelField="label"
           valueField="value"
@@ -30,7 +23,7 @@ const SelectMenu = (props) => {
             props.changeSelectedExercise(item.value);
           }}
         />
-      )}
+      
     </View>
   )
 }
