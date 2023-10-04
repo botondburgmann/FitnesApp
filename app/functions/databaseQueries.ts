@@ -83,13 +83,14 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
 
 // In works
 export const getExercises =async (userID) => {
+    const data = [];
     const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
-    const q = query(exercisesCollection, where("availableTo", '==', userID), where("avilableTo", '==', 'all'));
+    const q = query(exercisesCollection, where("availableTo", 'array-contains', 'all'));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach(async (docSnapshot) => {
-        console.log(docSnapshot);
-        
+        data.push(docSnapshot.data());   
     })
+    return data;
 }
 
 export const addExercise =async (userID:string, date: Date, exercises:(string | Array<string>), sets: Object) => {

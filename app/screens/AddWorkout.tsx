@@ -1,10 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, {useState } from 'react'
+import React, {useEffect, useState } from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker';
-import DropDownPicker from 'react-native-dropdown-picker';
+import { Dropdown } from 'react-native-element-dropdown';
+
 import BilateralSet from '../components/BilateralSet';
 import UnilateralSet from '../components/UnilateralSet';
-import { addExercise } from '../functions/databaseQueries';
+import { addExercise, getExercises } from '../functions/databaseQueries';
 
 interface RouteParams {
   userID: string;
@@ -12,6 +13,7 @@ interface RouteParams {
 
 
 const AddWorkout = () => {
+  
     const [date, setDate] = useState(new Date());
     const [showDate, setShowDate] = useState(false);
 
@@ -32,15 +34,34 @@ const AddWorkout = () => {
     const [rightRestTime  , setRightRestTime] = useState("");
 
     const [showSelect, setShowSelect] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(null);
+    
+    const [exercises, setExercises] = useState([]);
+    
 
-
-    const [exercises, setExercises] = useState([
-        {label: 'Bench press', value: 'Bench Press'},
-        {label: 'Lunge', value: 'Lunge'},
-      ]);
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const data = await getExercises("id");
   
+          // Map the data to create an array of { label, value } objects
+          const exerciseOptions = data.map((exercise) => ({
+            label: exercise.name,
+            value: exercise.name,
+            unilateral: exercise.unilateral
+          }));
+  
+          // Update the exercises state with the new array
+          setExercises(exerciseOptions);
+        } catch (error) {
+          // Handle errors
+          console.error("Error fetching exercises:", error);
+        }
+      };
+
+      fetchData();
+    }, [])
+    
+
     const onChange = (selectedDate) => {
       const currentDate = selectedDate || date; 
       setDate(currentDate);
@@ -92,7 +113,8 @@ const AddWorkout = () => {
       setTime("");
       setRestTime("");
     }
-
+    const [value, setValue] = useState(null);
+    const [isFocus, setIsFocus] = useState(false);
   return (
     <View style={styles.container}>
       <Text>Select date</Text>
@@ -111,15 +133,18 @@ const AddWorkout = () => {
         <Text style={styles.text}>Add new exercise</Text>
       </Pressable>
       {showSelect && (
-      <DropDownPicker
-        open={open}
-        value={value}
-        items={exercises}
-        setOpen={setOpen}
-        setValue={setValue}
-        setItems={setExercises} />
+        <Dropdown 
+          search
+          data={exercises}
+          labelField="label"
+          valueField="value"
+          onChange={item => {
+            setValue(item.value);
+            setIsFocus(false);
+          }}
+        />
       )}
-      {value === 'Lunge' ? 
+      {exercises.find((exercise) => exercise.value === value).unilateral ? 
         <>
           <UnilateralSet
                         leftWeight={{ leftWeight: leftWeight, setLeftWeight: setLeftWeight }}
@@ -136,7 +161,7 @@ const AddWorkout = () => {
             <Text style={styles.text}>Add</Text>
           </Pressable>
         </>
-      : value === 'Bench Press' ?
+      : !exercises.find((exercise) => exercise.value === value).unilateral ?
         <>
           <BilateralSet 
             weight={{ weight: weight, setWeight: setWeight }}
