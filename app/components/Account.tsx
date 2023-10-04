@@ -4,7 +4,7 @@ import { FIREBASE_AUTH } from '../../FirebaseConfig'
 
 const Account = ({ accountContainerStyle }) => {
   return (
-<       View style={accountContainerStyle ? styles.accountContainerShown : styles.accountContainerHidden}>
+<       View style={ styles.accountContainerShown }>
             <Pressable style={styles.button}>
                 <Text style={styles.text}>Profile Settings</Text>
             </Pressable>

@@ -89,6 +89,7 @@ export const getExercises =async (userID) => {
     querySnapshot.forEach(async (docSnapshot) => {
         data.push(docSnapshot.data());   
     })
+    
     return data;
 }
 

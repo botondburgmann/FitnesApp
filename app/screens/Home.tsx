@@ -25,9 +25,7 @@ const Home = ({navigation}: RouterProps) => {
 
   return (
     <View style={styles.container}>
-        <AddWorkout userID={userID} />
-        <Account accountContainerStyle={accountContainerStyle}/>
-        <Navbar toggleAccountVisibility={toggleAccountVisibility}/>
+      <Text>Home</Text>
     </View>
   )
 }

@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Login from './app/screens/Login';
 import { useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
@@ -12,12 +13,16 @@ import Height from './app/screens/Height';
 import ActivityLevel from './app/screens/ActivityLevel';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import Home from './app/screens/Home';
+import AddWorkout from './app/screens/AddWorkout';
+import Account from './app/components/Account';
 
 const Stack = createNativeStackNavigator();
 
 const SetupStack = createNativeStackNavigator();
 
-function InsideLayout({route}) {
+const Tab = createBottomTabNavigator();
+
+function SetUpLayout({route}) {
   const {userID} = route.params;
   
   return( 
@@ -27,10 +32,23 @@ function InsideLayout({route}) {
       <SetupStack.Screen name="weight" component={Weight} initialParams={{userID: userID} }  options={{ headerShown: false }} />
       <SetupStack.Screen name="height" component={Height} initialParams={{userID: userID} } options={{ headerShown: false }} />
       <SetupStack.Screen name="activityLevel" component={ActivityLevel } initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <SetupStack.Screen name="home" component={ Home } initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <SetupStack.Screen name="Setup" component={ InsideLayout } initialParams={{userID: userID} } options={{ headerShown: false }} />
     </SetupStack.Navigator>
   );
 }
+
+function InsideLayout({route}) {
+  const {userID} = route.params;
+  
+  return( 
+    <Tab.Navigator>
+      <Tab.Screen name='home' component={Home} initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <Tab.Screen name='Add' component={AddWorkout} initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <Tab.Screen name='Account' component={Account} initialParams={{userID: userID} } options={{ headerShown: false }} />
+    </Tab.Navigator>
+  );
+}
+
 
 
 export default function App() {
@@ -65,9 +83,9 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login'>
         {user && alreadySetUp ? 
-          (<Stack.Screen name='Home' component={ Home} initialParams={{userID: user.uid} } options={{ headerShown: false }}/>)
+          (<Stack.Screen name='Inside' component={ InsideLayout} initialParams={{userID: user.uid} } options={{ headerShown: false }}/>)
         : user && !alreadySetUp ?
-          (<Stack.Screen name='Inside' component={ InsideLayout} initialParams={{userID: user.uid} } options={{ headerShown: false } }/>) 
+          (<Stack.Screen name='SetUp' component={ SetUpLayout} initialParams={{userID: user.uid} } options={{ headerShown: false } }/>) 
         : (
           <>
             <Stack.Screen name='Login' component={ Login} options={{ headerShown: false }}/>

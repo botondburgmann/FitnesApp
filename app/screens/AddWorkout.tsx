@@ -5,8 +5,20 @@ import SelectMenu from '../components/SelectMenu'
 import { addExercise, getExercises } from '../functions/databaseQueries'
 import UnilateralSet from '../components/UnilateralSet'
 import BilateralSet from '../components/BilateralSet'
+import { NavigationProp, useRoute } from '@react-navigation/native'
 
-const AddWorkout = (props) => {
+interface RouterProps {
+  navigation: NavigationProp<any, any>;
+}
+
+interface RouteParams {
+  userID: string;
+}
+
+const AddWorkout = ({navigation}: RouterProps) => {
+  const route = useRoute();
+  const {userID} = route.params as RouteParams;
+
   const [date, setDate] = useState(new Date());
 
   const [exercises, setExercises] = useState([]);
@@ -53,19 +65,22 @@ const AddWorkout = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getExercises(props.userID);
-        const exerciseOptions = data.map((exercise) => ({
+        const data = await getExercises(userID);  
+         const exerciseOptions = data.map((exercise) => ({
           label: exercise.name,
           value: exercise.name,
           unilateral: exercise.unilateral
         }));
-        setExercises(exerciseOptions);
+        console.log(exerciseOptions);
+        
+        exerciseOptions && setExercises(exerciseOptions);
+        
       } catch (error) {
         console.error("Error fetching exercises:", error);
       }
     };
 
-    fetchData();
+    fetchData();    
   }, [])
 
   function addUnilateralSet(leftWeight: number, leftRep: number, leftTime: number, leftRestTime: number, 
@@ -126,7 +141,7 @@ const AddWorkout = (props) => {
           "rightTime" : rightTimes,
           "rightRestTime" : rightRestTimes
         }
-        addExercise(props.userID, date, selectedExercise, sets);
+        addExercise(userID, date, selectedExercise, sets);
       }
       else{
         const sets = {
@@ -135,7 +150,7 @@ const AddWorkout = (props) => {
           "time" : times,
           "restTime" : restTimes
         }
-        addExercise(props.userID, date, selectedExercise, sets);
+        addExercise(userID, date, selectedExercise, sets);
       }    
   
       setWeights([]); 
@@ -150,7 +165,7 @@ const AddWorkout = (props) => {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <Datepicker date={date} changeDate={date => setDate(date)} />
       <Text>{date.toDateString()}</Text>
       <SelectMenu data={exercises} changeSelectedExercise={selectedExercise => setSelectedExercise(selectedExercise)}/>
@@ -197,4 +212,23 @@ const AddWorkout = (props) => {
 
 export default AddWorkout
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+      justifyContent: 'center',
+      flex: 1,
+  },
+  button: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'lightblue',
+      padding: 10,
+      width: 100
+    },
+    text: {
+      fontSize: 16,
+      lineHeight: 21,
+      fontWeight: 'bold',
+      letterSpacing: 0.25,
+      color: 'white',
+    },
+});
