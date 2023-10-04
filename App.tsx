@@ -27,7 +27,7 @@ function InsideLayout({route}) {
       <SetupStack.Screen name="weight" component={Weight} initialParams={{userID: userID} }  options={{ headerShown: false }} />
       <SetupStack.Screen name="height" component={Height} initialParams={{userID: userID} } options={{ headerShown: false }} />
       <SetupStack.Screen name="activityLevel" component={ActivityLevel } initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <SetupStack.Screen name="home" component={Home} initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <SetupStack.Screen name="home" component={ Home } initialParams={{userID: userID} } options={{ headerShown: false }} />
     </SetupStack.Navigator>
   );
 }
@@ -65,7 +65,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login'>
         {user && alreadySetUp ? 
-          (<Stack.Screen name='Home' component={ Home} options={{ headerShown: false }}/>)
+          (<Stack.Screen name='Home' component={ Home} initialParams={{userID: user.uid} } options={{ headerShown: false }}/>)
         : user && !alreadySetUp ?
           (<Stack.Screen name='Inside' component={ InsideLayout} initialParams={{userID: user.uid} } options={{ headerShown: false } }/>) 
         : (

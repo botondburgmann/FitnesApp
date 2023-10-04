@@ -1,11 +1,22 @@
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, Text } from 'react-native'
 import React, {useState } from 'react'
 import Navbar from '../components/Navbar';
 import Account from '../components/Account';
 import AddWorkout from './AddWorkout';
+import { NavigationProp, useRoute } from '@react-navigation/native';
+
+interface RouterProps {
+  navigation: NavigationProp<any, any>;
+}
+
+interface RouteParams {
+  userID: string;
+}
 
 
-const Home: React.FC = () => {
+const Home = ({navigation}: RouterProps) => {
+  const route = useRoute();
+  const {userID} = route.params as RouteParams;
     const [accountContainerStyle, setAccountContainerStyle] = useState(false);
 
     const toggleAccountVisibility = () => {
@@ -14,7 +25,7 @@ const Home: React.FC = () => {
 
   return (
     <View style={styles.container}>
-        <AddWorkout />
+        <AddWorkout userID={userID} />
         <Account accountContainerStyle={accountContainerStyle}/>
         <Navbar toggleAccountVisibility={toggleAccountVisibility}/>
     </View>

@@ -6,7 +6,7 @@ import { addExercise, getExercises } from '../functions/databaseQueries'
 import UnilateralSet from '../components/UnilateralSet'
 import BilateralSet from '../components/BilateralSet'
 
-const AddWorkout = () => {
+const AddWorkout = (props) => {
   const [date, setDate] = useState(new Date());
 
   const [exercises, setExercises] = useState([]);
@@ -32,7 +32,7 @@ const AddWorkout = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getExercises("id");
+        const data = await getExercises(props.userID);
         const exerciseOptions = data.map((exercise) => ({
           label: exercise.name,
           value: exercise.name,
@@ -59,7 +59,7 @@ const AddWorkout = () => {
       "rightTime" : [rightTime],
       "rightRestTime" : [rightRestTime]
     }
-    addExercise("sdfdfsf", date, exercises, sets);
+    addExercise(props.userID, date, exercises, sets);
     setLeftWeight("");
     setLeftReps("");
     setLeftTime("");
@@ -77,7 +77,7 @@ const AddWorkout = () => {
     "time" : [time],
     "restTime" : [restTime]
     }
-    addExercise("sdfdfsf", date, exercises, sets);
+    addExercise(props.userID, date, exercises, sets);
     setWeight("");
     setReps("");
     setTime("");
