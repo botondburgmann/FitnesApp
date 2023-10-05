@@ -5,7 +5,7 @@ import SelectMenu from '../components/SelectMenu'
 import { addExercise, getExercises } from '../functions/databaseQueries'
 import UnilateralSet from '../components/UnilateralSet'
 import BilateralSet from '../components/BilateralSet'
-import { NavigationProp, useRoute } from '@react-navigation/native'
+import { useRoute } from '@react-navigation/native'
 
 
 

@@ -24,7 +24,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
 
   return (
     <View style={{flex: 1, justifyContent: 'center' }}>
-      <SelectMenu data={items} selectedValue={{ selectedValue: value, setSelectedValue: setValue }}
+      <SelectMenu data={items} setSelectedValue={setValue}
  />
       
       <Button onPress={() => navigation.navigate('height')} title="Go back"/>

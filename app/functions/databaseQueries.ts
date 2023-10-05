@@ -81,7 +81,7 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
     }
 }
 
-export const getExercises =async (userID) => {    
+export const getExercises =async (userID: string) => {    
     const data = [];
     const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
     const q = query(exercisesCollection, where("availableTo", 'array-contains-any', ['all', userID]));
@@ -131,4 +131,17 @@ export const addExercise =async (userID:string, date: Date, exercises:(string | 
         alert(error)
     }
     
+}
+
+export const getGender =async (userID:string) => {
+    let data = "";
+    const exercisesCollection = collection(FIRESTORE_DB, 'users');
+    const q = query(exercisesCollection, where("userID", '==', userID));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (docSnapshot) => {
+        data = docSnapshot.data().gender;   
+    })
+    console.log(data);
+    
+    return data;
 }
