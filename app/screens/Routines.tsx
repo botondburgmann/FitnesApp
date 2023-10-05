@@ -46,6 +46,8 @@ const Routines = () => {
         'Push' : require('../assets/push-female.png'),
         'Pull' : require('../assets/pull-female.png'),
         'Legs' : require('../assets/legs-female.png'),
+        'Back' : require('../assets/back-female.png'),
+        'Chest' : require('../assets/chest-female.png'),
         'Bicep' : require('../assets/bicep-female.png'),
         'Tricep' : require('../assets/tricep-female.png'),
         // Add more workout types and their corresponding image paths here
