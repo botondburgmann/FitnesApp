@@ -70,9 +70,7 @@ const AddWorkout = ({navigation}: RouterProps) => {
           label: exercise.name,
           value: exercise.name,
           unilateral: exercise.unilateral
-        }));
-        console.log(exerciseOptions);
-        
+        }));        
         exerciseOptions && setExercises(exerciseOptions);
         
       } catch (error) {
@@ -174,7 +172,7 @@ const AddWorkout = ({navigation}: RouterProps) => {
       <Text>{date.toDateString()}</Text>
       <SelectMenu 
         data={exercises} 
-        selectedExercise={{ selectedExercise: selectedExercise, setSelectedExercise: setSelectedExercise }}
+        selectedValue={{ selectedValue: selectedExercise, setSelectedValue: setSelectedExercise }}
         resetArrays={resetArrays}
         />
       {exercises.find((exercise) => exercise.value === selectedExercise)?.unilateral === true

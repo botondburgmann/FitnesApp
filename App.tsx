@@ -14,7 +14,7 @@ import ActivityLevel from './app/screens/ActivityLevel';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import Home from './app/screens/Home';
 import AddWorkout from './app/screens/AddWorkout';
-import Account from './app/components/Account';
+import Account from './app/screens/Account';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,7 +32,7 @@ function SetUpLayout({route}) {
       <SetupStack.Screen name="weight" component={Weight} initialParams={{userID: userID} }  options={{ headerShown: false }} />
       <SetupStack.Screen name="height" component={Height} initialParams={{userID: userID} } options={{ headerShown: false }} />
       <SetupStack.Screen name="activityLevel" component={ActivityLevel } initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <SetupStack.Screen name="Setup" component={ InsideLayout } initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <SetupStack.Screen name="insideLayout" component={ InsideLayout } initialParams={{userID: userID} } options={{ headerShown: false }} />
     </SetupStack.Navigator>
   );
 }

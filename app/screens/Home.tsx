@@ -1,8 +1,5 @@
 import { StyleSheet, View, Text } from 'react-native'
 import React, {useState } from 'react'
-import Navbar from '../components/Navbar';
-import Account from '../components/Account';
-import AddWorkout from './AddWorkout';
 import { NavigationProp, useRoute } from '@react-navigation/native';
 
 interface RouterProps {

@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { NavigationProp, useRoute } from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { setUpProfile } from '../functions/databaseQueries';
+import SelectMenu from '../components/SelectMenu';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -24,18 +25,12 @@ const ActivityLevel = ({navigation}: RouterProps) => {
   const {userID} = route.params as RouteParams;
 
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <DropDownPicker
-        open={open}
-        value={value}
-        items={items}
-        setOpen={setOpen}
-        setValue={setValue}
-        setItems={setItems}
-      />
+    <View style={{flex: 1, justifyContent: 'center' }}>
+      <SelectMenu data={items} selectedValue={{ selectedValue: value, setSelectedValue: setValue }}
+ />
       
       <Button onPress={() => navigation.navigate('height')} title="Go back"/>
-      <Button onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'home')} title="Complete"/>
+      <Button onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'insideLayout')} title="Complete"/>
     </View>
   )
 }

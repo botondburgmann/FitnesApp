@@ -1,12 +1,12 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import React, { useState } from 'react'
 import { Dropdown } from 'react-native-element-dropdown';
 
 const SelectMenu = (props) => {
 
-    const {selectedExercise, setSelectedExercise} = props.selectedExercise;    
+    const {selectedValue, setSelectedValue} = props.selectedValue;    
     const data = props.data
-    const resetArrays = props.resetArrays;
+    const {resetArrays = () => {}} = props;
 
     const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
@@ -24,8 +24,9 @@ const SelectMenu = (props) => {
             onChange={item => {
               setValue(item.value);
               setIsFocus(false);
-              setSelectedExercise(item.value);
-              resetArrays();
+              setSelectedValue(item.value);
+              if (resetArrays)
+                resetArrays();
             }}
         />
       
