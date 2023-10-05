@@ -1,9 +1,7 @@
 import { View, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
 import React, { useState } from 'react'
-import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { NavigationProp } from '@react-navigation/native';
-import { addDoc, collection } from 'firebase/firestore';
 import { signUp } from '../functions/databaseQueries';
 
 

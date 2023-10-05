@@ -4,14 +4,11 @@ import { Dropdown } from 'react-native-element-dropdown';
 
 const SelectMenu = (props) => {
 
-    const {selectedValue, setSelectedValue} = props.selectedValue;    
+    const setSelectedValue = props.setSelectedValue;    
     const data = props.data
     const {resetArrays = () => {}} = props;
 
-    const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
-
-    const [showSelect, setShowSelect] = useState(false);
 
   return (
     <View>
@@ -22,7 +19,6 @@ const SelectMenu = (props) => {
             labelField="label"
             valueField="value"
             onChange={item => {
-              setValue(item.value);
               setIsFocus(false);
               setSelectedValue(item.value);
               if (resetArrays)

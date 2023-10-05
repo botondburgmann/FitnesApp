@@ -1,7 +1,6 @@
 import { View, Button, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 import { NavigationProp, useRoute } from '@react-navigation/native';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { setUpProfile } from '../functions/databaseQueries';
 import SelectMenu from '../components/SelectMenu';
 
@@ -15,7 +14,6 @@ interface RouteParams {
 
 const ActivityLevel = ({navigation}: RouterProps) => {
   const route = useRoute();
-  const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string>(null);
   const [items, setItems] = useState<Array<Object>>([
     {label: 'Beginner', value: 'beginner'},

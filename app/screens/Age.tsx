@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet } from 'react-native'
+import { View, Button, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 import { NavigationProp, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';

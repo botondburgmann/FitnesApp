@@ -7,15 +7,13 @@ import UnilateralSet from '../components/UnilateralSet'
 import BilateralSet from '../components/BilateralSet'
 import { NavigationProp, useRoute } from '@react-navigation/native'
 
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-}
+
 
 interface RouteParams {
   userID: string;
 }
 
-const AddWorkout = ({navigation}: RouterProps) => {
+const AddWorkout = () => {
   const route = useRoute();
   const {userID} = route.params as RouteParams;
 
@@ -172,7 +170,7 @@ const AddWorkout = ({navigation}: RouterProps) => {
       <Text>{date.toDateString()}</Text>
       <SelectMenu 
         data={exercises} 
-        selectedValue={{ selectedValue: selectedExercise, setSelectedValue: setSelectedExercise }}
+        setSelectedValue={ setSelectedExercise }
         resetArrays={resetArrays}
         />
       {exercises.find((exercise) => exercise.value === selectedExercise)?.unilateral === true

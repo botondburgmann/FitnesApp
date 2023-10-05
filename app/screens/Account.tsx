@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig'
 
-const Account = ({ accountContainerStyle }) => {
+const Account = () => {
   return (
 <       View >
             <Pressable>

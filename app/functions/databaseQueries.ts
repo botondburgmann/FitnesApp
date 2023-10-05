@@ -93,6 +93,7 @@ export const getExercises =async (userID) => {
     return data;
 }
 
+// Work on different types of sets
 export const addExercise =async (userID:string, date: Date, exercises:(string | Array<string>), sets: Object) => {
     const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
     const q = query(workoutsCollection, where("date", '==', date.toDateString()), where("userID", '==', userID) );

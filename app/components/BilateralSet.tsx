@@ -1,5 +1,5 @@
-import { View, Text, TextInput } from 'react-native'
-import React, { useState } from 'react'
+import { View, TextInput } from 'react-native'
+import React from 'react'
 
 const BilateralSet = (props) => {
     const {weight, setWeight} = props.weight;    
