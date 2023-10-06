@@ -11,7 +11,7 @@ export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStat
         if (name === '')
             throw new Error('Name must be set'); 
         const response = await createUserWithEmailAndPassword(auth, email,password);
-        await addDoc(collection(FIRESTORE_DB, 'users'), {userID: response.user.uid, name: name, gender: "", age: 0, weight: 0, height: 0, activityLevel: "", set: false});
+        await addDoc(collection(FIRESTORE_DB, 'users'), {userID: response.user.uid, name: name, gender: "", age: 0, weight: 0, height: 0, activityLevel: "", set: false, level: 1, experience: 0});
         
         alert('Registered successfully!');
     }   catch (error:any) {

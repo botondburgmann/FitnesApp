@@ -54,7 +54,7 @@ const AddWorkout = () => {
   })
 
   
-  // New
+  // For unilateral set
   const [uniSet, setUniSet] = useState({
     // id: 0,
     weightLeft: "",
