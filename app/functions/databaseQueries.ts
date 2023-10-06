@@ -145,3 +145,16 @@ export const getGender =async (userID:string) => {
     
     return data;
 }
+
+export const getSetUpValue = async (userID: string) => {
+    try {
+      const usersCollectionRef = collection(FIRESTORE_DB, 'users');
+      const q = query(usersCollectionRef, where('userID', '==', userID));
+      const querySnapshot = await getDocs(q);
+      const userDocSnapshot = querySnapshot.docs[0];
+      const setUpValue = userDocSnapshot.data().set;
+      return setUpValue;
+    } catch (error) {
+      alert("Couldn't find set field : " + error.message);
+    }
+  };

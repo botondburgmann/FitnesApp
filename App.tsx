@@ -16,6 +16,7 @@ import Home from './app/screens/Home';
 import AddWorkout from './app/screens/AddWorkout';
 import Account from './app/screens/Account';
 import Routines from './app/screens/Routines';
+import { getSetUpValue } from './app/functions/databaseQueries';
 
 const Stack = createNativeStackNavigator();
 
@@ -59,34 +60,23 @@ export default function App() {
 
   
   useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, (user)=>{
+    onAuthStateChanged(FIREBASE_AUTH, async (user)=>{
       setUser(user);
-      if(user)
-        setAlreadySetUpValue(user.uid); 
-      else
-        setAlreadySetUp(true);
+      if(user){
+        const setUpValue = getSetUpValue(user.uid);
+        setAlreadySetUp(await setUpValue)
+      }
     });
   }, [])
 
-  const setAlreadySetUpValue = async (uid: string) => {
-    try {
-      const usersCollectionRef = collection(FIRESTORE_DB, 'users');
-      const q = query(usersCollectionRef, where('userID', '==', uid));
-      const querySnapshot = await getDocs(q);
-      const userDocSnapshot = querySnapshot.docs[0];
-      const alreadySetUpValue = userDocSnapshot.data().set;
-      setAlreadySetUp(alreadySetUpValue);
-    } catch (error) {
-      alert("Couldn't find set field : " + error.message);
-    }
-  };
+
 
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login'>
-        {user && alreadySetUp ? 
+        {user && alreadySetUp === true ? 
           (<Stack.Screen name='Inside' component={ InsideLayout} initialParams={{userID: user.uid} } options={{ headerShown: false }}/>)
-        : user && !alreadySetUp ?
+        : user && alreadySetUp === false ?
           (<Stack.Screen name='SetUp' component={ SetUpLayout} initialParams={{userID: user.uid} } options={{ headerShown: false } }/>) 
         : (
           <>
