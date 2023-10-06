@@ -21,6 +21,17 @@ interface BilateralSet {
   restTime: string;
 }
 
+interface UnilateralSet {
+  // id: number;
+   weightLeft: string;
+   repsLeft: string;
+   timeLeft: string;
+   restTimeLeft: string;
+   weightRight: string;
+   repsRight: string;
+   timeRight: string;
+   restTimeRight: string;
+ }
 
 const AddWorkout = () => {
   const route = useRoute();
@@ -34,8 +45,7 @@ const AddWorkout = () => {
   const [numOfSet, setNumOfSet] = useState(0);
 
   // For bilateral sets
-  // New
-  const [set, setSet] = useState({
+  const [biSet, setBiSet] = useState({
    // id: 0,
     weight: "",
     reps: "",
@@ -43,28 +53,21 @@ const AddWorkout = () => {
     restTime: ""
   })
 
+  
+  // New
+  const [uniSet, setUniSet] = useState({
+    // id: 0,
+    weightLeft: "",
+    repsLeft: "",
+    timeLeft: "",
+    restTimeLeft: "",
+    weightRight: "",
+    repsRight: "",
+    timeRight: "",
+    restTimeRight: ""
+  })
+  
   const [sets, setSets] = useState([])
-
-  // For unilateral sets
-  // Arrays of the whole set
-  const [leftWeights, setLeftWeights] = useState([]);
-  const [leftReps, setLeftReps] = useState([]);
-  const [leftTimes, setLeftTimes] = useState([]);
-  const [leftRestTimes, setLeftRestTimes] = useState([]);
-  const [rightWeights, setRightWeights] = useState([]);
-  const [rightReps, setRightReps] = useState([]);
-  const [rightTimes, setRightTimes] = useState([]);
-  const [rightRestTimes  , setRightRestTimes] = useState([]);
-
-  // Variables for the current set
-  const [leftWeight, setLeftWeight] = useState("");
-  const [leftRep, setLeftRep] = useState("");
-  const [leftTime, setLeftTime] = useState("");
-  const [leftRestTime, setLeftRestTime] = useState("");
-  const [rightWeight, setRightWeight] = useState("");
-  const [rightRep, setRightRep] = useState("");
-  const [rightTime, setRightTime] = useState("");
-  const [rightRestTime  , setRightRestTime] = useState("");
 
 
   useEffect(() => {
@@ -87,30 +90,19 @@ const AddWorkout = () => {
   }, [])
 
 
-  function addUnilateralSet(leftWeight: number, leftRep: number, leftTime: number, leftRestTime: number, 
-                            rightWeight: number, rightRep: number, rightTime: number, rightRestTime: number) {
+  function addUnilateralSet(set: UnilateralSet) {
 
-    if (leftRep === 0 && rightRep === 0)
+    if (set.repsLeft === "" && set.repsRight === "")
       alert("Error: Reps fields cannot be empty. Please fill at least one of them");
     else {
-      setLeftWeights([...leftWeights, leftWeight]);
-      setLeftReps([...leftReps, leftRep]);
-      setLeftTimes([...leftTimes, leftTime]);
-      setLeftRestTimes([...leftRestTimes, leftRestTime]);
-      setRightWeights([...rightWeights, rightWeight]);
-      setRightReps([...rightReps, rightRep]);
-      setRightTimes([...rightTimes, rightTime]);
-      setRightRestTimes([...rightRestTimes, rightRestTime]);
-
-      setLeftWeight("");
-      setLeftRep("");
-      setLeftTime("");
-      setLeftRestTime("");
-      setRightWeight("");
-      setRightRep("");
-      setRightTime("");
-      setRightRestTime("");
-      setNumOfSet((numOfSet) => {return numOfSet + 1});
+      for (const key in set) {
+        if (set.hasOwnProperty(key))
+          set[key] === "" ? set[key] = 0 : set[key] = parseInt(set[key]);
+      }
+      setSets((prevSets) => [...prevSets, set]);
+      console.log(sets);
+      setUniSet({...set, weightLeft: "", repsLeft: "", timeLeft: "", restTimeLeft: "",weightRight: "", repsRight: "", timeRight: "", restTimeRight: ""})
+      setNumOfSet((numOfSet) => {return numOfSet + 1})
     }
   }
 
@@ -125,22 +117,18 @@ const AddWorkout = () => {
       }
       setSets((prevSets) => [...prevSets, set]);
       console.log(sets);
-      setSet({...set, weight: "", reps: "", time: "", restTime: ""})
+      setBiSet({...set, weight: "", reps: "", time: "", restTime: ""})
       setNumOfSet((numOfSet) => {return numOfSet + 1})
     }
   }
 
-  function addSetToDatabase(unilateral:boolean, numOfSet:number) {
+  function addSetToDatabase(numOfSet:number) {
     if (numOfSet > 0) {
-      if (unilateral) {
-        return
-
-      }
-      else
         addExercise(userID, date, selectedExercise, sets);
 
       setSets([]);
       setSelectedExercise("");
+      setNumOfSet(0);
     } 
     else 
       alert("Not enough data");
@@ -156,36 +144,26 @@ const AddWorkout = () => {
         />
       {exercises.find((exercise) => exercise.value === selectedExercise)?.unilateral === true
       ?  <>
-          <UnilateralSet
-            leftWeight={{ leftWeight: leftWeight, setLeftWeight: setLeftWeight }}
-            leftRep={{ leftRep: leftRep, setLeftRep: setLeftRep }}
-            leftTime={{ leftTime: leftTime, setLeftTime: setLeftTime }}
-            leftRestTime={{ leftRestTime: leftRestTime, setLeftRestTime: setLeftRestTime }} 
-            rightWeight={{ rightWeight: rightWeight, setRightWeight: setRightWeight }}
-            rightRep={{ rightRep: rightRep, setRightRep: setRightRep }}
-            rightTime={{ rightTime: rightTime, setRightTime: setRightTime }}
-            rightRestTime={{ rightRestTime: rightRestTime, setRightRestTime: setRightRestTime }} 
-          />
-          <Pressable onPress={() => addUnilateralSet(Number(leftWeight), Number(leftRep), Number(leftTime), Number(leftRestTime),
-                                                    Number(rightWeight), Number(rightRep), Number(rightTime), Number(rightRestTime))}>
+          <UnilateralSet set={uniSet} setSet={setUniSet}/>
+          <Pressable onPress={() => addUnilateralSet(uniSet)}>
             <Text>Add another</Text>
           </Pressable>
-          <Pressable onPress={() => addSetToDatabase(true, numOfSet)}>
+          <Pressable onPress={() => addSetToDatabase(numOfSet)}>
             <Text>Finish set</Text>
           </Pressable>
         </>
       : exercises.find((exercise) => exercise.value === selectedExercise)?.unilateral === false
       ? <>
-          <BilateralSet set={set} setSet={setSet}/>
-          <Pressable onPress={() => addBilateralSet(set)}>
+          <BilateralSet set={biSet} setSet={setBiSet}/>
+          <Pressable onPress={() => addBilateralSet(biSet)}>
             <Text>Add new set</Text>
           </Pressable>
-          <Pressable onPress={() => addSetToDatabase(false, numOfSet)}>
+          <Pressable onPress={() => addSetToDatabase(numOfSet)}>
             <Text>Finish set</Text>
           </Pressable>
-          <Text>Current set: {numOfSet}</Text>
         </>
       :<></>}
+      <Text>Current set: {numOfSet}</Text>
     </View>
   )
 }

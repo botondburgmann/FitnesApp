@@ -1,71 +1,63 @@
 import { View, TextInput } from 'react-native'
 import React from 'react'
 
-const UnilateralSet = (props) => {
-    const {leftWeight, setLeftWeight} = props.leftWeight;    
-    const {leftRep, setLeftRep} = props.leftRep;    
-    const {leftTime, setLeftTime} = props.leftTime;    
-    const {leftRestTime, setLeftRestTime} = props.leftRestTime;    
-    const {rightWeight, setRightWeight} = props.rightWeight;    
-    const {rightRep, setRightRep} = props.rightRep;    
-    const {rightTime, setRightTime} = props.rightTime;    
-    const {rightRestTime, setRightRestTime} = props.rightRestTime;    
+const UnilateralSet = ({set, setSet}) => {
 
     return (
         <View>
             <TextInput
                 keyboardType='numeric'
-                value={leftWeight}
-                onChangeText={(text) => setLeftWeight(text)}
+                value={set.weightLeft}
+                onChangeText={(text) => setSet({...set, weightLeft: text})}
                 placeholder='Weight (kg) left'
                 autoCapitalize='none'
             />
             <TextInput
                 keyboardType='numeric'
-                value={leftRep}
-                onChangeText={(text) => setLeftRep(text)}
+                value={set.repsLeft}
+                onChangeText={(text) => setSet({...set, repsLeft: text})}
                 placeholder='Reps left'
                 autoCapitalize='none'
             />
             <TextInput
                 keyboardType='numeric'
-                value={leftTime}
-                onChangeText={(text) => setLeftTime(text)}
+                value={set.timeLeft}
+                onChangeText={(text) => setSet({...set, timeLeft: text})}
                 placeholder='Time (seconds) left'
                 autoCapitalize='none'
             />
             <TextInput
                 keyboardType='numeric'
-                value={leftRestTime}
-                onChangeText={(text) => setLeftRestTime(text)}
+                value={set.restTimeLeft}
+                onChangeText={(text) => setSet({...set, restTimeLeft: text})}
                 placeholder='Rest time (seconds) left'
                 autoCapitalize='none'
             />       
             <TextInput
                 keyboardType='numeric'
-                value={rightWeight}
-                onChangeText={(text) => setRightWeight(text)}
+                value={set.weightRight}
+                onChangeText={(text) => setSet({...set, weightRight: text})}
                 placeholder='Weight (kg) right'
                 autoCapitalize='none'
             />
             <TextInput
                 keyboardType='numeric'
-                value={rightRep}
-                onChangeText={(text) => setRightRep(text)}
+                value={set.repsRight}
+                onChangeText={(text) => setSet({...set, repsRight: text})}
                 placeholder='Reps right'
                 autoCapitalize='none'
             />
             <TextInput
                 keyboardType='numeric'
-                value={rightTime}
-                onChangeText={(text) => setRightTime(text)}
+                value={set.timeRight}
+                onChangeText={(text) => setSet({...set, timeRight: text})}
                 placeholder='Time (seconds) right'
                 autoCapitalize='none'
             />
             <TextInput
                 keyboardType='numeric'
-                value={rightRestTime}
-                onChangeText={(text) => setRightRestTime(text)}
+                value={set.restTimeRight}
+                onChangeText={(text) => setSet({...set, restTimeRight: text})}
                 placeholder='Rest time (seconds) right'
                 autoCapitalize='none'
             />       
