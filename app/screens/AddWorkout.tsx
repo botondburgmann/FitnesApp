@@ -124,7 +124,19 @@ const AddWorkout = () => {
 
   function addSetToDatabase(numOfSet:number) {
     if (numOfSet > 0) {
-        addExercise(userID, date, selectedExercise, sets);
+      const weights = [];
+      let typeOfSet: string;
+      for (const set of sets)
+        weights.push(set.weight);
+
+      let sorted = true;
+      for (let i = 0; i < weights.length-1; i++)
+        if (weights[i] < weights[i+1]) {
+          sorted = false;
+          break;
+        }
+      sorted ? typeOfSet = "drop" : typeOfSet = "straight"
+        addExercise(userID, date, selectedExercise, sets, typeOfSet);
 
       setSets([]);
       setSelectedExercise("");
