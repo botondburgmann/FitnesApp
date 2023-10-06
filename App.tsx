@@ -11,7 +11,6 @@ import Weight from './app/screens/Weight';
 import Gender from './app/screens/Gender';
 import Height from './app/screens/Height';
 import ActivityLevel from './app/screens/ActivityLevel';
-import { collection, getDocs, query, where } from 'firebase/firestore';
 import Home from './app/screens/Home';
 import AddWorkout from './app/screens/AddWorkout';
 import Account from './app/screens/Account';
@@ -26,7 +25,6 @@ const Tab = createBottomTabNavigator();
 
 function SetUpLayout({route}) {
   const {userID} = route.params;
-  
   return( 
     <SetupStack.Navigator>
       <SetupStack.Screen name="gender" component={Gender} initialParams={{userID: userID} }  options={{ headerShown: false }}/>
@@ -51,7 +49,6 @@ function InsideLayout({route}) {
     </Tab.Navigator>
   );
 }
-
 
 
 export default function App() {

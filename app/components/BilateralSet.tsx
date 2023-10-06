@@ -1,39 +1,36 @@
 import { View, TextInput } from 'react-native'
 import React from 'react'
 
-const BilateralSet = (props) => {
-    const {weight, setWeight} = props.weight;    
-    const {rep, setRep} = props.rep;    
-    const {time, setTime} = props.time;    
-    const {restTime, setRestTime} = props.restTime;    
+const BilateralSet = ({set, setSet}) => {
+   
 
   return (
     <View>
         <TextInput
             keyboardType='numeric'
-            value={weight}
-            onChangeText={(text) => setWeight(text)}
+            value={set.weight  }
+            onChangeText={(text) => setSet({...set, weight: text})}
             placeholder='Weight (kg)'
             autoCapitalize='none'
         />
         <TextInput
             keyboardType='numeric'
-            value={rep}
-            onChangeText={(text) => setRep(text)}
+            value={set.reps}
+            onChangeText={(text) => setSet({...set, reps: text})}
             placeholder='Reps'
             autoCapitalize='none'
         />
         <TextInput
             keyboardType='numeric'
-            value={time}
-            onChangeText={(text) => setTime(text)}
+            value={set.time}
+            onChangeText={(text) => setSet({...set, time: text})}
             placeholder='Time (seconds)'
             autoCapitalize='none'
         />
         <TextInput
             keyboardType='numeric'
-            value={restTime}
-            onChangeText={(text) => setRestTime(text)}
+            value={set.restTime}
+            onChangeText={(text) => setSet({...set, restTime: text})}
             placeholder='Rest time (seconds)'
             autoCapitalize='none'
         />       

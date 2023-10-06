@@ -13,6 +13,15 @@ interface RouteParams {
   userID: string;
 }
 
+interface BilateralSet {
+ // id: number;
+  weight: string;
+  reps: string;
+  time: string;
+  restTime: string;
+}
+
+
 const AddWorkout = () => {
   const route = useRoute();
   const {userID} = route.params as RouteParams;
@@ -25,18 +34,16 @@ const AddWorkout = () => {
   const [numOfSet, setNumOfSet] = useState(0);
 
   // For bilateral sets
-  // Arrays of the whole set
-  const [weights, setWeights] = useState([])
-  const [reps, setReps] = useState([])
-  const [times, setTimes] = useState([])
-  const [restTimes, setRestTimes] = useState([])
+  // New
+  const [set, setSet] = useState({
+   // id: 0,
+    weight: "",
+    reps: "",
+    time: "",
+    restTime: ""
+  })
 
-  // Variables for the current set
-  const [weight, setWeight] = useState("");
-  const [rep, setRep] = useState("");
-  const [time, setTime] = useState("");
-  const [restTime, setRestTime] = useState(""); 
-
+  const [sets, setSets] = useState([])
 
   // For unilateral sets
   // Arrays of the whole set
@@ -79,13 +86,6 @@ const AddWorkout = () => {
     fetchData();    
   }, [])
 
-  function resetArrays() {
-    setWeights([]); 
-    setReps([]); 
-    setTimes([]); 
-    setRestTimes([]); 
-    setNumOfSet(0);
-  }
 
   function addUnilateralSet(leftWeight: number, leftRep: number, leftTime: number, leftRestTime: number, 
                             rightWeight: number, rightRep: number, rightTime: number, rightRestTime: number) {
@@ -114,50 +114,32 @@ const AddWorkout = () => {
     }
   }
 
-  function addBilateralSet(weight: number, rep: number, time: number, restTime: number) {
-
-    if (rep === 0)
+  function addBilateralSet(set: BilateralSet) {    
+    if (set.reps === "")
       alert("Error: reps field cannot be empty");
-    else{
-      setWeights([...weights,weight]); 
-      setReps([...reps,rep]); 
-      setTimes([...times,time]); 
-      setRestTimes([...restTimes,restTime]); 
-      
-      setWeight("");
-      setRep("");
-      setTime("");
-      setRestTime("");
-      setNumOfSet((numOfSet) => {return numOfSet + 1});
+    else {
+      //set.id += 1;
+      for (const key in set) {
+        if (set.hasOwnProperty(key))
+          set[key] === "" ? set[key] = 0 : set[key] = parseInt(set[key]);
+      }
+      setSets((prevSets) => [...prevSets, set]);
+      console.log(sets);
+      setSet({...set, weight: "", reps: "", time: "", restTime: ""})
+      setNumOfSet((numOfSet) => {return numOfSet + 1})
     }
   }
 
   function addSetToDatabase(unilateral:boolean, numOfSet:number) {
     if (numOfSet > 0) {
       if (unilateral) {
-        const sets = {
-          "leftWeights" : leftWeights,
-          "leftReps" : leftReps,
-          "leftTime" : leftTimes,
-          "leftRestTime" : leftRestTimes,
-          "rightWeights" : rightWeights,
-          "rightReps" : rightReps,
-          "rightTime" : rightTimes,
-          "rightRestTime" : rightRestTimes
-        }
-        addExercise(userID, date, selectedExercise, sets);
+        return
+
       }
-      else{
-        const sets = {
-          "weights" : weights,
-          "reps" : reps,
-          "time" : times,
-          "restTime" : restTimes
-        }
+      else
         addExercise(userID, date, selectedExercise, sets);
-      }    
-  
-      resetArrays()
+
+      setSets([]);
       setSelectedExercise("");
     } 
     else 
@@ -171,7 +153,6 @@ const AddWorkout = () => {
       <SelectMenu 
         data={exercises} 
         setSelectedValue={ setSelectedExercise }
-        resetArrays={resetArrays}
         />
       {exercises.find((exercise) => exercise.value === selectedExercise)?.unilateral === true
       ?  <>
@@ -195,13 +176,8 @@ const AddWorkout = () => {
         </>
       : exercises.find((exercise) => exercise.value === selectedExercise)?.unilateral === false
       ? <>
-          <BilateralSet 
-            weight={{ weight: weight, setWeight: setWeight }}
-            rep={{ rep: rep, setRep: setRep }}
-            time={{ time: time, setTime: setTime }}
-            restTime={{ restTime: restTime, setRestTime: setRestTime }} 
-          />
-          <Pressable onPress={() => addBilateralSet(Number(weight), Number(rep), Number(time), Number(restTime))}>
+          <BilateralSet set={set} setSet={setSet}/>
+          <Pressable onPress={() => addBilateralSet(set)}>
             <Text>Add new set</Text>
           </Pressable>
           <Pressable onPress={() => addSetToDatabase(false, numOfSet)}>

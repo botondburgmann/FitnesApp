@@ -6,7 +6,6 @@ const SelectMenu = (props) => {
 
     const setSelectedValue = props.setSelectedValue;    
     const data = props.data
-    const {resetArrays = () => {}} = props;
 
     const [isFocus, setIsFocus] = useState(false);
 
@@ -21,8 +20,7 @@ const SelectMenu = (props) => {
             onChange={item => {
               setIsFocus(false);
               setSelectedValue(item.value);
-              if (resetArrays)
-                resetArrays();
+
             }}
         />
       
