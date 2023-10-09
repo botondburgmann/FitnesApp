@@ -1,9 +1,6 @@
-import React, { useState } from "react";
-import {  View, Button, Pressable, Text, StyleSheet } from "react-native";
+import React from "react";
+import {  View, StyleSheet } from "react-native";
 import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
-import { NavigationProp } from '@react-navigation/native';
-import { useRoute } from '@react-navigation/native';
-import { setUpProfile } from "../functions/databaseQueries";
 
 const Radiobutton = (props) => {
     const selectedValue = props.selectedValue;
@@ -13,7 +10,7 @@ const Radiobutton = (props) => {
     const radioButtonItems = [];
     for (let i = 0; i < options.length; i++) {
         radioButtonItems.push(
-          <RadioButtonItem value={options[i]} label={options[i]} />
+          <RadioButtonItem  key={i} value={options[i]} label={options[i]} />
         );
       }
   return (

@@ -1,4 +1,4 @@
-import { View, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, Pressable, Text } from 'react-native'
+import { View, StyleSheet, TextInput, ActivityIndicator, Pressable, Text } from 'react-native'
 import React, { useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';

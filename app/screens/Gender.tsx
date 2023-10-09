@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import {  View, Button, Pressable, Text, StyleSheet } from "react-native";
-import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
+import {  View, Pressable, Text, StyleSheet } from "react-native";
 import { NavigationProp } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
 import { setUpProfile } from "../functions/databaseQueries";

@@ -1,8 +1,9 @@
-import { View, Button, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import { NavigationProp, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { setUpProfile } from '../functions/databaseQueries';
+import Datepicker from '../components/Datepicker';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -27,18 +28,17 @@ const Age = ({navigation}: RouterProps) => {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Button onPress={() => setShow(true)} title="Show date picker!" />
-      {show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={birthDate}
-          mode='date'
-          onChange={(event, selectedDate) => onChange(selectedDate)}
-        />
-      )}
-      <Button onPress={() => navigation.navigate('gender')} title="Go back" />
-      <Button onPress={() => setUpProfile('age', birthDate, userID, navigation, 'weight')} title="Next" />
+    <View style={styles.container}>
+      <Text style={styles.label}>Please, select your date of birth</Text>
+      <Datepicker date={birthDate} changeDate={date => setBirthDate(date)} />
+      <View style={styles.buttonGroup}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('gender')}>
+          <Text style={styles.text}>Go back</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={() => setUpProfile('age', birthDate, userID, navigation, 'weight')}>
+          <Text style={styles.text}>Next</Text>
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -47,17 +47,42 @@ const Age = ({navigation}: RouterProps) => {
 export default Age
 
 const styles = StyleSheet.create({
-    container: {
-      marginHorizontal: 20,
-      flex: 1,
-      justifyContent: 'center'
-    },
-    input: {
-      marginVertical: 4,
-      height: 50,
-      borderWidth: 1,
-      borderRadius: 4,
-      padding: 10,
-      backgroundColor: '#fff'
-    }
-  });
+  container: {
+   flex: 1,
+   justifyContent: 'center',
+   alignItems: 'center',
+   backgroundColor: '#ff0000'
+ },
+
+ text:{
+   alignSelf: 'center',
+   fontSize: 18,
+   color: "#fff",
+   textTransform: 'uppercase',
+   fontWeight: "600",
+   paddingVertical: 10,
+ },
+ button:{
+     width: 100,
+     paddingHorizontal: 5,
+     marginHorizontal: 20,
+     alignSelf: "center",
+     backgroundColor: "#000",
+ },
+
+ label: {
+     alignSelf: 'center',
+     fontSize: 20,
+     fontWeight: "800",
+     color: "#fff",
+     textTransform: 'uppercase',
+     marginBottom: 50,
+     marginHorizontal: 50,
+     textAlign: 'center',
+     lineHeight: 40
+   },
+   buttonGroup: {
+    marginTop: 100,
+    flexDirection: 'row'
+   }
+});

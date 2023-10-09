@@ -24,7 +24,7 @@ export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStat
 export const setUpProfile =async (field:string, value:any, userID:string, navigation:NavigationProp<any, any>, nextPage:string) => {
     try {
         if(field === 'gender')
-            if(!(value === 'male' || value === 'female'))
+            if(!(value.toLowerCase() === 'male' || value.toLowerCase() === 'female'))
                 throw new Error(`Gender must be set to either male or female`);
             
             // If the field is age then calculate it from date of birth
@@ -36,10 +36,13 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
                 throw new Error("Age must be a number");
 
             if (age < 0)
-                throw new Error("Dude, how  the fuck are you negative years old");
+                throw new Error("Error: Unfortunately this time we cannot sign up time travellers. Sorry for the inconvenience");
 
-            if (age === 0)
-                throw new Error("Damn bro, you just got born and you wanna train?");
+            else if (age >= 0 && age < 12)
+                throw new Error("Error: You need to be at least 12 years old to sign up");
+            else if (age > 120 )
+                throw new Error("Error: Aren't you a bit too old (or dead) to work out?");
+
         }
 
         if (field === 'weight' || field === 'height') {

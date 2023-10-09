@@ -17,7 +17,7 @@ const Datepicker = (props) => {
   return (
     <View>
       <Pressable onPress={() => setShowDate(true)}>
-        <Text>Date</Text>
+        <Text>Calendar icon here</Text>
       </Pressable>
       {showDate && (
       <DateTimePicker
