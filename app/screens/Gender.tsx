@@ -24,7 +24,7 @@ const Gender = ( {navigation}: RouterProps) => {
             <Text style={styles.label}>Please, select your gender</Text>
             <Radiobutton selectedValue={gender} setselectedValue={setGender} options={options} />
 
-            <Pressable style={styles.button} onPress={() => setUpProfile('gender', gender, userID, navigation, 'age')}>
+            <Pressable style={styles.button} onPress={() => setUpProfile('gender', gender, userID, navigation, 'Age')}>
                 <Text style={styles.text}>Next</Text>
             </Pressable>
     </View>

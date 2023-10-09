@@ -31,10 +31,10 @@ const ActivityLevel = ({navigation}: RouterProps) => {
         <SelectMenu data={items} setSelectedValue={setValue} title={"Activity level"} />
       </View>      
       <View style={styles.buttonGroup}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('height')}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('Height')}>
           <Text style={styles.text}>Go back</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'insideLayout')}>
+        <Pressable style={styles.button} onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'InsideLayout')}>
           <Text style={styles.text}>Finish</Text>
         </Pressable>
       </View>  

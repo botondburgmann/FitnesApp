@@ -40,10 +40,10 @@ const Height = ({navigation}: RouterProps) => {
             </View>
         </View>  
         <View style={styles.buttonGroup}>
-          <Pressable style={styles.button} onPress={() => navigation.navigate('weight')}>
+          <Pressable style={styles.button} onPress={() => navigation.navigate('Weight')}>
             <Text style={styles.text}>Go back</Text>
           </Pressable>
-          <Pressable style={styles.button} onPress={() => setUpProfile('height', parseFloat(height), userID, navigation, 'activityLevel', value)}>
+          <Pressable style={styles.button} onPress={() => setUpProfile('height', parseFloat(height), userID, navigation, 'ActivityLevel', value)}>
             <Text style={styles.text}>Next</Text>
           </Pressable>
         </View>            

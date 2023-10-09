@@ -32,10 +32,10 @@ const Age = ({navigation}: RouterProps) => {
       <Text style={styles.label}>Please, select your date of birth</Text>
       <Datepicker date={birthDate} changeDate={date => setBirthDate(date)} />
       <View style={styles.buttonGroup}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('gender')}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('Gender')}>
           <Text style={styles.text}>Go back</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => setUpProfile('age', birthDate, userID, navigation, 'weight')}>
+        <Pressable style={styles.button} onPress={() => setUpProfile('age', birthDate, userID, navigation, 'Weight')}>
           <Text style={styles.text}>Next</Text>
         </Pressable>
       </View>

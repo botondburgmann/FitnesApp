@@ -41,10 +41,10 @@ const Weight = ({navigation}: RouterProps) => {
             </View>
         </View>        
       <View style={styles.buttonGroup}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('age')}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('Age')}>
           <Text style={styles.text}>Go back</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => setUpProfile('weight', parseFloat(weight),  userID, navigation, 'height', value)}>
+        <Pressable style={styles.button} onPress={() => setUpProfile('weight', parseFloat(weight),  userID, navigation, 'Height', value)}>
           <Text style={styles.text}>Next</Text>
         </Pressable>
       </View>        

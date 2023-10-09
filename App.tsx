@@ -29,12 +29,12 @@ function SetUpLayout({route}) {
   const {userID} = route.params;
   return( 
     <SetupStack.Navigator>
-      <SetupStack.Screen name="gender" component={Gender} initialParams={{userID: userID} }  options={{ headerShown: false }}/>
-      <SetupStack.Screen name="age" component={Age} initialParams={{userID: userID} } options={{ headerShown: false }}/>
-      <SetupStack.Screen name="weight" component={Weight} initialParams={{userID: userID} }  options={{ headerShown: false }} />
-      <SetupStack.Screen name="height" component={Height} initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <SetupStack.Screen name="activityLevel" component={ActivityLevel } initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <SetupStack.Screen name="insideLayout" component={ InsideLayout } initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <SetupStack.Screen name="Gender" component={Gender} initialParams={{userID: userID} }  options={{ headerShown: false }}/>
+      <SetupStack.Screen name="Age" component={Age} initialParams={{userID: userID} } options={{ headerShown: false }}/>
+      <SetupStack.Screen name="Weight" component={Weight} initialParams={{userID: userID} }  options={{ headerShown: false }} />
+      <SetupStack.Screen name="Height" component={Height} initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <SetupStack.Screen name="ActivityLevel" component={ActivityLevel } initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <SetupStack.Screen name="InsideLayout" component={ InsideLayout } initialParams={{userID: userID} } options={{ headerShown: false }} />
     </SetupStack.Navigator>
   );
 }
