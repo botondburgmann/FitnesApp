@@ -39,14 +39,14 @@ const Height = ({navigation}: RouterProps) => {
               <SelectMenu data={items} setSelectedValue={setValue} title={"System"} />
             </View>
         </View>  
-      <View style={styles.buttonGroup}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('weight')}>
-          <Text style={styles.text}>Go back</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={() => setUpProfile('height', Number(height), userID, navigation, 'activityLevel', value)}>
-          <Text style={styles.text}>Next</Text>
-        </Pressable>
-      </View>            
+        <View style={styles.buttonGroup}>
+          <Pressable style={styles.button} onPress={() => navigation.navigate('weight')}>
+            <Text style={styles.text}>Go back</Text>
+          </Pressable>
+          <Pressable style={styles.button} onPress={() => setUpProfile('height', parseFloat(height), userID, navigation, 'activityLevel', value)}>
+            <Text style={styles.text}>Next</Text>
+          </Pressable>
+        </View>            
       </View>
   )
 }

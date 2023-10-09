@@ -1,4 +1,4 @@
-import { View, Button, StyleSheet } from 'react-native'
+import { View, Button, StyleSheet, Pressable, Text } from 'react-native'
 import React, { useState } from 'react'
 import { NavigationProp, useRoute } from '@react-navigation/native';
 import { setUpProfile } from '../functions/databaseQueries';
@@ -23,11 +23,21 @@ const ActivityLevel = ({navigation}: RouterProps) => {
   const {userID} = route.params as RouteParams;
 
   return (
-    <View style={{flex: 1, justifyContent: 'center' }}>
-      <SelectMenu data={items} setSelectedValue={setValue} />
-      
-      <Button onPress={() => navigation.navigate('height')} title="Go back"/>
-      <Button onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'insideLayout')} title="Complete"/>
+    <View style={styles.container}>
+      <Text style={styles.label}>Please, select your activity level</Text>
+      <Text style={styles.icon}>Icon here</Text>
+
+      <View style={styles.selectMenuContainer}>
+        <SelectMenu data={items} setSelectedValue={setValue} title={"Activity level"} />
+      </View>      
+      <View style={styles.buttonGroup}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('height')}>
+          <Text style={styles.text}>Go back</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'insideLayout')}>
+          <Text style={styles.text}>Finish</Text>
+        </Pressable>
+      </View>  
     </View>
   )
 }
@@ -35,17 +45,67 @@ const ActivityLevel = ({navigation}: RouterProps) => {
 export default ActivityLevel
 
 const styles = StyleSheet.create({
-    container: {
-      marginHorizontal: 20,
-      flex: 1,
-      justifyContent: 'center'
-    },
-    input: {
-      marginVertical: 4,
-      height: 50,
-      borderWidth: 1,
-      borderRadius: 4,
-      padding: 10,
-      backgroundColor: '#fff'
-    }
-  });
+  container: {
+  flex: 1,
+  justifyContent: 'center',
+  backgroundColor: '#ff0000'
+},
+ input: {
+ marginHorizontal: 10,
+ marginVertical: 4,
+ height: 50,
+ borderWidth: 1,
+ borderRadius: 4,
+ padding: 10,
+ backgroundColor: '#fff'
+},
+text:{
+  alignSelf: 'center',
+  fontSize: 18,
+  color: "#fff",
+  textTransform: 'uppercase',
+  fontWeight: "600",
+  paddingVertical: 10,
+},
+button:{
+    width: 100,
+    paddingHorizontal: 5,
+    marginHorizontal: 20,
+    alignSelf: "center",
+    backgroundColor: "#000",
+},
+
+label: {
+    alignSelf: 'center',
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#fff",
+    textTransform: 'uppercase',
+    marginTop: -80,
+    marginBottom: 50,
+    marginHorizontal: 50,
+    textAlign: 'center',
+    lineHeight: 40
+  },
+  buttonGroup: {
+   marginTop: 80,
+   flexDirection: 'row',
+   justifyContent: 'space-evenly' 
+  },
+  inputGroup:{
+   flexDirection: 'row',
+   justifyContent: 'space-around',
+   alignItems: 'center',
+  },
+  selectMenuContainer: {
+   backgroundColor: "#fff",
+   padding: 5,
+   marginHorizontal:40,
+  },
+  icon: {
+   alignSelf: 'center',
+   fontSize: 18,
+   color: "#fff",
+   marginBottom: 50,
+  }
+});
