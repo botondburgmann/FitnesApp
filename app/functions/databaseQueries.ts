@@ -24,8 +24,11 @@ export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStat
 export const setUpProfile =async (field:string, value:any, userID:string, navigation:NavigationProp<any, any>, nextPage:string, system?: string) => {
     try {
         if(field === 'gender')
-            if(!(value.toLowerCase() === 'male' || value.toLowerCase() === 'female'))
-                throw new Error(`Gender must be set to either male or female`);
+            if(value === undefined)
+                throw new Error(`Gender must be set`);
+            
+            /* if(!(value.toLowerCase() === 'male' || value.toLowerCase() === 'female'))
+                throw new Error(`Gender must be set to either male or female`); */
             
             // If the field is age then calculate it from date of birth
         if (field === 'age'){
@@ -56,9 +59,9 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
             
         }
         if (field === 'weight' && system === "lbs")
-            value = value*0.453592;
+            value = Math.round((value*0.453592)*100)/100;
         if (field === 'height' && system === "ft")
-            value = value*0.3048;
+            value = Math.round((value*30.48)*100)/100;
         
         if (field === 'activityLevel'){
             if(!(value === 'beginner' || value === 'intermediate' || value === 'advanced') )
@@ -148,7 +151,6 @@ export const getGender =async (userID:string) => {
     querySnapshot.forEach(async (docSnapshot) => {
         data = docSnapshot.data().gender;   
     })
-    console.log(data);
     
     return data;
 }

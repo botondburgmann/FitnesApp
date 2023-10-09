@@ -1,14 +1,18 @@
 import { Pressable, ScrollView, StyleSheet, Text, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { useRoute } from '@react-navigation/native';
+import { NavigationProp, useRoute } from '@react-navigation/native';
 import Routine from '../components/Routine';
 import { getGender } from '../functions/databaseQueries';
 
+
+interface RouterProps {
+  navigation: NavigationProp<any, any>;
+}
 interface RouteParams {
     userID: string;
   }
 
-const Routines = () => {
+const Routines = ({navigation}: RouterProps) => {
     const route = useRoute();
     const {userID} = route.params as RouteParams;
 
@@ -70,9 +74,9 @@ const Routines = () => {
     //, 'Shoulder', 'Ab', 'Arm', 'Forearm','Upper body', 'Full body pull', 'Full body push'
     const routineComponents = [];
     for (let i = 0; i < workoutTypes.length; i++) {
-        const imageSource = gender === 'male' ? maleWorkoutImages[workoutTypes[i]] : femaleWorkoutImages[workoutTypes[i]];
+        const imageSource = gender === 'Male' ? maleWorkoutImages[workoutTypes[i]] : femaleWorkoutImages[workoutTypes[i]];
         routineComponents.push(
-          <Routine key={i} imageSource={imageSource} workoutType={workoutTypes[i]} />
+          <Routine key={i} imageSource={imageSource} workoutType={workoutTypes[i]} navigation={navigation}  />
         );
       }
         

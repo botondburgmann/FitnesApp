@@ -1,22 +1,16 @@
 import { Button, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
+import Radiobutton from '../components/Radiobutton';
+
+
 
 const Focus = () => {
 const [focus, setFocus] = useState<string>();
-
+const options = ["Strength", "Hypertrophy", "Cardio"];
   return (
     <View>
-        <RadioButtonGroup
-            containerStyle={{ marginBottom: 10 }}
-            selected={focus}
-            onSelected={(value) => setFocus(value)}
-            radioBackground="green">
-
-            <RadioButtonItem value="strength" label="Strength" />
-            <RadioButtonItem value="hypertrophy" label="Hypertrophy"/>
-            <RadioButtonItem value="cardio" label="Cardio"/>
-        </RadioButtonGroup>   
+        <Radiobutton selectedValue={focus} setselectedValue={setFocus} options={options} />
         <Button onPress={() => alert("Start")} title="Next"/> 
     </View>
   )

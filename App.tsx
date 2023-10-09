@@ -18,6 +18,9 @@ import Routines from './app/screens/Routines';
 import { getSetUpValue } from './app/functions/databaseQueries';
 import Toplist from './app/screens/Toplist';
 import Exercises from './app/screens/Exercises';
+import Focus from './app/screens/Focus';
+import { StyleSheet } from 'react-native'
+
 
 const Stack = createNativeStackNavigator();
 
@@ -43,7 +46,7 @@ function InsideLayout({route}) {
   const {userID} = route.params;
   
   return( 
-    <Tab.Navigator>
+    <Tab.Navigator screenOptions={{ tabBarStyle: {backgroundColor: '#ff0000'}, tabBarInactiveTintColor: '#fff'}}>
       <Tab.Screen name='Workouts' component={WorkoutLayout} initialParams={{userID: userID} } options={{ headerShown: false }} />
       <Tab.Screen name='Toplist' component={Toplist} initialParams={{userID: userID} } options={{ headerShown: false }} />
       <Tab.Screen name='Exercises' component={Exercises} initialParams={{userID: userID} } options={{ headerShown: false }} />
@@ -59,6 +62,7 @@ function WorkoutLayout({route}) {
       <SetupStack.Screen name="Log" component={Workouts} initialParams={{userID: userID} }  options={{ headerShown: false }}/>
       <SetupStack.Screen name="Add" component={AddWorkout} initialParams={{userID: userID} }  />
       <SetupStack.Screen name="Routine" component={Routines } initialParams={{userID: userID} }/>
+      <SetupStack.Screen name="Focus" component={Focus } initialParams={{userID: userID} }/>
     </SetupStack.Navigator>
   )
 }
@@ -99,3 +103,8 @@ export default function App() {
   );
 }
 
+const styles = StyleSheet.create({
+  navbar:{
+    backgroundColor: "#ff00ff"
+  }
+});
