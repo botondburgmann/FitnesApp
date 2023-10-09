@@ -44,7 +44,6 @@ function InsideLayout({route}) {
     <Tab.Navigator>
       <Tab.Screen name='home' component={Home} initialParams={{userID: userID} } options={{ headerShown: false }} />
       <Tab.Screen name='Add' component={AddWorkout} initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <Tab.Screen name='Routines' component={Routines} initialParams={{userID: userID} } options={{ headerShown: false }} />
       <Tab.Screen name='Account' component={Account} initialParams={{userID: userID} } options={{ headerShown: false }} />
     </Tab.Navigator>
   );

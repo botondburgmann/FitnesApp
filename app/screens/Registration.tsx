@@ -1,4 +1,4 @@
-import { View, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView } from 'react-native'
+import { View, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, Pressable, Text } from 'react-native'
 import React, { useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { NavigationProp } from '@react-navigation/native';
@@ -20,7 +20,8 @@ const Registration = ({navigation}: RouterProps) => {
 
     return (
         <View style={styles.container}>
-            <KeyboardAvoidingView behavior='padding'>
+            <View>
+                <Text  style={[styles.logo]}>App Name</Text>
                 <TextInput 
                     value={name}
                     style={styles.input} 
@@ -45,11 +46,16 @@ const Registration = ({navigation}: RouterProps) => {
                     <ActivityIndicator size="large" color="#0000ff"/>
                 : 
                     <>
-                        <Button title="Create new account" onPress={() => signUp(name, setLoading, auth, email, password )}/>
-                        <Button onPress={() => navigation.navigate('Login')} title="Login here"/>
+                        <Pressable style={styles.button} onPress={() => signUp(name, setLoading, auth, email, password )}>
+                            <Text style={styles.text}>Create new account</Text>
+                        </Pressable>
+                        <Text style={[styles.text, {marginTop: 30}]}>Not registered yet</Text>
+                        <Pressable style={styles.button} onPress={() => navigation.navigate('Login')}>
+                            <Text style={styles.text}>Login here</Text>
+                        </Pressable>
                     </> 
                 }
-            </KeyboardAvoidingView>
+            </View>
         </View>
     );
 };
@@ -57,17 +63,37 @@ const Registration = ({navigation}: RouterProps) => {
 export default Registration
 
 const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: 20,
-    flex: 1,
-    justifyContent: 'center'
-  },
-  input: {
-    marginVertical: 4,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 10,
-    backgroundColor: '#fff'
-  }
-});
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      backgroundColor: '#ff0000'
+    },
+    input: {
+      marginHorizontal: 10,
+      marginVertical: 4,
+      height: 50,
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 10,
+      backgroundColor: '#fff'
+    },
+    text:{
+      alignSelf: 'center',
+      fontSize: 18,
+      color: "#fff",
+      textTransform: 'uppercase',
+      paddingVertical: 10,
+    },
+    button:{
+      marginHorizontal: 10,
+      marginVertical: 20,
+      backgroundColor: "#000",
+    },
+    logo: {
+      alignSelf: 'center',
+      fontSize: 50,
+      color: "#fff",
+      textTransform: 'uppercase',
+      marginBottom: 50
+    }
+  });
