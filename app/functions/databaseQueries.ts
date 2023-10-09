@@ -57,6 +57,8 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
         }
         if (field === 'weight' && system === "lbs")
             value = value*0.453592;
+        if (field === 'height' && system === "ft")
+            value = value*0.3048;
         
         if (field === 'activityLevel'){
             if(!(value === 'beginner' || value === 'intermediate' || value === 'advanced') )
