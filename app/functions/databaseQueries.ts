@@ -31,7 +31,7 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
         if (field === 'age'){
             const today = new Date()      
             const age =  today.getFullYear()-value.getFullYear();      
-                
+            
             if(typeof(age) !== 'number')
                 throw new Error("Age must be a number");
 
@@ -42,7 +42,7 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
                 throw new Error("Error: You need to be at least 12 years old to sign up");
             else if (age > 120 )
                 throw new Error("Error: Aren't you a bit too old (or dead) to work out?");
-
+            value = age;
         }
 
         if (field === 'weight' || field === 'height') {

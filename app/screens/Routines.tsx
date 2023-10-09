@@ -34,18 +34,17 @@ const Routines = () => {
         'Push' : require('../assets/push-male.png'),
         'Pull' : require('../assets/pull-male.png'),
         'Leg' : require('../assets/leg-male.png'),
-        'Glute' : require('../assets/glute-male.png'),
         'Back' : require('../assets/back-male.png'),
         'Chest' : require('../assets/chest-male.png'),
         'Bicep' : require('../assets/bicep-male.png'),
         'Tricep' : require('../assets/tricep-male.png'),
-        'Shoulder' : require('../assets/shoulder-male.png'),
+/*         'Shoulder' : require('../assets/shoulder-male.png'),
         'Ab' : require('../assets/ab-male.png'),
         'Arm' : require('../assets/arm-male.png'),
         'Forearm' : require('../assets/forearm-male.png'),
         'Upper body' : require('../assets/upper-body-male.png'),
         'Full body pull' : require('../assets/full-body-pull-male.png'),
-        'Full body push' : require('../assets/full-body-push-male.png'),
+        'Full body push' : require('../assets/full-body-push-male.png'), */
       };
 
     const femaleWorkoutImages = {
@@ -53,23 +52,22 @@ const Routines = () => {
       'Push' : require('../assets/push-female.png'),
       'Pull' : require('../assets/pull-female.png'),
       'Leg' : require('../assets/leg-female.png'),
-      'Glute' : require('../assets/glute-female.png'),
       'Back' : require('../assets/back-female.png'),
       'Chest' : require('../assets/chest-female.png'),
       'Bicep' : require('../assets/bicep-female.png'),
       'Tricep' : require('../assets/tricep-female.png'),
-      'Shoulder' : require('../assets/shoulder-female.png'),
+/*       'Shoulder' : require('../assets/shoulder-female.png'),
       'Ab' : require('../assets/ab-female.png'),
       'Arm' : require('../assets/arm-female.png'),
       'Forearm' : require('../assets/forearm-female.png'),
       'Upper body' : require('../assets/upper-body-female.png'),
       'Full body pull' : require('../assets/full-body-pull-female.png'),
-      'Full body push' : require('../assets/full-body-push-female.png'),
+      'Full body push' : require('../assets/full-body-push-female.png'), */
       };
-    const workoutTypes = ['Full body', 'Push', 'Pull', 'Leg', 'Glute', 'Back', 
-                          'Chest', 'Bicep', 'Tricep', 'Shoulder', 'Ab', 'Arm', 'Forearm',
-                        'Upper body', 'Full body pull', 'Full body push'];
+    const workoutTypes = ['Full body', 'Push', 'Pull', 'Leg', 'Back', 
+                          'Chest', 'Bicep', 'Tricep'];
 
+    //, 'Shoulder', 'Ab', 'Arm', 'Forearm','Upper body', 'Full body pull', 'Full body push'
     const routineComponents = [];
     for (let i = 0; i < workoutTypes.length; i++) {
         const imageSource = gender === 'male' ? maleWorkoutImages[workoutTypes[i]] : femaleWorkoutImages[workoutTypes[i]];

@@ -11,11 +11,13 @@ import Weight from './app/screens/Weight';
 import Gender from './app/screens/Gender';
 import Height from './app/screens/Height';
 import ActivityLevel from './app/screens/ActivityLevel';
-import Home from './app/screens/Home';
+import Workouts from './app/screens/Workouts';
 import AddWorkout from './app/screens/AddWorkout';
 import Account from './app/screens/Account';
 import Routines from './app/screens/Routines';
 import { getSetUpValue } from './app/functions/databaseQueries';
+import Toplist from './app/screens/Toplist';
+import Exercises from './app/screens/Exercises';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,13 +44,24 @@ function InsideLayout({route}) {
   
   return( 
     <Tab.Navigator>
-      <Tab.Screen name='home' component={Home} initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <Tab.Screen name='Add' component={AddWorkout} initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <Tab.Screen name='Workouts' component={WorkoutLayout} initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <Tab.Screen name='Toplist' component={Toplist} initialParams={{userID: userID} } options={{ headerShown: false }} />
+      <Tab.Screen name='Exercises' component={Exercises} initialParams={{userID: userID} } options={{ headerShown: false }} />
       <Tab.Screen name='Account' component={Account} initialParams={{userID: userID} } options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 }
 
+function WorkoutLayout({route}) {
+  const {userID} = route.params;
+  return( 
+    <SetupStack.Navigator>
+      <SetupStack.Screen name="Log" component={Workouts} initialParams={{userID: userID} }  options={{ headerShown: false }}/>
+      <SetupStack.Screen name="Add" component={AddWorkout} initialParams={{userID: userID} }  options={{ headerShown: false }}/>
+      <SetupStack.Screen name="Routine" component={Routines } initialParams={{userID: userID} } options={{ headerShown: false }}/>
+    </SetupStack.Navigator>
+  )
+}
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
