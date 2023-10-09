@@ -21,7 +21,7 @@ export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStat
     }
 }
 
-export const setUpProfile =async (field:string, value:any, userID:string, navigation:NavigationProp<any, any>, nextPage:string) => {
+export const setUpProfile =async (field:string, value:any, userID:string, navigation:NavigationProp<any, any>, nextPage:string, system?: string) => {
     try {
         if(field === 'gender')
             if(!(value.toLowerCase() === 'male' || value.toLowerCase() === 'female'))
@@ -53,9 +53,11 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
                 throw new Error(`${field} must be a number`);
             if(value < 0)
                 throw new Error(`${field} can't be a negative number`);
-
+            
         }
-
+        if (field === 'weight' && system === "lbs")
+            value = value*0.453592;
+        
         if (field === 'activityLevel'){
             if(!(value === 'beginner' || value === 'intermediate' || value === 'advanced') )
                 throw new Error(`Please select one of the options`);

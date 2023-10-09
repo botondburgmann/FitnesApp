@@ -6,14 +6,17 @@ const SelectMenu = (props) => {
 
     const setSelectedValue = props.setSelectedValue;    
     const data = props.data
+    const title = props.title
+    const shouldIncludeSearch = data.length > 10;
+
 
     const [isFocus, setIsFocus] = useState(false);
 
   return (
     <View>
         <Dropdown 
-            search
-            placeholder={!isFocus ? 'Exercise' : '...'}
+            search={shouldIncludeSearch}
+            placeholder={!isFocus ? title : '...'}
             data={data}
             labelField="label"
             valueField="value"
