@@ -57,8 +57,8 @@ function WorkoutLayout({route}) {
   return( 
     <SetupStack.Navigator>
       <SetupStack.Screen name="Log" component={Workouts} initialParams={{userID: userID} }  options={{ headerShown: false }}/>
-      <SetupStack.Screen name="Add" component={AddWorkout} initialParams={{userID: userID} }  options={{ headerShown: false }}/>
-      <SetupStack.Screen name="Routine" component={Routines } initialParams={{userID: userID} } options={{ headerShown: false }}/>
+      <SetupStack.Screen name="Add" component={AddWorkout} initialParams={{userID: userID} }  />
+      <SetupStack.Screen name="Routine" component={Routines } initialParams={{userID: userID} }/>
     </SetupStack.Navigator>
   )
 }
