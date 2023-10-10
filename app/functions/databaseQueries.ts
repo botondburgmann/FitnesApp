@@ -103,7 +103,6 @@ export const getExercises =async (userID: string) => {
     return data;
 }
 
-// Work on different types of sets
 export const addExercise =async (userID:string, date: Date, exercises:(string | Array<string>), sets: Array<Object>, typeOfSet:string) => {
     const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
     const q = query(workoutsCollection, where("date", '==', date.toDateString()), where("userID", '==', userID) );
@@ -131,7 +130,7 @@ export const addExercise =async (userID:string, date: Date, exercises:(string | 
                 await addDoc(setsRef, {
                     exercise: exercises,
                     sets: sets,
-                    typeOfSet: "straight",
+                    typeOfSet: typeOfSet,
                     createdAt: serverTimestamp()
                 });
             }); 
@@ -163,6 +162,32 @@ export const getSetUpValue = async (userID: string) => {
       const userDocSnapshot = querySnapshot.docs[0];
       const setUpValue = userDocSnapshot.data().set;
       return setUpValue;
+    } catch (error) {
+      alert("Couldn't find set field : " + error.message);
+    }
+  };
+export const addExperience = async (userID: string, experience) => {
+    try {
+      const usersCollectionRef = collection(FIRESTORE_DB, 'users');
+      const q = query(usersCollectionRef, where('userID', '==', userID));
+      const querySnapshot = await getDocs(q);
+      const userDocSnapshot = querySnapshot.docs[0];
+      const userDocRef = doc(usersCollectionRef, userDocSnapshot.id);
+
+      let currentExperience = userDocSnapshot.data().experience;
+      currentExperience += experience;
+      let level: number;
+      if (currentExperience < 225){
+        level = 1;
+    }
+    else{
+        level = Math.floor(Math.log(currentExperience/100)/Math.log(1.5))
+    }
+    
+      await updateDoc(userDocRef, {
+        experience: currentExperience,
+        level: level
+      });
     } catch (error) {
       alert("Couldn't find set field : " + error.message);
     }
