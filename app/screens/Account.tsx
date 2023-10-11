@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig'
-import { getExerciseWithMostWeight, getExperience, getLevel, getName } from '../functions/databaseQueries'
+import { getExperience, getLevel, getName,getStrongestExercise } from '../functions/databaseQueries'
 import { useRoute } from '@react-navigation/native';
 
 
@@ -19,17 +19,30 @@ const Account = () => {
   const [level, setLevel] = useState(0);
   const [experience, setExperience] = useState(0);
   const [experienceNeeded, setExperienceNeeded] = useState(0);
-  const [mostWeight, setMostWeight] = useState(0)
+  const [mostWeight, setmostWeight] = useState({
+    name: "",
+    weight: 0,
+    reps: 0,
+  })
  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const strongest = await getStrongestExercise(userID);
+        if (strongest === undefined) {
+          console.log("not loaded");
+          
+        } else {
+          setmostWeight({...mostWeight, weight: strongest.weight, name: strongest.name, reps: strongest.reps})
+          console.log("In account:", strongest);         
+        }
+        
+
         const name = await getName(userID);  
         const level = await getLevel(userID);
         const experience = await getExperience(userID);
-        const data = await getExerciseWithMostWeight(userID);
-        
+
                 
 
         name && setName(name);
@@ -54,7 +67,7 @@ const Account = () => {
       <Text style={styles.text}>Level: {level}</Text>
       <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>
       <Text style={styles.text}>Best records</Text>
-      <Text style={styles.text}>Most Weight:</Text>
+      <Text style={styles.text}>Most Weight: {mostWeight.name} {mostWeight.weight} kg {mostWeight.reps} repetitions</Text>
       <Text style={styles.text}>Most repetitions</Text>
       <Text style={styles.text}>Achievements</Text>
       <Pressable style={styles.button}>

@@ -3,7 +3,11 @@ import { addDoc, collection, doc, getDocs, query, serverTimestamp, updateDoc, wh
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 
-
+interface Exercise {
+    name: string;
+    weight: number;
+    reps: number;
+  }
 
 export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStateAction<boolean>>, auth:Auth, email:string, password:string) => {
     setLoading(true);
@@ -227,49 +231,43 @@ export const getExperience   =async (userID:string) => {
         const experience = userDocSnapshot.data().experience;
         return experience;
       } catch (error) {
-        alert("Couldn't find set field : " + error.message);
+        alert("Couldn't find experience field : " + error.message);
       }
 }
 
-export const getExerciseWithMostWeight:Object =async (userID:string) => {
-    
-    const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
-    const q = query(workoutsCollection, where("userID", '==', userID) );
-    let bestExercise: string;
-    let mostWeight = 0
-
-        
+export const getStrongestExercise = async (userID: string): Promise<Exercise> => {
     try {
-        const querySnapshot = await getDocs(q);
-
-        querySnapshot.forEach(async (doc) => {
-            const workoutCollection = collection(doc.ref, "Workout");
-            const workoutSubcollectionSnapshot = await getDocs(workoutCollection);
-
-            workoutSubcollectionSnapshot.forEach((setDoc) => {
-                const data = setDoc.data();
-
-                for (let i = 0; i < data.sets.length; i++) {                    
-                    if(data.sets[i].weight > mostWeight){
-                        mostWeight = data.sets[i].weight;
-                        bestExercise = data.exercise[i]
-
-                    }
-                    
-                }
-                
-                
-            })
-            const best ={
-                'exercise': bestExercise, 
-                'weight': mostWeight
-            }  
-            console.log(typeof(best));
-                      
-            return best
-       })
-
+      const strongestExercise: Exercise = {
+        name: "",
+        weight: 0,
+        reps: 0,
+      }
+  
+      const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
+      const q = query(workoutsCollectionRef, where('userID', '==', userID));
+      const querySnapshot = await getDocs(q);
+  
+      for (const docSnapshot of querySnapshot.docs) {
+        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
+        const workoutQuerySnapshot = await getDocs(workoutCollectionRef);
+  
+        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {
+          const sets = workoutDocSnapshot.data().sets;
+          const exercises = workoutDocSnapshot.data().exercise;
+          for (let i = 0; i < sets.length; i++) {
+            if (sets[i].weight > strongestExercise.weight) {
+                strongestExercise.weight = sets[i].weight;
+                strongestExercise.reps = sets[i].reps;
+                strongestExercise.name = exercises[i];
+            }                        
+          }
+        }
+      }
+            
+      return strongestExercise;
     } catch (error) {
-        alert(error)
+      alert("Couldn't find experience field: " + error.message);
+      return ;
     }
-}
+  };
+  
