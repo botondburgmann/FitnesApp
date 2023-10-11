@@ -235,89 +235,89 @@ export const getExperience   =async (userID:string) => {
       }
 }
 
-export const getStrongestExercise = async (userID: string): Promise<Exercise> => {
+export const getExerciseWithMostWeight = async (userID: string): Promise<Exercise> => {
     try {
-      const strongestExercise: Exercise = {
-        name: "",
-        weight: 0,
-        reps: 0,
-      }
+        const exerciseWithMostWeight: Exercise = {
+            name: "",
+            weight: 0,
+            reps: 0,
+        }
   
-      const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
-      const q = query(workoutsCollectionRef, where('userID', '==', userID));
-      const querySnapshot = await getDocs(q);
+    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
+    const q = query(workoutsCollectionRef, where('userID', '==', userID));
+    const querySnapshot = await getDocs(q);
   
-      for (const docSnapshot of querySnapshot.docs) {
+    for (const docSnapshot of querySnapshot.docs) {
         const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
         const workoutQuerySnapshot = await getDocs(workoutCollectionRef);
   
         for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {
-          const sets = workoutDocSnapshot.data().sets;
-          const exercises = workoutDocSnapshot.data().exercise;
-          for (let i = 0; i < sets.length; i++) {
-            if (sets[i].weight > strongestExercise.weight) {
-                strongestExercise.weight = sets[i].weight;
-                strongestExercise.reps = sets[i].reps;
-                strongestExercise.name = exercises[i];
-            }  
-            else if (sets[i].weight === strongestExercise.weight) {
-                if (sets[i].reps > strongestExercise.reps) {
-                    strongestExercise.weight = sets[i].weight;
-                    strongestExercise.reps = sets[i].reps;
-                    strongestExercise.name = exercises[i];
-                }                 
-            }                      
-          }
+            const sets = workoutDocSnapshot.data().sets;
+            const exercises = workoutDocSnapshot.data().exercise;
+          
+            for (let i = 0; i < sets.length; i++) {
+                if (sets[i].weight > exerciseWithMostWeight.weight) {
+                    exerciseWithMostWeight.weight = sets[i].weight;
+                    exerciseWithMostWeight.reps = sets[i].reps;
+                    exerciseWithMostWeight.name = exercises[i];
+                }  
+                else if (sets[i].weight === exerciseWithMostWeight.weight) 
+                    if (sets[i].reps > exerciseWithMostWeight.reps) {
+                        exerciseWithMostWeight.weight = sets[i].weight;
+                        exerciseWithMostWeight.reps = sets[i].reps;
+                        exerciseWithMostWeight.name = exercises[i];
+                    }                                       
+            }
         }
       }
             
-      return strongestExercise;
+      return exerciseWithMostWeight;
     } catch (error) {
-      alert("Couldn't find experience field: " + error.message);
+      alert("Couldn't find fields: " + error.message);
       return ;
     }
   };
 
 
-  export const getMostRepsExercise = async (userID: string): Promise<Exercise> => {
+export const getExerciseWithMostReps = async (userID: string): Promise<Exercise> => {
     try {
-      const mostRepsExercise: Exercise = {
-        name: "",
-        weight: 0,
-        reps: 0,
-      }
+        const exerciseWithMostReps: Exercise = {
+            name: "",
+            weight: 0,
+            reps: 0,
+        }
   
-      const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
-      const q = query(workoutsCollectionRef, where('userID', '==', userID));
-      const querySnapshot = await getDocs(q);
+    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
+    const q = query(workoutsCollectionRef, where('userID', '==', userID));
+    const querySnapshot = await getDocs(q);
   
-      for (const docSnapshot of querySnapshot.docs) {
+    for (const docSnapshot of querySnapshot.docs) {
         const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
         const workoutQuerySnapshot = await getDocs(workoutCollectionRef);
   
         for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {
-          const sets = workoutDocSnapshot.data().sets;
-          const exercises = workoutDocSnapshot.data().exercise;
-          for (let i = 0; i < sets.length; i++) {
-            if (sets[i].reps > mostRepsExercise.reps) {
-                mostRepsExercise.weight = sets[i].weight;
-                mostRepsExercise.reps = sets[i].reps;
-                mostRepsExercise.name = exercises[i];
-            }  
-            else if (sets[i].reps === mostRepsExercise.reps) {
-                if (sets[i].weight > mostRepsExercise.weight) {
-                    mostRepsExercise.weight = sets[i].weight;
-                    mostRepsExercise.reps = sets[i].reps;
-                    mostRepsExercise.name = exercises[i];
-                }                 
-            }                      
-          }
+            const sets = workoutDocSnapshot.data().sets;
+            const exercises = workoutDocSnapshot.data().exercise;
+          
+            for (let i = 0; i < sets.length; i++) {
+                if (sets[i].reps > exerciseWithMostReps.reps) {
+                    exerciseWithMostReps.weight = sets[i].weight;
+                    exerciseWithMostReps.reps = sets[i].reps;
+                    exerciseWithMostReps.name = exercises[i];
+                }  
+                else if (sets[i].reps === exerciseWithMostReps.reps) 
+                    if (sets[i].weight > exerciseWithMostReps.weight) {
+                        exerciseWithMostReps.weight = sets[i].weight;
+                        exerciseWithMostReps.reps = sets[i].reps;
+                        exerciseWithMostReps.name = exercises[i];
+                    }                                             
+            }
         }
-      }
+    }
             
-      return mostRepsExercise;
+    return exerciseWithMostReps;
     } catch (error) {
-      alert("Couldn't find experience field: " + error.message);
+      alert("Couldn't find fields: " + error.message);
       return ;
     }
   };

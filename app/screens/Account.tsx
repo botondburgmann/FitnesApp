@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig'
-import { getExperience, getLevel, getMostRepsExercise, getName,getStrongestExercise } from '../functions/databaseQueries'
+import { getExperience, getLevel, getExerciseWithMostReps, getName,getExerciseWithMostWeight } from '../functions/databaseQueries'
 import { useRoute } from '@react-navigation/native';
 
 
@@ -19,12 +19,12 @@ const Account = () => {
   const [level, setLevel] = useState(0);
   const [experience, setExperience] = useState(0);
   const [experienceNeeded, setExperienceNeeded] = useState(0);
-  const [mostWeight, setmostWeight] = useState({
+  const [exerciseWithMostWeight, setExerciseWithMostWeight] = useState({
     name: "",
     weight: 0,
     reps: 0,
   })
-  const [mostReps, setMostReps] = useState({
+  const [exerciseWithMostReps, setExerciseWithMostReps] = useState({
     name: "",
     weight: 0,
     reps: 0,
@@ -34,43 +34,26 @@ const Account = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const strongest = await getStrongestExercise(userID);
-        if (strongest === undefined) {
-          console.log("not loaded");
-          
-        } else {
-          setmostWeight({...mostWeight, weight: strongest.weight, name: strongest.name, reps: strongest.reps})
-        }
-        const mostReps = await getMostRepsExercise(userID);
-        if (mostReps === undefined) {
-          console.log("not loaded");
-          
-        } else {
-          setMostReps({...mostReps, weight: mostReps.weight, name: mostReps.name, reps: mostReps.reps})
-        }
-        
-
         const name = await getName(userID);  
         const level = await getLevel(userID);
         const experience = await getExperience(userID);
-
-                
+        const exerciseWithMostWeight = await getExerciseWithMostWeight(userID);
+        const exerciseWithMostReps = await getExerciseWithMostReps(userID);
 
         name && setName(name);
         level && setLevel(level);
         experience && setExperience(experience);
         experience && setExperienceNeeded(Math.round(100*1.5**(level+1)-experience));
-        
-        
-        
+        exerciseWithMostWeight&& setExerciseWithMostWeight({...exerciseWithMostWeight, weight: exerciseWithMostWeight.weight, name: exerciseWithMostWeight.name, reps: exerciseWithMostWeight.reps})
+        exerciseWithMostReps && setExerciseWithMostReps({...exerciseWithMostReps, weight: exerciseWithMostReps.weight, name: exerciseWithMostReps.name, reps: exerciseWithMostReps.reps})
         
       } catch (error) {
-        console.error("Error fetching name:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();    
-  }, [mostWeight])
+  }, [exerciseWithMostWeight])
   
   return (
     <View style={styles.container} >
@@ -78,8 +61,8 @@ const Account = () => {
       <Text style={styles.text}>Level: {level}</Text>
       <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>
       <Text style={styles.text}>Best records</Text>
-      <Text style={styles.text}>Most Weight: {mostWeight.name} {mostWeight.weight} kg {mostWeight.reps} repetitions</Text>
-      <Text style={styles.text}>Most repetitions: {mostReps.name} {mostReps.weight} kg {mostReps.reps} repetitions</Text>
+      <Text style={styles.text}>Most Weight: {exerciseWithMostWeight.name} {exerciseWithMostWeight.weight} kg ({exerciseWithMostWeight.reps} repetitions)</Text>
+      <Text style={styles.text}>Most repetitions: {exerciseWithMostReps.name} {exerciseWithMostReps.reps} repetitions ({exerciseWithMostReps.weight} kg)</Text>
       <Text style={styles.text}>Achievements</Text>
       <Pressable style={styles.button}>
           <Text style={styles.text}>Edit profile</Text>
