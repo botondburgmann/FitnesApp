@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig'
-import { getExperience, getLevel, getName,getStrongestExercise } from '../functions/databaseQueries'
+import { getExperience, getLevel, getMostRepsExercise, getName,getStrongestExercise } from '../functions/databaseQueries'
 import { useRoute } from '@react-navigation/native';
 
 
@@ -24,6 +24,11 @@ const Account = () => {
     weight: 0,
     reps: 0,
   })
+  const [mostReps, setMostReps] = useState({
+    name: "",
+    weight: 0,
+    reps: 0,
+  })
  
 
   useEffect(() => {
@@ -35,7 +40,13 @@ const Account = () => {
           
         } else {
           setmostWeight({...mostWeight, weight: strongest.weight, name: strongest.name, reps: strongest.reps})
-          console.log("In account:", strongest);         
+        }
+        const mostReps = await getMostRepsExercise(userID);
+        if (mostReps === undefined) {
+          console.log("not loaded");
+          
+        } else {
+          setMostReps({...mostReps, weight: mostReps.weight, name: mostReps.name, reps: mostReps.reps})
         }
         
 
@@ -59,7 +70,7 @@ const Account = () => {
     };
 
     fetchData();    
-  }, [])
+  }, [mostWeight])
   
   return (
     <View style={styles.container} >
@@ -68,7 +79,7 @@ const Account = () => {
       <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>
       <Text style={styles.text}>Best records</Text>
       <Text style={styles.text}>Most Weight: {mostWeight.name} {mostWeight.weight} kg {mostWeight.reps} repetitions</Text>
-      <Text style={styles.text}>Most repetitions</Text>
+      <Text style={styles.text}>Most repetitions: {mostReps.name} {mostReps.weight} kg {mostReps.reps} repetitions</Text>
       <Text style={styles.text}>Achievements</Text>
       <Pressable style={styles.button}>
           <Text style={styles.text}>Edit profile</Text>

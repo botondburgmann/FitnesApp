@@ -259,12 +259,63 @@ export const getStrongestExercise = async (userID: string): Promise<Exercise> =>
                 strongestExercise.weight = sets[i].weight;
                 strongestExercise.reps = sets[i].reps;
                 strongestExercise.name = exercises[i];
-            }                        
+            }  
+            else if (sets[i].weight === strongestExercise.weight) {
+                if (sets[i].reps > strongestExercise.reps) {
+                    strongestExercise.weight = sets[i].weight;
+                    strongestExercise.reps = sets[i].reps;
+                    strongestExercise.name = exercises[i];
+                }                 
+            }                      
           }
         }
       }
             
       return strongestExercise;
+    } catch (error) {
+      alert("Couldn't find experience field: " + error.message);
+      return ;
+    }
+  };
+
+
+  export const getMostRepsExercise = async (userID: string): Promise<Exercise> => {
+    try {
+      const mostRepsExercise: Exercise = {
+        name: "",
+        weight: 0,
+        reps: 0,
+      }
+  
+      const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
+      const q = query(workoutsCollectionRef, where('userID', '==', userID));
+      const querySnapshot = await getDocs(q);
+  
+      for (const docSnapshot of querySnapshot.docs) {
+        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
+        const workoutQuerySnapshot = await getDocs(workoutCollectionRef);
+  
+        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {
+          const sets = workoutDocSnapshot.data().sets;
+          const exercises = workoutDocSnapshot.data().exercise;
+          for (let i = 0; i < sets.length; i++) {
+            if (sets[i].reps > mostRepsExercise.reps) {
+                mostRepsExercise.weight = sets[i].weight;
+                mostRepsExercise.reps = sets[i].reps;
+                mostRepsExercise.name = exercises[i];
+            }  
+            else if (sets[i].reps === mostRepsExercise.reps) {
+                if (sets[i].weight > mostRepsExercise.weight) {
+                    mostRepsExercise.weight = sets[i].weight;
+                    mostRepsExercise.reps = sets[i].reps;
+                    mostRepsExercise.name = exercises[i];
+                }                 
+            }                      
+          }
+        }
+      }
+            
+      return mostRepsExercise;
     } catch (error) {
       alert("Couldn't find experience field: " + error.message);
       return ;
