@@ -146,6 +146,12 @@ const AddWorkout = () => {
     return noRest;
   }
 
+  function areThereMultipleExercises(selectedExercises:string[]) {
+    const selectedExercisesNumber = new Set(selectedExercises).size;
+    if (selectedExercisesNumber > 1) 
+      return true;
+    return false;
+  }
   function calculateExperiencePoints(sets) {
     let experiencePoints = 0;
     for (const set of sets) {
@@ -173,12 +179,11 @@ const AddWorkout = () => {
   function addSetToDatabase(numOfSet:number) {
     if (numOfSet > 0) {
       let typeOfSet: string;
-      const selectedExercisesNumber = new Set(selectedExercises).size;
-      if (selectedExercisesNumber > 1) 
-        typeOfSet = "super"
+      if (areThereMultipleExercises(selectedExercises)) {
+        typeOfSet = "super";
+      }
       else{
-        const noRest = isThereRest(sets);
-        if (noRest === true) {      
+        if (isThereRest(sets)) {      
           const weights = addUpWeights(sets);
           const sorted = isSorted(weights);
           sorted ? typeOfSet = "drop" : typeOfSet = "straight"
