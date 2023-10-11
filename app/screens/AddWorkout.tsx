@@ -184,7 +184,7 @@ const AddWorkout = () => {
           
       }
 
-      addExperience(userID, experiencePoints)
+      addExperience(userID, Math.round(experiencePoints))
       addExercise(userID, date, selectedExercises, sets, typeOfSet);
 
       setSets([]);

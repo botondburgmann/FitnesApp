@@ -192,3 +192,84 @@ export const addExperience = async (userID: string, experience) => {
       alert("Couldn't find set field : " + error.message);
     }
   };
+
+export const getName =async (userID:string) => {
+    try {
+        const usersCollectionRef = collection(FIRESTORE_DB, 'users');
+        const q = query(usersCollectionRef, where('userID', '==', userID));
+        const querySnapshot = await getDocs(q);
+        const userDocSnapshot = querySnapshot.docs[0];
+        const name = userDocSnapshot.data().name;
+        return name;
+      } catch (error) {
+        alert("Couldn't find set field : " + error.message);
+      }
+}
+
+export const getLevel =async (userID:string) => {
+    try {
+        const usersCollectionRef = collection(FIRESTORE_DB, 'users');
+        const q = query(usersCollectionRef, where('userID', '==', userID));
+        const querySnapshot = await getDocs(q);
+        const userDocSnapshot = querySnapshot.docs[0];
+        const level = userDocSnapshot.data().level;
+        return level;
+      } catch (error) {
+        alert("Couldn't find set field : " + error.message);
+      }
+}
+export const getExperience   =async (userID:string) => {
+    try {
+        const usersCollectionRef = collection(FIRESTORE_DB, 'users');
+        const q = query(usersCollectionRef, where('userID', '==', userID));
+        const querySnapshot = await getDocs(q);
+        const userDocSnapshot = querySnapshot.docs[0];
+        const experience = userDocSnapshot.data().experience;
+        return experience;
+      } catch (error) {
+        alert("Couldn't find set field : " + error.message);
+      }
+}
+
+export const getExerciseWithMostWeight:Object =async (userID:string) => {
+    
+    const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
+    const q = query(workoutsCollection, where("userID", '==', userID) );
+    let bestExercise: string;
+    let mostWeight = 0
+
+        
+    try {
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach(async (doc) => {
+            const workoutCollection = collection(doc.ref, "Workout");
+            const workoutSubcollectionSnapshot = await getDocs(workoutCollection);
+
+            workoutSubcollectionSnapshot.forEach((setDoc) => {
+                const data = setDoc.data();
+
+                for (let i = 0; i < data.sets.length; i++) {                    
+                    if(data.sets[i].weight > mostWeight){
+                        mostWeight = data.sets[i].weight;
+                        bestExercise = data.exercise[i]
+
+                    }
+                    
+                }
+                
+                
+            })
+            const best ={
+                'exercise': bestExercise, 
+                'weight': mostWeight
+            }  
+            console.log(typeof(best));
+                      
+            return best
+       })
+
+    } catch (error) {
+        alert(error)
+    }
+}

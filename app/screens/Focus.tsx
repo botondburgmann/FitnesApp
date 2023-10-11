@@ -1,6 +1,5 @@
 import { Button, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
-import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
 import Radiobutton from '../components/Radiobutton';
 
 
