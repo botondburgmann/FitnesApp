@@ -1,7 +1,9 @@
 import { View, TextInput } from 'react-native'
 import React from 'react'
 
-const UnilateralSet = ({set, setSet}) => {
+const UnilateralSet = (props) => {
+    const set = props.set;
+    const setSet = props.setSet;
 
     return (
         <View>
@@ -62,7 +64,7 @@ const UnilateralSet = ({set, setSet}) => {
                 autoCapitalize='none'
             />       
         </View>
-  )
+    )
 }
 
 export default UnilateralSet

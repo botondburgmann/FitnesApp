@@ -5,6 +5,7 @@ import { NavigationProp } from "@react-navigation/native";
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
+
 const Routine = (props) => {
     const imageSource = props.imageSource;
     const navigation = props.navigation;
@@ -20,7 +21,7 @@ const Routine = (props) => {
 export default Routine
 
 const styles = StyleSheet.create({
-    container: {
+  container: {
     marginTop: 50,
     flexDirection:'row',
     justifyContent: 'space-evenly',
@@ -28,10 +29,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 5,
     borderColor: 'red'
-
-    },
-    image: {
-      width: 50,
-      height: 100,
-    },
-  });
+  },
+  image: {
+    width: 50,
+    height: 100,
+  },
+});

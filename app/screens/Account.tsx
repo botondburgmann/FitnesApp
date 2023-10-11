@@ -9,29 +9,30 @@ interface RouteParams {
   userID: string;
 }
 
+interface Exercise {
+  name: string;
+  weight: number;
+  reps: number;
+}
 
 const Account = () => {
   const route = useRoute();
 
   const {userID} = route.params as RouteParams;
 
-  const [name, setName] = useState("");
-  const [level, setLevel] = useState(0);
-  const [experience, setExperience] = useState(0);
-  const [experienceNeeded, setExperienceNeeded] = useState(0);
-  const [exerciseWithMostWeight, setExerciseWithMostWeight] = useState({
-    name: "",
-    weight: 0,
-    reps: 0,
-  })
-  const [exerciseWithMostReps, setExerciseWithMostReps] = useState({
-    name: "",
-    weight: 0,
-    reps: 0,
-  })
+  const [name, setName] = useState<string>();
+  const [level, setLevel] = useState<number>();
+  const [experienceNeeded, setExperienceNeeded] = useState<number>();
+  const [exerciseWithMostWeight, setExerciseWithMostWeight] = useState<Exercise>();
+  const [exerciseWithMostReps, setExerciseWithMostReps] = useState<Exercise>()
  
 
   useEffect(() => {
+
+    const calculateExperienceNeeded = (level:number, currentExperience:number) => {
+      return Math.round(100*1.5**(level+1)-currentExperience)
+    }
+
     const fetchData = async () => {
       try {
         const name = await getName(userID);  
@@ -42,11 +43,19 @@ const Account = () => {
 
         name && setName(name);
         level && setLevel(level);
-        experience && setExperience(experience);
-        experience && setExperienceNeeded(Math.round(100*1.5**(level+1)-experience));
-        exerciseWithMostWeight&& setExerciseWithMostWeight({...exerciseWithMostWeight, weight: exerciseWithMostWeight.weight, name: exerciseWithMostWeight.name, reps: exerciseWithMostWeight.reps})
-        exerciseWithMostReps && setExerciseWithMostReps({...exerciseWithMostReps, weight: exerciseWithMostReps.weight, name: exerciseWithMostReps.name, reps: exerciseWithMostReps.reps})
-        
+        experience && setExperienceNeeded(calculateExperienceNeeded(level, experience));
+        exerciseWithMostWeight && 
+        setExerciseWithMostWeight({
+          weight: exerciseWithMostWeight.weight, 
+          name: exerciseWithMostWeight.name, 
+          reps: exerciseWithMostWeight.reps
+        })
+        exerciseWithMostReps && 
+        setExerciseWithMostReps({
+          weight: exerciseWithMostReps.weight, 
+          name: exerciseWithMostReps.name, 
+          reps: exerciseWithMostReps.reps
+        })
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -57,13 +66,22 @@ const Account = () => {
   
   return (
     <View style={styles.container} >
-      <Text style={styles.text}>{name}</Text>
-      <Text style={styles.text}>Level: {level}</Text>
-      <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>
+      {name && <Text style={styles.text}>{name}</Text>}
+      {level && <Text style={styles.text}>Level: {level}</Text>}
+      {experienceNeeded && <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>}
+
       <Text style={styles.text}>Best records</Text>
-      <Text style={styles.text}>Most Weight: {exerciseWithMostWeight.name} {exerciseWithMostWeight.weight} kg ({exerciseWithMostWeight.reps} repetitions)</Text>
-      <Text style={styles.text}>Most repetitions: {exerciseWithMostReps.name} {exerciseWithMostReps.reps} repetitions ({exerciseWithMostReps.weight} kg)</Text>
+      {exerciseWithMostWeight && 
+      <Text style={styles.text}>
+        Weight: {exerciseWithMostWeight.name} {exerciseWithMostWeight.weight} kg ({exerciseWithMostWeight.reps} repetitions)
+      </Text>}
+      {exerciseWithMostReps && 
+      <Text style={styles.text}>
+        Most repetitions: {exerciseWithMostReps.name} {exerciseWithMostReps.reps} repetitions ({exerciseWithMostReps.weight} kg)
+      </Text>}
+      
       <Text style={styles.text}>Achievements</Text>
+      
       <Pressable style={styles.button}>
           <Text style={styles.text}>Edit profile</Text>
       </Pressable>

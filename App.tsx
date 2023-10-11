@@ -19,7 +19,6 @@ import { getSetUpValue } from './app/functions/databaseQueries';
 import Toplist from './app/screens/Toplist';
 import Exercises from './app/screens/Exercises';
 import Focus from './app/screens/Focus';
-import { StyleSheet } from 'react-native'
 
 
 const Stack = createNativeStackNavigator();
@@ -102,9 +101,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  navbar:{
-    backgroundColor: "#ff00ff"
-  }
-});

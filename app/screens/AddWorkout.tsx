@@ -13,8 +13,13 @@ interface RouteParams {
   userID: string;
 }
 
+interface ExerciseSelectOption{
+  label: string;
+  value: string;
+  unilateral: boolean
+}
+
 interface BilateralSet {
- // id: number;
   weight: string;
   reps: string;
   time: string;
@@ -22,15 +27,14 @@ interface BilateralSet {
 }
 
 interface UnilateralSet {
-  // id: number;
-   weightLeft: string;
-   repsLeft: string;
-   timeLeft: string;
-   restTimeLeft: string;
-   weightRight: string;
-   repsRight: string;
-   timeRight: string;
-   restTimeRight: string;
+  weightLeft: string;
+  repsLeft: string;
+  timeLeft: string;
+  restTimeLeft: string;
+  weightRight: string;
+  repsRight: string;
+  timeRight: string;
+  restTimeRight: string;
  }
 
 const AddWorkout = () => {
@@ -39,34 +43,15 @@ const AddWorkout = () => {
 
   const [date, setDate] = useState(new Date());
 
-  const [exercises, setExercises] = useState([]);
-  const [currentExercise, setCurrentExercise] = useState("");
-  const [selectedExercises, setSelectedExercises] = useState([]);
+  const [allExercises, setAllExercises] = useState<ExerciseSelectOption[]>();
+  const [currentExercise, setCurrentExercise] = useState<string>();
+  const [selectedExercises, setSelectedExercises] = useState<string[]>();
 
-  const [numOfSet, setNumOfSet] = useState(0);
+  const [numOfSet, setNumOfSet] = useState<number>();
 
-  // For bilateral sets
-  const [biSet, setBiSet] = useState({
-   // id: 0,
-    weight: "",
-    reps: "",
-    time: "",
-    restTime: ""
-  })
+  const [bilateralSet, setBilateralSet] = useState<BilateralSet>()
 
-  
-  // For unilateral set
-  const [uniSet, setUniSet] = useState({
-    // id: 0,
-    weightLeft: "",
-    repsLeft: "",
-    timeLeft: "",
-    restTimeLeft: "",
-    weightRight: "",
-    repsRight: "",
-    timeRight: "",
-    restTimeRight: ""
-  })
+  const [unilateralSet, setUniSet] = useState<UnilateralSet>()
   
   const [sets, setSets] = useState([])
 
@@ -74,14 +59,13 @@ const AddWorkout = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getExercises(userID);  
-         const exerciseOptions = data.map((exercise) => ({
+        const exercises = await getExercises(userID);
+        const exerciseData = exercises.map((exercise) => ({
           label: exercise.name,
           value: exercise.name,
-          unilateral: exercise.unilateral
-        }));        
-        exerciseOptions && setExercises(exerciseOptions);
-        
+          unilateral: exercise.unilateral,
+        }));
+        setAllExercises(exerciseData);
       } catch (error) {
         console.error("Error fetching exercises:", error);
       }
@@ -92,19 +76,26 @@ const AddWorkout = () => {
 
   
   function addUnilateralSet(set: UnilateralSet) {
-
     if (set.repsLeft === "" && set.repsRight === "")
       alert("Error: Reps fields cannot be empty. Please fill at least one of them");
     else {
       setSelectedExercises((prevSelected) => [...prevSelected, currentExercise]);
-      console.log(selectedExercises);
-      for (const key in set) {
-        if (set.hasOwnProperty(key))
-          set[key] === "" ? set[key] = 0 : set[key] = parseFloat(set[key]);
-      }
+      for (const key in set)
+        set[key] === "" ? set[key] = 0 : set[key] = parseFloat(set[key]);
+
       setSets((prevSets) => [...prevSets, set]);
-      setUniSet({...set, weightLeft: "", repsLeft: "", timeLeft: "", restTimeLeft: "",weightRight: "", repsRight: "", timeRight: "", restTimeRight: ""})
-      setNumOfSet((numOfSet) => {return numOfSet + 1})
+      setUniSet({...set, 
+        weightLeft: "", 
+        repsLeft: "", 
+        timeLeft: "", 
+        restTimeLeft: "",
+        weightRight: "", 
+        repsRight: "", 
+        timeRight: "", 
+        restTimeRight: ""
+      })
+      
+        setNumOfSet((numOfSet) => {return numOfSet + 1})
     }
   }
 
@@ -112,77 +103,91 @@ const AddWorkout = () => {
     if (set.reps === "")
       alert("Error: reps field cannot be empty");
     else {
-      //set.id += 1;
       setSelectedExercises((prevSelected) => [...prevSelected, currentExercise]);
-      console.log(selectedExercises);
       
-      for (const key in set) {
-        if (set.hasOwnProperty(key))
-          set[key] === "" ? set[key] = 0 : set[key] = parseFloat(set[key]);
-      }
+      for (const key in set)
+        set[key] === "" ? set[key] = 0 : set[key] = parseFloat(set[key]);
+  
       setSets((prevSets) => [...prevSets, set]);
-      setBiSet({...set, weight: "", reps: "", time: "", restTime: ""})
+      setBilateralSet({...set, 
+        weight: "", 
+        reps: "", 
+        time: "", 
+        restTime: ""
+      })
       setNumOfSet((numOfSet) => {return numOfSet + 1})
     }
+  }
+
+  function isSorted(weights:number[]) {
+    let sorted = true;
+    for (let i = 0; i < weights.length-1; i++)
+      if (weights[i] < weights[i+1]) {            
+        sorted = false;
+        break;
+      }
+    return sorted;
+  }
+
+  function addUpWeights(sets) {
+    const weights: number[] = [];
+    for (const set of sets)
+      weights.push(set.weight);
+    return weights;
+  }
+
+  function isThereRest(sets) {
+    let noRest = true
+    for (const set of sets)
+      if (set.restTime > 0 || (set.restTimeLeft > 0 && set.restTimeRight > 0)) {
+        noRest = false;
+        break;
+      }
+    return noRest;
+  }
+
+  function calculateExperiencePoints(sets) {
+    let experiencePoints = 0;
+    for (const set of sets) {
+      if (set.weightLeft !== undefined || set.weightRight !== undefined) {
+        if (set.weightLeft === 0)
+          experiencePoints += set.repsLeft;
+        else
+          experiencePoints += set.repsLeft * set.weightLeft;
+        if (set.weightRight === 0)
+          experiencePoints += set.repsRight;
+        else
+          experiencePoints += set.repsRight * set.weightRight;
+      }
+      else{
+        if (set.weight === 0)
+          experiencePoints += set.reps;
+        else
+          experiencePoints += set.reps * set.weight;
+      }
+    }
+
+    return experiencePoints;
   }
 
   function addSetToDatabase(numOfSet:number) {
     if (numOfSet > 0) {
       let typeOfSet: string;
-      const uniqueCount = new Set(selectedExercises).size;
-      if (uniqueCount > 1) {
+      const selectedExercisesNumber = new Set(selectedExercises).size;
+      if (selectedExercisesNumber > 1) 
         typeOfSet = "super"
-      }
       else{
-        let noRest = true
-        for (const set of sets)
-          if (set.restTime > 0 || (set.restTimeLeft > 0 && set.restTimeRight > 0)) {
-          noRest = false;
-          break;
+        const noRest = isThereRest(sets);
+        if (noRest === true) {      
+          const weights = addUpWeights(sets);
+          const sorted = isSorted(weights);
+          sorted ? typeOfSet = "drop" : typeOfSet = "straight"
         }
-          if (noRest === true) {      
-            const weights = [];
-            for (const set of sets)
-              weights.push(set.weight);
-            let sorted = true;
-            for (let i = 0; i < weights.length-1; i++)
-              if (weights[i] < weights[i+1]) {            
-                sorted = false;
-                break;
-              }
-            sorted ? typeOfSet = "drop" : typeOfSet = "straight"
-          }
-            else
-              typeOfSet = "straight"
+        else
+          typeOfSet = "straight"
       }
     
-  
-          
-      let experiencePoints = 0;
-      for (const set of sets) {
-        if (set.weightLeft !== undefined || set.weightRight !== undefined) {
-          if (set.weightLeft === 0) {
-            experiencePoints += set.repsLeft;
-          }
-          else{
-            experiencePoints += set.repsLeft * set.weightLeft;
-          }
-          if (set.weightRight === 0) {
-            experiencePoints += set.repsRight;
-          }
-          else{
-            experiencePoints += set.repsRight * set.weightRight;
-          }
-        }
-        else{
-          if (set.weight === 0) {
-            experiencePoints += set.reps;
-          }
-          else
-            experiencePoints += set.reps * set.weight;
-        }
-          
-      }
+      const experiencePoints = calculateExperiencePoints(sets);  
 
       addExperience(userID, Math.round(experiencePoints))
       addExercise(userID, date, selectedExercises, sets, typeOfSet);
@@ -196,30 +201,35 @@ const AddWorkout = () => {
       alert("Not enough data");
   }
 
+  
   return (
     <View style={styles.container}>
       <Datepicker date={date} changeDate={date => setDate(date)} />
       <Text>{date.toDateString()}</Text>
       <SelectMenu 
-        data={exercises} 
+        data={allExercises || []} 
         setSelectedValue={ setCurrentExercise }
-        />
-      {exercises.find((exercise) => exercise.value === currentExercise)?.unilateral === true
+      />
+      {allExercises && allExercises.find((exercise) => exercise.value === currentExercise)?.unilateral === true
       ?  <>
-          <UnilateralSet set={uniSet} setSet={setUniSet}/>
-          <Pressable onPress={() => addUnilateralSet(uniSet)}>
+          <UnilateralSet set={unilateralSet} setSet={setUniSet}/>
+         
+          <Pressable onPress={() => addUnilateralSet(unilateralSet)}>
             <Text>Add another</Text>
           </Pressable>
+         
           <Pressable onPress={() => addSetToDatabase(numOfSet)}>
             <Text>Finish set</Text>
           </Pressable>
         </>
-      : exercises.find((exercise) => exercise.value === currentExercise)?.unilateral === false
+      : allExercises && allExercises.find((exercise) => exercise.value === currentExercise)?.unilateral === false
       ? <>
-          <BilateralSet set={biSet} setSet={setBiSet}/>
-          <Pressable onPress={() => addBilateralSet(biSet)}>
+          <BilateralSet set={bilateralSet} setSet={setBilateralSet}/>
+         
+          <Pressable onPress={() => addBilateralSet(bilateralSet)}>
             <Text>Add new set</Text>
           </Pressable>
+         
           <Pressable onPress={() => addSetToDatabase(numOfSet)}>
             <Text>Finish set</Text>
           </Pressable>
@@ -234,21 +244,21 @@ export default AddWorkout
 
 const styles = StyleSheet.create({
   container: {
-      justifyContent: 'center',
-      flex: 1,
+    justifyContent: 'center',
+    flex: 1,
   },
   button: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'lightblue',
-      padding: 10,
-      width: 100
-    },
-    text: {
-      fontSize: 16,
-      lineHeight: 21,
-      fontWeight: 'bold',
-      letterSpacing: 0.25,
-      color: 'white',
-    },
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'lightblue',
+    padding: 10,
+    width: 100
+  },
+  text: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: 'bold',
+    letterSpacing: 0.25,
+    color: 'white',
+  },
 });

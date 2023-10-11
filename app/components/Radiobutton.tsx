@@ -8,25 +8,23 @@ const Radiobutton = (props) => {
     const options = props.options;
 
     const radioButtonItems = [];
-    for (let i = 0; i < options.length; i++) {
-        radioButtonItems.push(
-          <RadioButtonItem  key={i} value={options[i]} label={options[i]} />
-        );
-      }
-  return (
-    <View>
-        <RadioButtonGroup
-            radioStyle={styles.radioItem}
-            containerStyle={styles.radioContainer}
-            labelStyle={styles.radioLabel}
-            selected={selectedValue}
-            onSelected={(value) => setselectedValue(value)}
-            radioBackground="white">
+    for (let i = 0; i < options.length; i++)
+        radioButtonItems.push(<RadioButtonItem  key={i} value={options[i]} label={options[i]} />);
 
-            {radioButtonItems}
-        </RadioButtonGroup>
-    </View>
-  )
+    return (
+        <View>
+            <RadioButtonGroup
+                radioStyle={styles.radioItem}
+                containerStyle={styles.radioContainer}
+                labelStyle={styles.radioLabel}
+                selected={selectedValue}
+                onSelected={(value) => setselectedValue(value)}
+                radioBackground="white"
+            >
+                {radioButtonItems}
+            </RadioButtonGroup>
+        </View>
+    )
 }
 
 export default Radiobutton
