@@ -13,7 +13,7 @@ const Registration = ({navigation}: RouterProps) => {
     const [name, setName] = useState<string>();
     const [email, setEmail] = useState<string>();
     const [password, setPassword] = useState<string>();
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState(false);
     const auth = FIREBASE_AUTH;
     
 

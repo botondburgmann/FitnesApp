@@ -15,7 +15,7 @@ const Height = ({navigation}: RouterProps) => {
 
   const [height, setHeight] = useState<string>();
   const [value, setValue] = useState<string>();
-  const [items] = useState<Array<Object>>([
+  const [items] = useState<object[]>([
     {label: 'Metric (m)', value: 'm'},
     {label: 'Imperial (ft)', value: 'ft'}
   ]);

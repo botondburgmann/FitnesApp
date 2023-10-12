@@ -15,8 +15,8 @@ const Weight = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
 
   const [weight, setWeight] = useState<string>();
-  const [value, setValue] = useState<string>(null);
-  const [items] = useState<Array<Object>>([
+  const [value, setValue] = useState<string>();
+  const [items] = useState<object[]>([
     {label: 'Metric (kg)', value: 'kg'},
     {label: 'Imperial (lbs)', value: 'lbs'}
   ]);

@@ -38,10 +38,9 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
             if(value === undefined)
                 throw new Error(`Gender must be set`);
             
-            /* if(!(value.toLowerCase() === 'male' || value.toLowerCase() === 'female'))
-                throw new Error(`Gender must be set to either male or female`); */
+            else if(!(value.toLowerCase() === 'male' || value.toLowerCase() === 'female'))
+                throw new Error(`Gender must be set to either male or female`);
             
-            // If the field is age then calculate it from date of birth
         if (field === 'age'){
             const today = new Date()      
             const age =  today.getFullYear()-value.getFullYear();      
@@ -62,10 +61,9 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
         if (field === 'weight' || field === 'height') {
             if(Number.isNaN(value))
                 throw new Error(`${field} must be set`);
-            
-            if(typeof(value) !== 'number')
+            else if(typeof(value) !== 'number')
                 throw new Error(`${field} must be a number`);
-            if(value < 0)
+            else if(value < 0)
                 throw new Error(`${field} can't be a negative number`);
             
         }
@@ -74,11 +72,9 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
         if (field === 'height' && system === "ft")
             value = Math.round((value*30.48)*100)/100;
         
-        if (field === 'activityLevel'){
-            if(!(value === 'beginner' || value === 'intermediate' || value === 'advanced') )
-                throw new Error(`Please select one of the options`);
-
-        }
+        if (field === 'activityLevel' && 
+        !(value === 'beginner' || value === 'intermediate' || value === 'advanced') )
+            throw new Error(`Please select one of the options`);
 
     const usersCollection = collection(FIRESTORE_DB, 'users');
         const q = query(usersCollection, where("userID", '==',userID));
@@ -86,7 +82,6 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
         querySnapshot.forEach(async (docSnapshot) => {
             const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
 
-            // After the last step set the set field to true
             if (field === 'activityLevel') {
                 const newData = { [field]: value,set: true }; 
                 await updateDoc(userDocRef, newData);
@@ -94,7 +89,6 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
                 const newData = { [field]: value}; 
                 await updateDoc(userDocRef, newData);
             }
-            // Navigate to the next page        
             navigation.navigate(nextPage);
         });  
     }   catch (error:any) {

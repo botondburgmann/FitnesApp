@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const useFetch = (getter: Function, userID: string) => {
     const [data, setData] = useState(null);
     const [isPending, setIsPending] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string>(null);
     
 
     useEffect(() => {
