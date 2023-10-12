@@ -52,13 +52,27 @@ const AddWorkout = () => {
 
   const [allExercises, setAllExercises] = useState<ExerciseSelectOption[]>();
   const [currentExercise, setCurrentExercise] = useState<string>();
-  const [selectedExercises, setSelectedExercises] = useState<string[]>();
+  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
 
-  const [numOfSet, setNumOfSet] = useState<number>();
+  const [numOfSet, setNumOfSet] = useState(0);
 
-  const [bilateralSet, setBilateralSet] = useState<BilateralSet>()
+  const [bilateralSet, setBilateralSet] = useState({
+    weight: "", 
+    reps: "",
+    time: "",
+    restTime: ""
+  })
 
-  const [unilateralSet, setUniSet] = useState<UnilateralSet>()
+  const [unilateralSet, setUniSet] = useState({
+    weightLeft: "",
+    repsLeft: "",
+    timeLeft: "",
+    restTimeLeft: "",
+    weightRight: "",
+    repsRight: "",
+    timeRight: "",
+    restTimeRight: ""
+  })
   
   const [sets, setSets] = useState([])
 
@@ -85,7 +99,7 @@ const AddWorkout = () => {
         console.error("Error setting data:", error);
       }
     }
-    
+
     const exercises = fetchData();  
     setData(exercises);
       

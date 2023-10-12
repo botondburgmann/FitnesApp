@@ -229,15 +229,16 @@ export const getLevel =async (userID:string) => {
         alert("Couldn't find set field : " + error.message);
       }
 }
-export const getExperience   =async (userID:string) => {
+export const getExperienceNeeded   =async (userID:string) => {
     try {
         const usersCollectionRef = collection(FIRESTORE_DB, 'users');
         const q = query(usersCollectionRef, where('userID', '==', userID));
         const querySnapshot = await getDocs(q);
         const userDocSnapshot = querySnapshot.docs[0];
         const experience = userDocSnapshot.data().experience;
-        return experience;
-      } catch (error) {
+        const level = userDocSnapshot.data().level
+        return Math.round(100*1.5**(level+1)-experience)
+    } catch (error) {
         alert("Couldn't find experience field : " + error.message);
       }
 }
