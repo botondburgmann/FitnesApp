@@ -1,26 +1,15 @@
 import { StyleSheet, View, Text, Pressable } from 'react-native'
-import React, {useState } from 'react'
-import { NavigationProp, useRoute } from '@react-navigation/native';
-import { setUpProfile } from '../functions/databaseQueries';
+import React from 'react'
+import { NavigationProp } from '@react-navigation/native';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-interface RouteParams {
-  userID: string;
-}
+
 
 
 const Workouts = ({navigation}: RouterProps) => {
-  const route = useRoute();
-  const {userID} = route.params as RouteParams;
-    const [accountContainerStyle, setAccountContainerStyle] = useState(false);
-
-    const toggleAccountVisibility = () => {
-        setAccountContainerStyle(!accountContainerStyle);
-      };
-
   return (
     <View style={styles.container}>
       <View style={styles.buttonGroup}>

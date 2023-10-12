@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Login from './app/screens/Login';
 import { useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { FIREBASE_AUTH, FIRESTORE_DB} from './FirebaseConfig';
+import { FIREBASE_AUTH} from './FirebaseConfig';
 import Registration from './app/screens/Registration';
 import Age from './app/screens/Age';
 import Weight from './app/screens/Weight';
@@ -19,6 +19,7 @@ import { getSetUpValue } from './app/functions/databaseQueries';
 import Toplist from './app/screens/Toplist';
 import Exercises from './app/screens/Exercises';
 import Focus from './app/screens/Focus';
+import UserContext from './app/contexts/UserContext';
 
 
 const Stack = createNativeStackNavigator();
@@ -27,30 +28,27 @@ const SetupStack = createNativeStackNavigator();
 
 const Tab = createBottomTabNavigator();
 
-function SetUpLayout({route}) {
-  const {userID} = route.params;
+function SetUpLayout() {
   return( 
-    <SetupStack.Navigator>
-      <SetupStack.Screen name="Gender" component={Gender} initialParams={{userID: userID} }  options={{ headerShown: false }}/>
-      <SetupStack.Screen name="Age" component={Age} initialParams={{userID: userID} } options={{ headerShown: false }}/>
-      <SetupStack.Screen name="Weight" component={Weight} initialParams={{userID: userID} }  options={{ headerShown: false }} />
-      <SetupStack.Screen name="Height" component={Height} initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <SetupStack.Screen name="ActivityLevel" component={ActivityLevel } initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <SetupStack.Screen name="InsideLayout" component={ InsideLayout } initialParams={{userID: userID} } options={{ headerShown: false }} />
-    </SetupStack.Navigator>
+      <SetupStack.Navigator>
+        <SetupStack.Screen name="Gender" component={Gender} options={{ headerShown: false }}/>
+        <SetupStack.Screen name="Age" component={Age}  options={{ headerShown: false }}/>
+        <SetupStack.Screen name="Weight" component={Weight}   options={{ headerShown: false }} />
+        <SetupStack.Screen name="Height" component={Height} options={{ headerShown: false }} />
+        <SetupStack.Screen name="ActivityLevel" component={ActivityLevel }options={{ headerShown: false }} />
+        <SetupStack.Screen name="InsideLayout" component={ InsideLayout }  options={{ headerShown: false }} />
+      </SetupStack.Navigator>
   );
 }
 
-function InsideLayout({route}) {
-  const {userID} = route.params;
-  
+function InsideLayout() {
   return( 
-    <Tab.Navigator screenOptions={{ tabBarStyle: {backgroundColor: '#ff0000'}, tabBarInactiveTintColor: '#fff'}}>
-      <Tab.Screen name='Workouts' component={WorkoutLayout} initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <Tab.Screen name='Toplist' component={Toplist} initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <Tab.Screen name='Exercises' component={Exercises} initialParams={{userID: userID} } options={{ headerShown: false }} />
-      <Tab.Screen name='Account' component={Account} initialParams={{userID: userID} } options={{ headerShown: false }} />
-    </Tab.Navigator>
+      <Tab.Navigator screenOptions={{ tabBarStyle: {backgroundColor: '#ff0000'}, tabBarInactiveTintColor: '#fff'}}>
+        <Tab.Screen name='Workouts' component={WorkoutLayout}  options={{ headerShown: false }} />
+        <Tab.Screen name='Toplist' component={Toplist}  options={{ headerShown: false }} />
+        <Tab.Screen name='Exercises' component={Exercises} options={{ headerShown: false }} />
+        <Tab.Screen name='Account' component={Account} options={{ headerShown: false }} />
+      </Tab.Navigator>
   );
 }
 
@@ -83,21 +81,25 @@ export default function App() {
 
 
 
+  const userID = user.uid;
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName='Login'>
-        {user && alreadySetUp === true ? 
-          (<Stack.Screen name='Inside' component={ InsideLayout} initialParams={{userID: user.uid} } options={{ headerShown: false }}/>)
-        : user && alreadySetUp === false ?
-          (<Stack.Screen name='SetUp' component={ SetUpLayout} initialParams={{userID: user.uid} } options={{ headerShown: false } }/>) 
-        : (
-          <>
-            <Stack.Screen name='Login' component={ Login} options={{ headerShown: false }}/>
-            <Stack.Screen name='Register' component={ Registration} options={{ headerShown: false }}/>
-          </>
-          )
-        }
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserContext.Provider value={userID}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName='Login'>
+          {user && alreadySetUp === true ? 
+            (<Stack.Screen name='Inside' component={ InsideLayout} options={{ headerShown: false }}/>)
+          : user && alreadySetUp === false ?
+            (<Stack.Screen name='SetUp' component={ SetUpLayout} options={{ headerShown: false } }/>) 
+          : (
+            <>
+              <Stack.Screen name='Login' component={ Login} options={{ headerShown: false }}/>
+              <Stack.Screen name='Register' component={ Registration} options={{ headerShown: false }}/>
+            </>
+            )
+          }
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserContext.Provider>
+
   );
 }

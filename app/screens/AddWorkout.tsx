@@ -1,17 +1,14 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Datepicker from '../components/Datepicker'
 import SelectMenu from '../components/SelectMenu'
 import { addExercise, addExperience, getExercises } from '../functions/databaseQueries'
 import UnilateralSet from '../components/UnilateralSet'
 import BilateralSet from '../components/BilateralSet'
-import { useRoute } from '@react-navigation/native'
+import UserContext from '../contexts/UserContext'
 
 
 
-interface RouteParams {
-  userID: string;
-}
 
 interface ExerciseSelectOption{
   label: string;
@@ -45,9 +42,7 @@ interface UnilateralSet {
 }
 
 const AddWorkout = () => {
-  const route = useRoute();
-  const {userID} = route.params as RouteParams;
-
+  const userID = useContext(UserContext);
   const [date, setDate] = useState(new Date());
 
   const [allExercises, setAllExercises] = useState<ExerciseSelectOption[]>();
@@ -83,7 +78,7 @@ const AddWorkout = () => {
         const exercises = await getExercises(userID);
         return exercises
       } catch (error) {
-        console.error("Error fetching data:", error);
+        alert("Error fetching data:" + error);
       }
     };
     
@@ -96,7 +91,7 @@ const AddWorkout = () => {
         }));
         setAllExercises(exerciseData);
       } catch (error) {
-        console.error("Error setting data:", error);
+        alert("Error setting data:"+ error);
       }
     }
 

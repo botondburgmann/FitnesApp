@@ -28,40 +28,37 @@ const Login = ({navigation}: RouterProps) => {
 
   return (
     <View style={styles.container}>
-      <View>
       <Text  style={[styles.logo]}>App Name</Text>
-        <TextInput 
-          value={email}
-          style={styles.input} 
-          placeholder='Email' 
-          autoCapitalize='none' 
-          onChangeText={(text) => setEmail(text)}
-        />
-        <TextInput 
-          value={password}
-          secureTextEntry={true}
-          style={styles.input} 
-          placeholder='Password' 
-          autoCapitalize='none' 
-          onChangeText={(text) => setPassword(text)}
-        />
+      <TextInput 
+        value={email}
+        style={styles.input} 
+        placeholder='Email' 
+        autoCapitalize='none' 
+        onChangeText={(text) => setEmail(text)}
+      />
+      <TextInput 
+        value={password}
+        secureTextEntry={true}
+        style={styles.input} 
+        placeholder='Password' 
+        autoCapitalize='none' 
+        onChangeText={(text) => setPassword(text)}
+      />
 
-        { loading ? 
-          <ActivityIndicator size="large" color="#0000ff"/>
-        : 
-          <>
-            <Pressable style={styles.button} onPress={signIn}>
-              <Text  style={styles.text}>Login</Text>
-            </Pressable>
-            <Text style={[styles.text, {marginTop: 30}]}>Not registered yet</Text>
-            <Pressable style={styles.button} onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.text}>Create new account here</Text>
-            </Pressable>
-            <Text style={styles.copyright}>Copyright 2023 Botond Burgmann</Text>
-
-          </> 
-        }
-      </View>
+      { loading ? 
+        <ActivityIndicator size="large" color="#0000ff"/>
+      : 
+        <>
+          <Pressable style={styles.button} onPress={signIn}>
+            <Text  style={styles.text}>Login</Text>
+          </Pressable>
+          <Text style={[styles.text, {marginTop: 30}]}>Not registered yet</Text>
+          <Pressable style={styles.button} onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.text}>Create new account here</Text>
+          </Pressable>
+          <Text style={styles.copyright}>Copyright 2023 Botond Burgmann</Text>
+        </> 
+      }
     </View>
   );
 };

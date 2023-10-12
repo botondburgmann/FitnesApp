@@ -1,36 +1,26 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native'
-import React, { useState } from 'react'
-import { NavigationProp, useRoute } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import React, { useContext, useState } from 'react'
+import { NavigationProp } from '@react-navigation/native';
 import { setUpProfile } from '../functions/databaseQueries';
 import Datepicker from '../components/Datepicker';
+import UserContext from '../contexts/UserContext';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
-interface RouteParams {
-  userID: string;
-}
+
 
 const Age = ({navigation}: RouterProps) => {
-  const route = useRoute();
+  const userID = useContext(UserContext);
+  const [birthDate, setBirthDate] = useState(new Date());
 
-  const {userID} = route.params as RouteParams;
-  
-  const [birthDate, setBirthDate] = useState<Date>(new Date());
-  const [show, setShow] = useState<boolean>(false);
-
-  const onChange = (selectedDate) => {
-    const currentDate: Date = selectedDate || birthDate; 
-    setShow(false);
-    setBirthDate(currentDate);
-  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Please, select your date of birth</Text>
-      <Datepicker date={birthDate} changeDate={date => setBirthDate(date)} />
+      <Datepicker date={birthDate} setDate={setBirthDate} />
+      <Text>{birthDate.toDateString()}</Text>
       <View style={styles.buttonGroup}>
         <Pressable style={styles.button} onPress={() => navigation.navigate('Gender')}>
           <Text style={styles.text}>Go back</Text>

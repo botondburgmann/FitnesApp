@@ -1,26 +1,26 @@
 import { View, StyleSheet, Pressable, Text } from 'react-native'
-import React, { useState } from 'react'
-import { NavigationProp, useRoute } from '@react-navigation/native';
+import React, { useContext, useState } from 'react'
+import { NavigationProp } from '@react-navigation/native';
 import { setUpProfile } from '../functions/databaseQueries';
 import SelectMenu from '../components/SelectMenu';
+import UserContext from '../contexts/UserContext';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
-interface RouteParams {
-  userID: string;
-}
+
 
 const ActivityLevel = ({navigation}: RouterProps) => {
-  const route = useRoute();
+  const userID = useContext(UserContext);
+
   const [value, setValue] = useState<string>();
   const [items] = useState([
     {label: 'Beginner', value: 'beginner'},
     {label: 'Intermediate', value: 'intermediate'},
     {label: 'Advanced', value: 'advanced'}
   ]);
-  const {userID} = route.params as RouteParams;
+
 
   return (
     <View style={styles.container}>

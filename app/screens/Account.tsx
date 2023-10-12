@@ -1,13 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig'
 import { getExperienceNeeded, getLevel, getExerciseWithMostReps, getName,getExerciseWithMostWeight } from '../functions/databaseQueries'
-import { useRoute } from '@react-navigation/native';
+import UserContext from '../contexts/UserContext';
 
 
-interface RouteParams {
-  userID: string;
-}
 
 interface BestExercise {
   name: string;
@@ -16,9 +13,8 @@ interface BestExercise {
 }
 
 const Account = () => {
-  const route = useRoute();
 
-  const {userID} = route.params as RouteParams;
+  const userID   = useContext(UserContext);
 
   const [name, setName] = useState<string>();
   const [level, setLevel] = useState<number>();
@@ -33,14 +29,14 @@ const Account = () => {
         const data = await fetcher(userID);  
         return data;
       } catch (error) {
-        console.log("Error fetching data: ", error);
+        alert("Error fetching data: " + error);
       }
     }
     const setField =async (setter: Function, value: Promise<any>) => {
       try {
         setter(await value);
       } catch (error) {
-        console.log("Error setting data: ", error);
+        alert("Error setting data: " + error);
       }   
     }
 
