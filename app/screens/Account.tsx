@@ -1,69 +1,46 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig'
 import { getExperienceNeeded, getLevel, getExerciseWithMostReps, getName,getExerciseWithMostWeight } from '../functions/databaseQueries'
 import UserContext from '../contexts/UserContext';
+import useFetch from '../hooks/useFetch';
 
-
-
-interface BestExercise {
-  name: string;
-  weight: number;
-  reps: number;
-}
 
 const Account = () => {
-
   const userID   = useContext(UserContext);
 
-  const [name, setName] = useState<string>();
-  const [level, setLevel] = useState<number>();
-  const [experienceNeeded, setExperienceNeeded] = useState<number>();
-  const [exerciseWithMostWeight, setExerciseWithMostWeight] = useState<BestExercise>();
-  const [exerciseWithMostReps, setExerciseWithMostReps] = useState<BestExercise>()
- 
+  const {data:name, isPending:namePending, error: nameError } = useFetch(getName, userID);
+  const {data:level, isPending:levelPending, error:levelError } = useFetch(getLevel, userID);
+  const {data:experienceNeeded, isPending:experienceNeededPending, error:experienceNeededError } = useFetch(getExperienceNeeded, userID);
+  const {data:exerciseWithMostWeight, isPending:exerciseWithMostWeightPending, error:exerciseWithMostWeightError } = useFetch(getExerciseWithMostWeight, userID);
+  const {data:exerciseWithMostReps, isPending:exerciseWithMostRepsPending, error:exerciseWithMostRepsError } = useFetch(getExerciseWithMostReps, userID);
 
-  useEffect(() => {
-    const fetchData =async (data:string, fetcher: Function, userID: string): Promise<any> => {
-      try {
-        const data = await fetcher(userID);  
-        return data;
-      } catch (error) {
-        alert("Error fetching data: " + error);
-      }
-    }
-    const setField =async (setter: Function, value: Promise<any>) => {
-      try {
-        setter(await value);
-      } catch (error) {
-        alert("Error setting data: " + error);
-      }   
-    }
-
-    const name = fetchData('name', getName, userID);
-    const level = fetchData('level', getLevel, userID);
-    const experienceNeeded = fetchData('experience', getExperienceNeeded, userID);
-    const exerciseWithMostWeight = fetchData('exerciseWithMostWeight', getExerciseWithMostWeight,userID);
-    const exerciseWithMostReps = fetchData('exerciseWithMostReps', getExerciseWithMostReps,userID);
-
-    setField(setName, name);
-    setField(setLevel, level);
-    setField(setExperienceNeeded, experienceNeeded);
-    setField(setExerciseWithMostWeight, exerciseWithMostWeight);
-    setField(setExerciseWithMostReps, exerciseWithMostReps);
-  }, [exerciseWithMostWeight])
   
   return (
     <View style={styles.container} >
+      {nameError && <Text style={styles.text}>{nameError}</Text>}
+      {namePending && <Text style={styles.text}>Loading your name...</Text>}
       {name && <Text style={styles.text}>{name}</Text>}
+
+      {levelError && <Text style={styles.text}>{levelError}</Text>}
+      {levelPending && <Text style={styles.text}>Loading your level...</Text>}
       {level && <Text style={styles.text}>Level: {level}</Text>}
+
+      {experienceNeededError && <Text style={styles.text}>{experienceNeededError}</Text>}
+      {experienceNeededPending && <Text style={styles.text}>Loading how many experience you need...</Text>}
       {experienceNeeded && <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>}
 
       <Text style={styles.text}>Best records</Text>
+
+      {exerciseWithMostWeightError && <Text style={styles.text}>{exerciseWithMostWeightError}</Text>}
+      {exerciseWithMostWeightPending && <Text style={styles.text}>Loading your strongest exercise...</Text>}
       {exerciseWithMostWeight && 
       <Text style={styles.text}>
         Weight: {exerciseWithMostWeight.name} {exerciseWithMostWeight.weight} kg ({exerciseWithMostWeight.reps} repetitions)
       </Text>}
+
+      {exerciseWithMostRepsError && <Text style={styles.text}>{exerciseWithMostRepsError}</Text>}
+      {exerciseWithMostRepsPending && <Text style={styles.text}>Loading your exercise with the most repetitions done...</Text>}
       {exerciseWithMostReps && 
       <Text style={styles.text}>
         Most repetitions: {exerciseWithMostReps.name} {exerciseWithMostReps.reps} repetitions ({exerciseWithMostReps.weight} kg)
@@ -85,24 +62,24 @@ export default Account
 
 const styles = StyleSheet.create({
   container: {
-  flex: 1,
-  justifyContent: 'center',
-  backgroundColor: '#ff0000'
-},
-text:{
-  alignSelf: 'center',
-  fontSize: 18,
-  color: "#fff",
-  textTransform: 'uppercase',
-  fontWeight: "600",
-  paddingVertical: 10,
-},
-button:{
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#ff0000'
+  },
+  text:{
+    alignSelf: 'center',
+    fontSize: 18,
+    color: "#fff",
+    textTransform: 'uppercase',
+    fontWeight: "600",
+    paddingVertical: 10,
+  },
+  button:{
     width: 250,
     paddingHorizontal: 5,
     marginHorizontal: 20,
     marginVertical: 10,
     alignSelf: "center",
     backgroundColor: "#000",
-},
+  },
 });

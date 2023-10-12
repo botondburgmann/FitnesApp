@@ -4,6 +4,7 @@ import { NavigationProp } from '@react-navigation/native';
 import Routine from '../components/Routine';
 import { getGender } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
+import useFetch from '../hooks/useFetch';
 
 
 interface RouterProps {
@@ -13,23 +14,8 @@ interface RouterProps {
 
 const Routines = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext)
-  const [gender, setGender] = useState<string>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getGender(userID);  
-        data && setGender(data);
-        
-      } catch (error) {
-        console.error("Error fetching exercises:", error);
-      }
-    };
-
-    fetchData();    
-  }, [])
+  const {data:gender, isPending:genderPending, error:genderError} = useFetch(getGender, userID);
     
-
   const maleWorkoutImages = {
     'Full body': require('../assets/full-body-male.png'),
     'Push' : require('../assets/push-male.png'),
@@ -80,9 +66,35 @@ const Routines = ({navigation}: RouterProps) => {
         
   return (
     <ScrollView>
-        {routineComponents}
+      {genderError && <Text style={styles.text}>{genderError}</Text>}
+      {genderPending && <Text style={styles.text}>Loading your gender...</Text>}
+      {gender && routineComponents}
      </ScrollView>
   )
 }
 
 export default Routines
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#ff0000'
+  },
+  text:{
+    alignSelf: 'center',
+    fontSize: 18,
+    color: "#fff",
+    textTransform: 'uppercase',
+    fontWeight: "600",
+    paddingVertical: 10,
+  },
+  button:{
+    width: 250,
+    paddingHorizontal: 5,
+    marginHorizontal: 20,
+    marginVertical: 10,
+    alignSelf: "center",
+    backgroundColor: "#000",
+  },
+});

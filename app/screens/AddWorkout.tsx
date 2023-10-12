@@ -1,11 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Datepicker from '../components/Datepicker'
 import SelectMenu from '../components/SelectMenu'
 import { addExercise, addExperience, getExercises } from '../functions/databaseQueries'
 import UnilateralSet from '../components/UnilateralSet'
 import BilateralSet from '../components/BilateralSet'
 import UserContext from '../contexts/UserContext'
+import useFetch from '../hooks/useFetch'
 
 
 
@@ -34,12 +35,6 @@ interface UnilateralSet {
   restTimeRight: string;
  }
 
- interface Exercise{
-  name: string;
-  musclesWorked: string[];
-  availableTo: string[];
-  unilateral: boolean;
-}
 
 const AddWorkout = () => {
   const userID = useContext(UserContext);
@@ -71,34 +66,17 @@ const AddWorkout = () => {
   
   const [sets, setSets] = useState([])
 
+  const {data:exercises, isPending:exercisesPending, error:exercisesError } = useFetch(getExercises, userID);
 
-  useEffect(() => {
-    const fetchData = async ():Promise<Exercise[]> => {
-      try {
-        const exercises = await getExercises(userID);
-        return exercises
-      } catch (error) {
-        alert("Error fetching data:" + error);
-      }
-    };
-    
-    const setData =async (exercises:Promise<Exercise[]> ) => {      
-      try {
-        const exerciseData = (await exercises).map((exercise) => ({
-          label: exercise.name,
-          value: exercise.name,
-          unilateral: exercise.unilateral,
-        }));
-        setAllExercises(exerciseData);
-      } catch (error) {
-        alert("Error setting data:"+ error);
-      }
-    }
+  if (!exercisesPending && !exercisesError && exercises) {
+    const exerciseData = exercises.map((exercise) => ({
+      label: exercise.name,
+      value: exercise.name,
+      unilateral: exercise.unilateral,
+    }));
+    setAllExercises(exerciseData);  
+  }
 
-    const exercises = fetchData();  
-    setData(exercises);
-      
-  }, [])
 
   
   function addUnilateralSet(set: UnilateralSet) {
