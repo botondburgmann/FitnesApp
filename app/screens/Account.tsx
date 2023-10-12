@@ -9,7 +9,7 @@ interface RouteParams {
   userID: string;
 }
 
-interface Exercise {
+interface BestExercise {
   name: string;
   weight: number;
   reps: number;
@@ -23,8 +23,8 @@ const Account = () => {
   const [name, setName] = useState<string>();
   const [level, setLevel] = useState<number>();
   const [experienceNeeded, setExperienceNeeded] = useState<number>();
-  const [exerciseWithMostWeight, setExerciseWithMostWeight] = useState<Exercise>();
-  const [exerciseWithMostReps, setExerciseWithMostReps] = useState<Exercise>()
+  const [exerciseWithMostWeight, setExerciseWithMostWeight] = useState<BestExercise>();
+  const [exerciseWithMostReps, setExerciseWithMostReps] = useState<BestExercise>()
  
 
   useEffect(() => {
@@ -33,35 +33,33 @@ const Account = () => {
       return Math.round(100*1.5**(level+1)-currentExperience)
     }
 
-    const fetchData = async () => {
+    const fetchData =async (data:string, fetcher: Function, userID: string): Promise<any> => {
       try {
-        const name = await getName(userID);  
-        const level = await getLevel(userID);
-        const experience = await getExperience(userID);
-        const exerciseWithMostWeight = await getExerciseWithMostWeight(userID);
-        const exerciseWithMostReps = await getExerciseWithMostReps(userID);
-
-        name && setName(name);
-        level && setLevel(level);
-        experience && setExperienceNeeded(calculateExperienceNeeded(level, experience));
-        exerciseWithMostWeight && 
-        setExerciseWithMostWeight({
-          weight: exerciseWithMostWeight.weight, 
-          name: exerciseWithMostWeight.name, 
-          reps: exerciseWithMostWeight.reps
-        })
-        exerciseWithMostReps && 
-        setExerciseWithMostReps({
-          weight: exerciseWithMostReps.weight, 
-          name: exerciseWithMostReps.name, 
-          reps: exerciseWithMostReps.reps
-        })
+        const data = await fetcher(userID);  
+        return data;
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.log("Error fetching data: ", error);
       }
-    };
+    }
+    const setField =async (setter: Function, value: Promise<any>) => {
+      try {
+        setter(await value);
+      } catch (error) {
+        console.log("Error setting data: ", error);
+      }   
+    }
 
-    fetchData();    
+    const name = fetchData('name', getName, userID);
+    const level = fetchData('level', getLevel, userID);
+    const experience = fetchData('experience', getExperience, userID);
+    const exerciseWithMostWeight = fetchData('exerciseWithMostWeight', getExerciseWithMostWeight,userID);
+    const exerciseWithMostReps = fetchData('exerciseWithMostReps', getExerciseWithMostReps,userID);
+
+    setField(setName, name);
+    setField(setLevel, level);
+   // setField(setExperienceNeeded, experience);
+    setField(setExerciseWithMostWeight, exerciseWithMostWeight);
+    setField(setExerciseWithMostReps, exerciseWithMostReps);
   }, [exerciseWithMostWeight])
   
   return (

@@ -37,6 +37,13 @@ interface UnilateralSet {
   restTimeRight: string;
  }
 
+ interface Exercise{
+  name: string;
+  musclesWorked: string[];
+  availableTo: string[];
+  unilateral: boolean;
+}
+
 const AddWorkout = () => {
   const route = useRoute();
   const {userID} = route.params as RouteParams;
@@ -57,21 +64,31 @@ const AddWorkout = () => {
 
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async ():Promise<Exercise[]> => {
       try {
         const exercises = await getExercises(userID);
-        const exerciseData = exercises.map((exercise) => ({
+        return exercises
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    
+    const setData =async (exercises:Promise<Exercise[]> ) => {      
+      try {
+        const exerciseData = (await exercises).map((exercise) => ({
           label: exercise.name,
           value: exercise.name,
           unilateral: exercise.unilateral,
         }));
         setAllExercises(exerciseData);
       } catch (error) {
-        console.error("Error fetching exercises:", error);
+        console.error("Error setting data:", error);
       }
-    };
-
-    fetchData();    
+    }
+    
+    const exercises = fetchData();  
+    setData(exercises);
+      
   }, [])
 
   

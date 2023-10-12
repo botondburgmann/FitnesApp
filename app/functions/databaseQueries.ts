@@ -3,7 +3,14 @@ import { addDoc, collection, doc, getDocs, query, serverTimestamp, updateDoc, wh
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 
-interface Exercise {
+interface Exercise{
+    name: string;
+    musclesWorked: string[];
+    availableTo: string[];
+    unilateral: boolean;
+}
+
+interface BestExercise {
     name: string;
     weight: number;
     reps: number;
@@ -95,7 +102,7 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
     }
 }
 
-export const getExercises =async (userID: string) => {    
+export const getExercises =async (userID: string):Promise<Exercise[]> => {    
     const data = [];
     const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
     const q = query(exercisesCollection, where("availableTo", 'array-contains-any', ['all', userID]));
@@ -197,7 +204,7 @@ export const addExperience = async (userID: string, experience) => {
     }
   };
 
-export const getName =async (userID:string) => {
+export const getName =async (userID:string): Promise<string> => {
     try {
         const usersCollectionRef = collection(FIRESTORE_DB, 'users');
         const q = query(usersCollectionRef, where('userID', '==', userID));
@@ -235,9 +242,9 @@ export const getExperience   =async (userID:string) => {
       }
 }
 
-export const getExerciseWithMostWeight = async (userID: string): Promise<Exercise> => {
+export const getExerciseWithMostWeight = async (userID: string): Promise<BestExercise> => {
     try {
-        const exerciseWithMostWeight: Exercise = {
+        const exerciseWithMostWeight: BestExercise = {
             name: "",
             weight: 0,
             reps: 0,
@@ -279,9 +286,9 @@ export const getExerciseWithMostWeight = async (userID: string): Promise<Exercis
   };
 
 
-export const getExerciseWithMostReps = async (userID: string): Promise<Exercise> => {
+export const getExerciseWithMostReps = async (userID: string): Promise<BestExercise> => {
     try {
-        const exerciseWithMostReps: Exercise = {
+        const exerciseWithMostReps: BestExercise = {
             name: "",
             weight: 0,
             reps: 0,
