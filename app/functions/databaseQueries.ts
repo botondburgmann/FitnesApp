@@ -104,7 +104,7 @@ export const getExercises =async (userID: string):Promise<Exercise[]> => {
     querySnapshot.forEach(async (docSnapshot) => {
         data.push(docSnapshot.data());   
     })
-    
+
     return data;
 }
 
@@ -258,17 +258,32 @@ export const getExerciseWithMostWeight = async (userID: string): Promise<BestExe
             const exercises = workoutDocSnapshot.data().exercise;
           
             for (let i = 0; i < sets.length; i++) {
-                if (sets[i].weight > exerciseWithMostWeight.weight) {
-                    exerciseWithMostWeight.weight = sets[i].weight;
-                    exerciseWithMostWeight.reps = sets[i].reps;
-                    exerciseWithMostWeight.name = exercises[i];
-                }  
-                else if (sets[i].weight === exerciseWithMostWeight.weight) 
-                    if (sets[i].reps > exerciseWithMostWeight.reps) {
+                if (sets[i].weight === undefined) {
+                    if (sets[i].weightLeft > exerciseWithMostWeight.weight || sets[i].weightRight > exerciseWithMostWeight.weight ) {
+                        sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.weight = sets[i].weightLeft : exerciseWithMostWeight.weight = sets[i].weightRight
+                        sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.reps = sets[i].repsLeft : exerciseWithMostWeight.reps = sets[i].repsRight
+                        exerciseWithMostWeight.name = exercises[i];
+                    }  
+                    else if (sets[i].weightLeft === exerciseWithMostWeight.weight || sets[i].weightRight === exerciseWithMostWeight.weight ) 
+                        if (sets[i].repsLeft > exerciseWithMostWeight.reps || sets[i].repsRight > exerciseWithMostWeight.reps ) {
+                            sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.weight = sets[i].weightLeft : exerciseWithMostWeight.weight = sets[i].weightRight
+                            sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.reps = sets[i].repsLeft : exerciseWithMostWeight.reps = sets[i].repsRight
+                            exerciseWithMostWeight.name = exercises[i];
+                        }   
+                }
+                else{
+                    if (sets[i].weight > exerciseWithMostWeight.weight) {
                         exerciseWithMostWeight.weight = sets[i].weight;
                         exerciseWithMostWeight.reps = sets[i].reps;
                         exerciseWithMostWeight.name = exercises[i];
-                    }                                       
+                    }  
+                    else if (sets[i].weight === exerciseWithMostWeight.weight) 
+                        if (sets[i].reps > exerciseWithMostWeight.reps) {
+                            exerciseWithMostWeight.weight = sets[i].weight;
+                            exerciseWithMostWeight.reps = sets[i].reps;
+                            exerciseWithMostWeight.name = exercises[i];
+                        }                                       
+                }
             }
         }
       }
@@ -302,17 +317,32 @@ export const getExerciseWithMostReps = async (userID: string): Promise<BestExerc
             const exercises = workoutDocSnapshot.data().exercise;
           
             for (let i = 0; i < sets.length; i++) {
-                if (sets[i].reps > exerciseWithMostReps.reps) {
-                    exerciseWithMostReps.weight = sets[i].weight;
-                    exerciseWithMostReps.reps = sets[i].reps;
-                    exerciseWithMostReps.name = exercises[i];
-                }  
-                else if (sets[i].reps === exerciseWithMostReps.reps) 
+                if (sets[i].reps === undefined) {
+                    if (sets[i].repsLeft > exerciseWithMostReps.weight || sets[i].repsRight > exerciseWithMostReps.reps ) {
+                        sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.weight = sets[i].repsLeft : exerciseWithMostReps.weight = sets[i].repsRight
+                        sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.reps = sets[i].repsLeft : exerciseWithMostReps.reps = sets[i].repsRight
+                        exerciseWithMostReps.name = exercises[i];
+                    }  
+                    else if (sets[i].repsLeft === exerciseWithMostReps.weight || sets[i].repsRight === exerciseWithMostReps.weight ) 
+                        if (sets[i].repsLeft > exerciseWithMostReps.reps || sets[i].repsRight > exerciseWithMostReps.reps ) {
+                            sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.weight = sets[i].repsLeft : exerciseWithMostReps.weight = sets[i].repsRight
+                            sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.reps = sets[i].repsLeft : exerciseWithMostReps.reps = sets[i].repsRight
+                            exerciseWithMostReps.name = exercises[i];
+                        }   
+                }
+                else{
                     if (sets[i].weight > exerciseWithMostReps.weight) {
                         exerciseWithMostReps.weight = sets[i].weight;
                         exerciseWithMostReps.reps = sets[i].reps;
                         exerciseWithMostReps.name = exercises[i];
-                    }                                             
+                    }  
+                    else if (sets[i].weight === exerciseWithMostReps.weight) 
+                        if (sets[i].reps > exerciseWithMostReps.reps) {
+                            exerciseWithMostReps.weight = sets[i].weight;
+                            exerciseWithMostReps.reps = sets[i].reps;
+                            exerciseWithMostReps.name = exercises[i];
+                        }                                       
+                }                                         
             }
         }
     }

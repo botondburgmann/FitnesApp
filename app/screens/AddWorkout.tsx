@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Datepicker from '../components/Datepicker'
 import SelectMenu from '../components/SelectMenu'
 import { addExercise, addExperience, getExercises } from '../functions/databaseQueries'
@@ -68,14 +68,18 @@ const AddWorkout = () => {
 
   const {data:exercises, isPending:exercisesPending, error:exercisesError } = useFetch(getExercises, userID);
 
-  if (!exercisesPending && !exercisesError && exercises) {
-    const exerciseData = exercises.map((exercise) => ({
-      label: exercise.name,
-      value: exercise.name,
-      unilateral: exercise.unilateral,
-    }));
-    setAllExercises(exerciseData);  
-  }
+  
+  useEffect(() => {
+    if (!exercisesPending && !exercisesError && exercises) {
+      const exerciseData = exercises.map((exercise) => ({
+        label: exercise.name,
+        value: exercise.name,
+        unilateral: exercise.unilateral,
+      }));
+      setAllExercises(exerciseData);
+    }
+  }, [exercises, exercisesPending, exercisesError]);
+   
 
 
   
@@ -142,11 +146,12 @@ const AddWorkout = () => {
 
   function isThereRest(sets) {
     let noRest = true
-    for (const set of sets)
-      if (set.restTime > 0 || (set.restTimeLeft > 0 && set.restTimeRight > 0)) {
+    for (const set of sets){
+      if (set.restTime > 0 || (set.restTimeLeft > 0 || set.restTimeRight > 0)) {
         noRest = false;
         break;
       }
+    }
     return noRest;
   }
 

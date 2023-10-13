@@ -52,14 +52,13 @@ function InsideLayout() {
   );
 }
 
-function WorkoutLayout({route}) {
-  const {userID} = route.params;
+function WorkoutLayout() {
   return( 
     <SetupStack.Navigator>
-      <SetupStack.Screen name="Log" component={Workouts} initialParams={{userID: userID} }  options={{ headerShown: false }}/>
-      <SetupStack.Screen name="Add" component={AddWorkout} initialParams={{userID: userID} }  />
-      <SetupStack.Screen name="Routine" component={Routines } initialParams={{userID: userID} }/>
-      <SetupStack.Screen name="Focus" component={Focus } initialParams={{userID: userID} }/>
+      <SetupStack.Screen name="Log" component={Workouts} options={{ headerShown: false }}/>
+      <SetupStack.Screen name="Add" component={AddWorkout}  />
+      <SetupStack.Screen name="Routine" component={Routines } />
+      <SetupStack.Screen name="Focus" component={Focus }/>
     </SetupStack.Navigator>
   )
 }
@@ -78,10 +77,12 @@ export default function App() {
       }
     });
   }, [])
+  
+    let userID;
+    if (user !== null) {
+      userID = user.uid;
+    }
 
-
-
-  const userID = user.uid;
   return (
     <UserContext.Provider value={userID}>
       <NavigationContainer>
