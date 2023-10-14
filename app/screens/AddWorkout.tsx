@@ -1,12 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import Datepicker from '../components/Datepicker'
 import SelectMenu from '../components/SelectMenu'
 import { addExercise, addExperience, getExercises } from '../functions/databaseQueries'
 import UnilateralSet from '../components/UnilateralSet'
 import BilateralSet from '../components/BilateralSet'
 import UserContext from '../contexts/UserContext'
 import useFetch from '../hooks/useFetch'
+import { useRoute } from '@react-navigation/native'
 
 
 
@@ -35,10 +35,15 @@ interface UnilateralSet {
   restTimeRight: string;
  }
 
+ type DateParams = {
+    date: string; 
+  };
 
 const AddWorkout = () => {
   const userID = useContext(UserContext);
-  const [date, setDate] = useState(new Date());
+
+  const route = useRoute();
+  const { date } = route.params as DateParams;
 
   const [allExercises, setAllExercises] = useState<ExerciseSelectOption[]>();
   const [currentExercise, setCurrentExercise] = useState<string>();
@@ -218,8 +223,7 @@ const AddWorkout = () => {
   
   return (
     <View style={styles.container}>
-      <Datepicker date={date} changeDate={date => setDate(date)} />
-      <Text>{date.toDateString()}</Text>
+
       <SelectMenu 
         data={allExercises || []} 
         setSelectedValue={ setCurrentExercise }

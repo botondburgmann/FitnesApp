@@ -11,9 +11,9 @@ const Datepicker = (props) => {
 
     
   const onChange = (selectedDate) => {
-      const currentDate = selectedDate || date;
-      setDate(currentDate) 
-      setShowDate(false);  
+    const currentDate = selectedDate || date;
+    setDate(currentDate) 
+    setShowDate(false);  
     };
   
   return (

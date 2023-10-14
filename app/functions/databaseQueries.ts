@@ -16,6 +16,7 @@ interface BestExercise {
     reps: number;
   }
 
+
 export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStateAction<boolean>>, auth:Auth, email:string, password:string) => {
     setLoading(true);
     try {
@@ -108,15 +109,15 @@ export const getExercises =async (userID: string):Promise<Exercise[]> => {
     return data;
 }
 
-export const addExercise =async (userID:string, date: Date, exercises:(string | Array<string>), sets: Array<Object>, typeOfSet:string) => {
+export const addExercise =async (userID:string, date: string, exercises:(string | Array<string>), sets: Array<Object>, typeOfSet:string) => {
     const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
-    const q = query(workoutsCollection, where("date", '==', date.toDateString()), where("userID", '==', userID) );
+    const q = query(workoutsCollection, where("date", '==', date), where("userID", '==', userID) );
 
     try {
         const querySnapshot = await getDocs(q);
         if(querySnapshot.empty){
             const newDocRef = await addDoc(workoutsCollection, {
-                date: date.toDateString(),
+                date: date,
                 userID: userID
             });
             
@@ -354,3 +355,35 @@ export const getExerciseWithMostReps = async (userID: string): Promise<BestExerc
     }
   };
   
+export const getWorkout = async (userID: string, date: string) => {
+    try {  
+         const workout = {
+            sets: [],
+            exercises: [],
+            typeOfSets: [],
+            timeStamps: []
+
+        }
+    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
+    const q = query(workoutsCollectionRef, where('userID', '==', userID), where('date', '==', date));
+    const querySnapshot = await getDocs(q);
+  
+    for (const docSnapshot of querySnapshot.docs) {
+        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
+        const workoutQuerySnapshot = await getDocs(workoutCollectionRef);        
+
+        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {            
+            workout.exercises.push(workoutDocSnapshot.data().exercise);
+            workout.sets.push(workoutDocSnapshot.data().sets);
+            workout.typeOfSets.push(workoutDocSnapshot.data().typeOfSet);
+            workout.timeStamps.push(workoutDocSnapshot.data().createdAt);
+          
+
+        }
+    }    
+    return workout; 
+    } catch (error) {
+      alert("Couldn't find fields: " + error.message);
+      return ;
+    }
+  };

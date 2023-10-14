@@ -1,6 +1,9 @@
 import { StyleSheet, View, Text, Pressable } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
+import Datepicker from '../components/Datepicker'
+import DisplaySet from '../components/DisplaySet';
+
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -10,10 +13,17 @@ interface RouterProps {
 
 
 const Workouts = ({navigation}: RouterProps) => {
+  const [date, setDate] = useState(new Date());
+
   return (
     <View style={styles.container}>
+      <Datepicker date={date} setDate={setDate} />
+      <Text style={styles.text}>{date.toDateString()}</Text>
+      <View>
+        <DisplaySet date={date.toDateString()} />
+      </View>
       <View style={styles.buttonGroup}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Add')}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('Add',{ date: date.toDateString()})}>
           <Text style={styles.text}>Add new Exercise</Text>
         </Pressable>
         <Pressable style={styles.button} onPress={() => navigation.navigate('Routine')}>
