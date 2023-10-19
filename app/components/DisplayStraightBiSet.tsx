@@ -13,9 +13,11 @@ const DisplayStraightBiSet = (props) => {
         }
 
     let sameWeight = true;
-    const weightsNumber = new Set(sets.weights).size;
-    if (weightsNumber > 1) 
-      sameWeight = false;
+    for (let i = 1; i < sets.length; i++)
+    if (sets[i-1].weight !== sets[i].weight) {
+        sameWeight = false;
+        break;
+    }
 
     let sameRest = true;
     const restNumber = new Set(sets.restTime).size;
@@ -23,33 +25,33 @@ const DisplayStraightBiSet = (props) => {
       sameRest = false;
 
     return (
-        <View>
-            <Text>{sets.length} sets of {exercise}</Text>
+        <View style={styles.container}>
+            <Text style={styles.exercise}>{sets.length} sets of {exercise}</Text>
             {noWeight ? 
                 <View style={{ flexDirection: 'row' }}>
-                    {sets.map((item, index) => (<Text  key={index}>{item.reps} </Text>))}
-                    <Text>repetitions with no weight </Text>
+                    {sets.map((item, index) => (<Text style={styles.text} key={index}>{item.reps} </Text>))}
+                    <Text style={styles.text}>repetitions with no weight </Text>
                 </View>
             : sameWeight ? 
                 <View style={{ flexDirection: 'row' }}>
-                    {sets.map((item, index) => (<Text  key={index}>{item.reps} </Text>))}
-                    <Text>repetitions with {sets[0].weight} kg each </Text>
+                    {sets.map((item, index) => (<Text style={styles.text} key={index}>{item.reps} </Text>))}
+                    <Text style={styles.text}>repetitions with {sets[0].weight} kg each </Text>
                 </View> 
             :   
                 <View style={{ flexDirection: 'row' }}>
-                    {sets.map((item, index) => (<Text  key={index}>{item.reps} </Text>))}
-                    <Text>repetitions with </Text>
-                    {sets.map((item, index) => (<Text  key={index}>{item.weight} kg </Text>))}
+                    {sets.map((item, index) => (<Text style={styles.text} key={index}>{item.reps} </Text>))}
+                    <Text style={styles.text}>repetitions with </Text>
+                    {sets.map((item, index) => (<Text style={styles.text}  key={index}>{item.weight} kg </Text>))}
                 </View>}
       
             {sameRest ? 
                 <View style={{ flexDirection: 'row' }}>
-                    <Text>Rest: {sets[0].restTime/60} minutes between sets</Text>
+                    <Text style={styles.text}>Rest: {sets[0].restTime/60} minutes between sets</Text>
                 </View> 
             :   
                 <View style={{ flexDirection: 'row' }}>
-                    <Text>Rest: </Text>
-                    {sets.map((item, index) => (<Text  key={index}>{item.restTime/60} minutes</Text>))}
+                    <Text style={styles.text}>Rest: </Text>
+                    {sets.map((item, index) => (<Text style={styles.text}  key={index}>{item.restTime/60} minutes</Text>))}
                 </View>}
         </View>
     )
@@ -57,4 +59,22 @@ const DisplayStraightBiSet = (props) => {
 
 export default DisplayStraightBiSet
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    container: {
+        alignItems: 'center',
+        marginHorizontal: 0
+      },
+    text: {
+        fontSize: 16,
+        lineHeight: 25,
+        letterSpacing: 0.25,
+        color: 'white',
+    },
+    exercise: {
+        fontSize: 20,
+        lineHeight: 50,
+        fontWeight: 'bold',
+        letterSpacing: 0.25,
+        color: 'white',
+    }
+})

@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Pressable } from 'react-native'
+import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import Datepicker from '../components/Datepicker'
@@ -7,6 +7,7 @@ import useFetch from '../hooks/useFetch';
 import { getWorkout } from '../functions/databaseQueries';
 import DisplayStraightBiSet from '../components/DisplayStraightBiSet';
 import DisplayDropBiSet from './DisplayDropBiSet';
+import DisplaySuperBiSet from '../components/DisplaySuperBiSet';
 
 
 interface RouterProps {
@@ -30,7 +31,10 @@ const Workouts = ({navigation}: RouterProps) => {
             exerciseComponents.push(<DisplayStraightBiSet key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
         else if (workoutInOrder.typeOfSets[i] === "drop")
           exerciseComponents.push(<DisplayDropBiSet  key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
-
+        else if ((workoutInOrder.typeOfSets[i] === "super"))
+          exerciseComponents.push(<DisplaySuperBiSet  key={i} exercises={workoutInOrder.exercises[i]} sets={workoutInOrder.sets[i]}/>)
+          //console.log("work ",workoutInOrder.exercises[i]);
+          
     }
 }
 
@@ -57,12 +61,12 @@ const Workouts = ({navigation}: RouterProps) => {
   return (
     <View style={styles.container}>
       <Datepicker date={date} setDate={setDate} />
-      <Text style={styles.text}>{date.toDateString()}</Text>
-      <View>
+      <Text style={[styles.text, {marginTop: 20}]}>{date.toDateString()}</Text>
+      <ScrollView contentContainerStyle={styles.log}>
             {workoutError && <Text>{workoutError}</Text>}
             {workoutPending && <Text>Loading...</Text>}
             {workout && exerciseComponents}
-        </View>
+        </ScrollView>
       <View style={styles.buttonGroup}>
         <Pressable style={styles.button} onPress={() => navigation.navigate('Add',{ date: date.toDateString()})}>
           <Text style={styles.text}>Add new Exercise</Text>
@@ -120,9 +124,9 @@ label: {
     lineHeight: 40
   },
   buttonGroup: {
-   marginTop: 100,
    flexDirection: 'row',
-   justifyContent: 'space-evenly' 
+   justifyContent: 'space-evenly', 
+   marginVertical: 20
   },
   inputGroup:{
    flexDirection: 'row',
@@ -139,5 +143,8 @@ label: {
    fontSize: 18,
    color: "#fff",
    marginBottom: 50,
-  }
+  },
+  log:{
+    justifyContent:'flex-end',
+  },
 });
