@@ -5,7 +5,8 @@ import Datepicker from '../components/Datepicker'
 import UserContext from '../contexts/UserContext';
 import useFetch from '../hooks/useFetch';
 import { getWorkout } from '../functions/databaseQueries';
-import DisplayStraightSet from '../components/DisplayStraightSet';
+import DisplayStraightBiSet from '../components/DisplayStraightBiSet';
+import DisplayDropBiSet from './DisplayDropBiSet';
 
 
 interface RouterProps {
@@ -25,11 +26,11 @@ const Workouts = ({navigation}: RouterProps) => {
   if (workout) {
     const workoutInOrder = sortArrays(workout, workout.timeStamps.slice());
     for (let i = 0; i < workoutInOrder.exercises.length; i++) {
-        if (workoutInOrder.typeOfSets[i] === "straight") {
-            //exerciseComponents.push(<Text key={workoutInOrder.exercises[i][0]}>{workoutInOrder.exercises[i].length} sets of {workoutInOrder.exercises[i][0]} </Text>)
-            exerciseComponents.push(<DisplayStraightSet exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
+        if (workoutInOrder.typeOfSets[i] === "straight")
+            exerciseComponents.push(<DisplayStraightBiSet key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
+        else if (workoutInOrder.typeOfSets[i] === "drop")
+          exerciseComponents.push(<DisplayDropBiSet  key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
 
-        }
     }
 }
 
