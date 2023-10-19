@@ -1,8 +1,11 @@
 import { StyleSheet, View, Text, Pressable } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import Datepicker from '../components/Datepicker'
-import DisplaySet from '../components/DisplaySet';
+import UserContext from '../contexts/UserContext';
+import useFetch from '../hooks/useFetch';
+import { getWorkout } from '../functions/databaseQueries';
+import DisplayStraightSet from '../components/DisplayStraightSet';
 
 
 interface RouterProps {
@@ -13,15 +16,52 @@ interface RouterProps {
 
 
 const Workouts = ({navigation}: RouterProps) => {
+  const userID = useContext(UserContext);
   const [date, setDate] = useState(new Date());
 
+  const {data: workout, isPending: workoutPending, error: workoutError} = useFetch(getWorkout, userID, date.toDateString())
+  
+  const exerciseComponents = [];
+  if (workout) {
+    const workoutInOrder = sortArrays(workout, workout.timeStamps.slice());
+    for (let i = 0; i < workoutInOrder.exercises.length; i++) {
+        if (workoutInOrder.typeOfSets[i] === "straight") {
+            //exerciseComponents.push(<Text key={workoutInOrder.exercises[i][0]}>{workoutInOrder.exercises[i].length} sets of {workoutInOrder.exercises[i][0]} </Text>)
+            exerciseComponents.push(<DisplayStraightSet exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
+
+        }
+    }
+}
+
+        
+    
+ 
+
+      
+      function sortArrays(workout, keyArray) {
+        const indices = keyArray.map((_, index) => index);
+      
+        indices.sort((a, b) => (workout.timeStamps[a].nanoseconds + workout.timeStamps[a].seconds * 1e9) -(workout.timeStamps[b].nanoseconds + workout.timeStamps[b].seconds * 1e9));
+      
+        for (const prop in workout) {
+          if (prop !== 'timeStamps') {
+            workout[prop] = indices.map((index) => workout[prop][index]);
+          }
+        }
+      
+        workout.timeStamps = keyArray.sort((a, b) => a - b);
+      
+        return workout;
+      }
   return (
     <View style={styles.container}>
       <Datepicker date={date} setDate={setDate} />
       <Text style={styles.text}>{date.toDateString()}</Text>
       <View>
-        <DisplaySet date={date.toDateString()} />
-      </View>
+            {workoutError && <Text>{workoutError}</Text>}
+            {workoutPending && <Text>Loading...</Text>}
+            {workout && exerciseComponents}
+        </View>
       <View style={styles.buttonGroup}>
         <Pressable style={styles.button} onPress={() => navigation.navigate('Add',{ date: date.toDateString()})}>
           <Text style={styles.text}>Add new Exercise</Text>
