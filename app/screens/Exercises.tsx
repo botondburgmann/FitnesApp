@@ -1,10 +1,10 @@
-import { Button, StyleSheet, Text, View } from 'react-native'
+import {  StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../components/SelectMenu'
 import { getExercises, getExercise } from '../functions/databaseQueries';
 import useFetch from '../hooks/useFetch';
 import UserContext from '../contexts/UserContext';
-import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
+import { Table, Row, Rows} from 'react-native-table-component';
 
 
 interface ExerciseSelectOption{
@@ -17,8 +17,7 @@ const Exercises = () => {
 
   const [allExercises, setAllExercises] = useState<ExerciseSelectOption[]>();
   const [currentExercise, setCurrentExercise] = useState<string>();
-  const [tableData, setTableData] = useState([]);
-
+  const [tableData, setTableData] = useState([[],[],[],[]]);
 
   const {data:exercises, isPending:exercisesPending, error:exercisesError } = useFetch(getExercises, userID);
   const {data:exercise, isPending:exercisePending, error:exerciseError } = useFetch(getExercise, userID, currentExercise);
@@ -33,15 +32,36 @@ const Exercises = () => {
       }));
       setAllExercises(exerciseData);
     }
-    if (!exercisePending && !exerciseError && exercise) {      
-      setTableData([exercise.weights, exercise.reps, exercise.times, exercise.restTimes]);
-      console.log(tableData);
+    if (!exercisePending && !exerciseError && exercise) { 
+       const exerciseInOrder = sortArrays(exercise, exercise.dates.slice());
+      console.log(`sorted: ${exerciseInOrder}`); 
       
+      setTableData([exerciseInOrder.weights, exerciseInOrder.reps, exerciseInOrder.times, exerciseInOrder.restTimes]);
 
     }
-  }, [exercises, exercisesPending, exercisesError, exercise, exercisePending, exerciseError]);
+  }, [exercise, exercisePending, exerciseError]);
 
+  function sortArrays(exercise, keyArray) {
+    const indices = exercise.dates.map((_, index) => index);
+    indices.sort((a, b) => {
+      const dateA = new Date(exercise.dates[a]).getTime();
+      const dateB = new Date(exercise.dates[b]).getTime();
+      return dateA - dateB;
+    });
+
+// Create new objects with sorted data arrays
+const sortedData = {
+  "dates": indices.map(index => exercise.dates[index]),
+  "reps": indices.map(index => exercise.reps[index]),
+  "restTimes": indices.map(index => exercise.restTimes[index]),
+  "times": indices.map(index => exercise.times[index]),
+  "weights": indices.map(index => exercise.weights[index])
+};
+  
+    return sortedData;
+  }
   function transposeMatrix(matrix) {
+    
     const rows = matrix.length;
     const columns = matrix[0].length;
   
@@ -58,7 +78,7 @@ const Exercises = () => {
   
     return transposedMatrix;
   }
-
+  
   return (
     <View style={styles.container}>
       <Text style={styles.label}>My progress</Text>
@@ -67,11 +87,10 @@ const Exercises = () => {
         setSelectedValue={ setCurrentExercise }
       />
       <Text style={styles.label}>{currentExercise}</Text>
-
-      <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}} >
-        <Row data={ ['Weight', 'Reps', 'Time', 'Rest Time']} textStyle={styles.text}/>
-        <Rows data={transposeMatrix(tableData)} textStyle={styles.text} />
-      </Table>
+      {exercise && <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
+        <Row data={ ['Weight (kg)', 'Reps', 'Time (seconds)', 'Rest Time (minutes)']} textStyle={styles.text} />
+        <Rows data={transposeMatrix(tableData)} textStyle={styles.text}   />
+      </Table>}
     </View>
   )
 }

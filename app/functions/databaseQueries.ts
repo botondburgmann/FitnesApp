@@ -387,24 +387,25 @@ export const getWorkout = async (userID: string, date: string) => {
       return ;
     }
   };
-export const getExercise = async (userID: string, exerciseName: string) => {
+export const getExercise = async (userID: string, exerciseName = '') => {
     try {  
+
          const exercise = {
-            //dates: [],
             weights: [],
             reps: [],
             times: [],
             restTimes: [],
-            timeStamps: [],
+            dates: [],
 
         }
-        
+        if (exercise === undefined) {
+            return exercise
+        }
         const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
         const q = query(workoutsCollectionRef, where('userID', '==', userID));
         const querySnapshot = await getDocs(q);
         
         for (const docSnapshot of querySnapshot.docs) {
-       // exercise.dates.push(docSnapshot.data().date)
         
         const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
         const q = query(workoutCollectionRef, where('exercise', 'array-contains', exerciseName));
@@ -412,8 +413,8 @@ export const getExercise = async (userID: string, exerciseName: string) => {
         const workoutQuerySnapshot = await getDocs(q);        
 
         for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {            
-            exercise.timeStamps.push(workoutDocSnapshot.data().createdAt);
             for (let i = 0; i < workoutDocSnapshot.data().sets.length; i++) {
+                exercise.dates.push(docSnapshot.data().date);
                 exercise.weights.push(`${workoutDocSnapshot.data().sets[i].weight} kg`)
                 exercise.reps.push(workoutDocSnapshot.data().sets[i].reps)
                 exercise.times.push(`${workoutDocSnapshot.data().sets[i].time} secs`)
@@ -422,6 +423,7 @@ export const getExercise = async (userID: string, exerciseName: string) => {
             } 
         }
     }    
+    console.log(exercise);
     
     return exercise; 
     } catch (error) {
