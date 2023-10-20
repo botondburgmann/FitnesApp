@@ -82,15 +82,18 @@ const sortedData = {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>My progress</Text>
-      <SelectMenu 
+      <SelectMenu
         data={allExercises || []} 
         setSelectedValue={ setCurrentExercise }
+        title={'Select exercise'}
       />
-      <Text style={styles.label}>{currentExercise}</Text>
-      {exercise && <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
-        <Row data={ ['Weight (kg)', 'Reps', 'Time (seconds)', 'Rest Time (minutes)']} textStyle={styles.text} />
-        <Rows data={transposeMatrix(tableData)} textStyle={styles.text}   />
-      </Table>}
+      <Text style={styles.selectedExercise}>{currentExercise}</Text>
+      {exercise && <View style={styles.tableContainer}>
+        <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
+          <Row data={ ['Weight (kg)', 'Reps', 'Time (seconds)', 'Rest Time (minutes)']} textStyle={styles.text} />
+          <Rows data={transposeMatrix(tableData)} textStyle={styles.text}   />
+        </Table>
+      </View>}
     </View>
   )
 }
@@ -100,67 +103,34 @@ export default Exercises
 const styles = StyleSheet.create({
   container: {
   flex: 1,
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
   backgroundColor: '#ff0000'
 },
- input: {
- marginHorizontal: 10,
- marginVertical: 4,
- height: 50,
- borderWidth: 1,
- borderRadius: 4,
- padding: 10,
- backgroundColor: '#fff'
+tableContainer:{
+  marginHorizontal:10
 },
 text:{
-  alignSelf: 'center',
-  fontSize: 18,
+  textAlign: 'center',
+  fontSize: 12,
   color: "#fff",
   textTransform: 'uppercase',
   fontWeight: "600",
   paddingVertical: 10,
 },
-button:{
-    width: 100,
-    paddingHorizontal: 5,
-    marginHorizontal: 20,
-    alignSelf: "center",
-    backgroundColor: "#000",
+selectedExercise:{    alignSelf: 'center',
+fontSize: 20,
+fontWeight: "800",
+color: "#fff",
+textTransform: 'uppercase',
+marginVertical: 20,
 },
-
 label: {
     alignSelf: 'center',
     fontSize: 20,
     fontWeight: "800",
     color: "#fff",
     textTransform: 'uppercase',
-    marginTop: -80,
-    marginBottom: 50,
-    textAlign: 'center',
-    lineHeight: 40
-  },
-  buttonGroup: {
-   flexDirection: 'row',
-   justifyContent: 'space-evenly', 
-   marginVertical: 20
-  },
-  inputGroup:{
-   flexDirection: 'row',
-   justifyContent: 'space-around',
-   alignItems: 'center',
-  },
-  selectMenuContainer: {
-   flex: 0.5, //
-   backgroundColor: "#fff",
-   padding: 5
-  },
-  icon: {
-   alignSelf: 'center',
-   fontSize: 18,
-   color: "#fff",
-   marginBottom: 50,
-  },
-  log:{
-    justifyContent:'flex-end',
+    marginTop: 50,
+    marginBottom: 20
   },
 });

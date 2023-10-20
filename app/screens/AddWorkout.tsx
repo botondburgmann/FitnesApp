@@ -264,6 +264,8 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     flex: 1,
+    backgroundColor: '#ff0000'
+
   },
   button: {
     alignItems: 'center',

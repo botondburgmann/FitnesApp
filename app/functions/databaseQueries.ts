@@ -426,12 +426,21 @@ export const getExercise = async (userID: string, exerciseName = '') => {
             } 
             else{
                 for (let i = 0; i < workoutDocSnapshot.data().sets.length; i++) {
-                    exercise.dates.push(docSnapshot.data().date);
-                    exercise.weights.push(`${workoutDocSnapshot.data().sets[i].weight} kg`)
-                    exercise.reps.push(workoutDocSnapshot.data().sets[i].reps)
-                    exercise.times.push(`${workoutDocSnapshot.data().sets[i].time} secs`)
-                    exercise.restTimes.push(`${workoutDocSnapshot.data().sets[i].restTime/60} mins`)
-                    
+                    if(workoutDocSnapshot.data().sets[i].weight === undefined){
+                        exercise.dates.push(docSnapshot.data().date);
+                        exercise.weights.push(`${workoutDocSnapshot.data().sets[i].weightLeft} kg/\n${workoutDocSnapshot.data().sets[i].weightRight} kg`)
+                        exercise.reps.push(`${workoutDocSnapshot.data().sets[i].repsLeft}/${workoutDocSnapshot.data().sets[i].repsRight}`)
+                        exercise.times.push(`${workoutDocSnapshot.data().sets[i].timeLeft} secs/ \n${workoutDocSnapshot.data().sets[i].timeRight} secs`)
+                        exercise.restTimes.push(`${workoutDocSnapshot.data().sets[i].restTimeLeft/60} mins/\n${workoutDocSnapshot.data().sets[i].restTimeRight/60} mins`)   
+                    }
+                    else{
+                        exercise.dates.push(docSnapshot.data().date);
+                        exercise.weights.push(`${workoutDocSnapshot.data().sets[i].weight} kg`)
+                        exercise.reps.push(workoutDocSnapshot.data().sets[i].reps)
+                        exercise.times.push(`${workoutDocSnapshot.data().sets[i].time} secs`)
+                        exercise.restTimes.push(`${workoutDocSnapshot.data().sets[i].restTime/60} mins`)
+                        
+                    }
                 } 
                 
             }        
