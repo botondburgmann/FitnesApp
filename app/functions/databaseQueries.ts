@@ -411,16 +411,30 @@ export const getExercise = async (userID: string, exerciseName = '') => {
         const q = query(workoutCollectionRef, where('exercise', 'array-contains', exerciseName));
 
         const workoutQuerySnapshot = await getDocs(q);        
-
-        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {            
-            for (let i = 0; i < workoutDocSnapshot.data().sets.length; i++) {
-                exercise.dates.push(docSnapshot.data().date);
-                exercise.weights.push(`${workoutDocSnapshot.data().sets[i].weight} kg`)
-                exercise.reps.push(workoutDocSnapshot.data().sets[i].reps)
-                exercise.times.push(`${workoutDocSnapshot.data().sets[i].time} secs`)
-                exercise.restTimes.push(`${workoutDocSnapshot.data().sets[i].restTime/60} mins`)
-                
+        
+        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {  
+            if (workoutDocSnapshot.data().typeOfSet === "super") {
+                for (let i = 0; i < workoutDocSnapshot.data().sets.length; i++) {
+                    if (workoutDocSnapshot.data().exercise[i] === exerciseName) {                        
+                        exercise.dates.push(docSnapshot.data().date);
+                        exercise.weights.push(`${workoutDocSnapshot.data().sets[i].weight} kg`)
+                        exercise.reps.push(workoutDocSnapshot.data().sets[i].reps)
+                        exercise.times.push(`${workoutDocSnapshot.data().sets[i].time} secs`)
+                        exercise.restTimes.push(`${workoutDocSnapshot.data().sets[i].restTime/60} mins`)
+                    }
+                } 
             } 
+            else{
+                for (let i = 0; i < workoutDocSnapshot.data().sets.length; i++) {
+                    exercise.dates.push(docSnapshot.data().date);
+                    exercise.weights.push(`${workoutDocSnapshot.data().sets[i].weight} kg`)
+                    exercise.reps.push(workoutDocSnapshot.data().sets[i].reps)
+                    exercise.times.push(`${workoutDocSnapshot.data().sets[i].time} secs`)
+                    exercise.restTimes.push(`${workoutDocSnapshot.data().sets[i].restTime/60} mins`)
+                    
+                } 
+                
+            }        
         }
     }    
     console.log(exercise);
