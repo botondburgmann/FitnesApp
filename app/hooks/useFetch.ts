@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const useFetch = (getter: Function, userID: string, date?:string) => {
+const useFetch = (getter: Function, userID: string, date?:string, name?:string) => {
     const [fetchState, setFetchState] = useState({
       data: null,
       isPending: true,
@@ -10,7 +10,7 @@ const useFetch = (getter: Function, userID: string, date?:string) => {
     useEffect(() => {
       const fetchData = async (): Promise<void> => {
         try {
-          const data = await getter(userID, date);
+          const data = await getter(userID, date, name);
           setFetchState({ data, isPending: false, error: null });
         } catch (error) {
           setFetchState({ data: null, isPending: false, error: "Error fetching data: " + error });

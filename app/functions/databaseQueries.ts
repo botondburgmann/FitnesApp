@@ -387,3 +387,45 @@ export const getWorkout = async (userID: string, date: string) => {
       return ;
     }
   };
+export const getExercise = async (userID: string, exerciseName: string) => {
+    try {  
+         const exercise = {
+            //dates: [],
+            weights: [],
+            reps: [],
+            times: [],
+            restTimes: [],
+            timeStamps: [],
+
+        }
+        
+        const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
+        const q = query(workoutsCollectionRef, where('userID', '==', userID));
+        const querySnapshot = await getDocs(q);
+        
+        for (const docSnapshot of querySnapshot.docs) {
+       // exercise.dates.push(docSnapshot.data().date)
+        
+        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
+        const q = query(workoutCollectionRef, where('exercise', 'array-contains', exerciseName));
+
+        const workoutQuerySnapshot = await getDocs(q);        
+
+        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {            
+            exercise.timeStamps.push(workoutDocSnapshot.data().createdAt);
+            for (let i = 0; i < workoutDocSnapshot.data().sets.length; i++) {
+                exercise.weights.push(`${workoutDocSnapshot.data().sets[i].weight} kg`)
+                exercise.reps.push(workoutDocSnapshot.data().sets[i].reps)
+                exercise.times.push(`${workoutDocSnapshot.data().sets[i].time} secs`)
+                exercise.restTimes.push(`${workoutDocSnapshot.data().sets[i].restTime/60} mins`)
+                
+            } 
+        }
+    }    
+    
+    return exercise; 
+    } catch (error) {
+      alert("Couldn't find fields: " + error.message);
+      return ;
+    }
+  };
