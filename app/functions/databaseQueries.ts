@@ -1,5 +1,5 @@
 import { Auth, createUserWithEmailAndPassword } from "firebase/auth";
-import { addDoc, collection, doc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 
@@ -332,18 +332,20 @@ export const getExerciseWithMostReps = async (userID: string): Promise<BestExerc
                         }   
                 }
                 else{
-                    if (sets[i].weight > exerciseWithMostReps.weight) {
+                    
+                    if (sets[i].reps > exerciseWithMostReps.reps) {
                         exerciseWithMostReps.weight = sets[i].weight;
                         exerciseWithMostReps.reps = sets[i].reps;
                         exerciseWithMostReps.name = exercises[i];
                     }  
-                    else if (sets[i].weight === exerciseWithMostReps.weight) 
-                        if (sets[i].reps > exerciseWithMostReps.reps) {
+                    else if (sets[i].reps === exerciseWithMostReps.reps) 
+                        if (sets[i].weight > exerciseWithMostReps.weight) {
                             exerciseWithMostReps.weight = sets[i].weight;
                             exerciseWithMostReps.reps = sets[i].reps;
                             exerciseWithMostReps.name = exercises[i];
                         }                                       
-                }                                         
+                }  
+                                                       
             }
         }
     }
@@ -358,6 +360,7 @@ export const getExerciseWithMostReps = async (userID: string): Promise<BestExerc
 export const getWorkout = async (userID: string, date: string) => {
     try {  
          const workout = {
+            ids: [],
             sets: [],
             exercises: [],
             typeOfSets: [],
@@ -372,7 +375,8 @@ export const getWorkout = async (userID: string, date: string) => {
         const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
         const workoutQuerySnapshot = await getDocs(workoutCollectionRef);        
 
-        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {            
+        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {    
+            workout.ids.push(workoutDocSnapshot.id);        
             workout.exercises.push(workoutDocSnapshot.data().exercise);
             workout.sets.push(workoutDocSnapshot.data().sets);
             workout.typeOfSets.push(workoutDocSnapshot.data().typeOfSet);
@@ -380,7 +384,6 @@ export const getWorkout = async (userID: string, date: string) => {
           
 
         }
-    console.log(workout.sets);
     
     }    
     return workout; 
@@ -448,7 +451,6 @@ export const getExercise = async (userID: string, exerciseName = '') => {
             }        
         }
     }    
-    console.log(exercise);
     
     return exercise; 
     } catch (error) {
@@ -456,3 +458,31 @@ export const getExercise = async (userID: string, exerciseName = '') => {
       return ;
     }
   };
+
+export const deleteExercise =async (userID:string, exerciseID: string, xpToDelete: number ) => {
+    try {  
+       const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
+       const q = query(workoutsCollectionRef, where('userID', '==', userID));
+       const querySnapshot = await getDocs(q);
+       
+       for (const docSnapshot of querySnapshot.docs) {
+        
+        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
+        const nestedDocumentRef  = doc(workoutCollectionRef, exerciseID);
+        const nestedDocumentSnapshot = await getDoc(nestedDocumentRef);
+
+        if (nestedDocumentSnapshot.exists()) {
+            await deleteDoc(nestedDocumentRef);   
+            addExperience(userID,xpToDelete);
+        }
+        
+        
+    
+       
+   }    
+   
+   } catch (error) {
+     alert("Couldn't find fields: " + error.message);
+     return ;
+   }
+}

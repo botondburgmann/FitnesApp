@@ -24,15 +24,16 @@ const Workouts = ({navigation}: RouterProps) => {
   const {data: workout, isPending: workoutPending, error: workoutError} = useFetch(getWorkout, userID, date.toDateString())
   
   const exerciseComponents = [];
+  
   if (workout) {
     const workoutInOrder = sortArrays(workout, workout.timeStamps.slice());
     for (let i = 0; i < workoutInOrder.exercises.length; i++) {
         if (workoutInOrder.typeOfSets[i] === "straight" )
-            exerciseComponents.push(<DisplayStraightSet key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
+            exerciseComponents.push(<DisplayStraightSet key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/>)
         else if (workoutInOrder.typeOfSets[i] === "drop" )
-          exerciseComponents.push(<DisplayDropSet  key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
+          exerciseComponents.push(<DisplayDropSet  key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/>)
         else if ((workoutInOrder.typeOfSets[i] === "super"))
-          exerciseComponents.push(<DisplaySuperSet  key={i} exercises={workoutInOrder.exercises[i]} sets={workoutInOrder.sets[i]}/>)
+          exerciseComponents.push(<DisplaySuperSet  key={i} exercises={workoutInOrder.exercises[i]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/>)
           
     }
 }

@@ -1,15 +1,47 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+import React, { useContext } from 'react'
+import { deleteExercise } from '../functions/databaseQueries';
+import UserContext from '../contexts/UserContext';
 
 const DisplayDropSet = (props) => {
+    const userID = useContext(UserContext);
     const exercise = props.exercise;
     const sets = props.sets;
+    const id = props.id;
 
-    
+    function calculateXP() {
+        let experiencePoints = 0;
+    for (const set of sets) {
+      if (set.weightLeft !== undefined || set.weightRight !== undefined) {
+        if (set.weightLeft === 0)
+          experiencePoints -= set.repsLeft;
+        else
+          experiencePoints -= set.repsLeft * set.weightLeft;
+        if (set.weightRight === 0)
+          experiencePoints -= set.repsRight;
+        else
+          experiencePoints -= set.repsRight * set.weightRight;
+      }
+      else{
+        if (set.weight === 0)
+          experiencePoints -= set.reps;
+        else
+          experiencePoints -= set.reps * set.weight;
+      }
+    }
+
+    return experiencePoints;
+        
+    }
+
+    function deleteSets() {
+        alert("Deleted successfully")
+        deleteExercise(userID, id, calculateXP())
+    }
 
     
     return (
-        <View style={styles.container}>
+        <Pressable style={styles.container} onPress={() => deleteSets()}>
             <Text style={styles.exercise}>1 dropset of {exercise}</Text>
             {sets.map((item, index) => 
                 item.weight !== undefined && item.time > 0 ? 
@@ -48,7 +80,7 @@ const DisplayDropSet = (props) => {
                 </Text>
                 )}
                 
-        </View>
+        </Pressable>
     )
 }
 

@@ -34,7 +34,6 @@ const Exercises = () => {
     }
     if (!exercisePending && !exerciseError && exercise) { 
        const exerciseInOrder = sortArrays(exercise, exercise.dates.slice());
-      console.log(`sorted: ${exerciseInOrder}`); 
       
       setTableData([exerciseInOrder.weights, exerciseInOrder.reps, exerciseInOrder.times, exerciseInOrder.restTimes]);
 
