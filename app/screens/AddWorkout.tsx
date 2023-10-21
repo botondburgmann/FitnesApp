@@ -151,8 +151,8 @@ const AddWorkout = () => {
 
   function isThereRest(sets) {
     let noRest = true
-    for (const set of sets){
-      if (set.restTime > 0 || (set.restTimeLeft > 0 || set.restTimeRight > 0)) {
+    for (let i = 0; i < sets.length-1; i++) {
+      if (sets[i].restTime > 0 || (sets[i].restTimeLeft > 0 || sets[i].restTimeRight > 0)) {
         noRest = false;
         break;
       }

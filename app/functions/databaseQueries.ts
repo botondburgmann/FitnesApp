@@ -380,6 +380,8 @@ export const getWorkout = async (userID: string, date: string) => {
           
 
         }
+    console.log(workout.sets);
+    
     }    
     return workout; 
     } catch (error) {

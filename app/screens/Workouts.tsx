@@ -5,9 +5,9 @@ import Datepicker from '../components/Datepicker'
 import UserContext from '../contexts/UserContext';
 import useFetch from '../hooks/useFetch';
 import { getWorkout } from '../functions/databaseQueries';
-import DisplayStraightBiSet from '../components/DisplayStraightBiSet';
-import DisplayDropBiSet from './DisplayDropBiSet';
-import DisplaySuperBiSet from '../components/DisplaySuperBiSet';
+import DisplayStraightSet from '../components/DisplayStraightSet';
+import DisplayDropSet from '../components/DisplayDropSet';
+import DisplaySuperSet from '../components/DisplaySuperSet';
 
 
 interface RouterProps {
@@ -27,13 +27,12 @@ const Workouts = ({navigation}: RouterProps) => {
   if (workout) {
     const workoutInOrder = sortArrays(workout, workout.timeStamps.slice());
     for (let i = 0; i < workoutInOrder.exercises.length; i++) {
-        if (workoutInOrder.typeOfSets[i] === "straight")
-            exerciseComponents.push(<DisplayStraightBiSet key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
-        else if (workoutInOrder.typeOfSets[i] === "drop")
-          exerciseComponents.push(<DisplayDropBiSet  key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
+        if (workoutInOrder.typeOfSets[i] === "straight" )
+            exerciseComponents.push(<DisplayStraightSet key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
+        else if (workoutInOrder.typeOfSets[i] === "drop" )
+          exerciseComponents.push(<DisplayDropSet  key={i} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]}/>)
         else if ((workoutInOrder.typeOfSets[i] === "super"))
-          exerciseComponents.push(<DisplaySuperBiSet  key={i} exercises={workoutInOrder.exercises[i]} sets={workoutInOrder.sets[i]}/>)
-          //console.log("work ",workoutInOrder.exercises[i]);
+          exerciseComponents.push(<DisplaySuperSet  key={i} exercises={workoutInOrder.exercises[i]} sets={workoutInOrder.sets[i]}/>)
           
     }
 }
