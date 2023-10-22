@@ -193,7 +193,10 @@ const AddWorkout = () => {
   function addSetToDatabase(numOfSet:number) {
     if (numOfSet > 0) {
       let typeOfSet: string;
-      if (areThereMultipleExercises(selectedExercises)) {
+      if (numOfSet === 1){
+        typeOfSet = "straight"
+      }
+      else if (areThereMultipleExercises(selectedExercises)) {
         typeOfSet = "super";
       }
       else{

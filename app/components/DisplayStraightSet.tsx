@@ -9,44 +9,19 @@ const DisplayStraightSet = (props) => {
     const exercise = props.exercise;
     const sets = props.sets;
     const id = props.id
+    const deleteSets = props.deleteSets;
 
-    function calculateXP() {
-        let experiencePoints = 0;
-    for (const set of sets) {
-      if (set.weightLeft !== undefined || set.weightRight !== undefined) {
-        if (set.weightLeft === 0)
-          experiencePoints -= set.repsLeft;
-        else
-          experiencePoints -= set.repsLeft * set.weightLeft;
-        if (set.weightRight === 0)
-          experiencePoints -= set.repsRight;
-        else
-          experiencePoints -= set.repsRight * set.weightRight;
-      }
-      else{
-        if (set.weight === 0)
-          experiencePoints -= set.reps;
-        else
-          experiencePoints -= set.reps * set.weight;
-      }
-    }
+    
 
-    return experiencePoints;
-        
-    }
-
-    function deleteSets() {
-        alert("Deleted successfully")
-        deleteExercise(userID, id, calculateXP())
-    }
+ 
 
     return (
    
 
-    <Pressable style={styles.container} onPress={() => deleteSets()}>
+    <Pressable style={styles.container} onPress={() => deleteSets(id,sets)}>
     {sets.length > 1 
             ? <Text style={styles.exercise}>{sets.length} sets of {exercise}s</Text>
-            : <Text style={styles.exercise}>{sets.length} sets of {exercise}</Text>} 
+            : <Text style={styles.exercise}>{sets.length} set of {exercise}</Text>} 
                 {sets.map((item, index) => (
                     item.reps !== undefined && item.time > 0 ? 
                         <Text 
