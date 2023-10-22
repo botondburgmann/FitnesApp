@@ -19,7 +19,9 @@ const Routines = ({navigation}: RouterProps) => {
   
 
     const workoutTypes = ['Full body', 'Push', 'Pull', 'Leg', 'Back', 
-                          'Chest', 'Bicep', 'Tricep', 'Shoulder', 'Ab', 'Arm', 'Forearm','Upper body', 'Full body pull', 'Full body push'];
+                          'Chest', 'Bicep', 'Tricep', 'Shoulder', 'Ab', 
+                          'Arm', 'Forearm','Upper body', 'Full body pull', 
+                          'Full body push'];
 
     const routineComponents = [];
     for (let i = 0; i < workoutTypes.length; i++) {

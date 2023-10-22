@@ -1,17 +1,21 @@
 import { Button, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useState } from 'react'
 import Radiobutton from '../components/Radiobutton';
+import { NavigationProp } from '@react-navigation/native';
 
+interface RouterProps {
+  route: any,
+  navigation: NavigationProp<any, any>;
+}
 
-
-const Focus = ({route}) => {
+const Focus = ({ route, navigation }: RouterProps) => {
 const { workoutType } = route?.params;
 const [focus, setFocus] = useState<string>();
 const options = ["Strength", "Hypertrophy", "Cardio"];
   return (
     <View style={styles.container}>
         <Radiobutton selectedValue={focus} setselectedValue={setFocus} options={options} />
-        <Pressable style={styles.button}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('CurrentExercise',{workoutType: workoutType, focus:focus})}>
           <Text style={styles.text}>Start Workout</Text>
       </Pressable>
     </View>

@@ -486,3 +486,15 @@ export const deleteExercise =async (userID:string, exerciseID: string, xpToDelet
      return ;
    }
 }
+
+export const getExercisesByFocus =async (userID: string, musclesWorked: string[]):Promise<Exercise[]> => {    
+    const data = [];
+    const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
+    const q = query(exercisesCollection, where('musclesWorked', 'array-contains-any', musclesWorked));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (docSnapshot) => {
+        data.push(docSnapshot.data());   
+    })
+    
+    return data;
+}
