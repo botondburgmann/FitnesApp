@@ -1,5 +1,5 @@
 import { StyleSheet, Text, Pressable, Image } from 'react-native'
-import React from 'react'
+import React, { useContext } from 'react'
 import { NavigationProp } from "@react-navigation/native";
 
 interface RouterProps {
@@ -7,11 +7,12 @@ interface RouterProps {
 }
 
 const Routine = (props) => {
+
     const imageSource = props.imageSource;
     const navigation = props.navigation;
     const workoutType = props.workoutType;
   return (
-    <Pressable style={styles.container} onPress={() => navigation.navigate('Focus')}>
+    <Pressable style={styles.container} onPress={() => navigation.navigate('Focus',{workoutType: workoutType})}>
         <Image style={styles.image} source={imageSource} />
         <Text>{workoutType}</Text>
     </Pressable>

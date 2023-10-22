@@ -20,6 +20,7 @@ import Toplist from './app/screens/Toplist';
 import Exercises from './app/screens/Exercises';
 import Focus from './app/screens/Focus';
 import UserContext from './app/contexts/UserContext';
+import CurrentExercise from './app/screens/CurrentExercise';
 
 
 const Stack = createNativeStackNavigator();
@@ -59,6 +60,7 @@ function WorkoutLayout() {
       <SetupStack.Screen name="Add" component={AddWorkout}  />
       <SetupStack.Screen name="Routine" component={Routines } />
       <SetupStack.Screen name="Focus" component={Focus }/>
+      <SetupStack.Screen name="CurrentExercise" component={CurrentExercise }/>
     </SetupStack.Navigator>
   )
 }
