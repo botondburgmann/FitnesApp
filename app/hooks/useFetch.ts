@@ -18,7 +18,7 @@ const useFetch = (getter: Function, userID: string, date?:string, name?:string, 
       };
   
       fetchData();
-    }, []);
+    }, [getter, userID, date]);
   
     return fetchState;
   };

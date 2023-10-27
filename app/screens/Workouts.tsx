@@ -8,6 +8,7 @@ import { deleteExercise, getWorkout } from '../functions/databaseQueries';
 import DisplayDropSet from '../components/DisplayDropSet';
 import DisplayStraightSet from '../components/DisplayStraightSet';
 import DisplaySuperSet from '../components/DisplaySuperSet';
+import { Alert } from 'react-native';
 
 
 
@@ -31,11 +32,11 @@ const Workouts = ({navigation}: RouterProps) => {
       const workoutInOrder = sortArrays(workout, workout.timeStamps.slice());
       for (let i = 0; i < workoutInOrder.exercises.length; i++) {
         if (workoutInOrder.typeOfSets[i] === "straight" )
-          setExerciseComponents((prev) => [...prev,<DisplayStraightSet key={i} deleteSets={handleDelete} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/> ])
+          setExerciseComponents((prev) => [...prev,<DisplayStraightSet key={i} deleteSets={showDeleteConfirmation} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/> ])
         else if (workoutInOrder.typeOfSets[i] === "drop" )
-          setExerciseComponents((prev) => [...prev,<DisplayDropSet  key={i} deleteSets={handleDelete} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/>])
+          setExerciseComponents((prev) => [...prev,<DisplayDropSet  key={i} deleteSets={showDeleteConfirmation} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/>])
         else if ((workoutInOrder.typeOfSets[i] === "super"))
-          setExerciseComponents((prev) => [...prev,<DisplaySuperSet  key={i} deleteSets={handleDelete} exercises={workoutInOrder.exercises[i]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/>])
+          setExerciseComponents((prev) => [...prev,<DisplaySuperSet  key={i} deleteSets={showDeleteConfirmation} exercises={workoutInOrder.exercises[i]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/>])
       }
     }
   
@@ -56,12 +57,30 @@ const Workouts = ({navigation}: RouterProps) => {
  
   }, [workout])
   
+  const showDeleteConfirmation = (id, sets) => {
+    Alert.alert(
+      'Delete Item',
+      'Are you sure you want to delete this item?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: () => {
+            deleteExercise(userID, id, calculateXP(sets))
+            const updatedExerciseComponents = exerciseComponents.filter((component) => component.props.id !== id);
+            setExerciseComponents(updatedExerciseComponents)
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+  
 
-  function handleDelete(id,sets) {
-    deleteExercise(userID, id, calculateXP(sets))
-    const updatedExerciseComponents = exerciseComponents.filter((component) => component.props.id !== id);
-    setExerciseComponents(updatedExerciseComponents);
-  }
 
   function calculateXP(sets) {
     let experiencePoints = 0;

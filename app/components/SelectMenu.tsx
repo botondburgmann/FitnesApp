@@ -14,8 +14,6 @@ const SelectMenu = (props) => {
   return (
     <View style={styles.container}>
       <Dropdown 
-        placeholderStyle={styles.text}
-        selectedTextStyle={styles.text}
         search={shouldIncludeSearch}
         placeholder={title}
         data={data}

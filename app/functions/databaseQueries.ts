@@ -23,8 +23,30 @@ export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStat
         if (name === '')
             throw new Error('Name must be set'); 
         const response = await createUserWithEmailAndPassword(auth, email,password);
-        await addDoc(collection(FIRESTORE_DB, 'users'), {userID: response.user.uid, name: name, gender: "", age: 0, weight: 0, height: 0, activityLevel: "", set: false, level: 1, experience: 0});
+        const userData = {
+            userID: response.user.uid, 
+            name: name, 
+            gender: "", 
+            age: 0, 
+            weight: 0, 
+            height: 0, 
+            activityLevel: "", 
+            set: false, 
+            level: 1, 
+            experience: 0
+        }
+        const userDocRef = await addDoc(collection(FIRESTORE_DB, 'Users'), userData);
         
+        
+        const exercisesCollectionRef = collection(FIRESTORE_DB, 'Exercises');
+        const exercisesQuerySnapshot = await getDocs(exercisesCollectionRef);
+        exercisesQuerySnapshot.forEach(async (exerciseDoc) => {
+            const exerciseData = exerciseDoc.data()
+            const userSubcollectionRef = collection(userDocRef, 'exercises');
+            await addDoc(userSubcollectionRef, exerciseData);
+        })
+        
+
         alert('Registered successfully!');
     }   catch (error:any) {
         alert('Registration failed: ' + error.message);
@@ -77,11 +99,11 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
         !(value === 'beginner' || value === 'intermediate' || value === 'advanced') )
             throw new Error(`Please select one of the options`);
 
-    const usersCollection = collection(FIRESTORE_DB, 'users');
+    const usersCollection = collection(FIRESTORE_DB, 'Users');
         const q = query(usersCollection, where("userID", '==',userID));
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach(async (docSnapshot) => {
-            const userDocRef = doc(FIRESTORE_DB, 'users', docSnapshot.id);
+            const userDocRef = doc(FIRESTORE_DB, 'Users', docSnapshot.id);
 
             if (field === 'activityLevel') {
                 const newData = { [field]: value,set: true }; 
@@ -96,8 +118,177 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
         alert('Adding data has failed: ' + error.message);
     }
 }
-
-export const getExercises =async (userID: string):Promise<Exercise[]> => {    
+export const getSetUpValue = async (userID: string) => {
+    try {
+      const usersCollectionRef = collection(FIRESTORE_DB, 'Users');
+      const q = query(usersCollectionRef, where('userID', '==', userID));
+      const querySnapshot = await getDocs(q);
+      const userDocSnapshot = querySnapshot.docs[0];
+      const setUpValue = userDocSnapshot.data().set;
+      return setUpValue;
+    } catch (error) {
+      alert("Couldn't find set field : " + error.message);
+    }
+  };
+  
+  export const getName =async (userID:string): Promise<string> => {
+      try {
+          const usersCollectionRef = collection(FIRESTORE_DB, 'Users');
+          const q = query(usersCollectionRef, where('userID', '==', userID));
+          const querySnapshot = await getDocs(q);
+          const userDocSnapshot = querySnapshot.docs[0];
+          const name = userDocSnapshot.data().name;
+          return name;
+        } catch (error) {
+          alert("Couldn't find set field : " + error.message);
+        }
+  }
+  
+  export const getLevel =async (userID:string) => {
+      try {
+          const usersCollectionRef = collection(FIRESTORE_DB, 'Users');
+          const q = query(usersCollectionRef, where('userID', '==', userID));
+          const querySnapshot = await getDocs(q);
+          const userDocSnapshot = querySnapshot.docs[0];
+          const level = userDocSnapshot.data().level;
+          return level;
+        } catch (error) {
+          alert("Couldn't find set field : " + error.message);
+        }
+  }
+  export const getExperienceNeeded   =async (userID:string) => {
+      try {
+          const usersCollectionRef = collection(FIRESTORE_DB, 'Users');
+          const q = query(usersCollectionRef, where('userID', '==', userID));
+          const querySnapshot = await getDocs(q);
+          const userDocSnapshot = querySnapshot.docs[0];
+          const experience = userDocSnapshot.data().experience;
+          const level = userDocSnapshot.data().level
+          return Math.round(100*1.5**(level+1)-experience)
+      } catch (error) {
+          alert("Couldn't find experience field : " + error.message);
+        }
+  }
+  
+  export const getExerciseWithMostWeight = async (userID: string): Promise<BestExercise> => {
+      try {
+          const exerciseWithMostWeight: BestExercise = {
+              name: "",
+              weight: 0,
+              reps: 0,
+          }
+    
+      const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
+      const q = query(workoutsCollectionRef, where('userID', '==', userID));
+      const querySnapshot = await getDocs(q);
+    
+      for (const docSnapshot of querySnapshot.docs) {
+          const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
+          const workoutQuerySnapshot = await getDocs(workoutCollectionRef);
+    
+          for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {
+              const sets = workoutDocSnapshot.data().sets;
+              const exercises = workoutDocSnapshot.data().exercise;
+            
+              for (let i = 0; i < sets.length; i++) {
+                  if (sets[i].weight === undefined) {
+                      if (sets[i].weightLeft > exerciseWithMostWeight.weight || sets[i].weightRight > exerciseWithMostWeight.weight ) {
+                          sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.weight = sets[i].weightLeft : exerciseWithMostWeight.weight = sets[i].weightRight
+                          sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.reps = sets[i].repsLeft : exerciseWithMostWeight.reps = sets[i].repsRight
+                          exerciseWithMostWeight.name = exercises[i];
+                      }  
+                      else if (sets[i].weightLeft === exerciseWithMostWeight.weight || sets[i].weightRight === exerciseWithMostWeight.weight ) 
+                          if (sets[i].repsLeft > exerciseWithMostWeight.reps || sets[i].repsRight > exerciseWithMostWeight.reps ) {
+                              sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.weight = sets[i].weightLeft : exerciseWithMostWeight.weight = sets[i].weightRight
+                              sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.reps = sets[i].repsLeft : exerciseWithMostWeight.reps = sets[i].repsRight
+                              exerciseWithMostWeight.name = exercises[i];
+                          }   
+                  }
+                  else{
+                      if (sets[i].weight > exerciseWithMostWeight.weight) {
+                          exerciseWithMostWeight.weight = sets[i].weight;
+                          exerciseWithMostWeight.reps = sets[i].reps;
+                          exerciseWithMostWeight.name = exercises[i];
+                      }  
+                      else if (sets[i].weight === exerciseWithMostWeight.weight) 
+                          if (sets[i].reps > exerciseWithMostWeight.reps) {
+                              exerciseWithMostWeight.weight = sets[i].weight;
+                              exerciseWithMostWeight.reps = sets[i].reps;
+                              exerciseWithMostWeight.name = exercises[i];
+                          }                                       
+                  }
+              }
+          }
+        }
+              
+        return exerciseWithMostWeight;
+      } catch (error) {
+        alert("Couldn't find fields: " + error.message);
+        return ;
+      }
+    };
+  
+  
+  export const getExerciseWithMostReps = async (userID: string): Promise<BestExercise> => {
+      try {
+          const exerciseWithMostReps: BestExercise = {
+              name: "",
+              weight: 0,
+              reps: 0,
+          }
+    
+      const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
+      const q = query(workoutsCollectionRef, where('userID', '==', userID));
+      const querySnapshot = await getDocs(q);
+    
+      for (const docSnapshot of querySnapshot.docs) {
+          const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
+          const workoutQuerySnapshot = await getDocs(workoutCollectionRef);
+    
+          for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {
+              const sets = workoutDocSnapshot.data().sets;
+              const exercises = workoutDocSnapshot.data().exercise;
+            
+              for (let i = 0; i < sets.length; i++) {
+                  if (sets[i].reps === undefined) {
+                      if (sets[i].repsLeft > exerciseWithMostReps.weight || sets[i].repsRight > exerciseWithMostReps.reps ) {
+                          sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.weight = sets[i].repsLeft : exerciseWithMostReps.weight = sets[i].repsRight
+                          sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.reps = sets[i].repsLeft : exerciseWithMostReps.reps = sets[i].repsRight
+                          exerciseWithMostReps.name = exercises[i];
+                      }  
+                      else if (sets[i].repsLeft === exerciseWithMostReps.weight || sets[i].repsRight === exerciseWithMostReps.weight ) 
+                          if (sets[i].repsLeft > exerciseWithMostReps.reps || sets[i].repsRight > exerciseWithMostReps.reps ) {
+                              sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.weight = sets[i].repsLeft : exerciseWithMostReps.weight = sets[i].repsRight
+                              sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.reps = sets[i].repsLeft : exerciseWithMostReps.reps = sets[i].repsRight
+                              exerciseWithMostReps.name = exercises[i];
+                          }   
+                  }
+                  else{
+                      
+                      if (sets[i].reps > exerciseWithMostReps.reps) {
+                          exerciseWithMostReps.weight = sets[i].weight;
+                          exerciseWithMostReps.reps = sets[i].reps;
+                          exerciseWithMostReps.name = exercises[i];
+                      }  
+                      else if (sets[i].reps === exerciseWithMostReps.reps) 
+                          if (sets[i].weight > exerciseWithMostReps.weight) {
+                              exerciseWithMostReps.weight = sets[i].weight;
+                              exerciseWithMostReps.reps = sets[i].reps;
+                              exerciseWithMostReps.name = exercises[i];
+                          }                                       
+                  }  
+                                                         
+              }
+          }
+      }
+              
+      return exerciseWithMostReps;
+      } catch (error) {
+        alert("Couldn't find fields: " + error.message);
+        return ;
+      }
+    };
+/* export const getExercises =async (userID: string):Promise<Exercise[]> => {    
     const data = [];
     const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
     const q = query(exercisesCollection, where("availableTo", 'array-contains-any', ['all', userID]));
@@ -150,7 +341,7 @@ export const addExercise =async (userID:string, date: string, exercises:(string 
 
 export const getGender =async (userID:string) => {
     let data = "";
-    const exercisesCollection = collection(FIRESTORE_DB, 'users');
+    const exercisesCollection = collection(FIRESTORE_DB, 'Users');
     const q = query(exercisesCollection, where("userID", '==', userID));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach(async (docSnapshot) => {
@@ -160,21 +351,10 @@ export const getGender =async (userID:string) => {
     return data;
 }
 
-export const getSetUpValue = async (userID: string) => {
-    try {
-      const usersCollectionRef = collection(FIRESTORE_DB, 'users');
-      const q = query(usersCollectionRef, where('userID', '==', userID));
-      const querySnapshot = await getDocs(q);
-      const userDocSnapshot = querySnapshot.docs[0];
-      const setUpValue = userDocSnapshot.data().set;
-      return setUpValue;
-    } catch (error) {
-      alert("Couldn't find set field : " + error.message);
-    }
-  };
+
 export const addExperience = async (userID: string, experience) => {
     try {
-      const usersCollectionRef = collection(FIRESTORE_DB, 'users');
+      const usersCollectionRef = collection(FIRESTORE_DB, 'Users');
       const q = query(usersCollectionRef, where('userID', '==', userID));
       const querySnapshot = await getDocs(q);
       const userDocSnapshot = querySnapshot.docs[0];
@@ -199,163 +379,6 @@ export const addExperience = async (userID: string, experience) => {
     }
   };
 
-export const getName =async (userID:string): Promise<string> => {
-    try {
-        const usersCollectionRef = collection(FIRESTORE_DB, 'users');
-        const q = query(usersCollectionRef, where('userID', '==', userID));
-        const querySnapshot = await getDocs(q);
-        const userDocSnapshot = querySnapshot.docs[0];
-        const name = userDocSnapshot.data().name;
-        return name;
-      } catch (error) {
-        alert("Couldn't find set field : " + error.message);
-      }
-}
-
-export const getLevel =async (userID:string) => {
-    try {
-        const usersCollectionRef = collection(FIRESTORE_DB, 'users');
-        const q = query(usersCollectionRef, where('userID', '==', userID));
-        const querySnapshot = await getDocs(q);
-        const userDocSnapshot = querySnapshot.docs[0];
-        const level = userDocSnapshot.data().level;
-        return level;
-      } catch (error) {
-        alert("Couldn't find set field : " + error.message);
-      }
-}
-export const getExperienceNeeded   =async (userID:string) => {
-    try {
-        const usersCollectionRef = collection(FIRESTORE_DB, 'users');
-        const q = query(usersCollectionRef, where('userID', '==', userID));
-        const querySnapshot = await getDocs(q);
-        const userDocSnapshot = querySnapshot.docs[0];
-        const experience = userDocSnapshot.data().experience;
-        const level = userDocSnapshot.data().level
-        return Math.round(100*1.5**(level+1)-experience)
-    } catch (error) {
-        alert("Couldn't find experience field : " + error.message);
-      }
-}
-
-export const getExerciseWithMostWeight = async (userID: string): Promise<BestExercise> => {
-    try {
-        const exerciseWithMostWeight: BestExercise = {
-            name: "",
-            weight: 0,
-            reps: 0,
-        }
-  
-    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
-    const q = query(workoutsCollectionRef, where('userID', '==', userID));
-    const querySnapshot = await getDocs(q);
-  
-    for (const docSnapshot of querySnapshot.docs) {
-        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
-        const workoutQuerySnapshot = await getDocs(workoutCollectionRef);
-  
-        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {
-            const sets = workoutDocSnapshot.data().sets;
-            const exercises = workoutDocSnapshot.data().exercise;
-          
-            for (let i = 0; i < sets.length; i++) {
-                if (sets[i].weight === undefined) {
-                    if (sets[i].weightLeft > exerciseWithMostWeight.weight || sets[i].weightRight > exerciseWithMostWeight.weight ) {
-                        sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.weight = sets[i].weightLeft : exerciseWithMostWeight.weight = sets[i].weightRight
-                        sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.reps = sets[i].repsLeft : exerciseWithMostWeight.reps = sets[i].repsRight
-                        exerciseWithMostWeight.name = exercises[i];
-                    }  
-                    else if (sets[i].weightLeft === exerciseWithMostWeight.weight || sets[i].weightRight === exerciseWithMostWeight.weight ) 
-                        if (sets[i].repsLeft > exerciseWithMostWeight.reps || sets[i].repsRight > exerciseWithMostWeight.reps ) {
-                            sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.weight = sets[i].weightLeft : exerciseWithMostWeight.weight = sets[i].weightRight
-                            sets[i].weightLeft > sets[i].weightRight ? exerciseWithMostWeight.reps = sets[i].repsLeft : exerciseWithMostWeight.reps = sets[i].repsRight
-                            exerciseWithMostWeight.name = exercises[i];
-                        }   
-                }
-                else{
-                    if (sets[i].weight > exerciseWithMostWeight.weight) {
-                        exerciseWithMostWeight.weight = sets[i].weight;
-                        exerciseWithMostWeight.reps = sets[i].reps;
-                        exerciseWithMostWeight.name = exercises[i];
-                    }  
-                    else if (sets[i].weight === exerciseWithMostWeight.weight) 
-                        if (sets[i].reps > exerciseWithMostWeight.reps) {
-                            exerciseWithMostWeight.weight = sets[i].weight;
-                            exerciseWithMostWeight.reps = sets[i].reps;
-                            exerciseWithMostWeight.name = exercises[i];
-                        }                                       
-                }
-            }
-        }
-      }
-            
-      return exerciseWithMostWeight;
-    } catch (error) {
-      alert("Couldn't find fields: " + error.message);
-      return ;
-    }
-  };
-
-
-export const getExerciseWithMostReps = async (userID: string): Promise<BestExercise> => {
-    try {
-        const exerciseWithMostReps: BestExercise = {
-            name: "",
-            weight: 0,
-            reps: 0,
-        }
-  
-    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
-    const q = query(workoutsCollectionRef, where('userID', '==', userID));
-    const querySnapshot = await getDocs(q);
-  
-    for (const docSnapshot of querySnapshot.docs) {
-        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
-        const workoutQuerySnapshot = await getDocs(workoutCollectionRef);
-  
-        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {
-            const sets = workoutDocSnapshot.data().sets;
-            const exercises = workoutDocSnapshot.data().exercise;
-          
-            for (let i = 0; i < sets.length; i++) {
-                if (sets[i].reps === undefined) {
-                    if (sets[i].repsLeft > exerciseWithMostReps.weight || sets[i].repsRight > exerciseWithMostReps.reps ) {
-                        sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.weight = sets[i].repsLeft : exerciseWithMostReps.weight = sets[i].repsRight
-                        sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.reps = sets[i].repsLeft : exerciseWithMostReps.reps = sets[i].repsRight
-                        exerciseWithMostReps.name = exercises[i];
-                    }  
-                    else if (sets[i].repsLeft === exerciseWithMostReps.weight || sets[i].repsRight === exerciseWithMostReps.weight ) 
-                        if (sets[i].repsLeft > exerciseWithMostReps.reps || sets[i].repsRight > exerciseWithMostReps.reps ) {
-                            sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.weight = sets[i].repsLeft : exerciseWithMostReps.weight = sets[i].repsRight
-                            sets[i].repsLeft > sets[i].repsRight ? exerciseWithMostReps.reps = sets[i].repsLeft : exerciseWithMostReps.reps = sets[i].repsRight
-                            exerciseWithMostReps.name = exercises[i];
-                        }   
-                }
-                else{
-                    
-                    if (sets[i].reps > exerciseWithMostReps.reps) {
-                        exerciseWithMostReps.weight = sets[i].weight;
-                        exerciseWithMostReps.reps = sets[i].reps;
-                        exerciseWithMostReps.name = exercises[i];
-                    }  
-                    else if (sets[i].reps === exerciseWithMostReps.reps) 
-                        if (sets[i].weight > exerciseWithMostReps.weight) {
-                            exerciseWithMostReps.weight = sets[i].weight;
-                            exerciseWithMostReps.reps = sets[i].reps;
-                            exerciseWithMostReps.name = exercises[i];
-                        }                                       
-                }  
-                                                       
-            }
-        }
-    }
-            
-    return exerciseWithMostReps;
-    } catch (error) {
-      alert("Couldn't find fields: " + error.message);
-      return ;
-    }
-  };
   
 export const getWorkout = async (userID: string, date: string) => {
     try {  
@@ -464,14 +487,13 @@ export const deleteExercise =async (userID:string, exerciseID: string, xpToDelet
        const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
        const q = query(workoutsCollectionRef, where('userID', '==', userID));
        const querySnapshot = await getDocs(q);
-       
+              
        for (const docSnapshot of querySnapshot.docs) {
-        
         const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
         const nestedDocumentRef  = doc(workoutCollectionRef, exerciseID);
         const nestedDocumentSnapshot = await getDoc(nestedDocumentRef);
 
-        if (nestedDocumentSnapshot.exists()) {
+         if (nestedDocumentSnapshot.exists()) {
             await deleteDoc(nestedDocumentRef);   
             addExperience(userID,xpToDelete);
         }
@@ -497,4 +519,4 @@ export const getExercisesByFocus =async (userID: string, musclesWorked: string[]
     })
     
     return data;
-}
+} */

@@ -74,8 +74,11 @@ export default function App() {
   
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, async (user)=>{
+      
       setUser(user);
       if(user){
+        console.log(user.uid);
+        
         const setUpValue = getSetUpValue(user.uid);
         setAlreadySetUp(await setUpValue)
       }
