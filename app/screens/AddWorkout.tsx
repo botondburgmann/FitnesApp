@@ -76,11 +76,16 @@ const AddWorkout = () => {
   
   useEffect(() => {
     if (!exercisesPending && !exercisesError && exercises) {
-      const exerciseData = exercises.map((exercise) => ({
-        label: exercise.name,
-        value: exercise.name,
-        unilateral: exercise.unilateral,
-      }));
+      const exerciseData = [];
+      exercises.forEach(exercise => {
+        if (!exercise.hidden) {          
+          exerciseData.push({
+            label: exercise.name,
+            value: exercise.name,
+            unilateral: exercise.unilateral,
+          })
+        }
+      });
       setAllExercises(exerciseData);
     }
   }, [exercises, exercisesPending, exercisesError]);

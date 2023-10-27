@@ -348,7 +348,43 @@ export const toggleExerciseVisibilty =async (userID: string, exerciseName: strin
      return ;
    }
 }
-/*
+
+export const getWorkout = async (userID: string, date: string) => {
+    try {  
+         const workout = {
+            ids: [],
+            sets: [],
+            exercises: [],
+            typeOfSets: [],
+            timeStamps: []
+
+        }
+    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
+    const q = query(workoutsCollectionRef, where('userID', '==', userID), where('date', '==', date));
+    const querySnapshot = await getDocs(q);
+  
+    for (const docSnapshot of querySnapshot.docs) {
+        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
+        const workoutQuerySnapshot = await getDocs(workoutCollectionRef);        
+
+        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {    
+            workout.ids.push(workoutDocSnapshot.id);        
+            workout.exercises.push(workoutDocSnapshot.data().exercise);
+            workout.sets.push(workoutDocSnapshot.data().sets);
+            workout.typeOfSets.push(workoutDocSnapshot.data().typeOfSet);
+            workout.timeStamps.push(workoutDocSnapshot.data().createdAt);
+          
+
+        }
+    
+    }    
+    return workout; 
+    } catch (error) {
+      alert("Couldn't find fields: " + error.message);
+      return ;
+    }
+  };
+
 export const addExercise =async (userID:string, date: string, exercises:(string | Array<string>), sets: Array<Object>, typeOfSet:string) => {
     const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
     const q = query(workoutsCollection, where("date", '==', date), where("userID", '==', userID) );
@@ -429,41 +465,7 @@ export const addExperience = async (userID: string, experience) => {
   };
 
   
-export const getWorkout = async (userID: string, date: string) => {
-    try {  
-         const workout = {
-            ids: [],
-            sets: [],
-            exercises: [],
-            typeOfSets: [],
-            timeStamps: []
 
-        }
-    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
-    const q = query(workoutsCollectionRef, where('userID', '==', userID), where('date', '==', date));
-    const querySnapshot = await getDocs(q);
-  
-    for (const docSnapshot of querySnapshot.docs) {
-        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
-        const workoutQuerySnapshot = await getDocs(workoutCollectionRef);        
-
-        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {    
-            workout.ids.push(workoutDocSnapshot.id);        
-            workout.exercises.push(workoutDocSnapshot.data().exercise);
-            workout.sets.push(workoutDocSnapshot.data().sets);
-            workout.typeOfSets.push(workoutDocSnapshot.data().typeOfSet);
-            workout.timeStamps.push(workoutDocSnapshot.data().createdAt);
-          
-
-        }
-    
-    }    
-    return workout; 
-    } catch (error) {
-      alert("Couldn't find fields: " + error.message);
-      return ;
-    }
-  };
 export const getExercise = async (userID: string, exerciseName = '') => {
     try {  
 
@@ -568,4 +570,4 @@ export const getExercisesByFocus =async (userID: string, musclesWorked: string[]
     })
     
     return data;
-} */
+}
