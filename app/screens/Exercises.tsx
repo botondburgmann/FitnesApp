@@ -16,15 +16,15 @@ const Exercises = () => {
   const userID = useContext(UserContext);
 
   
-  const [toggled, setToggled] = useState(false)
-  const {data:exercises, isPending:exercisesPending, error:exercisesError } = useFetch(getExercises, userID, "", "", [], toggled);
+  const [exerciseToggled, setExerciseToggled] = useState("")
+  const {data:exercises, isPending:exercisesPending, error:exercisesError } = useFetch(getExercises, userID);
 
 
 
 
   function toggleVisibilty(exerciseName) {
     toggleExerciseVisibilty(userID, exerciseName)
-    toggled ? setToggled(false) : setToggled(true);
+    exerciseToggled === exerciseName ? setExerciseToggled("") : setExerciseToggled(exerciseName);
   }
 
   const exerciseComponentsList = [];
@@ -37,14 +37,14 @@ const Exercises = () => {
                       textAlign: 'left',
                       fontSize: 16,
                       color: "#fff",
-                      opacity: exercise.hidden ? 0.5 : 1,
+                      opacity: (exercise.hidden || exerciseToggled === exercise.name) ? 0.5 : 1,
                       textTransform: 'uppercase',
                       fontWeight: "600",
                       paddingVertical: 10,
             }}>{exercise.name}</Text>
           </Pressable>
           <Pressable>
-            {exercise.hidden ? <Text style={styles.text} onPress={() => toggleVisibilty(exercise.name)}>Unhide exercise</Text>
+            {(exercise.hidden || exerciseToggled === exercise.name) ? <Text style={styles.text} onPress={() => toggleVisibilty(exercise.name)}>Unhide exercise</Text>
             : <Text style={styles.text} onPress={() => toggleVisibilty(exercise.name)}>Hide exercise</Text>}
           </Pressable>
         </View>)
