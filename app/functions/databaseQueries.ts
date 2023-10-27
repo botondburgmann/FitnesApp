@@ -288,18 +288,67 @@ export const getSetUpValue = async (userID: string) => {
         return ;
       }
     };
-/* export const getExercises =async (userID: string):Promise<Exercise[]> => {    
-    const data = [];
-    const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
-    const q = query(exercisesCollection, where("availableTo", 'array-contains-any', ['all', userID]));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(async (docSnapshot) => {
-        data.push(docSnapshot.data());   
-    })
+ export const getExercises =async (userID: string):Promise<Exercise[]> => {    
+    try {  
+        const exercises = []
+        const usersCollectionRef = collection(FIRESTORE_DB, 'Users' )
+        const q = query(usersCollectionRef,where("userID", '==', userID))
+        const querySnapshot = await getDocs(q);
+ 
+        for (const docSnapshot of querySnapshot.docs) {
+            const exercisesCollectionRef = collection(docSnapshot.ref, 'exercises');
+            const exercisesQuerySnapshot = await getDocs(exercisesCollectionRef);        
 
-    return data;
+            for (const exerciseDocSnapshot of exercisesQuerySnapshot.docs)
+                exercises.push(exerciseDocSnapshot.data())
+        }    
+
+   return exercises; 
+   } catch (error) {
+     alert("Couldn't find fields: " + error.message);
+     return ;
+   }
 }
 
+export const toggleExerciseVisibilty =async (userID: string, exerciseName: string) => {
+    try {  
+        const usersCollectionRef = collection(FIRESTORE_DB, 'Users' )
+        const q = query(usersCollectionRef,where("userID", '==', userID))
+        const querySnapshot = await getDocs(q);
+ 
+        for (const docSnapshot of querySnapshot.docs) {
+            const exercisesCollectionRef = collection(docSnapshot.ref, 'exercises');
+            const q = query(exercisesCollectionRef,where("name", '==', exerciseName))
+            const exercisesQuerySnapshot = await getDocs(q);      
+
+            for (const exerciseDocSnapshot of exercisesQuerySnapshot.docs){
+
+
+                if (exerciseDocSnapshot.data().hidden === true) {
+                   const updateData = {
+                    hidden: false 
+                  };
+                  await updateDoc(exerciseDocSnapshot.ref, updateData);
+                   
+                }else{
+                    const updateData = {
+                        hidden: true 
+                      };
+                      await updateDoc(exerciseDocSnapshot.ref, updateData);
+                    
+                }
+                return exerciseDocSnapshot.data().hidden
+
+            }
+
+                
+        }    
+   } catch (error) {
+     alert("Couldn't find fields: " + error.message);
+     return ;
+   }
+}
+/*
 export const addExercise =async (userID:string, date: string, exercises:(string | Array<string>), sets: Array<Object>, typeOfSet:string) => {
     const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
     const q = query(workoutsCollection, where("date", '==', date), where("userID", '==', userID) );

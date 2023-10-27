@@ -77,7 +77,6 @@ export default function App() {
       
       setUser(user);
       if(user){
-        console.log(user.uid);
         
         const setUpValue = getSetUpValue(user.uid);
         setAlreadySetUp(await setUpValue)

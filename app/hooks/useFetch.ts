@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const useFetch = (getter: Function, userID: string, date?:string, name?:string, musclesWorked?:string[]) => {
+const useFetch = (getter: Function, userID: string, date?:string, name?:string, musclesWorked?:string[], toggled?:boolean) => {
     const [fetchState, setFetchState] = useState({
       data: null,
       isPending: true,
@@ -18,7 +18,7 @@ const useFetch = (getter: Function, userID: string, date?:string, name?:string, 
       };
   
       fetchData();
-    }, [getter, userID, date]);
+    }, [getter, userID, date, name, musclesWorked, toggled]);
   
     return fetchState;
   };

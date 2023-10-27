@@ -1,10 +1,10 @@
-import {  StyleSheet, Text, View } from 'react-native'
+import {  Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../components/SelectMenu'
-import { getExercises, getExercise } from '../functions/databaseQueries';
 import useFetch from '../hooks/useFetch';
 import UserContext from '../contexts/UserContext';
 import { Table, Row, Rows} from 'react-native-table-component';
+import { getExercises, toggleExerciseVisibilty } from '../functions/databaseQueries';
 
 
 interface ExerciseSelectOption{
@@ -15,11 +15,49 @@ interface ExerciseSelectOption{
 const Exercises = () => {
   const userID = useContext(UserContext);
 
-  const [allExercises, setAllExercises] = useState<ExerciseSelectOption[]>();
+  
+  const [toggled, setToggled] = useState(false)
+  const {data:exercises, isPending:exercisesPending, error:exercisesError } = useFetch(getExercises, userID, "", "", [], toggled);
+
+
+
+
+  function toggleVisibilty(exerciseName) {
+    toggleExerciseVisibilty(userID, exerciseName)
+    toggled ? setToggled(false) : setToggled(true);
+  }
+
+  const exerciseComponentsList = [];
+    if (exercises) {
+      for (const exercise of exercises) { 
+        exerciseComponentsList.push(
+        <View key={exercise.name} style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, flexWrap: 'wrap',}}>
+          <Pressable style={{   width: '50%' }}>
+            <Text style={{
+                      textAlign: 'left',
+                      fontSize: 16,
+                      color: "#fff",
+                      opacity: exercise.hidden ? 0.5 : 1,
+                      textTransform: 'uppercase',
+                      fontWeight: "600",
+                      paddingVertical: 10,
+            }}>{exercise.name}</Text>
+          </Pressable>
+          <Pressable>
+            {exercise.hidden ? <Text style={styles.text} onPress={() => toggleVisibilty(exercise.name)}>Unhide exercise</Text>
+            : <Text style={styles.text} onPress={() => toggleVisibilty(exercise.name)}>Hide exercise</Text>}
+          </Pressable>
+        </View>)
+      }      
+    }
+  
+   
+
+  
+/* 
   const [currentExercise, setCurrentExercise] = useState<string>();
   const [tableData, setTableData] = useState([[],[],[],[]]);
 
-  const {data:exercises, isPending:exercisesPending, error:exercisesError } = useFetch(getExercises, userID);
   const {data:exercise, isPending:exercisePending, error:exerciseError } = useFetch(getExercise, userID, currentExercise);
 
   
@@ -77,23 +115,15 @@ const sortedData = {
   
     return transposedMatrix;
   }
-  
+   */
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>My progress</Text>
-      <SelectMenu
-        data={allExercises || []} 
-        setSelectedValue={ setCurrentExercise }
-        title={'Select exercise'}
-      />
-      <Text style={styles.selectedExercise}>{currentExercise}</Text>
-      {exercise && <View style={styles.tableContainer}>
-        <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
-          <Row data={ ['Weight (kg)', 'Reps', 'Time (seconds)', 'Rest Time (minutes)']} textStyle={styles.text} />
-          <Rows data={transposeMatrix(tableData)} textStyle={styles.text}   />
-        </Table>
-      </View>}
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.label}>My exercises</Text>
+      {exercisesError && <Text style={styles.text}>{exercisesError}</Text> }
+      {exercisesPending && <Text style={styles.text}>Loading...</Text> }
+      
+      {exerciseComponentsList}
+    </ScrollView>
   )
 }
 
@@ -101,7 +131,6 @@ export default Exercises
 
 const styles = StyleSheet.create({
   container: {
-  flex: 1,
   justifyContent: 'flex-start',
   backgroundColor: '#ff0000'
 },
@@ -109,8 +138,8 @@ tableContainer:{
   marginHorizontal:10
 },
 text:{
-  textAlign: 'center',
-  fontSize: 12,
+  textAlign: 'left',
+  fontSize: 16,
   color: "#fff",
   textTransform: 'uppercase',
   fontWeight: "600",
