@@ -51,79 +51,20 @@ const Exercises = () => {
       }      
     }
   
-   
 
-  
-/* 
-  const [currentExercise, setCurrentExercise] = useState<string>();
-  const [tableData, setTableData] = useState([[],[],[],[]]);
-
-  const {data:exercise, isPending:exercisePending, error:exerciseError } = useFetch(getExercise, userID, currentExercise);
-
-  
-  useEffect(() => {
-    if (!exercisesPending && !exercisesError && exercises) {      
-      const exerciseData = exercises.map((exercise) => ({
-        label: exercise.name,
-        value: exercise.name,
-        unilateral: exercise.unilateral,
-      }));
-      setAllExercises(exerciseData);
-    }
-    if (!exercisePending && !exerciseError && exercise) { 
-       const exerciseInOrder = sortArrays(exercise, exercise.dates.slice());
-      
-      setTableData([exerciseInOrder.weights, exerciseInOrder.reps, exerciseInOrder.times, exerciseInOrder.restTimes]);
-
-    }
-  }, [exercise, exercisePending, exerciseError]);
-
-  function sortArrays(exercise, keyArray) {
-    const indices = exercise.dates.map((_, index) => index);
-    indices.sort((a, b) => {
-      const dateA = new Date(exercise.dates[a]).getTime();
-      const dateB = new Date(exercise.dates[b]).getTime();
-      return dateA - dateB;
-    });
-
-// Create new objects with sorted data arrays
-const sortedData = {
-  "dates": indices.map(index => exercise.dates[index]),
-  "reps": indices.map(index => exercise.reps[index]),
-  "restTimes": indices.map(index => exercise.restTimes[index]),
-  "times": indices.map(index => exercise.times[index]),
-  "weights": indices.map(index => exercise.weights[index])
-};
-  
-    return sortedData;
-  }
-  function transposeMatrix(matrix) {
-    
-    const rows = matrix.length;
-    const columns = matrix[0].length;
-  
-    const transposedMatrix = new Array(columns);
-    for (let i = 0; i < columns; i++) {
-      transposedMatrix[i] = new Array(rows);
-    }
-  
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < columns; j++) {
-        transposedMatrix[j][i] = matrix[i][j];
-      }
-    }
-  
-    return transposedMatrix;
-  }
-   */
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.label}>My exercises</Text>
+    <ScrollView>
       {exercisesError && <Text style={styles.text}>{exercisesError}</Text> }
       {exercisesPending && <Text style={styles.text}>Loading...</Text> }
       
       {exerciseComponentsList}
     </ScrollView>
+    <Pressable>
+        <Text style={styles.text}>Add new Exercise</Text>
+      </Pressable>
+    </View>
   )
 }
 
@@ -131,6 +72,7 @@ export default Exercises
 
 const styles = StyleSheet.create({
   container: {
+  flex: 1,
   justifyContent: 'flex-start',
   backgroundColor: '#ff0000'
 },
