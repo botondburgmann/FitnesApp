@@ -22,6 +22,7 @@ import Focus from './app/screens/Focus';
 import UserContext from './app/contexts/UserContext';
 import CurrentExercise from './app/screens/CurrentExercise';
 import Rest from './app/screens/Rest';
+import CreateExercise from './app/screens/CreateExercise';
 
 
 const Stack = createNativeStackNavigator();
@@ -48,7 +49,7 @@ function InsideLayout() {
       <Tab.Navigator screenOptions={{ tabBarStyle: {backgroundColor: '#ff0000'}, tabBarInactiveTintColor: '#fff'}}>
         <Tab.Screen name='Workouts' component={WorkoutLayout}  options={{ headerShown: false }} />
         <Tab.Screen name='Toplist' component={Toplist}  options={{ headerShown: false }} />
-        <Tab.Screen name='Exercises' component={Exercises} options={{ headerShown: false }} />
+        <Tab.Screen name='Exercises' component={ExercisesLayout} options={{ headerShown: false }} />
         <Tab.Screen name='Account' component={Account} options={{ headerShown: false }} />
       </Tab.Navigator>
   );
@@ -63,6 +64,14 @@ function WorkoutLayout() {
       <SetupStack.Screen name="Focus" component={Focus }/>
       <SetupStack.Screen name="CurrentExercise" component={CurrentExercise }/>
       <SetupStack.Screen name="Rest" component={Rest }/>
+    </SetupStack.Navigator>
+  )
+}
+function ExercisesLayout() {
+  return( 
+    <SetupStack.Navigator>
+      <SetupStack.Screen name="ExerciseList" component={Exercises} options={{ headerShown: false }}/>
+      <SetupStack.Screen name="CreateExercise" component={CreateExercise}  />
     </SetupStack.Navigator>
   )
 }

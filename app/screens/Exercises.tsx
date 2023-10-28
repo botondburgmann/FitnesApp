@@ -5,6 +5,7 @@ import useFetch from '../hooks/useFetch';
 import UserContext from '../contexts/UserContext';
 import { Table, Row, Rows} from 'react-native-table-component';
 import { getExercises, toggleExerciseVisibilty } from '../functions/databaseQueries';
+import { NavigationProp } from '@react-navigation/native';
 
 
 interface ExerciseSelectOption{
@@ -12,7 +13,11 @@ interface ExerciseSelectOption{
   value: string;
   unilateral: boolean
 }
-const Exercises = () => {
+
+interface RouterProps {
+  navigation: NavigationProp<any, any>;
+}
+const Exercises = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
 
   
@@ -61,8 +66,8 @@ const Exercises = () => {
       
       {exerciseComponentsList}
     </ScrollView>
-    <Pressable>
-        <Text style={styles.text}>Add new Exercise</Text>
+    <Pressable style={styles.createExerciseButton} onPress={() => navigation.navigate("CreateExercise")}>
+        <Text style={styles.createExerciseButtonText}>+</Text>
       </Pressable>
     </View>
   )
@@ -103,4 +108,21 @@ label: {
     marginTop: 50,
     marginBottom: 20
   },
+  createExerciseButton:{
+    marginVertical: 20,
+    alignSelf: 'flex-end',
+    marginRight: 20,
+    width: 50, // Set the desired width
+    height: 50, // Set the desired height
+    borderRadius: 50, // Make the borderRadius half of the width and height for a perfect circle
+    backgroundColor: '#808080', // Set your desired background color
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createExerciseButtonText:{
+    fontSize: 25,
+    color: "#fff",
+    fontWeight: "600",
+    alignSelf: 'center'
+  }
 });
