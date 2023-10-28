@@ -70,8 +70,8 @@ function WorkoutLayout() {
 function ExercisesLayout() {
   return( 
     <SetupStack.Navigator>
-      <SetupStack.Screen name="ExerciseList" component={Exercises} options={{ headerShown: false }}/>
-      <SetupStack.Screen name="CreateExercise" component={CreateExercise}  />
+      <SetupStack.Screen name="Exercise List" component={Exercises} options={{ headerShown: false }}/>
+      <SetupStack.Screen name="Create Exercise" component={CreateExercise}  />
     </SetupStack.Navigator>
   )
 }

@@ -66,7 +66,7 @@ const Exercises = ({navigation}: RouterProps) => {
       
       {exerciseComponentsList}
     </ScrollView>
-    <Pressable style={styles.createExerciseButton} onPress={() => navigation.navigate("CreateExercise")}>
+    <Pressable style={styles.createExerciseButton} onPress={() => navigation.navigate("Create Exercise")}>
         <Text style={styles.createExerciseButtonText}>+</Text>
       </Pressable>
     </View>

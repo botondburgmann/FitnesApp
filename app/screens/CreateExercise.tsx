@@ -16,14 +16,18 @@ const CreateExercise = ({navigation}: RouterProps) => {
     const [unilaterality, setUnilaterality] = useState("bilateral")
     const [isometricity, setIsometricity] = useState("not isometric")
     const [isCustomAlertVisible, setCustomAlertVisible] = useState(false);
+    const [title, setTitle] = useState<string>();
+    const [information, setInformation] = useState<string>();
 
-    const showCustomAlert = () => {
+    const showCustomAlert = (title, information) => {
         setCustomAlertVisible(true);
-      };
+        setTitle(title);
+        setInformation(information);
+    };
     
-      const hideCustomAlert = () => {
+    const hideCustomAlert = () => {
         setCustomAlertVisible(false);
-      };
+    };
 
     function toggleUnilateralitySwitch() {
         if (isUnilateral) {
@@ -34,6 +38,7 @@ const CreateExercise = ({navigation}: RouterProps) => {
         }
         setIsUnilateral(previousState => !previousState);
     }
+
     function toggleIsometricitySwitch() {
         if (isIsometric) {
             setIsometricity('not isometric');
@@ -46,50 +51,59 @@ const CreateExercise = ({navigation}: RouterProps) => {
 
   return (
     <View style={styles.container}>
-            <TextInput 
-                value={name}
-                style={styles.input} 
-                placeholder='Exercise name' 
-                autoCapitalize='none' 
-                onChangeText={(text) => setName(text)}
-            />
-            <Text style={styles.text}>This exercise is {unilaterality}</Text>
-                <Info 
-                isVisible={isCustomAlertVisible} 
-                onClose={hideCustomAlert} 
-                title={"What is unilaterality?"}
-                information={`A unilateral exercise is a weight bearing movement mainly or completely involving one limb (e.g. single leg squat, Bulgarian split squat and single leg jump), whereas, a bilateral exercise is a weight bearing movement executed evenly and simultaneously by both limbs (e.g. back squat, deadlift and countermovement jump).`} />
-            <Pressable style={styles.createExerciseButton} onPress={showCustomAlert}>
+        <TextInput 
+            value={name}
+            style={styles.input} 
+            placeholder='Exercise name' 
+            autoCapitalize='none' 
+            onChangeText={(text) => setName(text)}
+        />
 
-        <Text style={styles.createExerciseButtonText}>i</Text>
-      </Pressable>
-            <Switch 
-            trackColor={{ false: "#808080", true: "#fff" }}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleUnilateralitySwitch}
-            value={isUnilateral}
+        <View style={styles.gridContainer}>
+            <Text style={[styles.text,styles.gridItem]}>This exercise is {unilaterality}</Text>
+            <Pressable style={styles.createExerciseButton} onPress={() => showCustomAlert("What is unilaterality?","A unilateral exercise is a weight bearing movement mainly or completely involving one limb (e.g. single leg squat, Bulgarian split squat and single leg jump), whereas, a bilateral exercise is a weight bearing movement executed evenly and simultaneously by both limbs (e.g. back squat, deadlift and countermovement jump)." )}>
+                <Text style={styles.createExerciseButtonText}>i</Text>
+            </Pressable>
+            <Info
+                isVisible={isCustomAlertVisible}
+                onClose={hideCustomAlert}
+                title={title}
+                information={information}
             />
+        </View>
+            <View style={styles.switch}>
+                <Switch
+                    trackColor={{ false: "#808080", true: "#fff" }}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={toggleUnilateralitySwitch}
+                    value={isUnilateral}
+                />
+            </View>
+            
+        <View style={styles.gridContainer}>
             <Text style={styles.text}>This exercise is {isometricity}</Text>
-
-        <Info 
-            isVisible={isCustomAlertVisible} 
-            onClose={hideCustomAlert} 
-            title={"What is isometricity?"}
-            information={`Isometric exercises are tightening (contractions) of a specific muscle or group of muscles. During isometric exercises, the muscle doesn't noticeably change length. The affected joint also doesn't move. Isometric exercises help maintain strength. They can also build strength, but not effectively. And they can be performed anywhere. Examples include wall sit or plank.`} />
-            <Pressable style={styles.createExerciseButton} onPress={showCustomAlert} >
-        <Text style={styles.createExerciseButtonText}>i</Text>
-
-      </Pressable>
-            <Switch 
-            trackColor={{ false: "#808080", true: "#fff" }}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleIsometricitySwitch}
-            value={isIsometric}
+            <Pressable style={styles.createExerciseButton} onPress={() => showCustomAlert("What is isometricity?","Isometric exercises are tightening (contractions) of a specific muscle or group of muscles. During isometric exercises, the muscle doesn't noticeably change length. The affected joint also doesn't move. Isometric exercises help maintain strength. They can also build strength, but not effectively. And they can be performed anywhere. Examples include wall sit or plank." )} >
+                <Text style={styles.createExerciseButtonText}>i</Text>
+            </Pressable>
+            <Info
+                isVisible={isCustomAlertVisible}
+                onClose={hideCustomAlert}
+                title={title}
+                information={information}
             />
-            <Pressable style={styles.button}  >
-        <Text style={styles.text}>Create new exercise</Text>
-
-      </Pressable>
+        </View>
+            <View style={styles.switch}>
+                <Switch
+                    trackColor={{ false: "#808080", true: "#fff" }}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={toggleIsometricitySwitch}
+                    value={isIsometric}
+                />
+            </View>
+        
+        <Pressable style={styles.button}  >
+            <Text style={styles.text}>Create new exercise</Text>
+        </Pressable>
     </View>
   )
 }
@@ -102,9 +116,19 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     backgroundColor: '#ff0000'
   },
-  tableContainer:{
-    marginHorizontal:10
+  gridContainer: {
+    flexDirection: 'row',
+    justifyContent:'space-between',
+    marginLeft: 10,
+    marginRight: 50
+
   },
+gridItem: {
+    marginVertical: 10
+},
+switch:{
+    marginRight: 150 
+},
   text:{
     textAlign: 'left',
     fontSize: 16,
@@ -114,21 +138,18 @@ const styles = StyleSheet.create({
   },
   input: {
     marginHorizontal: 10,
-    marginVertical: 4,
+    marginTop: 100,
+    marginBottom: 30,
     height: 50,
     borderWidth: 1,
     borderRadius: 4,
     padding: 10,
     backgroundColor: '#fff'
 },
-  selectedExercise:{    alignSelf: 'center',
-  fontSize: 20,
-  fontWeight: "800",
-  color: "#fff",
-  textTransform: 'uppercase',
-  marginVertical: 20,
-  },
+  
   button:{
+    
+    marginTop: 125,
     paddingHorizontal: 5,
     alignSelf: "center",
     backgroundColor: "#000",
