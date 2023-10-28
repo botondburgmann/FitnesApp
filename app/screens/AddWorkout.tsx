@@ -9,12 +9,11 @@ import useFetch from '../hooks/useFetch'
 import { useRoute } from '@react-navigation/native'
 
 
-
-
 interface ExerciseSelectOption{
   label: string;
   value: string;
   unilateral: boolean
+  isometric: boolean
 }
 
 interface BilateralSet {
@@ -46,8 +45,13 @@ const AddWorkout = () => {
   const { date } = route.params as DateParams;
 
   const [allExercises, setAllExercises] = useState<ExerciseSelectOption[]>();
-  const [currentExercise, setCurrentExercise] = useState<string>();
-  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [currentExercise, setCurrentExercise] = useState<ExerciseSelectOption>({
+    label: "",
+    value: "",
+    unilateral: undefined,
+    isometric: undefined
+  });
+  const [selectedExercises, setSelectedExercises] = useState<ExerciseSelectOption[]>([]);
 
   const [numOfSet, setNumOfSet] = useState(0);
 
@@ -71,11 +75,11 @@ const AddWorkout = () => {
   
   const [sets, setSets] = useState([])
 
-  const {data:exercises, isPending:exercisesPending, error:exercisesError } = useFetch(getExercises, userID);
+  const {data:exercises, error:exercisesError } = useFetch(getExercises, userID);
 
   
   useEffect(() => {
-    if (!exercisesPending && !exercisesError && exercises) {
+    if ( !exercisesError && exercises) {
       const exerciseData = [];
       exercises.forEach(exercise => {
         if (!exercise.hidden) {          
@@ -83,19 +87,22 @@ const AddWorkout = () => {
             label: exercise.name,
             value: exercise.name,
             unilateral: exercise.unilateral,
+            isometric: exercise.isometric
           })
         }
       });
       setAllExercises(exerciseData);
     }
-  }, [exercises, exercisesPending, exercisesError]);
+  }, [exercises, exercisesError]);
    
 
 
   
   function addUnilateralSet(set: UnilateralSet) {
-    if (set.repsLeft === "" && set.repsRight === "")
+    if (!currentExercise.isometric && set.repsLeft === "" && set.repsRight === "")
       alert("Error: Reps fields cannot be empty. Please fill at least one of them");
+    else if (currentExercise.isometric && set.timeLeft === "" && set.timeRight === "")
+      alert("Error: Time fields cannot be empty. Please fill at least one of them");
     else {
       setSelectedExercises((prevSelected) => [...prevSelected, currentExercise]);
       for (const key in set)
@@ -118,8 +125,11 @@ const AddWorkout = () => {
   }
 
   function addBilateralSet(set: BilateralSet) {    
-    if (set.reps === "")
+    if (!currentExercise.isometric && set.reps === "")
       alert("Error: reps field cannot be empty");
+    else if (currentExercise.isometric && set.time === "")
+      alert("Error: time field cannot be empty");
+
     else {
       setSelectedExercises((prevSelected) => [...prevSelected, currentExercise]);
       
@@ -165,7 +175,7 @@ const AddWorkout = () => {
     return noRest;
   }
 
-  function areThereMultipleExercises(selectedExercises:string[]) {
+  function areThereMultipleExercises(selectedExercises:ExerciseSelectOption[]) {
     const selectedExercisesNumber = new Set(selectedExercises).size;
     if (selectedExercisesNumber > 1) 
       return true;
@@ -220,7 +230,14 @@ const AddWorkout = () => {
       addExercise(userID, date, selectedExercises, sets, typeOfSet);
 
       setSets([]);
-      setCurrentExercise("");
+
+      setCurrentExercise({
+        label: "",
+        value: "",
+        unilateral: false,
+        isometric: false,
+
+      });
       setSelectedExercises([]);
       setNumOfSet(0);
     } 
@@ -236,7 +253,7 @@ const AddWorkout = () => {
         data={allExercises || []} 
         setSelectedValue={ setCurrentExercise }
       />
-      {allExercises && allExercises.find((exercise) => exercise.value === currentExercise)?.unilateral === true
+      {allExercises && currentExercise.unilateral === true
       ?  <>
           <UnilateralSet set={unilateralSet} setSet={setUniSet}/>
          
@@ -248,7 +265,7 @@ const AddWorkout = () => {
             <Text>Finish set</Text>
           </Pressable>
         </>
-      : allExercises && allExercises.find((exercise) => exercise.value === currentExercise)?.unilateral === false
+      : allExercises && currentExercise.unilateral === false
       ? <>
           <BilateralSet set={bilateralSet} setSet={setBilateralSet}/>
          

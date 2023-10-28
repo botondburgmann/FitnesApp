@@ -3,6 +3,13 @@ import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, serverTimes
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 
+interface ExerciseSelectOption{
+    label: string;
+    value: string;
+    unilateral: boolean
+    isometric: boolean
+  }
+
 interface Exercise{
     name: string;
     musclesWorked: string[];
@@ -302,7 +309,8 @@ export const getSetUpValue = async (userID: string) => {
             for (const exerciseDocSnapshot of exercisesQuerySnapshot.docs)
                 exercises.push(exerciseDocSnapshot.data())
         }    
-
+        console.log(exercises);
+        
    return exercises; 
    } catch (error) {
      alert("Couldn't find fields: " + error.message);
@@ -385,7 +393,7 @@ export const getWorkout = async (userID: string, date: string) => {
     }
   };
 
-export const addExercise =async (userID:string, date: string, exercises:(string | Array<string>), sets: Array<Object>, typeOfSet:string) => {
+export const addExercise =async (userID:string, date: string, exercises:(ExerciseSelectOption[]), sets: Array<Object>, typeOfSet:string) => {
     const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
     const q = query(workoutsCollection, where("date", '==', date), where("userID", '==', userID) );
 

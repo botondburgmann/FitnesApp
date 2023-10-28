@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const useFetch = (getter: Function, userID: string, date?:string, name?:string, musclesWorked?:string[]) => {
+const useFetch = (getter: Function, userID: string, date?:string,  name?:string, musclesWorked?:string[]) => {
     const [fetchState, setFetchState] = useState({
       data: null,
       isPending: true,

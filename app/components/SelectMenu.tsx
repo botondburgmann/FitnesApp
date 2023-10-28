@@ -21,7 +21,7 @@ const SelectMenu = (props) => {
         valueField="value"
         onChange={item => {
           setIsFocus(false);
-          setSelectedValue(item.value);
+          setSelectedValue(item);
         }}
       />
     </View>
