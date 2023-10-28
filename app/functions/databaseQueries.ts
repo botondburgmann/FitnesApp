@@ -533,7 +533,7 @@ export const getExercise = async (userID: string, exerciseName = '') => {
     }
   };
 
-export const deleteExercise =async (userID:string, exerciseID: string, xpToDelete: number ) => {
+export const deleteExercise = async (userID:string, exerciseID: string, xpToDelete: number ) => {
     try {  
        const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
        const q = query(workoutsCollectionRef, where('userID', '==', userID));
@@ -560,7 +560,7 @@ export const deleteExercise =async (userID:string, exerciseID: string, xpToDelet
    }
 }
 
-export const getExercisesByFocus =async (userID: string, musclesWorked: string[]):Promise<Exercise[]> => {    
+export const getExercisesByFocus = async (userID: string, musclesWorked: string[]):Promise<Exercise[]> => {    
     const data = [];
     const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
     const q = query(exercisesCollection, where('musclesWorked', 'array-contains-any', musclesWorked));
@@ -570,4 +570,26 @@ export const getExercisesByFocus =async (userID: string, musclesWorked: string[]
     })
     
     return data;
+}
+
+export const createNewExercise = async (userID: string, name: string, isUnilateral: boolean, isIsometric: boolean) => {
+    try {  
+        const usersCollectionRef = collection(FIRESTORE_DB, 'Users' )
+        const q = query(usersCollectionRef,where("userID", '==', userID))
+        const querySnapshot = await getDocs(q);
+ 
+        for (const docSnapshot of querySnapshot.docs) {
+            const exercisesCollectionRef = collection(docSnapshot.ref, 'exercises');
+            await addDoc(exercisesCollectionRef, {
+                hidden: false,
+                isometric: isIsometric,
+                name: name,
+                unilateral: isUnilateral
+              });
+        }    
+
+   } catch (error) {
+     alert("Couldn't create exercise: " + error.message);
+     return ;
+   }
 }

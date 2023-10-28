@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react'
 import UserContext from '../contexts/UserContext';
 import { NavigationProp } from '@react-navigation/native';
 import Info from '../components/Info';
+import { createNewExercise } from '../functions/databaseQueries';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -47,6 +48,15 @@ const CreateExercise = ({navigation}: RouterProps) => {
             setIsometricity('isometric')
         }
         setIsIsometric(previousState => !previousState);
+    }
+
+    function handleButtonClick() {
+        createNewExercise(userID, name, isUnilateral, isIsometric)
+        setName("");
+        setIsIsometric(false);
+        setIsUnilateral(false);
+        setUnilaterality("");
+        setIsometricity("");
     }
 
   return (
@@ -101,7 +111,7 @@ const CreateExercise = ({navigation}: RouterProps) => {
                 />
             </View>
         
-        <Pressable style={styles.button}  >
+        <Pressable style={styles.button} onPress={handleButtonClick} >
             <Text style={styles.text}>Create new exercise</Text>
         </Pressable>
     </View>
