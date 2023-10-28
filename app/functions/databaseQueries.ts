@@ -309,7 +309,6 @@ export const getSetUpValue = async (userID: string) => {
             for (const exerciseDocSnapshot of exercisesQuerySnapshot.docs)
                 exercises.push(exerciseDocSnapshot.data())
         }    
-        console.log(exercises);
         
    return exercises; 
    } catch (error) {
@@ -358,39 +357,46 @@ export const toggleExerciseVisibilty =async (userID: string, exerciseName: strin
 }
 
 export const getWorkout = async (userID: string, date: string) => {
-    try {  
-         const workout = {
-            ids: [],
-            sets: [],
-            exercises: [],
-            typeOfSets: [],
-            timeStamps: []
-
+    try {
+        const workout = {
+          ids: [],
+          sets: [],
+          exercises: [],
+          typeOfSets: [],
+          timeStamps: [],
+        };
+      
+        const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
+        const q = query(
+          workoutsCollectionRef,
+          where('userID', '==', userID),
+          where('date', '==', date)
+        );
+        const querySnapshot = await getDocs(q);
+      
+        for (const docSnapshot of querySnapshot.docs) {
+          const workoutCollectionRef = collection(FIRESTORE_DB, 'Workouts', docSnapshot.id, 'Workout');
+          const workoutQuerySnapshot = await getDocs(workoutCollectionRef);
+      
+          workoutQuerySnapshot.forEach((doc) => {
+            const data = doc.data();
+      
+            if (data && data.exercise && data.sets && data.typeOfSet && data.createdAt) {
+              workout.ids.push(doc.id);
+              workout.exercises.push(data.exercise);
+              workout.sets.push(data.sets);
+              workout.typeOfSets.push(data.typeOfSet);
+              workout.timeStamps.push(data.createdAt);
+            }
+          });
         }
-    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
-    const q = query(workoutsCollectionRef, where('userID', '==', userID), where('date', '==', date));
-    const querySnapshot = await getDocs(q);
-  
-    for (const docSnapshot of querySnapshot.docs) {
-        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
-        const workoutQuerySnapshot = await getDocs(workoutCollectionRef);        
-
-        for (const workoutDocSnapshot of workoutQuerySnapshot.docs) {    
-            workout.ids.push(workoutDocSnapshot.id);        
-            workout.exercises.push(workoutDocSnapshot.data().exercise);
-            workout.sets.push(workoutDocSnapshot.data().sets);
-            workout.typeOfSets.push(workoutDocSnapshot.data().typeOfSet);
-            workout.timeStamps.push(workoutDocSnapshot.data().createdAt);
-          
-
-        }
-    
-    }    
-    return workout; 
-    } catch (error) {
-      alert("Couldn't find fields: " + error.message);
-      return ;
-    }
+      
+        return workout;
+      } catch (error) {
+        alert("Error retrieving data:" + error);
+        return null;
+      }
+      
   };
 
 export const addExercise =async (userID:string, date: string, exercises:(ExerciseSelectOption[]), sets: Array<Object>, typeOfSet:string) => {
@@ -406,9 +412,11 @@ export const addExercise =async (userID:string, date: string, exercises:(Exercis
             });
             
             const setsRef = collection(newDocRef, 'Workout');
+            const data = [];
+            exercises.forEach((exercise => {data.push(exercise.value)}))                
 
             await addDoc(setsRef, {
-                exercise: exercises,
+                exercise: data,
                 sets: sets,
                 typeOfSet: typeOfSet,
                 createdAt: serverTimestamp()
@@ -417,8 +425,11 @@ export const addExercise =async (userID:string, date: string, exercises:(Exercis
             querySnapshot.forEach(async (doc) => {
                 const setsRef = collection(doc.ref, 'Workout');
                 
+                const data = [];
+                exercises.forEach((exercise => {data.push(exercise.value)}))                
+
                 await addDoc(setsRef, {
-                    exercise: exercises,
+                    exercise: data,
                     sets: sets,
                     typeOfSet: typeOfSet,
                     createdAt: serverTimestamp()

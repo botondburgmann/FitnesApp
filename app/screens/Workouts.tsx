@@ -21,6 +21,8 @@ const Workouts = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
   const [date, setDate] = useState(new Date());
 
+  
+
   const {data: workout, isPending: workoutPending, error: workoutError} = useFetch(getWorkout, userID, date.toDateString())
         
   const [exerciseComponents, setExerciseComponents] = useState([])
