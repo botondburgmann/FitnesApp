@@ -89,11 +89,7 @@ const Workouts = ({navigation}: RouterProps) => {
     
   }, [userID, date]);
   
-   const exerciseComponentss = [];
-   if (workout !== undefined) {
-    console.log(workout);
-    
-   }
+
    
 /*     if (workout !== undefined) {
     for (let i = 0; i < workout.length; i++) {
