@@ -6,51 +6,12 @@ import UserContext from '../contexts/UserContext';
 const DisplayDropSet = (props) => {
     const userID = useContext(UserContext);
     const exercise = props.exercise;
-    const sets = props.sets;
-    const id = props.id;
-    const deleteSets = props.deleteSets;
     
 
     
     return (
-        <Pressable style={styles.container} onPress={() => deleteSets(id,sets)}>
-            <Text style={styles.exercise}>1 dropset of {exercise}</Text>
-            {sets.map((item, index) => 
-                item.weight !== undefined && item.time > 0 ? 
-                <Text 
-                    style={styles.text} 
-                    key={index}
-                >
-                    {item.weight} kg 
-                    for {item.reps} reps
-                    for {item.time} seconds
-                </Text>
-                : item.weight !== undefined && item.time === 0 ?
-                <Text 
-                    style={styles.text} 
-                    key={index}
-                >
-                    {item.weight} kg 
-                    for {item.reps} reps
-                </Text>
-                : item.weight === undefined && item.time > 0 ?
-                <Text 
-                    style={styles.text} 
-                    key={index}
-                >
-                    {item.weightLeft}/{item.weightRight} kg 
-                    for {item.repsLeft}/{item.repsRight} reps
-                    for  {item.timeLeft}/{item.timeRight} seconds
-                </Text>
-                :
-                <Text 
-                    style={styles.text} 
-                    key={index}
-                >
-                    {item.weightLeft}/{item.weightRight} kg 
-                    for {item.repsLeft}/{item.repsRight} reps
-                </Text>
-                )}
+        <Pressable style={styles.container}>
+            <Text style={styles.exercise}>1 dropset of {exercise.exerciseName[0]}</Text>
                 
         </Pressable>
     )

@@ -14,7 +14,7 @@ interface RouterProps {
 const ActivityLevel = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
 
-  const [value, setValue] = useState<string>();
+  const [value, setValue] = useState<any>();
   const [items] = useState([
     {label: 'Beginner', value: 'beginner'},
     {label: 'Intermediate', value: 'intermediate'},

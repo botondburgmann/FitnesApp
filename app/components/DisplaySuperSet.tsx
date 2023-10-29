@@ -6,69 +6,18 @@ import UserContext from '../contexts/UserContext';
 const DisplaySuperSet = (props) => {
     const userID = useContext(UserContext);
 
-    const exercises = props.exercises;
-    const sets = props.sets;
-    const id = props.id;
-    const deleteSets = props.deleteSets;
+    const exercise = props.exercise;
 
-    const exerciseNumber = new Set(exercises).size;
+    const exerciseNumber = new Set(exercise).size;
 
 
 
     return (
-        <Pressable style={styles.container} onPress={() => deleteSets(id,sets)}>
-            {sets.length > 1 
-            ?
-            <>
-                <Text style={[styles.exercise, {marginTop:20}]}>{exercises.length/exerciseNumber} supersets of</Text>
-                <Text style={[styles.exercise, {marginBottom:20}]}>{exercises[0]}s and {exercises[1]}s</Text>
-            </> 
-            :             <>
-            <Text style={[styles.exercise, {marginTop:20}]}>{exercises.length/exerciseNumber} supersets of</Text>
-            <Text style={[styles.exercise, {marginBottom:20}]}>{exercises[0]} and {exercises[1]}</Text>
-        </> } 
-            
-            
-            <View style={styles.gridContainer}>
-            {sets.map((item, index) => (
-                <View key={index} style={styles.gridItem}>
-                    {item.weight !== undefined && item.time > 0 ? 
-                <Text 
-                    style={styles.text} 
-                    key={index}
-                >
-                    {item.weight} kg 
-                    for {item.reps} reps
-                    for {item.time} seconds
-                </Text>
-                : item.weight !== undefined && item.time === 0 ?
-                <Text 
-                    style={styles.text} 
-                    key={index}
-                >
-                    {item.weight} kg 
-                    for {item.reps} reps
-                </Text>
-                : item.weight === undefined && item.time > 0 ?
-                <Text 
-                    style={styles.text} 
-                    key={index}
-                >
-                    {item.weightLeft}/{item.weightRight} kg 
-                    for {item.repsLeft}/{item.repsRight} reps
-                    for  {item.timeLeft}/{item.timeRight} seconds
-                </Text>
-                :
-                <Text 
-                    style={styles.text} 
-                    key={index}
-                >
-                    {item.weightLeft}/{item.weightRight} kg 
-                    for {item.repsLeft}/{item.repsRight} reps
-                </Text>}
-                </View>))}
-            </View>
-        </Pressable>
+        <Pressable style={styles.container}>
+        {exercise.reps.length > 1 
+                ? <Text style={styles.exercise}>{exercise.reps.length} sets of {exercise.exerciseName[0]}s</Text>
+                : <Text style={styles.exercise}>{exercise.reps.length} setssdfds of {exercise.exerciseName[0]}</Text>}         
+        </Pressable>    
     )
 }
 

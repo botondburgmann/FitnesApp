@@ -7,9 +7,6 @@ const DisplayStraightSet = (props) => {
     const userID = useContext(UserContext);
 
     const exercise = props.exercise;
-    const sets = props.sets;
-    const id = props.id
-    const deleteSets = props.deleteSets;
 
     
 
@@ -18,46 +15,13 @@ const DisplayStraightSet = (props) => {
     return (
    
 
-    <Pressable style={styles.container} onPress={() => deleteSets(id,sets)}>
-    {sets.length > 1 
-            ? <Text style={styles.exercise}>{sets.length} sets of {exercise}s</Text>
-            : <Text style={styles.exercise}>{sets.length} set of {exercise}</Text>} 
-                {sets.map((item, index) => (
-                    item.reps !== undefined && item.time > 0 ? 
-                        <Text 
-                            style={styles.text} 
-                            key={index}
-                        >
-                            Set {index + 1}: {item.weight} kg 
-                            for {item.reps} reps 
-                            for {item.time} seconds 
-                        </Text>
-                    : item.reps !== undefined && item.time === 0 ? 
-                        <Text 
-                            style={styles.text} 
-                            key={index}
-                        >
-                            Set {index + 1}: {item.weight} kg 
-                            for {item.reps} reps
-                        </Text>
-                    : item.reps === undefined && item.time > 0 ? 
-                        <Text 
-                            style={styles.text} 
-                            key={index}
-                        >
-                            Set {index + 1}: {item.weightLeft}/{item.weightRight} kg 
-                            for {item.repsLeft}/{item.repsRight} reps 
-                            for {item.timeLeft}/{item.timeRight} seconds 
-                        </Text>
-                    :   <Text 
-                            style={styles.text} 
-                            key={index}
-                        >
-                            Set {index + 1}: {item.weightLeft}/{item.weightRight} kg 
-                            for {item.repsLeft}/{item.repsRight} reps 
-                        </Text>
-                    ))}
-    </Pressable>    )
+    <Pressable style={styles.container}>
+    {exercise.reps.length > 1 
+            ? <Text style={styles.exercise}>{exercise.reps.length} sets of {exercise.exerciseName[0]}s</Text>
+            : <Text style={styles.exercise}>{exercise.reps.length} set of {exercise.exerciseName[0]}</Text>}         
+    </Pressable>    
+    )
+
 }
 
 export default DisplayStraightSet

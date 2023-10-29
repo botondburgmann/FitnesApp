@@ -1,5 +1,5 @@
 import { Auth, createUserWithEmailAndPassword } from "firebase/auth";
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
+import { DocumentData, addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 
@@ -103,8 +103,11 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
             value = Math.round((value*30.48)*100)/100;
         
         if (field === 'activityLevel' && 
-        !(value === 'beginner' || value === 'intermediate' || value === 'advanced') )
+        !(value.value === 'beginner' || value.value === 'intermediate' || value.value === 'advanced') ){
+            console.log(value);
+            
             throw new Error(`Please select one of the options`);
+        }
 
     const usersCollection = collection(FIRESTORE_DB, 'Users');
         const q = query(usersCollection, where("userID", '==',userID));
@@ -356,47 +359,45 @@ export const toggleExerciseVisibilty =async (userID: string, exerciseName: strin
    }
 }
 
-export const getWorkout = async (userID: string, date: string) => {
-    try {
-        const workout = {
-          ids: [],
-          sets: [],
-          exercises: [],
-          typeOfSets: [],
-          timeStamps: [],
-        };
-      
-        const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
-        const q = query(
-          workoutsCollectionRef,
-          where('userID', '==', userID),
-          where('date', '==', date)
-        );
-        const querySnapshot = await getDocs(q);
-      
-        for (const docSnapshot of querySnapshot.docs) {
-          const workoutCollectionRef = collection(FIRESTORE_DB, 'Workouts', docSnapshot.id, 'Workout');
-          const workoutQuerySnapshot = await getDocs(workoutCollectionRef);
-      
-          workoutQuerySnapshot.forEach((doc) => {
-            const data = doc.data();
-      
-            if (data && data.exercise && data.sets && data.typeOfSet && data.createdAt) {
-              workout.ids.push(doc.id);
-              workout.exercises.push(data.exercise);
-              workout.sets.push(data.sets);
-              workout.typeOfSets.push(data.typeOfSet);
-              workout.timeStamps.push(data.createdAt);
-            }
-          });
-        }
-      
-        return workout;
-      } catch (error) {
-        alert("Error retrieving data:" + error);
-        return null;
-      }
-      
+export const getWorkout = (userID: string, date: string) => {
+    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
+    
+    const q = query(workoutsCollectionRef, where('userID', '==', userID), where('date', '==', date));
+
+    getDocs(q)
+    .then((snapshot) => {
+        
+      snapshot.docs.forEach((doc) => {
+        const workoutCollectionRef = collection(doc.ref, "Workout")
+        
+        onSnapshot(workoutCollectionRef, (snapshot) => {
+            const workout = {
+                ids: [],
+                sets: [],
+                exercises: [],
+                typeOfSets: [],
+                timeStamps: [],
+              };
+            snapshot.docs.forEach((doc) => {
+                workout.ids.push(doc.id);
+                workout.exercises.push(doc.data().exercise);
+                workout.sets.push(doc.data().sets);
+                workout.typeOfSets.push(doc.data().typeOfSets);
+                workout.timeStamps.push(doc.data().createdAt);
+                
+            })
+            console.log(`returning ${workout.exercises}`);
+            
+            return workout;
+            
+        })
+      })
+
+        
+    })
+    .catch(err => {
+        alert(err.message)
+    })
   };
 
 export const addExercise =async (userID:string, date: string, exercises:(ExerciseSelectOption[]), sets: Array<Object>, typeOfSet:string) => {

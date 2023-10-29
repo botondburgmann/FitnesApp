@@ -1,133 +1,203 @@
-import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native'
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
 import Datepicker from '../components/Datepicker'
+import { NavigationProp } from '@react-navigation/native';
 import UserContext from '../contexts/UserContext';
-import useFetch from '../hooks/useFetch';
 import { deleteExercise, getWorkout } from '../functions/databaseQueries';
+import { collection, query, where, getDocs, onSnapshot, snapshotEqual } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../FirebaseConfig';
 import DisplayDropSet from '../components/DisplayDropSet';
 import DisplayStraightSet from '../components/DisplayStraightSet';
 import DisplaySuperSet from '../components/DisplaySuperSet';
-import { Alert } from 'react-native';
-
-
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
+interface BilateralExercise {
+  exerciseName: string[];
+  reps: number[];
+  weights: number[];
+  times: number[];
+  restTimes: number[];
+  typeOfSet: string
+}
+interface UnilateralExercise {
+  exerciseName: string[];
+  repsLeft: number[];
+  weightsLeft: number[];
+  timesLeft: number[];
+  restTimesLeft:number [];
+  repsRight: number[];
+  weightsRight: number[];
+  timesRight: number[];
+  restTimesRight: number[];
+  typeOfSet: string;
+}
 
 const Workouts = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
   const [date, setDate] = useState(new Date());
 
-  
+  const [workout, setWorkout] = useState([]);
 
-  const {data: workout, isPending: workoutPending, error: workoutError} = useFetch(getWorkout, userID, date.toDateString())
-        
-  const [exerciseComponents, setExerciseComponents] = useState([])
 
   useEffect(() => {
-    setExerciseComponents([]);
+    setWorkout([]);
+    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
+    const q = query(workoutsCollectionRef, where("userID", "==", userID), where("date", "==", date.toDateString()));
+    
+    onSnapshot(q, (snapshot) => {
+      setWorkout([]);
 
-    if (workout) {
-      const workoutInOrder = sortArrays(workout, workout.timeStamps.slice());
-      for (let i = 0; i < workoutInOrder.exercises.length; i++) {
-        if (workoutInOrder.typeOfSets[i] === "straight" )
-          setExerciseComponents((prev) => [...prev,<DisplayStraightSet key={i} deleteSets={showDeleteConfirmation} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/> ])
-        else if (workoutInOrder.typeOfSets[i] === "drop" )
-          setExerciseComponents((prev) => [...prev,<DisplayDropSet  key={i} deleteSets={showDeleteConfirmation} exercise={workoutInOrder.exercises[i][0]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/>])
-        else if ((workoutInOrder.typeOfSets[i] === "super"))
-          setExerciseComponents((prev) => [...prev,<DisplaySuperSet  key={i} deleteSets={showDeleteConfirmation} exercises={workoutInOrder.exercises[i]} sets={workoutInOrder.sets[i]} id={workoutInOrder.ids[i]}/>])
-      }
-    }
+      snapshot.docs.forEach((doc) => {        
+        for (let i = 0; i < doc.data().Workout.length; i++) {
+          if(doc.data().Workout[i].reps !== undefined){
+            const exercise = {
+              exerciseName: doc.data().Workout[i].exercise,
+              reps: doc.data().Workout[i].reps,
+              weights: doc.data().Workout[i].weights,
+              times: doc.data().Workout[i].times,
+              restTimes: doc.data().Workout[i].restTimes,
+              typeOfSet: doc.data().Workout[i].typeOfSet
+            }
+            
+            setWorkout((prev) => [...prev, exercise])
+          }
+          else{
+            const exercise = {
+              exerciseName: doc.data().Workout[i].exercise,
+              repsLeft: doc.data().Workout[i].repsLeft,
+              weightsLeft: doc.data().Workout[i].weightsLeft,
+              timesLeft: doc.data().Workout[i].timesLeft,
+              restTimesLeft: doc.data().Workout[i].restTimesLeft,
+              repsRight: doc.data().Workout[i].repsRight,
+              weightsRight: doc.data().Workout[i].weightsRight,
+              timesRight: doc.data().Workout[i].timesRight,
+              restTimesRight: doc.data().Workout[i].restTimesRight,
+              typeOfSet: doc.data().Workout[i].typeOfSet
+            }
+            
+            setWorkout((prev) => [...prev, exercise])            
+          }        
+        }
+        
+        
+        
+      })
+    })
+    
+  }, [userID, date]);
   
-    function sortArrays(workout, keyArray) {
-      const indices = keyArray.map((_, index) => index);
-        
-      indices.sort((a, b) => (workout.timeStamps[a].nanoseconds + workout.timeStamps[a].seconds * 1e9) -(workout.timeStamps[b].nanoseconds + workout.timeStamps[b].seconds * 1e9));
-        
-      for (const prop in workout) 
-        if (prop !== 'timeStamps') 
-          workout[prop] = indices.map((index) => workout[prop][index]);
-          
-      workout.timeStamps = keyArray.sort((a, b) => a - b);
-        
-      return workout;
-    }
+   const exerciseComponentss = [];
+   if (workout !== undefined) {
+    console.log(workout);
+    
+   }
    
- 
-  }, [workout])
-  
-  const showDeleteConfirmation = (id, sets) => {
-    Alert.alert(
-      'Delete Item',
-      'Are you sure you want to delete this item?',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          onPress: () => {
-            deleteExercise(userID, id, calculateXP(sets))
-            const updatedExerciseComponents = exerciseComponents.filter((component) => component.props.id !== id);
-            setExerciseComponents(updatedExerciseComponents)
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-  
-
-
-  function calculateXP(sets) {
-    let experiencePoints = 0;
-    for (const set of sets) {
-      if (set.weightLeft !== undefined || set.weightRight !== undefined) {
-        if (set.weightLeft === 0)
-          experiencePoints -= set.repsLeft;
-        else
-          experiencePoints -= set.repsLeft * set.weightLeft;
-        if (set.weightRight === 0)
-          experiencePoints -= set.repsRight;
-        else
-          experiencePoints -= set.repsRight * set.weightRight;
+/*     if (workout !== undefined) {
+    for (let i = 0; i < workout.length; i++) {
+      if (workout[i].typeOfSet === "straight" ){
+        let set;
+        if (workout[i].reps !== undefined) {
+          set = {
+            reps: workout[i].reps,
+            weights: workout[i].weights,
+            times: workout[i].times,
+            restTimes: workout[i].restTimes,
+          }
+        }
+        else{
+          set = {
+            repsLeft: workout[i].repsLeft,
+            weightsLeft: workout[i].weightsLeft,
+            timesLeft: workout[i].timesLeft,
+            restTimesLeft: workout[i].restTimesLeft,
+            repsRight: workout[i].repsRight,
+            weightsRight: workout[i].weightsRight,
+            timesRight: workout[i].timesRight,
+            restTimesRight: workout[i].restTimesRight,
+          }
+        }      
+        exerciseComponentss.push(<DisplayStraightSet key={i}  exercise={workout[i].exerciseName[0]} set={set}/>)
       }
-      else{
-        if (set.weight === 0)
-          experiencePoints -= set.reps;
-        else
-          experiencePoints -= set.reps * set.weight;
+      else if (workout[i].typeOfSet === "drop" ){
+        let set;
+        if (workout[i].reps !== undefined) {
+          set = {
+            reps: workout[i].reps,
+            weights: workout[i].weights,
+            times: workout[i].times,
+            restTimes: workout[i].restTimes,
+          }
+        }
+        else{
+          set = {
+            repsLeft: workout[i].repsLeft,
+            weightsLeft: workout[i].weightsLeft,
+            timesLeft: workout[i].timesLeft,
+            restTimesLeft: workout[i].restTimesLeft,
+            repsRight: workout[i].repsRight,
+            weightsRight: workout[i].weightsRight,
+            timesRight: workout[i].timesRight,
+            restTimesRight: workout[i].restTimesRight,
+          }
+        }      
+        exerciseComponentss.push(<DisplayDropSet key={i}  exercise={workout[i].exerciseName[0]} set={set}/>)
       }
-    }
-
-  return experiencePoints;  
+      else if (workout[i].typeOfSet === "super" ){
+        let set;
+        if (workout[i].reps !== undefined) {
+          set = {
+            reps: workout[i].reps,
+            weights: workout[i].weights,
+            times: workout[i].times,
+            restTimes: workout[i].restTimes,
+          }
+        }
+        else{
+          set = {
+            repsLeft: workout[i].repsLeft,
+            weightsLeft: workout[i].weightsLeft,
+            timesLeft: workout[i].timesLeft,
+            restTimesLeft: workout[i].restTimesLeft,
+            repsRight: workout[i].repsRight,
+            weightsRight: workout[i].weightsRight,
+            timesRight: workout[i].timesRight,
+            restTimesRight: workout[i].restTimesRight,
+          }
+        }      
+        exerciseComponentss.push(<DisplaySuperSet key={i}  exercise={workout[i].exerciseName} set={set}/>)
+      }
+     
   }
+  } */
+    
 
 
-  
   return (
     <View style={styles.container}>
-      <Datepicker date={date} setDate={setDate} />
-      <Text style={[styles.text, {marginTop: 20}]}>{date.toDateString()}</Text>
-      <ScrollView contentContainerStyle={styles.log}>
-        {workoutError && <Text style={[styles.text, {marginTop: 20}]}>{workoutError}</Text> }
-        {workoutPending && <Text style={[styles.text, {marginTop: 20}]}>Loading...</Text>}
-        {workout && exerciseComponents}
-      </ScrollView>
-      <View style={styles.buttonGroup}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Add',{ date: date.toDateString()})}>
-          <Text style={styles.text}>Add new Exercise</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Routine')}>
-          <Text style={styles.text}>Ask for routine</Text>
-        </Pressable>
-      </View>     
-    </View>
+    <Datepicker date={date} setDate={setDate} />
+    <Text style={[styles.text, {marginTop: 20}]}>{date.toDateString()}</Text>
+    <ScrollView contentContainerStyle={styles.log}>
+    {workout && workout.map((exercise, index) => 
+       exercise.typeOfSet === "straight" ? (<DisplayStraightSet key={index}  exercise={exercise}/>)
+       :  exercise.typeOfSet === "drop" ? (<DisplayDropSet key={index}  exercise={exercise}/>)
+       : exercise.typeOfSet === "super" ?(<DisplaySuperSet key={index}  exercise={exercise}/>)
+       : <></>
+
+    )}
+    </ScrollView>
+    
+    <View style={styles.buttonGroup}>
+      <Pressable style={styles.button} onPress={() => navigation.navigate('Add',{ date: date.toDateString()})}>
+        <Text style={styles.text}>Add new Exercise</Text>
+      </Pressable>
+      <Pressable style={styles.button} onPress={() => navigation.navigate('Routine')}>
+        <Text style={styles.text}>Ask for routine</Text>
+      </Pressable>
+    </View>     
+  </View>
   )
 }
 
