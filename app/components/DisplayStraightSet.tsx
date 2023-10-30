@@ -17,12 +17,22 @@ const DisplayStraightSet = (props) => {
     ?   exercise.reps.length !== 0 
         ?   exercise.reps.map((rep, index) => 
             exercise.weights[index] === 0 && exercise.times[index] === 0
-                ?   <Pressable key={index} style={styles.setContainer} onPress={() => alert("pressed")} onLongPress={() => handleDelete(exercise.exerciseName, true, index, exercise.reps[index])}>
+                ?   <Pressable 
+                        key={index} 
+                        style={styles.setContainer} 
+                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, setID: index, isIsometric: false})}  
+                        onLongPress={() => handleDelete(exercise.exerciseName, true, index, exercise.reps[index])}
+                    >
                         <Text style={styles.text} > Set {index + 1}: {rep} reps with no weight</Text>
                         <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
                     </Pressable>
                 :  exercise.weights[index] === 0
-                ?   <Pressable key={index} style={styles.setContainer} onPress={() => alert("pressed")} onLongPress={() => handleDelete(exercise.exerciseName, true, index, (exercise.reps[index]* exercise.times[index]))}>
+                ?   <Pressable 
+                        key={index} 
+                        style={styles.setContainer} 
+                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, setID: index, isIsometric: false})} 
+                        onLongPress={() => handleDelete(exercise.exerciseName, true, index, (exercise.reps[index]* exercise.times[index]))}
+                    >
                         <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight for {exercise.times[index]} seconds</Text>
                         <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
                     </Pressable> 
@@ -32,26 +42,39 @@ const DisplayStraightSet = (props) => {
                     <Pressable 
                         key={index} 
                         style={styles.setContainer} 
-                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, setID: index})} 
+                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, setID: index,isIsometric: false})} 
                         onLongPress={() => handleDelete(exercise.exerciseName, true, index, (exercise.reps[index]* exercise.weights[index]))}>
                         <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with {exercise.weights[index]} kg</Text>
                         <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
                     </Pressable>
                 : 
-                    <Pressable key={index} style={styles.setContainer} onPress={() => alert("pressed")} onLongPress={() => handleDelete(exercise.exerciseName, true, index, (exercise.reps[index]* exercise.times[index] * exercise.weights[index]))}>
+                    <Pressable 
+                        key={index} 
+                        style={styles.setContainer} 
+                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, setID: index, isIsometric: false})} 
+                        onLongPress={() => handleDelete(exercise.exerciseName, true, index, (exercise.reps[index]* exercise.times[index] * exercise.weights[index]))}>
                         <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with {exercise.weights[index]} kg for {exercise.times[index]} seconds </Text>
                         <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
                     </Pressable>
             )
         : exercise.times.map((time, index) => 
             exercise.weights[index] === 0
-            ?   <Pressable key={index} style={styles.setContainer} onPress={() => alert("pressed")} onLongPress={() => handleDelete(exercise.exerciseName, true, index, exercise.times[index])}>
+            ?   <Pressable 
+                    key={index} 
+                    style={styles.setContainer} 
+                    onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, setID: index, isIsometric: true})} 
+                    onLongPress={() => handleDelete(exercise.exerciseName, true, index, exercise.times[index])}
+                >
                     <Text style={styles.text} key={index}> Set {index + 1}: {time} seconds hold</Text>
                     <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
                 </Pressable>
             
             : 
-                <Pressable key={index} style={styles.setContainer} onPress={() => alert("pressed")} onLongPress={() => handleDelete(exercise.exerciseName, true, index, (exercise.weights[index]* exercise.times[index]))}>
+                <Pressable 
+                    key={index} 
+                    style={styles.setContainer} 
+                    onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, setID: index, isIsometric: true})} 
+                    onLongPress={() => handleDelete(exercise.exerciseName, true, index, (exercise.weights[index]* exercise.times[index]))}>
                     <Text style={styles.text} key={index}> Set {index + 1}: {time} seconds hold with {exercise.weights[index]} kg</Text>
                     <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
                 </Pressable>

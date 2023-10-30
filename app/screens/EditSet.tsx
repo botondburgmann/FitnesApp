@@ -14,16 +14,20 @@ interface RouterProps {
 const EditBilateralSet = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
 
-    const { exercise, setID} = route?.params; 
+    const { exercise, setID, isIsometric} = route?.params; 
     const exerciseName = exercise.exerciseName[setID];   
     const [weight, setWeight] = useState<string>(exercise.weights[setID].toString())
     const [time, setTime] = useState<string>(exercise.times[setID].toString())
-    const [reps, setReps] = useState<string>(exercise.reps[setID].toString())
+    const [reps, setReps] = isIsometric ? useState<string>("") : useState<string>(exercise.reps[setID].toString())
     const [restTime, setRestTime] = useState<string>(exercise.restTimes[setID].toString())
 
-    const changes = {
+    const changeNormal = {
         weights : parseFloat(weight) ,
-        reps :  parseFloat(reps) ,
+        reps :  parseFloat(reps),
+        times :  parseFloat(time) ,
+    }
+    const changeIsometric = {
+        weights : parseFloat(weight) ,
         times :  parseFloat(time) ,
     }
 
@@ -31,21 +35,21 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
         let currentExperience = 0;
         let toDelete = 1;
         let toAdd = 1
-        for (const change in changes) {
+        for (const change in changeNormal) {
             if (exercise[change][setID] === 0) {
                 exercise[change][setID] = 1
             }
             toDelete *=exercise[change][setID]
-            if (Number.isNaN(changes[change])) {
-                changes[change] = exercise[change][setID];
+            if (Number.isNaN(changeNormal[change])) {
+                toAdd *= exercise[change][setID];
 
             }
-            else if (changes[change] === 0) {
-                changes[change] = 1;
-
+            else if (changeNormal[change] === 0) {
+                toAdd *= 1;
             }
-            
-            toAdd *= changes[change];
+            else{
+                toAdd *= changeNormal[change];
+            }
         }
 
         currentExperience -=toDelete;
@@ -55,38 +59,71 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
 
 
     function handleModifyButton() {
-        editSet(userID,exercise.exerciseName[setID],setID,changes, changeXP())
-        navigation.navigate("Log")
+        console.log(isIsometric);
+        console.log(changeNormal.reps);
+        if (isIsometric) {
+            if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) {
+                alert("Time field cannot be empty");
+            }
+            else{
+                editSet(userID,exercise.exerciseName[setID],setID,changeIsometric, changeXP())
+                navigation.navigate("Log")
+            }
+        } else {
+            if (changeNormal.reps === 0 || Number.isNaN(changeNormal.reps)) {
+                alert("Reps field cannot be empty"); 
+            }
+            else{
+                editSet(userID,exercise.exerciseName[setID],setID,changeNormal, changeXP())
+                navigation.navigate("Log")
+            }
+        }
+
+    
     }
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Edit set</Text>
-            <Text>{exerciseName} {weight} {reps} {time} {restTime}</Text>
+            <Text style={styles.label}>Edit {exerciseName}</Text>
+            <Text style={styles.text}>weight (kg)</Text>
             <TextInput
             keyboardType='numeric'
             style={styles.input}
+            value={weight}
             placeholder="Weight"
             autoCapitalize='none'
             onChangeText={(text) => setWeight(text)}
             />
+            {!isIsometric 
+            
+            ? <>
+             <Text style={styles.text}>reps</Text>
             <TextInput
             keyboardType='numeric'
             style={styles.input}
+            value={reps}
             placeholder="Reps"
             autoCapitalize='none'
             onChangeText={(text) => setReps(text)}
             />
+            </>:
+            <></>
+        }
+           
+            <Text style={styles.text}>time (seconds)</Text>
             <TextInput
             keyboardType='numeric'
             style={styles.input}
+            value={time}
             placeholder="Time (in seconds)"
             autoCapitalize='none'
             onChangeText={(text) => setTime(text)}
             />
+            <Text style={styles.text}>Rest time (seconds)</Text>
             <TextInput
             keyboardType='numeric'
             style={styles.input}
+            value={restTime}
             placeholder="Rest time (in seconds)"
             autoCapitalize='none'
             onChangeText={(text) => setRestTime(text)}

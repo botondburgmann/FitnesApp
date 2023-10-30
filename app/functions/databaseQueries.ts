@@ -104,7 +104,6 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
         
         if (field === 'activityLevel' && 
         !(value.value === 'beginner' || value.value === 'intermediate' || value.value === 'advanced') ){
-            console.log(value);
             
             throw new Error(`Please select one of the options`);
         }
@@ -386,7 +385,6 @@ export const getWorkout = (userID: string, date: string) => {
                 workout.timeStamps.push(doc.data().createdAt);
                 
             })
-            console.log(`returning ${workout.exercises}`);
             
             return workout;
             
@@ -658,8 +656,7 @@ export const editSet = async (userID:string, exerciseName: string, setID: number
         const updatedData = { ...docSnapshot.data() };
 
         for (let i = 0; i < docSnapshot.data().Workout.length; i++) {   
-            console.log(`${docSnapshot.data().Workout[i].exercise[setID]} is a ${typeof(docSnapshot.data().Workout[i].exercise[setID])}
-            and ${exerciseName} is a ${typeof(exerciseName)}`);
+      
             
             if(docSnapshot.data().Workout[i].exercise[setID] === exerciseName){
                 
