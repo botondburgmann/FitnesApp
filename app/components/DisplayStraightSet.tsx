@@ -8,73 +8,151 @@ const DisplayStraightSet = (props) => {
 
     const exercise = props.exercise;
 
-    const properties = {
-        isUnilateral: false,
-        isIsometric: false,
-        isWeighted: false
-    }
-
- 
-
     return (
    
 
-    <Pressable style={styles.container}>
+    <View style={styles.container}>
     {exercise.exerciseName.length > 1
             ? <Text style={styles.exercise}>{exercise.exerciseName.length} sets of {exercise.exerciseName[0]}s</Text>
             : <Text style={styles.exercise}>{exercise.exerciseName.length} set of {exercise.exerciseName[0]}</Text>}     
     {exercise.reps !== undefined 
-    ?   exercise.reps.map((rep, index) => 
+    ?   exercise.reps.length !== 0 
+        ?   exercise.reps.map((rep, index) => 
             exercise.weights[index] === undefined && exercise.times[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight {exercise.times[index]} + {exercise.restTimes[index]/60} minutes rest</Text>
-            :  exercise.weights[index] === undefined 
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight for {exercise.times[index]} seconds + {exercise.restTimes[index]/60} minutes rest </Text>
-            : exercise.times[index] === undefined 
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {exercise.weights[index]} kg for {rep} reps + {exercise.restTimes[index]/60} min rest </Text>
-            : <Text style={styles.text} key={index}> Set {index + 1}: {exercise.weights[index]} kg for {rep} reps for {exercise.times[index]} seconds  + {exercise.restTimes[index]/60} min rest </Text>
+                ?   <Pressable key={index} style={styles.setContainer} onPress={() => alert("pressed")} onLongPress={() => alert("long pressed")}>
+                        <Text style={styles.text} > Set {index + 1}: {rep} reps with no weight</Text>
+                        <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
+                    </Pressable>
+                :  exercise.weights[index] === undefined 
+                ?   <View key={index} style={styles.setContainer}>
+                        <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight for {exercise.times[index]} seconds</Text>
+                        <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
+                    </View> 
+                
+                : exercise.times[index] === undefined 
+                ? 
+                    <View key={index} style={styles.setContainer}>
+                        <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with {exercise.weights[index]} kg</Text>
+                        <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
+                    </View>
+                : 
+                    <View key={index} style={styles.setContainer}>
+                        <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with {exercise.weights[index]} kg for {exercise.times[index]} seconds </Text>
+                        <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
+                    </View>
+            )
+        : exercise.times.map((time, index) => 
+            exercise.weights[index] === undefined
+            ?   <View key={index} style={styles.setContainer}>
+                    <Text style={styles.text} key={index}> Set {index + 1}: {time} seconds hold</Text>
+                    <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
+                </View>
+            
+            : 
+                <View key={index} style={styles.setContainer}>
+                    <Text style={styles.text} key={index}> Set {index + 1}: {time} seconds hold with {exercise.weights[index]} kg</Text>
+                    <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
+                </View>
         )
-    : <>
-         <Text style={styles.text}>Left side: </Text>
-{         exercise.repsLeft.map((rep, index) => 
-            exercise.weightsLeft[index] === undefined && exercise.timesLeft[index] === undefined && exercise.restTimesLeft[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight {exercise.timesLeft[index]}</Text>
-            :  exercise.weightsLeft[index] === undefined && exercise.timesLeft[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight + {exercise.restTimesLeft[index]/60} minutes rest </Text>
-            : exercise.weightsLeft[index] === undefined && exercise.restTimesLeft[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight for {exercise.timesLeft[index]} seconds </Text>
-            : exercise.weightsLeft[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight for {exercise.timesLeft[index]} seconds + {exercise.restTimesLeft[index]/60} minutes rest </Text>
-            : exercise.timesLeft[index] === undefined && exercise.restTimesLeft[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {exercise.weightsLeft[index]} kg for {rep} reps</Text>
-            : exercise.timesLeft[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {exercise.weightsLeft[index]} kg for {rep} reps + {exercise.restTimesLeft[index]/60} min rest </Text>
-            : exercise.restTimesLeft[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {exercise.weightsLeft[index]} kg for {rep} reps for {exercise.timesLeft[index]} seconds </Text>
-            : <Text style={styles.text} key={index}> Set {index + 1}: {exercise.weightsLeft[index]} kg for {rep} reps for {exercise.timesLeft[index]} seconds + {exercise.restTimesLeft[index]/60} min rest </Text>
+    
+    
+    : 
+        exercise.repsLeft.length !== 0 && exercise.repsRight.length !== 0
+        ?   <View style={styles.gridContainer}>
+                <View style={styles.gridItem}>
+                    <Text style={styles.text}>Left side: </Text>
+                    {exercise.repsLeft.map((rep, index) => 
+                        exercise.weightsLeft[index] === undefined && exercise.timesLeft[index] === undefined && exercise.restTimesLeft[index] === undefined
+                        ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight</Text>
+                        :  exercise.weightsLeft[index] === undefined && exercise.timesLeft[index] === undefined
+                        ?   <View key={index} style={[styles.setContainer, styles.gridItem]}>
+                                <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight</Text>
+                                <Text style={styles.text}> Rest: {exercise.restTimesLeft[index]/60} minutes</Text>
+                            </View>
+                        : exercise.weightsLeft[index] === undefined && exercise.restTimesLeft[index] === undefined
+                        ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight for {exercise.timesLeft[index]} seconds </Text>
+                        : exercise.weightsLeft[index] === undefined
+                        ?  <View key={index} style={[styles.setContainer, styles.gridItem]}>
+                                <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight for {exercise.timesLeft[index]} seconds</Text>
+                                <Text style={styles.text}> Rest: {exercise.restTimesLeft[index]/60} minutes</Text>
+                            </View>
+                        : exercise.timesLeft[index] === undefined && exercise.restTimesLeft[index] === undefined
+                        ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with {exercise.weightsLeft[index]} kg</Text>
+                        : exercise.timesLeft[index] === undefined
+                        ?   <View key={index} style={[styles.setContainer, styles.gridItem]}>
+                                <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with {exercise.weightsLeft[index]} kg</Text>
+                                <Text style={styles.text}> Rest: {exercise.restTimesLeft[index]/60} minutes</Text>
+                            </View>
+                        : exercise.restTimesLeft[index] === undefined
+                        ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with {exercise.weightsLeft[index]} kg for {exercise.timesLeft[index]} seconds </Text>
+                        :  <View key={index} style={[styles.setContainer, styles.gridItem]}>
+                                <Text style={styles.text} key={index}> Set {index + 1}: {rep} with {exercise.weightsLeft[index]} kg reps for {exercise.timesLeft[index]} seconds </Text>
+                                <Text style={styles.text}>Rest: {exercise.restTimesLeft[index]/60} minutes</Text>
+                            </View> 
+                    )}
+                </View>
+                <View style={styles.gridItem}>
+                <Text style={styles.text}>Right side: </Text>
+                {exercise.repsRight.map((rep, index) => 
+                    exercise.weightsRight[index] === undefined && exercise.timesRight[index] === undefined
+                    ?   <View key={index} style={styles.setContainer}>
+                            <Text style={styles.text} key={index}>{rep} reps with no weight</Text>
+                            <Text style={styles.text}>Rest: {exercise.restTimesRight[index]/60} minutes</Text>
+                        </View> 
+                    : exercise.weightsRight[index] === undefined
+                    ?   <View key={index} style={styles.setContainer}>
+                            <Text style={styles.text} key={index}>{rep} reps with no weight for {exercise.timesRight[index]} seconds</Text>
+                            <Text style={styles.text}>Rest: {exercise.restTimesRight[index]/60} minutes</Text>
+                        </View>  
+                    
+                    : exercise.timesRight[index] === undefined
+                    ?   <View key={index} style={styles.setContainer}>
+                            <Text style={styles.text} key={index}>{rep} reps with {exercise.weightsRight[index]} kg </Text>
+                            <Text style={styles.text}> Rest: {exercise.restTimesRight[index]/60} minutes</Text>
+                        </View> 
+                    :   <View key={index} style={styles.setContainer}>
+                            <Text style={styles.text} key={index}>{rep} reps with {exercise.weightsRight[index]} kg for {exercise.timesRight[index]} seconds</Text>
+                            <Text style={styles.text}> Rest: {exercise.restTimesRight[index]/60} minutes</Text>
+                        </View>  
+                )}
+                </View>
+            </View>
+        : <View style={styles.gridContainer}>
+            <View style={styles.gridItem}>
+            <Text style={styles.text}>Left side: </Text>
+            {exercise.timesLeft.map((time, index) => 
+                exercise.weightsLeft[index] === undefined && exercise.restTimesLeft[index] === undefined
+                ? <Text style={styles.text} key={index}> Set {index + 1}: {time} seconds hold with no weight</Text>
+                :  exercise.weightsLeft[index] === undefined
+                ? <View key={index} style={styles.setContainer}>
+                    <Text style={styles.text} key={index}> Set {index + 1}: {time} seconds hold with no weight</Text>
+                    <Text style={styles.text}> Rest: {exercise.restTimesLeft[index]/60} minutes</Text>
+                </View>  
+                : exercise.restTimesLeft[index] === undefined
+                ? <Text style={styles.text} key={index}> Set {index + 1}: {time} seconds hold with  reps with {exercise.weightsLeft[index]} kg </Text>
+                : <View key={index} style={styles.setContainer}>
+                    <Text style={styles.text} key={index}> Set {index + 1}: {time} seconds hold with  reps with {exercise.weightsLeft[index]} kg </Text>
+                    <Text style={styles.text}> Rest: {exercise.restTimesLeft[index]/60} minutes</Text>
+                </View>  
+            )}
+            </View>
+            <View style={styles.gridItem}>
+        <Text style={styles.text}>Right side: </Text>
+        {exercise.timesRight.map((time, index) => 
+            exercise.weightsRight[index] === undefined
+            ?   <View key={index} style={styles.setContainer}>
+                    <Text style={styles.text} key={index}>{time} seconds hold with no weight</Text>
+                    <Text style={styles.text}> Rest: {exercise.restTimesRight[index]/60} minutes</Text>
+                </View>  
+            : <View key={index} style={styles.setContainer}>
+            <Text style={styles.text} key={index}>{time} seconds hold with  reps with {exercise.weightsRight[index]} kg</Text>
+            <Text style={styles.text}> Rest: {exercise.restTimesRight[index]/60} minutes</Text>
+            </View> 
         )}
-         <Text style={styles.text}>Right side: </Text>
-        {
-            exercise.repsRight.map((rep, index) => 
-            exercise.weightsRight[index] === undefined && exercise.timesRight[index] === undefined && exercise.restTimesRight[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight {exercise.timesRight[index]}</Text>
-            :  exercise.weightsRight[index] === undefined && exercise.timesRight[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight + {exercise.restTimesRight[index]/60} minutes rest </Text>
-            : exercise.weightsRight[index] === undefined && exercise.restTimesRight[index] === undefined    
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight for {exercise.timesRight[index]} seconds </Text>
-            : exercise.weightsRight[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with no weight for {exercise.timesRight[index]} seconds + {exercise.restTimesRight[index]/60} minutes rest </Text>
-            : exercise.timesRight[index] === undefined && exercise.restTimesRight[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {exercise.weightsRight[index]} kg for {rep} reps</Text>
-            : exercise.timesRight[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {exercise.weightsRight[index]} kg for {rep} reps + {exercise.restTimesRight[index]/60} min rest </Text>
-            : exercise.restTimesRight[index] === undefined
-            ? <Text style={styles.text} key={index}> Set {index + 1}: {exercise.weightsRight[index]} kg for {rep} reps for {exercise.timesRight[index]} seconds </Text>
-            : <Text style={styles.text} key={index}> Set {index + 1}: {exercise.weightsRight[index]} kg for {rep} reps for {exercise.timesRight[index]} seconds + {exercise.restTimesRight[index]/60} min rest </Text>
-       )    
-        }
-    </>
+            </View>
+        </View>
     }    
-    </Pressable>    
+    </View>    
     )
 
 }
@@ -84,7 +162,23 @@ export default DisplayStraightSet
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
-        marginHorizontal: 0
+        marginVertical: 5
+      },
+      setContainer: {
+        alignItems: 'center',
+        marginVertical: 5
+      },
+      gridContainer:{
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginHorizontal: 10,
+        marginVertical: 20
+
+      },
+      gridItem:{
+        width: '50%',
+        justifyContent: 'space-between',
+        alignItems: 'center'
       },
     text: {
         fontSize: 16,
