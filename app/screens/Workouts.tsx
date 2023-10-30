@@ -101,7 +101,7 @@ const Workouts = ({navigation}: RouterProps) => {
     }    
   return experiencePoints;  
   }
-  const showDeleteConfirmation = (exerciseName, setID, xpDelete) => {
+  const showDeleteConfirmation = (exerciseName, isBilateral, setID, xpDelete) => {
     Alert.alert(
       'Delete Item',
       'Are you sure you want to delete this item?',
@@ -114,7 +114,7 @@ const Workouts = ({navigation}: RouterProps) => {
         {
           text: 'Delete',
           onPress: () => {
-            deleteSet(userID, exerciseName, setID, -xpDelete)
+            deleteSet(userID, exerciseName, isBilateral, setID, -xpDelete)
           },
         },
       ],
