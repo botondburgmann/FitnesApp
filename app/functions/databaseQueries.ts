@@ -560,7 +560,7 @@ function arrayEquals(arrayOne, arrayTwo) {
     return true
 }
 
-export const deleteSet = async (userID:string, exerciseName: number, isBilateral:boolean, setID: number, xpToDelete: number ) => {
+export const deleteSet = async (userID:string, exerciseName: string, isBilateral:boolean, setID: number, xpToDelete: number ) => {
     try {  
        const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
        const q = query(workoutsCollectionRef, where('userID', '==', userID));
@@ -644,6 +644,42 @@ export const createNewExercise = async (userID: string, name: string, isUnilater
 
    } catch (error) {
      alert("Couldn't create exercise: " + error.message);
+     return ;
+   }
+}
+
+export const editSet = async (userID:string, exerciseName: string, setID: number, changes: object, xpToChange: number ) => {
+    try {  
+       const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
+       const q = query(workoutsCollectionRef, where('userID', '==', userID));
+       const querySnapshot = await getDocs(q);
+              
+       for (const docSnapshot of querySnapshot.docs) {
+        const updatedData = { ...docSnapshot.data() };
+
+        for (let i = 0; i < docSnapshot.data().Workout.length; i++) {   
+            console.log(`${docSnapshot.data().Workout[i].exercise[setID]} is a ${typeof(docSnapshot.data().Workout[i].exercise[setID])}
+            and ${exerciseName} is a ${typeof(exerciseName)}`);
+            
+            if(docSnapshot.data().Workout[i].exercise[setID] === exerciseName){
+                
+                for (const change in changes) {
+                    updatedData.Workout[i][change][setID] = changes[change];
+                }
+                 await updateDoc(doc(FIRESTORE_DB, 'Workouts', docSnapshot.id), {
+                    Workout: updatedData.Workout
+                  });
+            }
+
+                
+        }
+        addExperience(userID, xpToChange);
+
+       
+   }    
+   
+   } catch (error) {
+     alert("Couldn't find fields: " + error.message);
      return ;
    }
 }

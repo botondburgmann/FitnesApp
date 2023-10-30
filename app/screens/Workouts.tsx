@@ -130,7 +130,7 @@ const Workouts = ({navigation}: RouterProps) => {
     <Text style={[styles.text, {marginTop: 20}]}>{date.toDateString()}</Text>
     <ScrollView contentContainerStyle={styles.log}>
     {workout && workout.map((exercise, index) => 
-       exercise.typeOfSet === "straight" ? (<DisplayStraightSet key={index}  exercise={exercise} handleDelete={showDeleteConfirmation}/>)
+       exercise.typeOfSet === "straight" ? (<DisplayStraightSet key={index}  exercise={exercise} handleDelete={showDeleteConfirmation} navigation={navigation}/>)
        :  exercise.typeOfSet === "drop" ? (<DisplayDropSet key={index}  exercise={exercise} handleDelete={showDeleteConfirmation}/>)
        : exercise.typeOfSet === "super" ?(<DisplaySuperSet key={index}  exercise={exercise} handleDelete={showDeleteConfirmation}/>)
        : <></>

@@ -3,7 +3,8 @@ import React from 'react'
 
 const DisplayStraightSet = (props) => {
     const exercise = props.exercise;
-    const handleDelete = props.handleDelete
+    const handleDelete = props.handleDelete;
+    const navigation = props.navigation
 
     return (
    
@@ -28,7 +29,11 @@ const DisplayStraightSet = (props) => {
                 
                 : exercise.times[index] === 0
                 ? 
-                    <Pressable key={index} style={styles.setContainer} onPress={() => alert("pressed")} onLongPress={() => handleDelete(exercise.exerciseName, true, index, (exercise.reps[index]* exercise.weights[index]))}>
+                    <Pressable 
+                        key={index} 
+                        style={styles.setContainer} 
+                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, setID: index})} 
+                        onLongPress={() => handleDelete(exercise.exerciseName, true, index, (exercise.reps[index]* exercise.weights[index]))}>
                         <Text style={styles.text} key={index}> Set {index + 1}: {rep} reps with {exercise.weights[index]} kg</Text>
                         <Text style={styles.text}> Rest: {exercise.restTimes[index]/60} minutes</Text>
                     </Pressable>
