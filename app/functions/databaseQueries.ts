@@ -457,7 +457,7 @@ export const getGender =async (userID:string) => {
 }
 
 
-export const addExperience = async (userID: string, experience) => {
+export const addExperience = async (userID: string, experience: number) => {
     try {
       const usersCollectionRef = collection(FIRESTORE_DB, 'Users');
       const q = query(usersCollectionRef, where('userID', '==', userID));
@@ -553,23 +553,42 @@ export const getExercise = async (userID: string, exerciseName = '') => {
     }
   };
 
-export const deleteExercise = async (userID:string, exerciseID: string, xpToDelete: number ) => {
+function arrayEquals(arrayOne, arrayTwo) {
+    for (let i = 0; i < arrayOne.length; i++) 
+        if (arrayOne[i] !== arrayTwo[i])
+            return false
+    return true
+}
+
+export const deleteSet = async (userID:string, exerciseName: number, setID: number, xpToDelete: number ) => {
     try {  
        const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
        const q = query(workoutsCollectionRef, where('userID', '==', userID));
        const querySnapshot = await getDocs(q);
               
        for (const docSnapshot of querySnapshot.docs) {
-        const workoutCollectionRef = collection(docSnapshot.ref, 'Workout');
-        const nestedDocumentRef  = doc(workoutCollectionRef, exerciseID);
-        const nestedDocumentSnapshot = await getDoc(nestedDocumentRef);
+        const updatedData = { ...docSnapshot.data() };
 
-         if (nestedDocumentSnapshot.exists()) {
-            await deleteDoc(nestedDocumentRef);   
-            addExperience(userID,xpToDelete);
+        for (let i = 0; i < docSnapshot.data().Workout.length; i++) {            
+            if(arrayEquals(docSnapshot.data().Workout[i].exercise, exerciseName)){
+            if ( updatedData.Workout[i].exercise.length === 1) {
+                updatedData.Workout.splice(i, 1)
+            }
+            else{
+                updatedData.Workout[i].exercise.splice(setID, 1);
+                updatedData.Workout[i].weights.splice(setID, 1);
+                updatedData.Workout[i].reps.splice(setID, 1);
+                updatedData.Workout[i].times.splice(setID, 1);
+                updatedData.Workout[i].restTimes.splice(setID, 1);
+                
+            }
+            await updateDoc(doc(FIRESTORE_DB, 'Workouts', docSnapshot.id), {
+                Workout: updatedData.Workout
+              }); 
+            
+            }
+        addExperience(userID, xpToDelete);
         }
-        
-        
     
        
    }    

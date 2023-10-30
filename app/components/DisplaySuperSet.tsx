@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext } from 'react'
-import { deleteExercise } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 
 const DisplaySuperSet = (props) => {

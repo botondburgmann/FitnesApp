@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import Datepicker from '../components/Datepicker'
 import { NavigationProp } from '@react-navigation/native';
 import UserContext from '../contexts/UserContext';
-import { deleteExercise, getWorkout } from '../functions/databaseQueries';
+import {  deleteSet, getWorkout } from '../functions/databaseQueries';
 import { collection, query, where, getDocs, onSnapshot, snapshotEqual } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import DisplayDropSet from '../components/DisplayDropSet';
@@ -14,26 +14,6 @@ interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-interface BilateralExercise {
-  exerciseName: string[];
-  reps: number[];
-  weights: number[];
-  times: number[];
-  restTimes: number[];
-  typeOfSet: string
-}
-interface UnilateralExercise {
-  exerciseName: string[];
-  repsLeft: number[];
-  weightsLeft: number[];
-  timesLeft: number[];
-  restTimesLeft:number [];
-  repsRight: number[];
-  weightsRight: number[];
-  timesRight: number[];
-  restTimesRight: number[];
-  typeOfSet: string;
-}
 
 const Workouts = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
@@ -89,8 +69,58 @@ const Workouts = ({navigation}: RouterProps) => {
     
   }, [userID, date]);
   
-
-  
+  function calculateXP(sets) {
+    let experiencePoints = 0;
+    if (sets.reps !== undefined) {
+      for (let i = 0; i < sets.reps.length; i++) {
+        if (sets.weights[i] === 0) {
+          experiencePoints -= sets.reps[i];
+        }
+        else {
+          experiencePoints -= sets.reps[i] * sets.weights[i];
+        }
+      }
+    }
+    else {
+      for (let i = 0; i < sets.repsLeft.length; i++) {
+        if (sets.weightsLeft[i] === 0) {
+          experiencePoints -= sets.repsleft[i];
+        }
+        else {
+          experiencePoints -= sets.repsLeft[i] * sets.weightsLeft[i];
+        }
+      }
+      for (let i = 0; i < sets.repsRight.length; i++) {
+        if (sets.weightsRight[i] === 0) {
+          experiencePoints -= sets.repsRight[i];
+        }
+        else {
+          experiencePoints -= sets.repsRight[i] * sets.weightsRight[i];
+        }
+      }
+    }    
+  return experiencePoints;  
+  }
+  const showDeleteConfirmation = (exerciseName, setID, xpDelete) => {
+    Alert.alert(
+      'Delete Item',
+      'Are you sure you want to delete this item?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: () => {
+            deleteSet(userID, exerciseName, setID, -xpDelete)
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
     
 
 
@@ -100,9 +130,9 @@ const Workouts = ({navigation}: RouterProps) => {
     <Text style={[styles.text, {marginTop: 20}]}>{date.toDateString()}</Text>
     <ScrollView contentContainerStyle={styles.log}>
     {workout && workout.map((exercise, index) => 
-       exercise.typeOfSet === "straight" ? (<DisplayStraightSet key={index}  exercise={exercise}/>)
-       :  exercise.typeOfSet === "drop" ? (<DisplayDropSet key={index}  exercise={exercise}/>)
-       : exercise.typeOfSet === "super" ?(<DisplaySuperSet key={index}  exercise={exercise}/>)
+       exercise.typeOfSet === "straight" ? (<DisplayStraightSet key={index}  exercise={exercise} handleDelete={showDeleteConfirmation}/>)
+       :  exercise.typeOfSet === "drop" ? (<DisplayDropSet key={index}  exercise={exercise} handleDelete={showDeleteConfirmation}/>)
+       : exercise.typeOfSet === "super" ?(<DisplaySuperSet key={index}  exercise={exercise} handleDelete={showDeleteConfirmation}/>)
        : <></>
 
     )}
