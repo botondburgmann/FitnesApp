@@ -445,10 +445,12 @@ export const addSet =async (userID:string, date: string, exercise: string[], set
                 for (const key in set) 
                     Number.isNaN(set[key]) ? data[key].push(0) : data[key].push(set[key]) 
             for (const docSnapshot of querySnapshot.docs) {
-                const updatedData = docSnapshot.data().Workout.push(data)
-                await updateDoc(doc(FIRESTORE_DB, 'Workouts', docSnapshot.id), {
+                const updatedData = [...docSnapshot.data().Workout ];
+
+                updatedData.push(data)
+                 await updateDoc(doc(FIRESTORE_DB, 'Workouts', docSnapshot.id), {
                     Workout: updatedData
-                });       
+                });     
             }
             addExperience(userID, xpToAdd);
         } 
@@ -567,12 +569,6 @@ export const getExercise = async (userID: string, exerciseName = '') => {
     }
   };
 
-function arrayEquals(arrayOne, arrayTwo) {
-    for (let i = 0; i < arrayOne.length; i++) 
-        if (arrayOne[i] !== arrayTwo[i])
-            return false
-    return true
-}
 
 export const deleteSet = async (userID:string, exerciseName: string, exerciseID: number, setID: number, xpToDelete: number ) => {
     try {  

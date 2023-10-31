@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import React from 'react'
 
 const IsometricSet = (props) => {
     const exercise = props.exercise;
@@ -14,7 +14,7 @@ const IsometricSet = (props) => {
         weights: [],
         names: [],
         sides: []
-    }
+    };
  
     for (let i = 0; i < exercise.times.length; i++) {
         typeOfSet === "straight" || typeOfSet === "drop"
@@ -36,32 +36,28 @@ const IsometricSet = (props) => {
     }
 
     for (let i = 0; i < exercise.sides.length; i++) {
-        if (typeOfSet === "drop" || (typeOfSet === "super" && exercise.exerciseName[i] !== exercise.exerciseName[0]) && exercise.sides[i] !== "both") {
-            outputs.setNumbers.push("")
-        }
-        else if (exercise.sides[i] === "both") {
-            outputs.setNumbers.push(`Set ${i+1}`)
-        }
-        else if(exercise.sides[i] !== "both" && i % 2 === 0){
-            i === 0 ? outputs.setNumbers.push(`Set ${i+1}`) : outputs.setNumbers.push(`Set ${i}`)
-        }
-        else{
-            outputs.setNumbers.push("")
-        }
+        if (typeOfSet === "drop" || (typeOfSet === "super" && exercise.exerciseName[i] !== exercise.exerciseName[0]) && exercise.sides[i] !== "both")
+            outputs.setNumbers.push("");
+        else if (exercise.sides[i] === "both")
+            outputs.setNumbers.push(`Set ${i+1}`);
+        else if(exercise.sides[i] !== "both" && i % 2 === 0)
+            i === 0 ? outputs.setNumbers.push(`Set ${i+1}`) : outputs.setNumbers.push(`Set ${i}`);
+        else
+            outputs.setNumbers.push("");
     }
  
-    function removeXP(setID) {
+    function removeXP(setID): number {
         let currentExperience = 0;
         if (exercise.weights[setID] === 0)
-            currentExperience -= exercise.times[setID]
+            currentExperience -= exercise.times[setID];
         else 
-            currentExperience -= exercise.times[setID] * exercise.weights[setID]
-        return currentExperience
+            currentExperience -= exercise.times[setID] * exercise.weights[setID];
+        return currentExperience;
     }
     return (
         <View>
             {outputs.seconds.map((second,index) => 
-                <View key={index} style={styles.setContainer} >
+                <View key={index} style={styles.container} >
                     {
                         outputs.setNumbers[index] !== ""
                             ? <Text style={styles.text}>{outputs.setNumbers[index]}</Text>
@@ -89,23 +85,7 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         marginVertical: 5
-      },
-      setContainer: {
-        alignItems: 'center',
-        marginVertical: 5
-      },
-      gridContainer:{
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginHorizontal: 10,
-        marginVertical: 20
-
-      },
-      gridItem:{
-        width: '50%',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      },
+    },
     text: {
         fontSize: 16,
         lineHeight: 25,
@@ -113,11 +93,4 @@ const styles = StyleSheet.create({
         color: 'white',
         textAlign: 'center'
     },
-    exercise: {
-        fontSize: 20,
-        lineHeight: 50,
-        fontWeight: 'bold',
-        letterSpacing: 0.25,
-        color: 'white',
-    }
 })
