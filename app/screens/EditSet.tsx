@@ -36,33 +36,50 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
         restTimes : parseFloat(restTime)
     }
 
-    function changeXP() {
+    function addXP() {
         let currentExperience = 0;
-        let toDelete = 1;
-        let toAdd = 1
-/*         for (const change in changeNormal) {
-            if (exercise[change][setID] === 0) {
-                exercise[change][setID] = 1
+        if (!isIsometric) {
+            if (changeNormal.weights === 0 && Number.isNaN(changeNormal.weights)) {
+                currentExperience += changeNormal.reps
             }
-            toDelete *=exercise[change][setID]
-            if (Number.isNaN(changeNormal[change])) {
-                changeNormal[change] = 0;
-                toAdd *= exercise[change][setID];
-
-            }
-            else if (changeNormal[change] === 0) {
-                toAdd *= 1;
-            }
-            else{
-                toAdd *= changeNormal[change];
+            else {
+                currentExperience += changeNormal.reps * changeNormal.weights
             }
         }
-
-        currentExperience -=toDelete;
-        currentExperience +=toAdd; */
+        else {
+            if (changeNormal.weights === 0 && Number.isNaN(changeNormal.weights)) {
+                currentExperience += changeNormal.times
+            }
+            else {
+                currentExperience += changeNormal.times * changeNormal.weights
+            }
+        }
+        console.log(currentExperience);
+        
         return currentExperience
     }
+    function removeXP() {
+        let currentExperience = 0;
+        if (!isIsometric) {
+            if (exercise.weights[setID] === 0 && Number.isNaN(exercise.weights[setID])) {
+                currentExperience -= exercise.reps[setID]
+            }
+            else {
+                currentExperience -= exercise.reps[setID] * exercise.weights[setID]
+            }
+        }
+        else {
+            if (changeNormal.weights === 0 && Number.isNaN(changeNormal.weights)) {
+                currentExperience -= exercise.times[setID];
+            }
+            else {
+                currentExperience -= exercise.times[setID] * exercise.weights[setID];
+            }
+        }
+        console.log(currentExperience);
 
+        return currentExperience
+    }
 
     function handleModifyButton() {
         if (isIsometric) {
@@ -70,7 +87,7 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
                 alert("Time field cannot be empty");
             }
             else{
-                editSet(userID,exercise.exerciseName[setID],exerciseID,setID,changeIsometric, changeXP())
+                editSet(userID,exercise.exerciseName[setID],exerciseID,setID,changeIsometric, (addXP()+removeXP()))
                 navigation.navigate("Log")
             }
         } else {
@@ -78,7 +95,7 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
                 alert("Reps field cannot be empty"); 
             }
             else{
-                editSet(userID,exercise.exerciseName[setID], exerciseID, setID,changeNormal, changeXP())
+                editSet(userID,exercise.exerciseName[setID], exerciseID, setID,changeNormal, (addXP()-removeXP()))
                 navigation.navigate("Log")
             }
         }

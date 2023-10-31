@@ -7,7 +7,6 @@ const NormalSet = (props) => {
     const navigation = props.navigation;
     const exerciseID = props.exerciseID;
     const typeOfSet = props.typeOfSet;
-    let isIsometric: boolean;
 
     const outputs = {
         reps : [],
@@ -23,10 +22,7 @@ const NormalSet = (props) => {
             : outputs.names.push(` of ${exercise.exerciseName[i]}`);
         exercise.sides[i] === "both" 
             ? outputs.sides.push(``) 
-            : outputs.sides.push(`on the ${exercise.sides[i]} side`);    
-        exercise.sides[i] === "both" 
-            ? isIsometric = false
-            : isIsometric = true;         
+            : outputs.sides.push(`on the ${exercise.sides[i]} side`);           
         exercise.reps[i] === 1 
             ? outputs.reps.push(`1 rep`) 
             : outputs.reps.push(`${exercise.reps[i]} reps`);    
@@ -42,7 +38,19 @@ const NormalSet = (props) => {
             : outputs.weights.push(`with ${exercise.weights[i]} kg`);
     }
  
-    
+    function removeXP(setID) {
+        let currentExperience = 0;
+        if (exercise.weights[setID] === 0)
+            currentExperience -= exercise.reps[setID]
+        else 
+            currentExperience -= exercise.reps[setID] * exercise.weights[setID]
+        
+        console.log(currentExperience);
+
+        return currentExperience
+    }
+
+
     return (
         <View>
             {outputs.reps.map((rep,index) => 
@@ -53,8 +61,8 @@ const NormalSet = (props) => {
                         : <></>
                     }
                     <Pressable
-                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, exerciseID: exerciseID,  setID: index, isIsometric: isIsometric})} 
-                        onLongPress={() => alert("delete")}                                
+                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, exerciseID: exerciseID,  setID: index, isIsometric: false})} 
+                        onLongPress={() => handleDelete(exercise.exerciseName[index], exerciseID, index, removeXP(index))}                                
                     >
                         <Text style={styles.text}>{rep}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]} {outputs.seconds[index]}</Text>                            
                         { exercise.restTimes[index] > 0

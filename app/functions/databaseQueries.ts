@@ -558,7 +558,7 @@ function arrayEquals(arrayOne, arrayTwo) {
     return true
 }
 
-export const deleteSet = async (userID:string, exerciseName: string, isBilateral:boolean, setID: number, xpToDelete: number ) => {
+export const deleteSet = async (userID:string, exerciseName: string, exerciseID: number, setID: number, xpToDelete: number ) => {
     try {  
        const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
        const q = query(workoutsCollectionRef, where('userID', '==', userID));
@@ -567,41 +567,28 @@ export const deleteSet = async (userID:string, exerciseName: string, isBilateral
        for (const docSnapshot of querySnapshot.docs) {
         const updatedData = { ...docSnapshot.data() };
 
-        for (let i = 0; i < docSnapshot.data().Workout.length; i++) {            
-            if(arrayEquals(docSnapshot.data().Workout[i].exercise, exerciseName)){
-            if ( updatedData.Workout[i].exercise.length === 1) {
-                updatedData.Workout.splice(i, 1)
-            }
-            else{
-                if (isBilateral) {
-                    updatedData.Workout[i].exercise.splice(setID, 1);
-                    updatedData.Workout[i].weights.splice(setID, 1);
-                    updatedData.Workout[i].reps.splice(setID, 1);
-                    updatedData.Workout[i].times.splice(setID, 1);
-                    updatedData.Workout[i].restTimes.splice(setID, 1);
-                } else {
-                    updatedData.Workout[i].exercise.splice(setID, 1);
-                    updatedData.Workout[i].weightsLeft.splice(setID, 1);
-                    updatedData.Workout[i].repsLeft.splice(setID, 1);
-                    updatedData.Workout[i].timesLeft.splice(setID, 1);
-                    updatedData.Workout[i].restTimesLeft.splice(setID, 1);
-                    updatedData.Workout[i].weightsRight.splice(setID, 1);
-                    updatedData.Workout[i].repsRight.splice(setID, 1);
-                    updatedData.Workout[i].timesRight.splice(setID, 1);
-                    updatedData.Workout[i].restTimesRight.splice(setID, 1);
+        for (let i = 0; i < docSnapshot.data().Workout.length; i++) {   
+            if(docSnapshot.data().Workout[i].exercise[setID] === exerciseName && i === exerciseID){
+                if ( updatedData.Workout[i].exercise.length === 1) {
+                    updatedData.Workout.splice(i, 1)
                 }
-               
-
+                else{
+                        updatedData.Workout[i].exercise.splice(setID, 1);
+                        updatedData.Workout[i].weights.splice(setID, 1);
+                        updatedData.Workout[i].reps.splice(setID, 1);
+                        updatedData.Workout[i].times.splice(setID, 1);
+                        updatedData.Workout[i].sides.splice(setID, 1);
+                        updatedData.Workout[i].restTimes.splice(setID, 1);   
+                }
+                 await updateDoc(doc(FIRESTORE_DB, 'Workouts', docSnapshot.id), {
+                    Workout: updatedData.Workout
+                  });
+            }
 
                 
-            }
-            await updateDoc(doc(FIRESTORE_DB, 'Workouts', docSnapshot.id), {
-                Workout: updatedData.Workout
-              }); 
-            
-            }
-        addExperience(userID, xpToDelete);
         }
+        addExperience(userID, xpToDelete);
+        
     
        
    }    
@@ -656,8 +643,6 @@ export const editSet = async (userID:string, exerciseName: string, exerciseID: n
         const updatedData = { ...docSnapshot.data() };
 
         for (let i = 0; i < docSnapshot.data().Workout.length; i++) {   
-      
-            
             if(docSnapshot.data().Workout[i].exercise[setID] === exerciseName && i === exerciseID){
                 
                 for (const change in changes) {

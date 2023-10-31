@@ -7,7 +7,6 @@ const IsometricSet = (props) => {
     const navigation = props.navigation;
     const exerciseID = props.exerciseID;
     const typeOfSet = props.typeOfSet;
-    let isIsometric: boolean;
 
     const outputs = {
         seconds: [],
@@ -22,10 +21,7 @@ const IsometricSet = (props) => {
             : outputs.names.push(` of ${exercise.exerciseName[i]}`);
         exercise.sides[i] === "both" 
             ? outputs.sides.push(``) 
-            : outputs.sides.push(`on the ${exercise.sides[i]} side`);    
-        exercise.sides[i] === "both" 
-            ? isIsometric = false
-            : isIsometric = true;         
+            : outputs.sides.push(`on the ${exercise.sides[i]} side`);          
         exercise.times[i] === 1 
             ? outputs.seconds.push('1 second hold') 
             :  exercise.times[i] > 1 
@@ -38,7 +34,14 @@ const IsometricSet = (props) => {
             : outputs.weights.push(`with ${exercise.weights[i]} kg`);
     }
  
-    
+    function removeXP(setID) {
+        let currentExperience = 0;
+        if (exercise.weights[setID] === 0)
+            currentExperience -= exercise.times[setID]
+        else 
+            currentExperience -= exercise.times[setID] * exercise.weights[setID]
+        return currentExperience
+    }
     return (
         <View>
             {outputs.seconds.map((second,index) => 
@@ -49,8 +52,8 @@ const IsometricSet = (props) => {
                         : <></>
                     }
                     <Pressable
-                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, exerciseID: exerciseID,  setID: index, isIsometric: isIsometric})} 
-                        onLongPress={() => alert("delete")}                                
+                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, exerciseID: exerciseID,  setID: index, isIsometric: true})} 
+                        onLongPress={() => handleDelete(exercise.exerciseName[index], exerciseID, index, removeXP(index))}                                
                     >
                         <Text style={styles.text}>{second}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]}</Text>
                         { exercise.restTimes[index] > 0

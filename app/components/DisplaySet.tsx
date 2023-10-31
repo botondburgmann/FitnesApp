@@ -50,17 +50,14 @@ const DisplaySet = (props) => {
    
 
     <View style={styles.container}>
-        {
-            isSuperSet()
-            ? 
-                <View>
+        {isSuperSet()
+            ?   <View>
                     <Text style={styles.exercise}>{numberOfSet} superset of</Text>
                     <View style={styles.gridContainer}>
                         {uniqueValues.exercise.map((exercise,index) =>
                         index !== uniqueValues.exercise.length-1
                             ? <Text style={styles.exercise} key={index}>{exercise} and </Text>
                             : <Text style={styles.exercise} key={index}>{exercise}</Text>
-                        
                         )}
                     </View>
                     { exercise.reps.length > 0 
@@ -68,9 +65,8 @@ const DisplaySet = (props) => {
                     : <IsometricSet exercise={exercise} handleDelete={handleDelete} navigation={navigation} exerciseID={exerciseID} typeOfSet={"super"}/>
                     }
                 </View>
-            : isDropsSet()
-            ? 
-                <View>
+        : isDropsSet()
+            ?   <View>
                     <Text style={styles.exercise}>1 dropset of {uniqueValues.exercise}</Text>
                     { exercise.reps.length > 0 
                         ? <NormalSet exercise={exercise} handleDelete={handleDelete} navigation={navigation} exerciseID={exerciseID} typeOfSet={"drop"}/>
@@ -78,17 +74,16 @@ const DisplaySet = (props) => {
 
                     }
                 </View>
-            : 
-            <View>
-            { numberOfSet === 1
-                ? <Text style={styles.exercise}>1 set of {uniqueValues.exercise[0]}</Text>
-                : <Text style={styles.exercise}>{numberOfSet} sets of {uniqueValues.exercise[0]}</Text>
-            }
-            { exercise.reps.length > 0 
-            ? <NormalSet exercise={exercise} handleDelete={handleDelete} navigation={navigation} exerciseID={exerciseID} typeOfSet={"straight"}/>
-            : <IsometricSet exercise={exercise} handleDelete={handleDelete} navigation={navigation} exerciseID={exerciseID} typeOfSet={"straight"}/>
-            }
-        </View>
+        :   <View>
+                { numberOfSet === 1
+                    ? <Text style={styles.exercise}>1 set of {uniqueValues.exercise[0]}</Text>
+                    : <Text style={styles.exercise}>{numberOfSet} sets of {uniqueValues.exercise[0]}</Text>
+                }
+                { exercise.reps.length > 0 
+                ? <NormalSet exercise={exercise} handleDelete={handleDelete} navigation={navigation} exerciseID={exerciseID} typeOfSet={"straight"}/>
+                : <IsometricSet exercise={exercise} handleDelete={handleDelete} navigation={navigation} exerciseID={exerciseID} typeOfSet={"straight"}/>
+                }
+            </View>
         }
 
 
