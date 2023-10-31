@@ -398,44 +398,60 @@ export const getWorkout = (userID: string, date: string) => {
     })
   };
 
-export const addExercise =async (userID:string, date: string, exercises:(ExerciseSelectOption[]), sets: Array<Object>, typeOfSet:string) => {
+export const addSet =async (userID:string, date: string, exercise: string[], sets: object[], xpToAdd) => {
     const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
     const q = query(workoutsCollection, where("date", '==', date), where("userID", '==', userID) );
 
+
+
+    
     try {
+
         const querySnapshot = await getDocs(q);
         if(querySnapshot.empty){
-            const newDocRef = await addDoc(workoutsCollection, {
-                date: date,
-                userID: userID
-            });
-            
-            const setsRef = collection(newDocRef, 'Workout');
-            const data = [];
-            exercises.forEach((exercise => {data.push(exercise.value)}))                
-
-            await addDoc(setsRef, {
-                exercise: data,
-                sets: sets,
-                typeOfSet: typeOfSet,
-                createdAt: serverTimestamp()
-              });
-        } else {
-            querySnapshot.forEach(async (doc) => {
-                const setsRef = collection(doc.ref, 'Workout');
+            const data = {
+                exercise : exercise,
+                weights: [],
+                reps: [],
+                times: [],
+                restTimes: [],
+                sides: []
+        
+            }
+            for (const set of sets) 
+                for (const key in set) 
+                    Number.isNaN(set[key]) ? data[key].push(0) : data[key].push(set[key])
+                console.log("Adding doc");
+                const Workout = []
+                Workout.push(data)
                 
-                const data = [];
-                exercises.forEach((exercise => {data.push(exercise.value)}))                
-
-                await addDoc(setsRef, {
-                    exercise: data,
-                    sets: sets,
-                    typeOfSet: typeOfSet,
-                    createdAt: serverTimestamp()
+                await addDoc(workoutsCollection, {
+                    date: date,
+                    userID: userID,
+                    Workout: Workout
                 });
-            }); 
-        }
-
+        
+        } else {
+            const data = {
+                exercise : exercise,
+                weights: [],
+                reps: [],
+                times: [],
+                restTimes: [],
+                sides: []
+        
+            }
+            for (const set of sets) 
+                for (const key in set) 
+                    Number.isNaN(set[key]) ? data[key].push(0) : data[key].push(set[key]) 
+            for (const docSnapshot of querySnapshot.docs) {
+                const updatedData = docSnapshot.data().Workout.push(data)
+                await updateDoc(doc(FIRESTORE_DB, 'Workouts', docSnapshot.id), {
+                    Workout: updatedData
+                });       
+            }
+            addExperience(userID, xpToAdd);
+        } 
     } catch (error) {
         alert(error)
     }

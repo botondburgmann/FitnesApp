@@ -1,13 +1,28 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { KeyboardAvoidingView, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../components/SelectMenu'
-import { addExercise, addExperience, getExercises } from '../functions/databaseQueries'
+import { addSet, getExercises } from '../functions/databaseQueries'
 import UnilateralSet from '../components/UnilateralSet'
 import BilateralSet from '../components/BilateralSet'
 import UserContext from '../contexts/UserContext'
 import useFetch from '../hooks/useFetch'
-import { useRoute } from '@react-navigation/native'
+import { NavigationProp, useRoute } from '@react-navigation/native'
 
+
+interface Isometric {
+  sides: string;
+  weights : number;
+  times :  number;
+  restTimes : number;
+}
+
+interface Normal {
+  sides: string;
+  weights : number;
+  reps: number;
+  times :  number;
+  restTimes : number;
+}
 
 interface ExerciseSelectOption{
   label: string;
@@ -16,32 +31,19 @@ interface ExerciseSelectOption{
   isometric: boolean
 }
 
-interface BilateralSet {
-  weight: string;
-  reps: string;
-  time: string;
-  restTime: string;
+
+interface RouterProps {
+  route: any,
+  navigation: NavigationProp<any, any>;
 }
 
-interface UnilateralSet {
-  weightLeft: string;
-  repsLeft: string;
-  timeLeft: string;
-  restTimeLeft: string;
-  weightRight: string;
-  repsRight: string;
-  timeRight: string;
-  restTimeRight: string;
- }
-
- type DateParams = {
+type DateParams = {
     date: string; 
   };
 
-const AddWorkout = () => {
+const AddWorkout = ({ route, navigation }: RouterProps) => {
   const userID = useContext(UserContext);
 
-  const route = useRoute();
   const { date } = route.params as DateParams;
 
   const [allExercises, setAllExercises] = useState<ExerciseSelectOption[]>();
@@ -51,32 +53,15 @@ const AddWorkout = () => {
     unilateral: undefined,
     isometric: undefined
   });
-  const [selectedExercises, setSelectedExercises] = useState<ExerciseSelectOption[]>([]);
-
-  const [numOfSet, setNumOfSet] = useState(0);
-
-  const [bilateralSet, setBilateralSet] = useState({
-    weight: "", 
-    reps: "",
-    time: "",
-    restTime: ""
-  })
-
-  const [unilateralSet, setUniSet] = useState({
-    weightLeft: "",
-    repsLeft: "",
-    timeLeft: "",
-    restTimeLeft: "",
-    weightRight: "",
-    repsRight: "",
-    timeRight: "",
-    restTimeRight: ""
-  })
-  
-  const [sets, setSets] = useState([])
-
+  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [weight, setWeight] = useState("");
+  const [reps, setReps] = useState("");
+  const [time, setTime] = useState("");
+  const [restTime, setRestTime] = useState("");
+  const [sets, setSets] = useState<(Isometric | Normal)[]>([])
   const {data:exercises, error:exercisesError } = useFetch(getExercises, userID);
-
+  const [isEnabled, setIsEnabled] =  useState(false)
+  const [side, setSide] = useState<string>("both")
   
   useEffect(() => {
     if ( !exercisesError && exercises) {
@@ -94,192 +79,185 @@ const AddWorkout = () => {
       setAllExercises(exerciseData);
     }
   }, [exercises, exercisesError]);
-   
 
+  useEffect(() => {
+    if (currentExercise.unilateral) {
+      setSide("left");
+    }
+  
+  }, [currentExercise])
+  
+  const changeNormal = {
+    sides : side,
+    weights : parseFloat(weight) ,
+    reps :  parseFloat(reps),
+    times :  parseFloat(time) ,
+    restTimes : parseFloat(restTime)
+  }
+const changeIsometric = {
+    sides: side,
+    weights : parseFloat(weight) ,
+    times :  parseFloat(time) ,
+    restTimes : parseFloat(restTime)
+}
+
+
+
+  function toggleSwitch() {
+      if (isEnabled) {
+          setSide('left');
+      }
+      else {
+          setSide('right')
+      }
+      setIsEnabled(previousState => !previousState);
+  }
+
+  function addXP() {
+      let currentExperience = 0;
+      if (!isEnabled) {
+          if (changeNormal.weights === 0 && Number.isNaN(changeNormal.weights)) {
+              currentExperience += changeNormal.reps
+          }
+          else {
+              currentExperience += changeNormal.reps * changeNormal.weights
+          }
+      }
+      else {
+          if (changeNormal.weights === 0 && Number.isNaN(changeNormal.weights)) {
+              currentExperience += changeNormal.times
+          }
+          else {
+              currentExperience += changeNormal.times * changeNormal.weights
+          }
+      }
+      console.log(currentExperience);
+      
+      return currentExperience
+  }
+  
+
+  function handleAddButton() {
+      if (currentExercise.isometric) {
+          if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) {
+              alert("Time field cannot be empty");
+          }
+          else{
+              setSets((prev) => [...prev,changeIsometric])
+              setSelectedExercises((prev) => [...prev,currentExercise.label])
+          }
+      } else {
+          if (changeNormal.reps === 0 || Number.isNaN(changeNormal.reps)) {
+              alert("Reps field cannot be empty"); 
+          }
+          else{
+            setSets((prev) => [...prev,changeNormal])
+            setSelectedExercises((prev) => [...prev,currentExercise.label])
+          }
+      }
 
   
-  function addUnilateralSet(set: UnilateralSet) {
-    if (!currentExercise.isometric && set.repsLeft === "" && set.repsRight === "")
-      alert("Error: Reps fields cannot be empty. Please fill at least one of them");
-    else if (currentExercise.isometric && set.timeLeft === "" && set.timeRight === "")
-      alert("Error: Time fields cannot be empty. Please fill at least one of them");
-    else {
-      setSelectedExercises((prevSelected) => [...prevSelected, currentExercise]);
-      for (const key in set)
-        set[key] === "" ? set[key] = 0 : set[key] = parseFloat(set[key]);
-
-      setSets((prevSets) => [...prevSets, set]);
-      setUniSet({...set, 
-        weightLeft: "", 
-        repsLeft: "", 
-        timeLeft: "", 
-        restTimeLeft: "",
-        weightRight: "", 
-        repsRight: "", 
-        timeRight: "", 
-        restTimeRight: ""
-      })
-      
-        setNumOfSet((numOfSet) => {return numOfSet + 1})
-    }
   }
+  function handleFinishButton() {
+      if (isEnabled) {
+          if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) {
+              alert("Time field cannot be empty");
+          }
+          else{
+              addSet(userID,date, selectedExercises ,sets, addXP())
+              navigation.navigate("Log")
+          }
+      } else {
+          if (changeNormal.reps === 0 || Number.isNaN(changeNormal.reps)) {
+              alert("Reps field cannot be empty"); 
+          }
+          else{
+              addSet(userID,date,selectedExercises, sets, addXP())
+              navigation.navigate("Log")
 
-  function addBilateralSet(set: BilateralSet) {    
-    if (!currentExercise.isometric && set.reps === "")
-      alert("Error: reps field cannot be empty");
-    else if (currentExercise.isometric && set.time === "")
-      alert("Error: time field cannot be empty");
+          }
+      }
 
-    else {
-      setSelectedExercises((prevSelected) => [...prevSelected, currentExercise]);
-      
-      for (const key in set)
-        set[key] === "" ? set[key] = 0 : set[key] = parseFloat(set[key]);
   
-      setSets((prevSets) => [...prevSets, set]);
-      setBilateralSet({...set, 
-        weight: "", 
-        reps: "", 
-        time: "", 
-        restTime: ""
-      })
-      setNumOfSet((numOfSet) => {return numOfSet + 1})
-    }
-  }
-
-  function isSorted(weights:number[]) {
-    let sorted = true;
-    for (let i = 0; i < weights.length-1; i++)
-      if (weights[i] < weights[i+1]) {            
-        sorted = false;
-        break;
-      }
-    return sorted;
-  }
-
-  function addUpWeights(sets) {
-    const weights: number[] = [];
-    for (const set of sets)
-      weights.push(set.weight);
-    return weights;
-  }
-
-  function isThereRest(sets) {
-    let noRest = true
-    for (let i = 0; i < sets.length-1; i++) {
-      if (sets[i].restTime > 0 || (sets[i].restTimeLeft > 0 || sets[i].restTimeRight > 0)) {
-        noRest = false;
-        break;
-      }
-    }
-    return noRest;
-  }
-
-  function areThereMultipleExercises(selectedExercises:ExerciseSelectOption[]) {
-    const selectedExercisesNumber = new Set(selectedExercises).size;
-    if (selectedExercisesNumber > 1) 
-      return true;
-    return false;
-  }
-  function calculateExperiencePoints(sets) {
-    let experiencePoints = 0;
-    for (const set of sets) {
-      if (set.weightLeft !== undefined || set.weightRight !== undefined) {
-        if (set.weightLeft === 0)
-          experiencePoints += set.repsLeft;
-        else
-          experiencePoints += set.repsLeft * set.weightLeft;
-        if (set.weightRight === 0)
-          experiencePoints += set.repsRight;
-        else
-          experiencePoints += set.repsRight * set.weightRight;
-      }
-      else{
-        if (set.weight === 0)
-          experiencePoints += set.reps;
-        else
-          experiencePoints += set.reps * set.weight;
-      }
-    }
-
-    return experiencePoints;
-  }
-
-  function addSetToDatabase(numOfSet:number) {
-    if (numOfSet > 0) {
-      let typeOfSet: string;
-      if (numOfSet === 1){
-        typeOfSet = "straight"
-      }
-      else if (areThereMultipleExercises(selectedExercises)) {
-        typeOfSet = "super";
-      }
-      else{
-        if (isThereRest(sets)) {      
-          const weights = addUpWeights(sets);
-          const sorted = isSorted(weights);
-          sorted ? typeOfSet = "drop" : typeOfSet = "straight"
-        }
-        else
-          typeOfSet = "straight"
-      }
-    
-      const experiencePoints = calculateExperiencePoints(sets);  
-
-      addExperience(userID, Math.round(experiencePoints))
-      addExercise(userID, date, selectedExercises, sets, typeOfSet);
-
-      setSets([]);
-
-      setCurrentExercise({
-        label: "",
-        value: "",
-        unilateral: false,
-        isometric: false,
-
-      });
-      setSelectedExercises([]);
-      setNumOfSet(0);
-    } 
-    else 
-      alert("Not enough data");
   }
 
   
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior='padding'>
 
-      <SelectMenu 
-        data={allExercises || []} 
-        setSelectedValue={ setCurrentExercise }
-      />
-      {allExercises && currentExercise.unilateral === true
-      ?  <>
-          <UnilateralSet set={unilateralSet} setSet={setUniSet}/>
-         
-          <Pressable onPress={() => addUnilateralSet(unilateralSet)}>
-            <Text>Add another</Text>
-          </Pressable>
-         
-          <Pressable onPress={() => addSetToDatabase(numOfSet)}>
-            <Text>Finish set</Text>
-          </Pressable>
-        </>
-      : allExercises && currentExercise.unilateral === false
-      ? <>
-          <BilateralSet set={bilateralSet} setSet={setBilateralSet}/>
-         
-          <Pressable onPress={() => addBilateralSet(bilateralSet)}>
-            <Text>Add new set</Text>
-          </Pressable>
-         
-          <Pressable onPress={() => addSetToDatabase(numOfSet)}>
-            <Text>Finish set</Text>
-          </Pressable>
-        </>
-      :<></>}
-      <Text>Current set: {numOfSet}</Text>
-    </View>
+      <View style={styles.selectMenuContainer}
+>
+        <SelectMenu
+          data={allExercises || []}
+          setSelectedValue={ setCurrentExercise }
+        />
+      </View>
+      {allExercises && 
+              <View style={styles.container}>
+              <Text style={styles.label}>Add new execise</Text>
+              { currentExercise.unilateral
+                  ?<View style={styles.gridContainer}>
+                      <Text style={styles.text}>{side} side</Text>
+                      <Switch
+                          trackColor={{ false: "#808080", true: "#fff" }}
+                          ios_backgroundColor="#3e3e3e"
+                          onValueChange={toggleSwitch}
+                          value={isEnabled}
+                      />
+                  </View>
+                  :<></>
+              }
+              <Text style={styles.text}>weight (kg)</Text>
+              <TextInput
+              keyboardType='numeric'
+              style={styles.input}
+              value={weight}
+              placeholder="Weight"
+              autoCapitalize='none'
+              onChangeText={(text) => setWeight(text)}
+              />
+            {!currentExercise.isometric 
+            
+            ? <>
+             <Text style={styles.text}>reps</Text>
+            <TextInput
+            keyboardType='numeric'
+            style={styles.input}
+            value={reps}
+            placeholder="Reps"
+            autoCapitalize='none'
+            onChangeText={(text) => setReps(text)}
+            />
+            </>:
+            <></>
+        }
+              <Text style={styles.text}>time (seconds)</Text>
+              <TextInput
+              keyboardType='numeric'
+              style={styles.input}
+              value={time}
+              placeholder="Time (in seconds)"
+              autoCapitalize='none'
+              onChangeText={(text) => setTime(text)}
+              />
+              <Text style={styles.text}>Rest time (seconds)</Text>
+              <TextInput
+              keyboardType='numeric'
+              style={styles.input}
+              value={restTime}
+              placeholder="Rest time (in seconds)"
+              autoCapitalize='none'
+              onChangeText={(text) => setRestTime(text)}
+              />
+              <Pressable style={styles.button} onPress={() => handleAddButton()}>
+                  <Text style={styles.text}>Add set</Text>                   
+              </Pressable>
+              <Pressable style={styles.button} onPress={() => handleFinishButton()}>
+                  <Text style={styles.text}>Finish</Text>                   
+              </Pressable>
+              <Text style={styles.text}>Total sets: {selectedExercises.length}</Text>
+          </View>}
+    </KeyboardAvoidingView>
   )
 }
 
@@ -287,23 +265,75 @@ export default AddWorkout
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center',
-    flex: 1,
-    backgroundColor: '#ff0000'
+  flex: 1,
+  justifyContent: 'center',
+  backgroundColor: '#ff0000'
+},
+ input: {
+ marginHorizontal: 10,
+ marginVertical: 4,
+ height: 50,
+ borderWidth: 1,
+ borderRadius: 4,
+ padding: 10,
+ backgroundColor: '#fff'
+},
+text:{
+  alignSelf: 'center',
+  fontSize: 18,
+  color: "#fff",
+  textTransform: 'uppercase',
+  fontWeight: "600",
+  paddingVertical: 10,
+},
 
+gridContainer:{
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  marginHorizontal: 10,
+  marginVertical: 20
+
+},
+button:{
+    width: 100,
+    paddingHorizontal: 5,
+    marginHorizontal: 20,
+    alignSelf: "center",
+    backgroundColor: "#000",
+},
+
+label: {
+    alignSelf: 'center',
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#fff",
+    textTransform: 'uppercase',
+    marginTop: -80,
+    marginBottom: 50,
+    textAlign: 'center',
+    lineHeight: 40
   },
-  button: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'lightblue',
-    padding: 10,
-    width: 100
+  buttonGroup: {
+   flexDirection: 'row',
+   justifyContent: 'space-evenly', 
+   marginVertical: 20
   },
-  text: {
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: 'bold',
-    letterSpacing: 0.25,
-    color: 'white',
+  inputGroup:{
+   flexDirection: 'row',
+   justifyContent: 'space-around',
+   alignItems: 'center',
+  },
+  selectMenuContainer: {
+   backgroundColor: "#fff",
+   padding: 5
+  },
+  icon: {
+   alignSelf: 'center',
+   fontSize: 18,
+   color: "#fff",
+   marginBottom: 50,
+  },
+  log:{
+    justifyContent:'flex-end',
   },
 });
