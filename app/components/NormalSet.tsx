@@ -9,6 +9,7 @@ const NormalSet = (props) => {
     const typeOfSet = props.typeOfSet;
 
     const outputs = {
+        setNumbers: [],
         reps : [],
         seconds: [],
         weights: [],
@@ -37,7 +38,21 @@ const NormalSet = (props) => {
             ? outputs.weights.push(`with ${-exercise.weights[i]} kg assisted`)
             : outputs.weights.push(`with ${exercise.weights[i]} kg`);
     }
- 
+
+    for (let i = 0; i < exercise.sides.length; i++) {
+        if (typeOfSet === "drop" || (typeOfSet === "super" && exercise.exerciseName[i] !== exercise.exerciseName[0]) && exercise.sides[i] !== "both") {
+            outputs.setNumbers.push("")
+        }
+        else if (exercise.sides[i] === "both") {
+            outputs.setNumbers.push(`Set ${i+1}`)
+        }
+        else if(exercise.sides[i] !== "both" && i % 2 === 0){
+            i === 0 ? outputs.setNumbers.push(`Set ${i+1}`) : outputs.setNumbers.push(`Set ${i}`)
+        }
+        else{
+            outputs.setNumbers.push("")
+        }
+    }
     function removeXP(setID) {
         let currentExperience = 0;
         if (exercise.weights[setID] === 0)
@@ -55,10 +70,10 @@ const NormalSet = (props) => {
         <View>
             {outputs.reps.map((rep,index) => 
                 <View key={index} style={styles.setContainer} >
-                    
-                    {typeOfSet !== "drop" 
-                        ? <Text style={styles.text}>Set {index + 1}</Text>
-                        : <></>
+                    {
+                        outputs.setNumbers[index] !== ""
+                            ? <Text style={styles.text}>{outputs.setNumbers[index]}</Text>
+                            : <></>
                     }
                     <Pressable
                         onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, exerciseID: exerciseID,  setID: index, isIsometric: false})} 

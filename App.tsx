@@ -23,7 +23,7 @@ import UserContext from './app/contexts/UserContext';
 import CurrentExercise from './app/screens/CurrentExercise';
 import Rest from './app/screens/Rest';
 import CreateExercise from './app/screens/CreateExercise';
-import EditBilateralSet from './app/screens/EditSet';
+import EditSet from './app/screens/EditSet';
 
 
 const Stack = createNativeStackNavigator();
@@ -61,7 +61,7 @@ function WorkoutLayout() {
     <SetupStack.Navigator>
       <SetupStack.Screen name="Log" component={Workouts} options={{ headerShown: false }}/>
       <SetupStack.Screen name="Add" component={AddWorkout}  />
-      <SetupStack.Screen name="Edit bilateral set" component={EditBilateralSet}  />
+      <SetupStack.Screen name="Edit bilateral set" component={EditSet}  />
       <SetupStack.Screen name="Routine" component={Routines } />
       <SetupStack.Screen name="Focus" component={Focus }/>
       <SetupStack.Screen name="CurrentExercise" component={CurrentExercise }/>

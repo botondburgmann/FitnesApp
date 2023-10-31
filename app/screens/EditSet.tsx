@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import { editSet } from '../functions/databaseQueries';
@@ -11,7 +11,7 @@ interface RouterProps {
 
 
 
-const EditBilateralSet = ({ route, navigation }: RouterProps) => {
+const EditSet = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
 
     const { exercise, exerciseID, setID, isIsometric} = route?.params; 
@@ -19,21 +19,32 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
     const [weight, setWeight] = useState<string>(exercise.weights[setID].toString())
     const [time, setTime] = useState<string>(exercise.times[setID].toString())
     const [reps, setReps] = isIsometric ? useState<string>("") : useState<string>(exercise.reps[setID].toString())
-    const [restTime, setRestTime] = useState<string>(exercise.restTimes[setID].toString())
-
-    console.log(`rest: ${restTime}`);
-    
+    const [restTime, setRestTime] = useState<string>(exercise.restTimes[setID].toString())    
+    const [isEnabled, setIsEnabled] = exercise.sides[setID] === "left" ? useState(false) : useState(true);
+    const [side, setSide] = useState<string>(exercise.sides[setID])
 
     const changeNormal = {
+        sides : side,
         weights : parseFloat(weight) ,
         reps :  parseFloat(reps),
         times :  parseFloat(time) ,
         restTimes : parseFloat(restTime)
     }
     const changeIsometric = {
+        side: side,
         weights : parseFloat(weight) ,
         times :  parseFloat(time) ,
         restTimes : parseFloat(restTime)
+    }
+
+    function toggleSwitch() {
+        if (isEnabled) {
+            setSide('left');
+        }
+        else {
+            setSide('right')
+        }
+        setIsEnabled(previousState => !previousState);
     }
 
     function addXP() {
@@ -106,6 +117,18 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
     return (
         <View style={styles.container}>
             <Text style={styles.label}>Edit {exerciseName}</Text>
+            { side !== "both"
+                ?<View style={styles.gridContainer}>
+                    <Text style={styles.text}>{side} side</Text>
+                    <Switch
+                        trackColor={{ false: "#808080", true: "#fff" }}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={toggleSwitch}
+                        value={isEnabled}
+                    />
+                </View>
+                :<></>
+            }
             <Text style={styles.text}>weight (kg)</Text>
             <TextInput
             keyboardType='numeric'
@@ -156,7 +179,7 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
     )
 }
 
-export default EditBilateralSet
+export default EditSet
 
 const styles = StyleSheet.create({
     container: {
@@ -180,6 +203,13 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight: "600",
     paddingVertical: 10,
+  },
+  gridContainer:{
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: 10,
+    marginVertical: 20
+
   },
   button:{
       width: 100,

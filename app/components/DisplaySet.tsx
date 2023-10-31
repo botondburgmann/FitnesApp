@@ -9,17 +9,28 @@ const DisplaySet = (props) => {
     const navigation = props.navigation;
     const exerciseID = props.exerciseID;
 
+    
     const uniqueValues = {
         sides: Array.from(new Set<string>(exercise.sides)),
         exercise: Array.from(new Set<string>(exercise.exerciseName))
+        
+    }
+    const unilateral = uniqueValues.sides.length === 2 ? "(per side)" : ""
 
+    const numberOfSet = calculateNumberOfSets();
+
+
+    function calculateNumberOfSets(): number {
+        let numberOfSet = 0
+        for (const side of exercise.sides) {
+            if (side === "both")
+                numberOfSet++;
+            else 
+                numberOfSet +=0.5
+        }
+        return isSuperSet ? numberOfSet/uniqueValues.exercise.length : numberOfSet;
     }
 
-    const numberOfSet = exercise.reps.length > 0 
-        ? exercise.reps.length/uniqueValues.sides.length/uniqueValues.exercise.length 
-        : exercise.times.length/uniqueValues.sides.length/uniqueValues.exercise.length ;
-
-    
     function isDecreasing(array: any[]) {
         for (let i = 1; i <= array.length; i++)
             if (array[i-1] < array[i] )
@@ -52,9 +63,12 @@ const DisplaySet = (props) => {
     <View style={styles.container}>
         {isSuperSet()
             ?   <View>
-                    <Text style={styles.exercise}>{numberOfSet} superset of</Text>
+                    { numberOfSet === 1
+                        ? <Text style={styles.exercise}>1 superset of</Text>
+                        : <Text style={styles.exercise}>{numberOfSet} supersets</Text>
+                    }     
                     <View style={styles.gridContainer}>
-                        {uniqueValues.exercise.map((exercise,index) =>
+                        {uniqueValues.exercise.map((exercise,index) =>  
                         index !== uniqueValues.exercise.length-1
                             ? <Text style={styles.exercise} key={index}>{exercise} and </Text>
                             : <Text style={styles.exercise} key={index}>{exercise}</Text>
@@ -67,7 +81,7 @@ const DisplaySet = (props) => {
                 </View>
         : isDropsSet()
             ?   <View>
-                    <Text style={styles.exercise}>1 dropset of {uniqueValues.exercise}</Text>
+                    <Text style={styles.exercise}>1 dropset of {uniqueValues.exercise} {unilateral}</Text>
                     { exercise.reps.length > 0 
                         ? <NormalSet exercise={exercise} handleDelete={handleDelete} navigation={navigation} exerciseID={exerciseID} typeOfSet={"drop"}/>
                         : <IsometricSet exercise={exercise} handleDelete={handleDelete} navigation={navigation} exerciseID={exerciseID} typeOfSet={"drop"}/>
@@ -77,7 +91,7 @@ const DisplaySet = (props) => {
         :   <View>
                 { numberOfSet === 1
                     ? <Text style={styles.exercise}>1 set of {uniqueValues.exercise[0]}</Text>
-                    : <Text style={styles.exercise}>{numberOfSet} sets of {uniqueValues.exercise[0]}</Text>
+                    : <Text style={styles.exercise}>{numberOfSet} sets of {uniqueValues.exercise[0]}s {unilateral}</Text>
                 }
                 { exercise.reps.length > 0 
                 ? <NormalSet exercise={exercise} handleDelete={handleDelete} navigation={navigation} exerciseID={exerciseID} typeOfSet={"straight"}/>
