@@ -18,7 +18,7 @@ const NormalSet = (props) => {
     }
  
     for (let i = 0; i < exercise.reps.length; i++) {
-        typeOfSet === "straight"
+        typeOfSet === "straight" || typeOfSet === "drop"
             ? outputs.names.push("")
             : outputs.names.push(` of ${exercise.exerciseName[i]}`);
         exercise.sides[i] === "both" 
@@ -47,12 +47,20 @@ const NormalSet = (props) => {
         <View>
             {outputs.reps.map((rep,index) => 
                 <View key={index} style={styles.setContainer} >
-                    <Text style={styles.text}>Sets {index + 1}</Text>
+                    
+                    {typeOfSet !== "drop" 
+                        ? <Text style={styles.text}>Set {index + 1}</Text>
+                        : <></>
+                    }
                     <Pressable
                         onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, exerciseID: exerciseID,  setID: index, isIsometric: isIsometric})} 
                         onLongPress={() => alert("delete")}                                
                     >
                         <Text style={styles.text}>{rep}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]} {outputs.seconds[index]}</Text>                            
+                        { exercise.restTimes[index] > 0
+                            ? <Text style={styles.text}>{exercise.restTimes[index]/60} minute rest</Text>
+                            : <></>
+                        }    
                     </Pressable>
                 </View>
             )}
@@ -88,6 +96,7 @@ const styles = StyleSheet.create({
         lineHeight: 25,
         letterSpacing: 0.25,
         color: 'white',
+        textAlign: 'center'
     },
     exercise: {
         fontSize: 20,

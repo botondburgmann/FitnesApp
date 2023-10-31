@@ -21,21 +21,26 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
     const [reps, setReps] = isIsometric ? useState<string>("") : useState<string>(exercise.reps[setID].toString())
     const [restTime, setRestTime] = useState<string>(exercise.restTimes[setID].toString())
 
+    console.log(`rest: ${restTime}`);
+    
+
     const changeNormal = {
         weights : parseFloat(weight) ,
         reps :  parseFloat(reps),
         times :  parseFloat(time) ,
+        restTimes : parseFloat(restTime)
     }
     const changeIsometric = {
         weights : parseFloat(weight) ,
         times :  parseFloat(time) ,
+        restTimes : parseFloat(restTime)
     }
 
     function changeXP() {
         let currentExperience = 0;
         let toDelete = 1;
         let toAdd = 1
-        for (const change in changeNormal) {
+/*         for (const change in changeNormal) {
             if (exercise[change][setID] === 0) {
                 exercise[change][setID] = 1
             }
@@ -54,14 +59,12 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
         }
 
         currentExperience -=toDelete;
-        currentExperience +=toAdd;
+        currentExperience +=toAdd; */
         return currentExperience
     }
 
 
     function handleModifyButton() {
-        console.log(isIsometric);
-        console.log(changeNormal.reps);
         if (isIsometric) {
             if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) {
                 alert("Time field cannot be empty");
