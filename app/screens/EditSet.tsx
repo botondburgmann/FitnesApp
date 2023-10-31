@@ -14,7 +14,7 @@ interface RouterProps {
 const EditBilateralSet = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
 
-    const { exercise, setID, isIsometric} = route?.params; 
+    const { exercise, exerciseID, setID, isIsometric} = route?.params; 
     const exerciseName = exercise.exerciseName[setID];   
     const [weight, setWeight] = useState<string>(exercise.weights[setID].toString())
     const [time, setTime] = useState<string>(exercise.times[setID].toString())
@@ -41,6 +41,7 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
             }
             toDelete *=exercise[change][setID]
             if (Number.isNaN(changeNormal[change])) {
+                changeNormal[change] = 0;
                 toAdd *= exercise[change][setID];
 
             }
@@ -66,7 +67,7 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
                 alert("Time field cannot be empty");
             }
             else{
-                editSet(userID,exercise.exerciseName[setID],setID,changeIsometric, changeXP())
+                editSet(userID,exercise.exerciseName[setID],exerciseID,setID,changeIsometric, changeXP())
                 navigation.navigate("Log")
             }
         } else {
@@ -74,7 +75,7 @@ const EditBilateralSet = ({ route, navigation }: RouterProps) => {
                 alert("Reps field cannot be empty"); 
             }
             else{
-                editSet(userID,exercise.exerciseName[setID],setID,changeNormal, changeXP())
+                editSet(userID,exercise.exerciseName[setID], exerciseID, setID,changeNormal, changeXP())
                 navigation.navigate("Log")
             }
         }

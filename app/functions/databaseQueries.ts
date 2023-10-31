@@ -646,7 +646,7 @@ export const createNewExercise = async (userID: string, name: string, isUnilater
    }
 }
 
-export const editSet = async (userID:string, exerciseName: string, setID: number, changes: object, xpToChange: number ) => {
+export const editSet = async (userID:string, exerciseName: string, exerciseID: number, setID: number, changes: object, xpToChange: number ) => {
     try {  
        const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');    
        const q = query(workoutsCollectionRef, where('userID', '==', userID));
@@ -658,7 +658,7 @@ export const editSet = async (userID:string, exerciseName: string, setID: number
         for (let i = 0; i < docSnapshot.data().Workout.length; i++) {   
       
             
-            if(docSnapshot.data().Workout[i].exercise[setID] === exerciseName){
+            if(docSnapshot.data().Workout[i].exercise[setID] === exerciseName && i === exerciseID){
                 
                 for (const change in changes) {
                     updatedData.Workout[i][change][setID] = changes[change];

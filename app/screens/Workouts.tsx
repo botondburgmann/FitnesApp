@@ -6,9 +6,7 @@ import UserContext from '../contexts/UserContext';
 import {  deleteSet, getWorkout } from '../functions/databaseQueries';
 import { collection, query, where, getDocs, onSnapshot, snapshotEqual } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
-import DisplayDropSet from '../components/DisplayDropSet';
-import DisplayStraightSet from '../components/DisplayStraightSet';
-import DisplaySuperSet from '../components/DisplaySuperSet';
+import DisplaySet from '../components/DisplaySet';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -32,39 +30,22 @@ const Workouts = ({navigation}: RouterProps) => {
 
       snapshot.docs.forEach((doc) => {        
         for (let i = 0; i < doc.data().Workout.length; i++) {
-          if(doc.data().Workout[i].reps !== undefined){
-            const exercise = {
-              exerciseName: doc.data().Workout[i].exercise,
-              reps: doc.data().Workout[i].reps,
-              weights: doc.data().Workout[i].weights,
-              times: doc.data().Workout[i].times,
-              restTimes: doc.data().Workout[i].restTimes,
-              typeOfSet: doc.data().Workout[i].typeOfSet
-            }
-            
-            setWorkout((prev) => [...prev, exercise])
+          const exercise = {
+            exerciseName: doc.data().Workout[i].exercise,
+            reps: doc.data().Workout[i].reps,
+            weights: doc.data().Workout[i].weights,
+            times: doc.data().Workout[i].times,
+            sides: doc.data().Workout[i].sides,
+            restTimes: doc.data().Workout[i].restTimes,
+            typeOfSet: doc.data().Workout[i].typeOfSet
           }
-          else{
-            const exercise = {
-              exerciseName: doc.data().Workout[i].exercise,
-              repsLeft: doc.data().Workout[i].repsLeft,
-              weightsLeft: doc.data().Workout[i].weightsLeft,
-              timesLeft: doc.data().Workout[i].timesLeft,
-              restTimesLeft: doc.data().Workout[i].restTimesLeft,
-              repsRight: doc.data().Workout[i].repsRight,
-              weightsRight: doc.data().Workout[i].weightsRight,
-              timesRight: doc.data().Workout[i].timesRight,
-              restTimesRight: doc.data().Workout[i].restTimesRight,
-              typeOfSet: doc.data().Workout[i].typeOfSet
-            }
-            
             setWorkout((prev) => [...prev, exercise])            
           }        
         }
         
         
         
-      })
+      )
     })
     
   }, [userID, date]);
@@ -130,10 +111,7 @@ const Workouts = ({navigation}: RouterProps) => {
     <Text style={[styles.text, {marginTop: 20}]}>{date.toDateString()}</Text>
     <ScrollView contentContainerStyle={styles.log}>
     {workout && workout.map((exercise, index) => 
-       exercise.typeOfSet === "straight" ? (<DisplayStraightSet key={index}  exercise={exercise} handleDelete={showDeleteConfirmation} navigation={navigation}/>)
-       :  exercise.typeOfSet === "drop" ? (<DisplayDropSet key={index}  exercise={exercise} handleDelete={showDeleteConfirmation}/>)
-       : exercise.typeOfSet === "super" ?(<DisplaySuperSet key={index}  exercise={exercise} handleDelete={showDeleteConfirmation}/>)
-       : <></>
+       <DisplaySet key={index} exerciseID={index}  exercise={exercise} handleDelete={showDeleteConfirmation} navigation={navigation}/>
 
     )}
     </ScrollView>
