@@ -4,7 +4,18 @@ import useFetch from '../hooks/useFetch';
 import UserContext from '../contexts/UserContext';
 import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
-import { getExercise, getExercises, getExercisesByFocus } from '../functions/databaseQueries';
+import { getExercise, getExercises, getExercisesByFocus, getUser } from '../functions/databaseQueries';
+
+interface User {
+  activityLevel: string,
+  age: number,
+  experience: number,
+  gender: string,
+  height: number,
+  level: number,
+  name: string,
+  weight: number
+}
 
 const CurrentExercise = ({route}) => {
   const { workoutType, focus } = route?.params;
@@ -31,7 +42,7 @@ const CurrentExercise = ({route}) => {
   }
   
   let exercises = getExercisesByFocus(userID, muscles[workoutType]);
-  
+  let user: User = getUser(userID);
   
   
   
@@ -40,6 +51,13 @@ const CurrentExercise = ({route}) => {
     <View>
       <Text>{workoutType}</Text>
       <Text>{focus}</Text>
+      {user && <>
+      <Text>{user.name}</Text>
+      <Text>{user.age}</Text>
+      <Text>{user.activityLevel}</Text>
+      <Text>{user.gender}</Text>
+      
+      </>}
       {exercises.map((exercise, index) => <Text key={index}>{exercise.name}</Text>)}
     </View>
   )
