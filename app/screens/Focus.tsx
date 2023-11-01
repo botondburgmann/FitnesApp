@@ -11,7 +11,7 @@ interface RouterProps {
 const Focus = ({ route, navigation }: RouterProps) => {
 const { workoutType } = route?.params;
 const [focus, setFocus] = useState<string>();
-const options = ["Strength", "Hypertrophy", "Cardio"];
+const options = ["Strength", "Hypertrophy"];
   return (
     <View style={styles.container}>
         <Radiobutton selectedValue={focus} setselectedValue={setFocus} options={options} />

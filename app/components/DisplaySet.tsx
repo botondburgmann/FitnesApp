@@ -28,7 +28,6 @@ const DisplaySet = (props) => {
 
     const numberOfSet = calculateNumberOfSets();
 
-
     function calculateNumberOfSets(): number {
         let numberOfSet = 0;
         for (const side of exercise.sides) {
@@ -97,6 +96,8 @@ const DisplaySet = (props) => {
             :   <View>
                     { numberOfSet === 1
                         ? <Text style={styles.exercise}>1 set of {uniqueValues.exercise[0]}</Text>
+                        : uniqueValues.exercise[0][uniqueValues.exercise[0].length-1] === "s" 
+                        ? <Text style={styles.exercise}>{numberOfSet} sets of {uniqueValues.exercise[0]}es {unilateral}</Text>
                         : <Text style={styles.exercise}>{numberOfSet} sets of {uniqueValues.exercise[0]}s {unilateral}</Text>
                     }
                     { exercise.reps.length > 0 

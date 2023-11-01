@@ -7,17 +7,10 @@ import useFetch from '../hooks/useFetch'
 import { NavigationProp } from '@react-navigation/native'
 
 
-interface Isometric {
+interface ExerciseSet {
   sides: string;
   weights : number;
-  times :  number;
-  restTimes : number;
-};
-
-interface Normal {
-  sides: string;
-  weights : number;
-  reps: number;
+  reps?: number;
   times :  number;
   restTimes : number;
 };
@@ -51,18 +44,18 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
     unilateral: undefined,
     isometric: undefined
   });
-  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [selectedExercises, setSelectedExercises] = useState<ExerciseSelectOption[]>([]);
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
   const [time, setTime] = useState("");
   const [restTime, setRestTime] = useState("");
-  const [sets, setSets] = useState<(Isometric | Normal)[]>([])
-  const {data:exercises, error:exercisesError } = useFetch(getExercises, userID);
+  const [sets, setSets] = useState<ExerciseSet[]>([])
+  let exercises = getExercises(userID);
   const [isEnabled, setIsEnabled] =  useState(false)
   const [side, setSide] = useState("both")
   
   useEffect(() => {
-    if ( !exercisesError && exercises) {
+    if (exercises) {
       const exerciseData = [];
       exercises.forEach(exercise => {
         if (!exercise.hidden) {          
@@ -76,7 +69,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
       });
       setAllExercises(exerciseData);
     }
-  }, [exercises, exercisesError]);
+  }, [exercises]);
 
   useEffect(() => {
     if (currentExercise.unilateral)
@@ -91,13 +84,11 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
     restTimes : parseFloat(restTime)
   };
   const changeIsometric = {
-    sides: side,
+    sides : side,
     weights : parseFloat(weight) ,
     times :  parseFloat(time) ,
     restTimes : parseFloat(restTime)
   };
-
-
 
   function toggleSwitch(): void {
     if (isEnabled)
@@ -108,19 +99,22 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
   }
 
   function addXP(): number {
+    console.log(sets);
     let currentExperience = 0;
-    if (!isEnabled) {
-      if (changeNormal.weights === 0 && Number.isNaN(changeNormal.weights))
-        currentExperience += changeNormal.reps;
-      else
-        currentExperience += changeNormal.reps * changeNormal.weights;
+    for (let i = 0; i < selectedExercises.length; i++) {
+      if (Number.isNaN(sets[i].weights)) {
+        if (selectedExercises[i].isometric)
+          currentExperience += sets[i].times;
+        else
+          currentExperience += sets[i].reps;
+      } else {
+          if (selectedExercises[i].isometric)
+            currentExperience += sets[i].times * sets[i].weights;
+          else
+            currentExperience += sets[i].reps * sets[i].weights;      
+      } 
     }
-    else {
-      if (changeNormal.weights === 0 && Number.isNaN(changeNormal.weights))
-        currentExperience += changeNormal.times;
-      else
-        currentExperience += changeNormal.times * changeNormal.weights
-    }    
+
     return currentExperience
   }
   
@@ -131,7 +125,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
         alert("Time field cannot be empty");
       else{
         setSets((prev) => [...prev,changeIsometric])
-        setSelectedExercises((prev) => [...prev,currentExercise.label])
+        setSelectedExercises((prev) => [...prev,currentExercise])
         setTime("");
         setWeight("");
         setRestTime("");  
@@ -141,7 +135,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
         alert("Reps field cannot be empty"); 
       else{
         setSets((prev) => [...prev,changeNormal]);
-        setSelectedExercises((prev) => [...prev,currentExercise.label]);
+        setSelectedExercises((prev) => [...prev,currentExercise]);
         setTime("");
         setWeight("");
         setRestTime("");  

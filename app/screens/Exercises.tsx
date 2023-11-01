@@ -22,15 +22,11 @@ const Exercises = ({navigation}: RouterProps) => {
 
   
   const [exerciseToggled, setExerciseToggled] = useState("")
-  const {data:exercises, isPending:exercisesPending, error:exercisesError } = useFetch(getExercises, userID);
+  let exercises = getExercises(userID);
 
 
 
 
-  function toggleVisibilty(exerciseName) {
-    toggleExerciseVisibilty(userID, exerciseName)
-    exerciseToggled === exerciseName ? setExerciseToggled("") : setExerciseToggled(exerciseName);
-  }
 
   const exerciseComponentsList = [];
     if (exercises) {
@@ -42,15 +38,18 @@ const Exercises = ({navigation}: RouterProps) => {
                       textAlign: 'left',
                       fontSize: 16,
                       color: "#fff",
-                      opacity: (exercise.hidden || exerciseToggled === exercise.name) ? 0.5 : 1,
+                      opacity: exercise.hidden ? 0.5 : 1,
                       textTransform: 'uppercase',
                       fontWeight: "600",
                       paddingVertical: 10,
             }}>{exercise.name}</Text>
           </Pressable>
           <Pressable>
-            {(exercise.hidden || exerciseToggled === exercise.name) ? <Text style={styles.text} onPress={() => toggleVisibilty(exercise.name)}>Unhide exercise</Text>
-            : <Text style={styles.text} onPress={() => toggleVisibilty(exercise.name)}>Hide exercise</Text>}
+            {exercise.hidden 
+              ? <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
+              }>Unhide exercise</Text>
+              : <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
+              }>Hide exercise</Text>}
           </Pressable>
         </View>)
       }      
@@ -61,9 +60,6 @@ const Exercises = ({navigation}: RouterProps) => {
     <View style={styles.container}>
       <Text style={styles.label}>My exercises</Text>
     <ScrollView>
-      {exercisesError && <Text style={styles.text}>{exercisesError}</Text> }
-      {exercisesPending && <Text style={styles.text}>Loading...</Text> }
-      
       {exerciseComponentsList}
     </ScrollView>
     <Pressable style={styles.createExerciseButton} onPress={() => navigation.navigate("Create Exercise")}>

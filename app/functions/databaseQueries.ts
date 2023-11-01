@@ -1,7 +1,8 @@
 import { Auth, createUserWithEmailAndPassword } from "firebase/auth";
-import { DocumentData, addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
+import { DocumentData, QuerySnapshot, addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
+import { useState, useEffect } from "react";
 
 interface ExerciseSelectOption{
     label: string;
@@ -11,9 +12,9 @@ interface ExerciseSelectOption{
   }
 
 interface Exercise{
+    isometric: boolean;
     name: string;
     musclesWorked: string[];
-    availableTo: string[];
     unilateral: boolean;
 }
 
@@ -297,68 +298,70 @@ export const getSetUpValue = async (userID: string) => {
         return ;
       }
     };
- export const getExercises =async (userID: string):Promise<Exercise[]> => {    
-    try {  
-        const exercises = []
-        const usersCollectionRef = collection(FIRESTORE_DB, 'Users' )
-        const q = query(usersCollectionRef,where("userID", '==', userID))
-        const querySnapshot = await getDocs(q);
- 
-        for (const docSnapshot of querySnapshot.docs) {
-            const exercisesCollectionRef = collection(docSnapshot.ref, 'exercises');
-            const exercisesQuerySnapshot = await getDocs(exercisesCollectionRef);        
 
-            for (const exerciseDocSnapshot of exercisesQuerySnapshot.docs)
-                exercises.push(exerciseDocSnapshot.data())
-        }    
+
+
+export const getExercises = (userID: string) => {
+    const [exercises, setExercises] = useState([])
+
+    useEffect(() => {
+        const fetchData =async () => {
+            try {
+                setExercises([]);
+                const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+                const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+            
+                onSnapshot(usersQuery, (snapshot) => {
+                    snapshot.docs.forEach((doc) => {
+                        const exercisesCollectionRef = collection(doc.ref, "exercises");
+                        onSnapshot(exercisesCollectionRef, (snapshot)=> {
+                            let data = [];
+                            snapshot.docs.forEach((doc) => {
+                                data.push(doc.data());
+                            })
+                            setExercises(data);
+                        });
+                    });
+                });
+            } catch (error) {
+                alert("Couldn't retrieve exercises: " + error.message);
+            }
+        };
         
-   return exercises; 
-   } catch (error) {
-     alert("Couldn't find fields: " + error.message);
-     return ;
-   }
+        fetchData()
+        
+    }, [userID])
+    return exercises;
 }
+    
 
 export const toggleExerciseVisibilty =async (userID: string, exerciseName: string) => {
-    try {  
-        const usersCollectionRef = collection(FIRESTORE_DB, 'Users' )
-        const q = query(usersCollectionRef,where("userID", '==', userID))
-        const querySnapshot = await getDocs(q);
- 
-        for (const docSnapshot of querySnapshot.docs) {
-            const exercisesCollectionRef = collection(docSnapshot.ref, 'exercises');
-            const q = query(exercisesCollectionRef,where("name", '==', exerciseName))
-            const exercisesQuerySnapshot = await getDocs(q);      
+    try {
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
 
-            for (const exerciseDocSnapshot of exercisesQuerySnapshot.docs){
-
-
-                if (exerciseDocSnapshot.data().hidden === true) {
-                   const updateData = {
-                    hidden: false 
-                  };
-                  await updateDoc(exerciseDocSnapshot.ref, updateData);
-                   
-                }else{
-                    const updateData = {
-                        hidden: true 
-                      };
-                      await updateDoc(exerciseDocSnapshot.ref, updateData);
-                    
-                }
-                return exerciseDocSnapshot.data().hidden
-
-            }
-
-                
-        }    
-   } catch (error) {
-     alert("Couldn't find fields: " + error.message);
-     return ;
-   }
+        getDocs(usersQuery)
+            .then((snapshot) => {
+                snapshot.docs.forEach((doc) => {
+                    const exercisesCollectionRef = collection(doc.ref, "exercises");
+                    const exercisesQuery = query(exercisesCollectionRef, where("name", "==", exerciseName));
+                    getDocs(exercisesQuery)
+                        .then((snapshot) => {
+                            snapshot.docs.forEach((doc) => {
+                                const updateData = {
+                                    hidden: !doc.data().hidden
+                                };
+                                updateDoc(doc.ref, updateData);
+                            })
+                        })
+                });
+            });
+    } catch (error) {
+        alert(`Couldn't change visibility for ${exerciseName}: ${error.message}`)
+    }
 }
 
-export const getWorkout = (userID: string, date: string) => {
+/* export const getWorkout = (userID: string, date: string) => {
     const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
     
     const q = query(workoutsCollectionRef, where('userID', '==', userID), where('date', '==', date));
@@ -396,13 +399,15 @@ export const getWorkout = (userID: string, date: string) => {
     .catch(err => {
         alert(err.message)
     })
-  };
+  }; */
 
-export const addSet =async (userID:string, date: string, exercise: string[], sets: object[], xpToAdd) => {
+export const addSet =async (userID:string, date: string, exercises: ExerciseSelectOption[], sets: object[], xpToAdd) => {
     const workoutsCollection = collection(FIRESTORE_DB, 'Workouts');
     const q = query(workoutsCollection, where("date", '==', date), where("userID", '==', userID) );
 
-
+    const exerciseNames = [];
+    for (const exercise of exercises)
+        exerciseNames.push(exercise.label);
 
     
     try {
@@ -410,7 +415,7 @@ export const addSet =async (userID:string, date: string, exercise: string[], set
         const querySnapshot = await getDocs(q);
         if(querySnapshot.empty){
             const data = {
-                exercise : exercise,
+                exercise : exerciseNames,
                 weights: [],
                 reps: [],
                 times: [],
@@ -421,7 +426,6 @@ export const addSet =async (userID:string, date: string, exercise: string[], set
             for (const set of sets) 
                 for (const key in set) 
                     Number.isNaN(set[key]) ? data[key].push(0) : data[key].push(set[key])
-                console.log("Adding doc");
                 const Workout = []
                 Workout.push(data)
                 
@@ -433,7 +437,7 @@ export const addSet =async (userID:string, date: string, exercise: string[], set
         
         } else {
             const data = {
-                exercise : exercise,
+                exercise : exerciseNames,
                 weights: [],
                 reps: [],
                 times: [],
@@ -611,16 +615,38 @@ export const deleteSet = async (userID:string, exerciseName: string, exerciseID:
    }
 }
 
-export const getExercisesByFocus = async (userID: string, musclesWorked: string[]):Promise<Exercise[]> => {    
-    const data = [];
-    const exercisesCollection = collection(FIRESTORE_DB, 'Exercises');
-    const q = query(exercisesCollection, where('musclesWorked', 'array-contains-any', musclesWorked));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(async (docSnapshot) => {
-        data.push(docSnapshot.data());   
-    })
-    
-    return data;
+export const getExercisesByFocus = (userID: string, musclesWorked: string[]) => {
+    const [exercises, setExercises] = useState([])
+    useEffect(() => {
+        const fetchData =async () => {
+            try {
+                setExercises([]);
+                const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+                const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+            
+                onSnapshot(usersQuery, (snapshot) => {
+                    snapshot.docs.forEach((doc) => {
+                        const exercisesCollectionRef = collection(doc.ref, "exercises");
+                        
+                        const exercisesQuery = query(exercisesCollectionRef, where("hidden", "==", false), where("musclesWorked", "array-contains-any", musclesWorked));
+                        onSnapshot(exercisesQuery, (snapshot)=> {
+                            let data = [];
+                            snapshot.docs.forEach((doc) => {
+                                data.push(doc.data());
+                            })
+                            setExercises(data);
+                        });
+                    });
+                });
+            } catch (error) {
+                alert("Couldn't retrieve exercises: " + error.message);
+            }
+        };
+        
+        fetchData()
+        
+    }, [userID])
+    return exercises;
 }
 
 export const createNewExercise = async (userID: string, name: string, isUnilateral: boolean, isIsometric: boolean) => {

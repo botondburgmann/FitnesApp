@@ -18,7 +18,7 @@ const Account = () => {
   
   return (
     <View style={styles.container} >
-      {nameError && <Text style={styles.text}>{nameError}</Text>}
+{/*       {nameError && <Text style={styles.text}>{nameError}</Text>}
       {namePending && <Text style={styles.text}>Loading your name...</Text>}
       {name && <Text style={styles.text}>{name}</Text>}
 
@@ -47,13 +47,13 @@ const Account = () => {
       </Text>}
       
       <Text style={styles.text}>Achievements</Text>
-      
+      */}
       <Pressable style={styles.button}>
           <Text style={styles.text}>Edit profile</Text>
       </Pressable>
       <Pressable style={styles.button}>
           <Text style={styles.text} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>
-      </Pressable>
+      </Pressable> 
     </View>
   )
 }
