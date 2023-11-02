@@ -57,6 +57,8 @@ const NormalSet = (props) => {
             currentExperience -= exercise.reps[setID];
         else 
             currentExperience -= exercise.reps[setID] * exercise.weights[setID];
+        console.log(`returning ${currentExperience}`);
+        
         return currentExperience
     }
 

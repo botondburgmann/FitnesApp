@@ -74,6 +74,8 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
   useEffect(() => {
     if (currentExercise.unilateral)
       setSide("left");
+    else if (!currentExercise.unilateral)
+      setSide("both");
   }, [currentExercise])
   
   const changeNormal = {
@@ -149,6 +151,9 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
       alert("Not enough data");
     else{
       addSet(userID,date, selectedExercises ,sets, addXP())
+      setSets([]);
+      setIsEnabled(false);
+      setSide("both");
       navigation.navigate("Log")
     }
   }

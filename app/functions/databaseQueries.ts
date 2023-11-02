@@ -17,6 +17,7 @@ interface MaxValueAndIndex {
 }
 
 interface Exercise{
+    hidden: boolean;
     isometric: boolean;
     name: string;
     musclesWorked: string[];
@@ -329,8 +330,8 @@ export const addSet =async (userID:string, date: string, exercises: ExerciseSele
                     Workout: updatedData
                 });     
             }
-            addExperience(userID, xpToAdd);
         } 
+        addExperience(userID, xpToAdd);
     } catch (error) {
         alert(error)
     }
@@ -463,13 +464,14 @@ export const deleteSet = async (userID:string, exerciseName: string, exerciseID:
 
                 
         }
-        addExperience(userID, xpToDelete);
         
+        
+        
+        
+    }    
     
-       
-   }    
-   
-   } catch (error) {
+    addExperience(userID, xpToDelete);
+    } catch (error) {
      alert("Couldn't find fields: " + error.message);
      return ;
    }

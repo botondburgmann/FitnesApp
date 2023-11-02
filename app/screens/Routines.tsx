@@ -2,9 +2,9 @@ import {ScrollView, StyleSheet, Text, Image } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import Routine from '../components/Routine';
-import { getGender } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import useFetch from '../hooks/useFetch';
+import { getUser } from '../functions/databaseQueries';
 
 
 interface RouterProps {
@@ -14,8 +14,7 @@ interface RouterProps {
 
 const Routines = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext)
-  const {data:gender, isPending:genderPending, error:genderError} = useFetch(getGender, userID);
-    
+  let user = getUser(userID);  
   
 
     const workoutTypes = ['Full body', 'Push', 'Pull', 'Leg', 'Back', 
@@ -32,9 +31,7 @@ const Routines = ({navigation}: RouterProps) => {
         
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {genderError && <Text style={styles.text}>{genderError}</Text>}
-      {genderPending && <Text style={styles.text}>Loading your gender...</Text>}
-      {gender && routineComponents}
+      {user && routineComponents}
      </ScrollView>
   )
 }
