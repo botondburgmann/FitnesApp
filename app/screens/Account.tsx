@@ -11,7 +11,7 @@ const Account = () => {
   let user = getUser(userID);
   let exerciseWithMostWeight = getBestExercise(userID,"weights", "reps");
   let exerciseWithMostReps =   getBestExercise(userID, "reps", "weights");
-
+  
   
   
  

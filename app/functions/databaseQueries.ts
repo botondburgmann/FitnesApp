@@ -33,6 +33,7 @@ interface BestExercise {
   interface User {
     activityLevel: string;
     age: number;
+    weeklyExperience:number;
     experience: number;
     gender: string;
     height: number;
@@ -339,30 +340,22 @@ export const addSet =async (userID:string, date: string, exercises: ExerciseSele
 }
 
 export const addExperience = async (userID: string, experience: number) => {
-    try {
-      const usersCollectionRef = collection(FIRESTORE_DB, 'Users');
-      const q = query(usersCollectionRef, where('userID', '==', userID));
-      const querySnapshot = await getDocs(q);
-      const userDocSnapshot = querySnapshot.docs[0];
-      const userDocRef = doc(usersCollectionRef, userDocSnapshot.id);
-
-      let currentExperience = userDocSnapshot.data().experience;
-      currentExperience += experience;
-      let level: number;
-      if (currentExperience < 225){
-        level = 1;
-    }
-    else{
-        level = Math.floor(Math.log(currentExperience/100)/Math.log(1.5))
-    }
-    
-      await updateDoc(userDocRef, {
-        experience: currentExperience,
-        level: level
-      });
-    } catch (error) {
-      alert("Couldn't find set field : " + error.message);
-    }
+    const usersCollectionRef = collection(FIRESTORE_DB,"Users");
+    const q = query(usersCollectionRef, where("userID", "==", userID));
+    getDocs(q)
+        .then((snapshot) => {
+            snapshot.docs.forEach((doc) => {
+                const updatedData = {
+                    experience: doc.data().experience+experience,
+                    weeklyExperience: doc.data().weeklyExperience+experience,
+                    level: doc.data().experience < 225 ? 1 : Math.floor(Math.log(doc.data().experience/100)/Math.log(1.5))
+                }
+                updateDoc(doc.ref, updatedData);
+            })
+        })
+        .catch(error => {
+            alert(`Error updating experience fields: ${error}`)
+        })
   };
 
   
@@ -575,6 +568,7 @@ export const getUser = (userID: string):User => {
                 setUser({
                     activityLevel: "",
                     age: 0,
+                    weeklyExperience: 0,
                     experience: 0,
                     gender: "",
                     height: 0,
@@ -591,6 +585,7 @@ export const getUser = (userID: string):User => {
                         const userData = {
                             activityLevel: doc.data().activityLevel,
                             age: doc.data().age,
+                            weeklyExperience : doc.data().weeklyExperience,
                             experience: doc.data().experience,
                             gender: doc.data().gender,
                             height: doc.data().height,
@@ -611,4 +606,22 @@ export const getUser = (userID: string):User => {
         
     }, [userID])
     return user;
+}
+
+
+export const resetWeeklyExperience = async (userID:string) => {
+    const usersCollection = collection(FIRESTORE_DB, "Users");
+    const q = query(usersCollection, where("userID", "==", userID));
+    getDocs(q)
+        .then((snapshot) => {
+            snapshot.docs.forEach((doc) => {
+                const updateData = {
+                    weeklyExperience: 0
+                };
+                updateDoc(doc.ref, updateData);
+            })            
+        })
+        .catch(error => {
+            alert("Couldn't reset weekly experience " + error);
+        })
 }
