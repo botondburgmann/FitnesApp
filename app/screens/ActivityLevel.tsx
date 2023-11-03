@@ -4,15 +4,12 @@ import { NavigationProp } from '@react-navigation/native';
 import { setUpProfile } from '../functions/databaseQueries';
 import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
+import { SelectItem } from '../types and interfaces/types';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
-interface SelectItem {
-  label: string
-  value: string
-}
 
 
 const ActivityLevel = ({navigation}: RouterProps) => {
