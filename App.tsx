@@ -24,6 +24,7 @@ import CurrentExercise from './app/screens/CurrentExercise';
 import Rest from './app/screens/Rest';
 import CreateExercise from './app/screens/CreateExercise';
 import EditSet from './app/screens/EditSet';
+import EditProfile from './app/screens/EditProfile';
 
 
 const Stack = createNativeStackNavigator();
@@ -51,9 +52,19 @@ function InsideLayout() {
         <Tab.Screen name='Workouts' component={WorkoutLayout}  options={{ headerShown: false }} />
         <Tab.Screen name='Toplist' component={Toplist}  options={{ headerShown: false }} />
         <Tab.Screen name='Exercises' component={ExercisesLayout} options={{ headerShown: false }} />
-        <Tab.Screen name='Account' component={Account} options={{ headerShown: false }} />
+        <Tab.Screen name='Profile' component={ProfileLayout} options={{ headerShown: false }} />
       </Tab.Navigator>
   );
+}
+
+function ProfileLayout() {
+  return( 
+    <SetupStack.Navigator>
+        <Tab.Screen name='Account' component={Account} options={{ headerShown: false }} />
+        <Tab.Screen name='Edit profile' component={EditProfile} />
+
+    </SetupStack.Navigator>
+  )
 }
 
 function WorkoutLayout() {

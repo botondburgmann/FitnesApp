@@ -3,9 +3,14 @@ import React, { useContext, useEffect, useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig'
 import { getUser, getBestExercise } from '../functions/databaseQueries'
 import UserContext from '../contexts/UserContext';
+import { NavigationProp } from '@react-navigation/native';
 
+interface RouterProps {
+  route: any,
+  navigation: NavigationProp<any, any>;
+}
 
-const Account = () => {
+const Account = ({ route, navigation }: RouterProps) => {
   const userID   = useContext(UserContext);
 
   let user = getUser(userID);
@@ -39,7 +44,7 @@ const Account = () => {
 
       
       <Pressable style={styles.button}>
-          <Text style={styles.text}>Edit profile</Text>
+          <Text style={styles.text} onPress={() => navigation.navigate("Edit profile", {user: user})}>Edit profile</Text>
       </Pressable>
       <Pressable style={styles.button}>
           <Text style={styles.text} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>

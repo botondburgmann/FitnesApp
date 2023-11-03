@@ -41,6 +41,19 @@ interface BestExercise {
     name: string;
     weight: number;
   }
+  interface Profile {
+    activityLevel: string;
+    age: number;
+    gender: string;
+    height: number;
+    name: string;
+    weight: number;
+  }
+
+interface Table {
+    tableHead: string[],
+    tableData: any[]
+}
 export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStateAction<boolean>>, auth:Auth, email:string, password:string) => {
     setLoading(true);
     try {
@@ -340,22 +353,29 @@ export const addSet =async (userID:string, date: string, exercises: ExerciseSele
 }
 
 export const addExperience = async (userID: string, experience: number) => {
-    const usersCollectionRef = collection(FIRESTORE_DB,"Users");
-    const q = query(usersCollectionRef, where("userID", "==", userID));
-    getDocs(q)
-        .then((snapshot) => {
-            snapshot.docs.forEach((doc) => {
-                const updatedData = {
-                    experience: doc.data().experience+experience,
-                    weeklyExperience: doc.data().weeklyExperience+experience,
-                    level: doc.data().experience < 225 ? 1 : Math.floor(Math.log(doc.data().experience/100)/Math.log(1.5))
-                }
-                updateDoc(doc.ref, updatedData);
-            })
+    try {
+        const usersCollectionRef = collection(FIRESTORE_DB,"Users");
+        const q = query(usersCollectionRef, where("userID", "==", userID));
+        const snapshot = await getDocs(q);
+        snapshot.docs.forEach(async doc => {
+            const updatedData = {
+                experience: doc.data().experience+experience,
+                weeklyExperience: doc.data().weeklyExperience+experience,
+            }
+            await updateDoc(doc.ref, updatedData);
         })
-        .catch(error => {
-            alert(`Error updating experience fields: ${error}`)
+        const snapshotTwo = await getDocs(q);
+        snapshotTwo.docs.forEach(async doc => {
+            const updatedData = {
+                level: doc.data().experience < 225 ? 1 : Math.floor(Math.log(doc.data().experience/100)/Math.log(1.5))
+    
+            }
+            await updateDoc(doc.ref, updatedData);
         })
+    } catch (error) {
+        alert(`Error updating experience fields: ${error}`)
+    }
+
   };
 
   
@@ -608,6 +628,76 @@ export const getUser = (userID: string):User => {
     return user;
 }
 
+export const getTable = async (userID: string): Promise<Table> => {
+    const [userToCompareTo, setUserToCompareTo] = useState({
+        gender: "",
+        height: 0,
+        weight: 0,
+        level: 0,
+        weeklyExperience: 0,
+        name: ""
+    })
+
+    const [table, setTable] = useState({
+        tableHead: ["Position", "Name", "Level", "XP this week"],
+        tableData: []
+    })
+
+    useEffect(() => {
+        const fetchData =async () => {
+            try {
+                setUserToCompareTo({
+                    weeklyExperience: 0,
+                    gender: "",
+                    height: 0,
+                    level: 0,
+                    name: "",
+                    weight: 0
+                });
+                const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+                const currentUserQuery = query(usersCollectionRef, where("userID", "==", userID));
+            
+                onSnapshot(currentUserQuery, (snapshot) => {
+                    let data;
+                    snapshot.docs.forEach((doc) => {
+                        data = {
+                            weeklyExperience : doc.data().weeklyExperience,
+                            gender: doc.data().gender,
+                            height: doc.data().height,
+                            level: doc.data().level,
+                            name: doc.data().name,
+                            weight: doc.data().weight
+                        };
+                    });
+                    setUserToCompareTo(data);
+                });
+
+                const relatedUsersQuery = query(usersCollectionRef, where("gender", "==", userToCompareTo.gender));
+
+                onSnapshot(relatedUsersQuery, async (snapshot) => {
+                    let row = [];
+                    snapshot.docs.forEach((doc, index) => {
+                        if (doc.data().weight/((doc.data().height/100)**2) >= userToCompareTo.weight/((userToCompareTo.height/100)**2)-5 && 
+                            doc.data().weight/((doc.data().height/100)**2) <= userToCompareTo.weight/((userToCompareTo.height/100)**2)+5) {
+                            row.push([index,doc.data().name, doc.data().level, doc.data().weeklyExperience])
+                        }
+                    })
+                    await setTable(prev => ({
+                        ...prev,
+                        tableData: row
+                    }))
+                })
+            } catch (error) {
+                alert("Couldn't retrieve exercises: " + error.message);
+            }
+        };
+        
+        fetchData()
+        
+    }, [userID])
+    return table;
+}
+
 
 export const resetWeeklyExperience = async (userID:string) => {
     const usersCollection = collection(FIRESTORE_DB, "Users");
@@ -624,4 +714,30 @@ export const resetWeeklyExperience = async (userID:string) => {
         .catch(error => {
             alert("Couldn't reset weekly experience " + error);
         })
+}
+
+export const editProfile = (userID:string, changes: Profile ) => {
+    try {  
+        const usersCollectionRef = collection(FIRESTORE_DB, 'Users');    
+        const q = query(usersCollectionRef, where('userID', '==', userID));
+        
+        getDocs(q)
+            .then((snapshot) => {
+                snapshot.docs.forEach((doc) => {
+                    const updateData = {
+                        name : changes.name,
+                        age: changes.age,
+                        gender: changes.gender,
+                        weight: changes.weight,
+                        height: changes.height,
+                        activityLevel: changes.activityLevel
+                    };
+                    updateDoc(doc.ref, updateData);
+                })
+            })
+
+   } catch (error) {
+     alert("Couldn't find fields: " + error.message);
+     return ;
+   }
 }

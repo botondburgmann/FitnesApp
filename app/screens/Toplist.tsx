@@ -1,7 +1,7 @@
-import { Button, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import {Table, Row, Rows} from 'react-native-table-component'
-import { resetWeeklyExperience } from '../functions/databaseQueries';
+import { getTable, resetWeeklyExperience } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
@@ -38,14 +38,83 @@ const Toplist = () => {
       })
     }); */
     
-    const [table, setTable] = useState({
-      tableHead: ["Position", "Name", "Level", "XP this week"],
-      tableData: []
-    })
+
+const [userToCompareTo, setUserToCompareTo] = useState({
+  gender: "",
+  height: 0,
+  weight: 0,
+  level: 0,
+  weeklyExperience: 0,
+  name: ""
+})
+
+const [table, setTable] = useState({
+  tableHead: ["Position", "Name", "Level", "XP this week"],
+  tableData: []
+})
+const [isLoading, setIsLoading] = useState(true);
+
+
+useEffect(() => {
+  const fetchData =async () => {
+      try {
+          setUserToCompareTo({
+              weeklyExperience: 0,
+              gender: "",
+              height: 0,
+              level: 0,
+              name: "",
+              weight: 0
+          });
+          const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+          const currentUserQuery = query(usersCollectionRef, where("userID", "==", userID));
+      
+          onSnapshot(currentUserQuery, (snapshot) => {
+              let data;
+              snapshot.docs.forEach((doc) => {
+                  data = {
+                      weeklyExperience : doc.data().weeklyExperience,
+                      gender: doc.data().gender,
+                      height: doc.data().height,
+                      level: doc.data().level,
+                      name: doc.data().name,
+                      weight: doc.data().weight
+                  };
+              });
+              setUserToCompareTo(data);
+          });
+
+          const relatedUsersQuery = query(usersCollectionRef, where("gender", "==", userToCompareTo.gender));
+
+          onSnapshot(relatedUsersQuery, async (snapshot) => {
+              let row = [];
+              snapshot.docs.forEach((doc, index) => {
+                  if (doc.data().weight/((doc.data().height/100)**2) >= userToCompareTo.weight/((userToCompareTo.height/100)**2)-5 && 
+                      doc.data().weight/((doc.data().height/100)**2) <= userToCompareTo.weight/((userToCompareTo.height/100)**2)+5) {
+                      row.push([index,doc.data().name, doc.data().level, doc.data().weeklyExperience])
+                  }
+              })
+              await setTable(prev => ({
+                  ...prev,
+                  tableData: row
+              }))
+              setIsLoading(false);
+
+          })
+      } catch (error) {
+          alert("Couldn't retrieve exercises: " + error.message);
+      }
+  };
+  
+  fetchData()
+  
+}, [userID])
     
-      const usersCollectionRef = collection(FIRESTORE_DB, 'Users');
+
+
+    
      // const q = query(workoutsCollectionRef, where("userID", "==", userID), where("date", "==", date.toDateString()));
-      getDocs(usersCollectionRef)
+/*       getDocs(usersCollectionRef)
         .then(snapshot => {
           let updatedRow = []
           snapshot.docs.forEach((doc,index) => {        
@@ -55,7 +124,7 @@ const Toplist = () => {
               tableData: updatedRow
             }));
         })
-      })
+      }) */
   
   
 
@@ -110,10 +179,10 @@ const Toplist = () => {
   return (
     <View style={styles.container}>
     <Text style={styles.label}>{week.start} - {week.end}</Text>
-      <Table>
-        <Row data={table.tableHead} textStyle={styles.text}/>
-        <Rows data={table.tableData} textStyle={styles.text}/>
-      </Table>
+{isLoading ? <ActivityIndicator/> : <Table>
+  <Row data={table.tableHead} />
+  <Rows data={table.tableData} />
+</Table>}
     </View>
   )
 }
