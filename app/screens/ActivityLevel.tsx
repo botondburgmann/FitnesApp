@@ -9,12 +9,16 @@ interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
+interface SelectItem {
+  label: string
+  value: string
+}
 
 
 const ActivityLevel = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
 
-  const [value, setValue] = useState<any>();
+  const [value, setValue] = useState<SelectItem>();
   const [items] = useState([
     {label: 'Beginner', value: 'beginner'},
     {label: 'Intermediate', value: 'intermediate'},

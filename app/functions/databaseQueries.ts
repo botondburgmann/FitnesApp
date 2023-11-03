@@ -3,6 +3,7 @@ import { DocumentData, QuerySnapshot, addDoc, collection, deleteDoc, doc, getDoc
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 import { useState, useEffect } from "react";
+import { validateActivityLevel, validateAge, validateGender, validateHeight, validateWeight } from "./validations";
 
 interface ExerciseSelectOption{
     label: string;
@@ -54,11 +55,16 @@ interface Table {
     tableHead: string[],
     tableData: any[]
 }
-export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStateAction<boolean>>, auth:Auth, email:string, password:string) => {
+
+interface SelectItem {
+    label: string;
+    value: string;
+  }
+export const signUp =async (name:string, setLoading:Function, auth:Auth, email:string, password:string): Promise<void> => {
     setLoading(true);
     try {
-        if (name === '')
-            throw new Error('Name must be set'); 
+        if (name === "")
+            throw new Error("Name must be set"); 
         const response = await createUserWithEmailAndPassword(auth, email,password);
         const userData = {
             userID: response.user.uid, 
@@ -71,80 +77,62 @@ export const signUp =async (name:string, setLoading:React.Dispatch<React.SetStat
             set: false, 
             level: 1, 
             experience: 0
-        }
-        const userDocRef = await addDoc(collection(FIRESTORE_DB, 'Users'), userData);
+        };
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const userDocRef = await addDoc(usersCollectionRef, userData);
         
         
-        const exercisesCollectionRef = collection(FIRESTORE_DB, 'Exercises');
+        const exercisesCollectionRef = collection(FIRESTORE_DB, "Exercises");
         const exercisesQuerySnapshot = await getDocs(exercisesCollectionRef);
         exercisesQuerySnapshot.forEach(async (exerciseDoc) => {
-            const exerciseData = exerciseDoc.data()
-            const userSubcollectionRef = collection(userDocRef, 'exercises');
+            const exerciseData = exerciseDoc.data();
+            const userSubcollectionRef = collection(userDocRef, "exercises");
             await addDoc(userSubcollectionRef, exerciseData);
         })
-        
-
-        alert('Registered successfully!');
-    }   catch (error:any) {
-        alert('Registration failed: ' + error.message);
-    }   finally{
+        alert("Registered successfully!");
+    }   
+    catch (error:any) {
+        alert(`Registration failed: ${error.message}`);
+    }   
+    finally{
         setLoading(false);
     }
 }
 
-export const setUpProfile =async (field:string, value:any, userID:string, navigation:NavigationProp<any, any>, nextPage:string, system?: string) => {
+export const setUpProfile =async (field:string, value:number | string | Date | SelectItem, userID:string, navigation:NavigationProp<any, any>, nextPage:string, system?: string) => {
     try {
-        if(field === 'gender')
-            if(value === undefined)
-                throw new Error(`Gender must be set`);
-            
-            else if(!(value.toLowerCase() === 'male' || value.toLowerCase() === 'female'))
-                throw new Error(`Gender must be set to either male or female`);
-            
-        if (field === 'age'){
+        if (field === "gender" && typeof(value) === "string")
+            validateGender(value);
+
+        else if (field === "age" && value instanceof Date){
             const today = new Date()      
             const age =  today.getFullYear()-value.getFullYear();      
-            
-            if(typeof(age) !== 'number')
-                throw new Error("Age must be a number");
-
-            if (age < 0)
-                throw new Error("Error: Unfortunately this time we cannot sign up time travellers. Sorry for the inconvenience");
-
-            else if (age >= 0 && age < 12)
-                throw new Error("Error: You need to be at least 12 years old to sign up");
-            else if (age > 120 )
-                throw new Error("Error: Aren't you a bit too old (or dead) to work out?");
+            validateAge(age);
             value = age;
         }
-
-        if (field === 'weight' || field === 'height') {
-            if(Number.isNaN(value))
-                throw new Error(`${field} must be set`);
-            else if(typeof(value) !== 'number')
-                throw new Error(`${field} must be a number`);
-            else if(value < 0)
-                throw new Error(`${field} can't be a negative number`);
-            
-        }
-        if (field === 'weight' && system === "lbs")
-            value = Math.round((value*0.453592)*100)/100;
-        if (field === 'height' && system === "ft")
-            value = Math.round((value*30.48)*100)/100;
         
-        if (field === 'activityLevel' && 
-        !(value.value === 'beginner' || value.value === 'intermediate' || value.value === 'advanced') ){
-            
-            throw new Error(`Please select one of the options`);
+        else if (field === "weight" && typeof(value) === "number") {
+            validateWeight(value);
+            if (system === "lbs")
+                value = Math.round((value*0.453592)*100)/100;
         }
+        
+        else if (field === "height" && typeof(value) === "number") {
+            validateHeight(value);
+            if (system === "ft")
+                value = Math.round((value*30.48)*100)/100;
+        }
+        else if (field === "activityLevel" && typeof value === "object" && "label" in value && "value" in value)
+            validateActivityLevel(value as SelectItem);
+          
 
-    const usersCollection = collection(FIRESTORE_DB, 'Users');
-        const q = query(usersCollection, where("userID", '==',userID));
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach(async (docSnapshot) => {
-            const userDocRef = doc(FIRESTORE_DB, 'Users', docSnapshot.id);
+        const usersCollection = collection(FIRESTORE_DB, "Users");
+        const q = query(usersCollection, where("userID", "==", userID));
+        const snapshot = await getDocs(q);
+        snapshot.forEach(async (docSnapshot) => {
+            const userDocRef = doc(FIRESTORE_DB, "Users", docSnapshot.id);
 
-            if (field === 'activityLevel') {
+            if (field === "activityLevel" && typeof value === "object" && "label" in value && "value" in value) {
                 const newData = { [field]: value.value,set: true }; 
                 await updateDoc(userDocRef, newData);
             } else {
@@ -153,8 +141,9 @@ export const setUpProfile =async (field:string, value:any, userID:string, naviga
             }
             navigation.navigate(nextPage);
         });  
-    }   catch (error:any) {
-        alert('Adding data has failed: ' + error.message);
+    }   
+    catch (error:any) {
+        alert(`Adding data has failed: ${error.message}`);
     }
 }
 export const getSetUpValue = async (userID: string):Promise<boolean> => {
