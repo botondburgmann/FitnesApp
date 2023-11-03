@@ -1,12 +1,13 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import Datepicker from '../components/Datepicker'
 import { NavigationProp } from '@react-navigation/native';
 import UserContext from '../contexts/UserContext';
-import {  deleteSet } from '../functions/databaseQueries';
+import {  deleteSet, getExercises } from '../functions/databaseQueries';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import DisplaySet from '../components/DisplaySet';
+import { ExerciseSet } from '../types and interfaces/types';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -17,33 +18,40 @@ const Workouts = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
   const [date, setDate] = useState(new Date());
 
-  const [workout, setWorkout] = useState([]);
-
-
+    const [workout, setWorkout] = useState<ExerciseSet[]>([]);
+    const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
-    setWorkout([]);
-    const workoutsCollectionRef = collection(FIRESTORE_DB, 'Workouts');
-    const q = query(workoutsCollectionRef, where("userID", "==", userID), where("date", "==", date.toDateString()));
-    
-    onSnapshot(q, (snapshot) => {
-      setWorkout([]);
+    const fetchExercises = async () => {
+      try {
+        const data = await getExercises(userID, date.toDateString());
+        setWorkout(data);
+        setLoading(false);
+      } 
+      catch (error) {
+        alert(`Couldn't retrieve exercises: ${error.message}`);
+      }
+    };
 
-      snapshot.docs.forEach((doc) => {        
-        for (let i = 0; i < doc.data().Workout.length; i++) {
-          const exercise = {
-            exerciseName: doc.data().Workout[i].exercise,
-            reps: doc.data().Workout[i].reps,
-            weights: doc.data().Workout[i].weights,
-            times: doc.data().Workout[i].times,
-            sides: doc.data().Workout[i].sides,
-            restTimes: doc.data().Workout[i].restTimes,
-          };
-          setWorkout((prev) => [...prev, exercise]);            
-        }        
-      })
-    })
+    const unsubscribe = onSnapshot(
+      query(collection(FIRESTORE_DB, "Workouts"), where("userID", "==", userID), where("date", "==", date.toDateString())),
+      () => {
+        fetchExercises();
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  
   }, [userID, date]);
   
+
+  
+  
+  
+
+
 
   function showDeleteConfirmation (exerciseName,exerciseID, setID, xpDelete): void {
     Alert.alert(
@@ -68,11 +76,13 @@ const Workouts = ({navigation}: RouterProps) => {
     <View style={styles.container}>
       <Datepicker date={date} setDate={setDate} />
       <Text style={[styles.text, {marginTop: 20}]}>{date.toDateString()}</Text>
-      
+
       <ScrollView contentContainerStyle={styles.log}>
-        {workout && workout.map((exercise, index) => 
-          <DisplaySet key={index} exerciseID={index}  exercise={exercise} handleDelete={showDeleteConfirmation} navigation={navigation}/>
-        )}
+        {loading ? <ActivityIndicator /> 
+        : workout.map((exercise, index) => 
+        <DisplaySet key={index} exerciseID={index}  exercise={exercise} handleDelete={showDeleteConfirmation} navigation={navigation}/>
+      )
+        }
       </ScrollView>
     
       <View style={styles.buttonGroup}>

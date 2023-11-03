@@ -51,3 +51,10 @@ export type ExerciseRecords = {
     restTimes: number[],
     dates: number[],
 }
+
+export type ExerciseSelectOption = {
+    label: string;
+    value: string;
+    unilateral: boolean,
+    isometric: boolean
+}

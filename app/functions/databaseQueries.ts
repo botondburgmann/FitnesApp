@@ -7,8 +7,218 @@ import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, Exer
 import { useRef } from "react";
 
 
+// getters
+export const getSetUpValue = async (userID: string): Promise<boolean> => {
+    try {
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const q = query(usersCollectionRef, where("userID", "==", userID));
+        const snapshot = await getDocs(q);
+        const doc = snapshot.docs[0];
+        return doc.data().set;
+    } 
+    catch (error) {
+        alert(`Error: Couldn't find set field: ${error.message}`);
+    }
+};
+
+function getMax(array:number[]): MaxValueAndIndex{
+    const max = {
+        value : 0,
+        index: 0
+    };
+    for (let i = 0; i < array.length; i++)
+        if (array[i] > max.value) {
+            max.value = array[i];
+            max.index = i;
+        }
+    return max;
+}
+
+export const getBestExercise =  async (userID: string, field:string, secondaryField:string ): Promise<BestExercise> => {
+    try {
+        const bestExercise = useRef({
+            name: "",
+            weights: 0,
+            reps: 0
+        });
+        const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        const workoutQuery = query(workoutCollectionRef, where("userID", "==", userID));
+        onSnapshot(workoutQuery, snapshot => {
+            const doc = snapshot.docs[0];
+            for (const exercise of doc.data().Workout) {
+                if (getMax(exercise[field]).value > bestExercise.current[field]) {
+                    bestExercise.current[field] = getMax(exercise[field]).value;
+                    bestExercise.current.name = exercise.exercise[getMax(exercise.weights).index];
+                    bestExercise.current[secondaryField] = exercise.reps[getMax(exercise[field]).index];
+                }
+                else if (getMax(exercise[field]).value === bestExercise.current[field]) {
+                    if (getMax(exercise[secondaryField]).value > bestExercise.current[secondaryField]) {
+                        bestExercise.current[secondaryField] = getMax(exercise[secondaryField]).value;
+                        bestExercise.current.name = exercise.exercise[getMax(exercise[secondaryField]).index];
+                        bestExercise.current[field] = exercise.weights[getMax(exercise[secondaryField]).index];
+                    }   
+                } 
+            };                
+     
+        })
+        return bestExercise.current;
+    } catch (error) {
+        alert(`Error: Couldn't find best exercise for ${field}: ${error.message}`);
+    }
+    
+};
+  
 
 
+export const getUsersExercises = async (userID: string): Promise<Exercise[]> => {
+    return new Promise((resolve, reject) => {
+        const exercises = [];
+
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        onSnapshot(usersQuery, async userSnapshot => {
+            const userDoc = userSnapshot.docs[0];
+            const exercisesCollectionRef = collection(userDoc.ref, "exercises");
+            onSnapshot(exercisesCollectionRef, (exercisesSnapshot)=> {
+                exercisesSnapshot.docs.forEach((exercisesDoc) => {
+                    exercises.push(exercisesDoc.data());
+                })
+                resolve(exercises);
+            },error => {
+                reject(error);
+            });
+        });
+    });
+  };
+
+export const getExercise = async (userID: string, exerciseName: string): Promise<ExerciseRecords> => {
+    try {  
+        const exerciseRecords = useRef({
+            weights: [],
+            reps: [],
+            times: [],
+            restTimes: [],
+            dates: [],
+        });
+
+     
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+
+        onSnapshot(workoutsQuery, workoutSnapshot => {
+            workoutSnapshot.docs.forEach(workoutDoc => {
+                for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
+                    let set = workoutDoc.data().Workout[i];
+                    for (let j = 0; j < set.exercise.length; j++)
+                        if (set.exercise[j] === exerciseName) {
+                            exerciseRecords.current.weights.push(set.weights[i])
+                            exerciseRecords.current.reps.push(set.reps[i])
+                            exerciseRecords.current.times.push(set.times[i])
+                            exerciseRecords.current.restTimes.push(set.restTimes[i])
+                            exerciseRecords.current.dates.push(workoutDoc.data().date)
+                        }
+                }
+            })
+
+        })
+    
+        return exerciseRecords.current; 
+    } 
+    catch (error) {
+        alert(`Error: Couldn't find fields for ${exerciseName}: ${error.message}`);
+    }
+};
+
+export const getExercisesByFocus = async (userID: string, musclesWorked: string[]): Promise<Exercise[]> => {
+    try {
+        const exercises = useRef([]);
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        onSnapshot(usersQuery, usersSnapshot => {
+            const userDoc = usersSnapshot.docs[0];
+            const exercisesCollectionRef = collection(userDoc.ref, "exercises");
+            const exercisesQuery = query(exercisesCollectionRef, where("hidden", "==", false), where("musclesWorked", "array-contains-any", musclesWorked));
+            onSnapshot(exercisesQuery, exercisesSnapshot => {
+                exercisesSnapshot.docs.forEach(exercisesDoc => {
+                    exercises.current.push(exercisesDoc.data());
+                })
+            })
+        })
+
+        return exercises.current;
+    } catch (error) {
+        alert(`Error: Couldn't retrieve exercises: ${error.message}`);
+    }
+};
+
+export const getUser = async (userID: string): Promise<Account> => {
+    try {
+        const profile = useRef({
+            activityLevel: "",
+            age: 0,
+            experience: 0,
+            gender: "",
+            height: 0,
+            level: 0,
+            name: "",
+            weeklyExperience: 0,
+            weight: 0
+        });
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        onSnapshot(usersQuery, usersSnapshot => {
+            const usersDoc = usersSnapshot.docs[0];
+            profile.current.activityLevel = usersDoc.data().activityLevel;
+            profile.current.age = usersDoc.data().age;
+            profile.current.experience = usersDoc.data().experience;
+            profile.current.gender = usersDoc.data().gender;
+            profile.current.height = usersDoc.data().height;
+            profile.current.level = usersDoc.data().level;
+            profile.current.name = usersDoc.data().name;
+            profile.current.weeklyExperience = usersDoc.data().weeklyExperience;
+            profile.current.weight = usersDoc.data().weight;
+        })
+        return profile.current    
+    } 
+    catch (error) {
+        alert(`Error: couldn't retrieve exercises: ${error.message}`);
+    }
+};
+
+export const getExercises = async (userID: string, date: string): Promise<ExerciseSet[]> => {
+    return new Promise((resolve, reject) => {
+      const exercises = [];
+  
+      const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
+      const workoutsQuery = query(workoutCollectionRef, where("userID", "==", userID), where("date", "==", date));
+  
+      onSnapshot(
+        workoutsQuery,
+        async (workoutsSnapshot) => {
+          workoutsSnapshot.docs.forEach((workoutsDoc) => {
+            for (let i = 0; i < workoutsDoc.data().Workout.length; i++) {
+              exercises.push({
+                exercise: workoutsDoc.data().Workout[i].exercise,
+                weights: workoutsDoc.data().Workout[i].weights,
+                reps: workoutsDoc.data().Workout[i].reps,
+                times: workoutsDoc.data().Workout[i].times,
+                restTimes: workoutsDoc.data().Workout[i].restTimes,
+                sides: workoutsDoc.data().Workout[i].sides,
+              });
+            }
+          });
+  
+          resolve(exercises); // Resolve the Promise with the data
+        },
+        (error) => {
+          reject(error); // Reject the Promise if there's an error
+        }
+      );
+    });
+  };
+  
+
+// setters
 export const signUp =async (name:string, setLoading:Function, auth:Auth, email:string, password:string): Promise<void> => {
     setLoading(true);
     try {
@@ -95,109 +305,6 @@ export const setUpProfile =async (field:string, value:number | string | Date | S
         alert(`Error: Adding data has failed: ${error.message}`);
     }
 }
-export const getSetUpValue = async (userID: string): Promise<boolean> => {
-    try {
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const q = query(usersCollectionRef, where("userID", "==", userID));
-        const snapshot = await getDocs(q);
-        const doc = snapshot.docs[0];
-        return doc.data().set;
-    } 
-    catch (error) {
-        alert(`Error: Couldn't find set field: ${error.message}`);
-    }
-};
-  
-
-function getMax(array:number[]): MaxValueAndIndex{
-    const max = {
-        value : 0,
-        index: 0
-    };
-    for (let i = 0; i < array.length; i++)
-        if (array[i] > max.value) {
-            max.value = array[i];
-            max.index = i;
-        }
-    return max;
-}
-
-export const getBestExercise =  async (userID: string, field:string, secondaryField:string ): Promise<BestExercise> => {
-    try {
-        const bestExercise = useRef({
-            name: "",
-            weights: 0,
-            reps: 0
-        });
-        const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
-        const workoutQuery = query(workoutCollectionRef, where("userID", "==", userID));
-        onSnapshot(workoutQuery, snapshot => {
-            const doc = snapshot.docs[0];
-            for (const exercise of doc.data().Workout) {
-                if (getMax(exercise[field]).value > bestExercise.current[field]) {
-                    bestExercise.current[field] = getMax(exercise[field]).value;
-                    bestExercise.current.name = exercise.exercise[getMax(exercise.weights).index];
-                    bestExercise.current[secondaryField] = exercise.reps[getMax(exercise[field]).index];
-                }
-                else if (getMax(exercise[field]).value === bestExercise.current[field]) {
-                    if (getMax(exercise[secondaryField]).value > bestExercise.current[secondaryField]) {
-                        bestExercise.current[secondaryField] = getMax(exercise[secondaryField]).value;
-                        bestExercise.current.name = exercise.exercise[getMax(exercise[secondaryField]).index];
-                        bestExercise.current[field] = exercise.weights[getMax(exercise[secondaryField]).index];
-                    }   
-                } 
-            };                
-     
-        })
-        return bestExercise.current;
-    } catch (error) {
-        alert(`Error: Couldn't find best exercise for ${field}: ${error.message}`);
-    }
-    
-};
-  
-export const getExercises = async (userID: string): Promise<Exercise[]> => {
-    try {
-        const exercises = useRef([]);
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        onSnapshot(usersQuery, userSnapshot => {
-            const userDoc = userSnapshot.docs[0];
-            const exercisesCollectionRef = collection(userDoc.ref, "exercises");
-            onSnapshot(exercisesCollectionRef, (exercisesSnapshot)=> {
-                exercisesSnapshot.docs.forEach((exercisesDoc) => {
-                    exercises.current.push(exercisesDoc.data());
-                })
-            });
-        });
-        return exercises.current;
-    } catch (error) {
-        alert(`Error: Couldn't retrieve exercises: ${error.message}`);
-    }
-}
-    
-
-export const toggleExerciseVisibilty =async (userID: string, exerciseName: string): Promise<void> => {
-    try {
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        const usersSnapshot = await getDocs(usersQuery);
-        const userDoc = usersSnapshot.docs[0];
-
-        const exercisesCollectionRef = collection(userDoc.ref, "exercises");
-        const exercisesQuery = query(exercisesCollectionRef, where("name", "==", exerciseName));
-        const exercisesSnapshot = await getDocs(exercisesQuery);
-        exercisesSnapshot.docs.forEach((exercisesDoc) => {
-            const updateData = {
-                hidden: !exercisesDoc.data().hidden
-            };
-            updateDoc(exercisesDoc.ref, updateData);
-        })
-
-    } catch (error) {
-        alert(`Error: Couldn't change visibility for ${exerciseName}: ${error.message}`)
-    }
-}
 
 export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToAdd: number): Promise<void> => {
     try {
@@ -276,47 +383,29 @@ export const addExperience = async (userID: string, experience: number): Promise
     catch (error) {
         alert(`Error: Couldn't update experience and level fields: ${error}`)
     }
-  };
-
-
-export const getExercise = async (userID: string, exerciseName: string): Promise<ExerciseRecords> => {
-    try {  
-        const exerciseRecords = useRef({
-            weights: [],
-            reps: [],
-            times: [],
-            restTimes: [],
-            dates: [],
-        });
-
-     
-        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
-        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-
-        onSnapshot(workoutsQuery, workoutSnapshot => {
-            workoutSnapshot.docs.forEach(workoutDoc => {
-                for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
-                    let set = workoutDoc.data().Workout[i];
-                    for (let j = 0; j < set.exercise.length; j++)
-                        if (set.exercise[j] === exerciseName) {
-                            exerciseRecords.current.weights.push(set.weights[i])
-                            exerciseRecords.current.reps.push(set.reps[i])
-                            exerciseRecords.current.times.push(set.times[i])
-                            exerciseRecords.current.restTimes.push(set.restTimes[i])
-                            exerciseRecords.current.dates.push(workoutDoc.data().date)
-                        }
-                }
-            })
-
-        })
-    
-        return exerciseRecords.current; 
-    } 
-    catch (error) {
-        alert(`Error: Couldn't find fields for ${exerciseName}: ${error.message}`);
-    }
 };
 
+export const toggleExerciseVisibilty =async (userID: string, exerciseName: string): Promise<void> => {
+    try {
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        const usersSnapshot = await getDocs(usersQuery);
+        const userDoc = usersSnapshot.docs[0];
+
+        const exercisesCollectionRef = collection(userDoc.ref, "exercises");
+        const exercisesQuery = query(exercisesCollectionRef, where("name", "==", exerciseName));
+        const exercisesSnapshot = await getDocs(exercisesQuery);
+        exercisesSnapshot.docs.forEach((exercisesDoc) => {
+            const updateData = {
+                hidden: !exercisesDoc.data().hidden
+            };
+            updateDoc(exercisesDoc.ref, updateData);
+        })
+
+    } catch (error) {
+        alert(`Error: Couldn't change visibility for ${exerciseName}: ${error.message}`)
+    }
+};
 
 export const deleteSet = async (userID:string, exerciseName: string, exerciseID: number, setID: number, xpToDelete: number ): Promise<void> => {
     try {  
@@ -346,7 +435,9 @@ export const deleteSet = async (userID:string, exerciseName: string, exerciseID:
                 }   
             }
   
-        }    
+        } 
+    console.log(xpToDelete);
+      
     validateExperience(xpToDelete);
     addExperience(userID, xpToDelete);
 
@@ -354,29 +445,7 @@ export const deleteSet = async (userID:string, exerciseName: string, exerciseID:
     catch (error) {
         alert(`Error: Couldn't delete fields: ${error.message}`);
    }
-}
-
-export const getExercisesByFocus = async (userID: string, musclesWorked: string[]): Promise<Exercise[]> => {
-    try {
-        const exercises = useRef([]);
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        onSnapshot(usersQuery, usersSnapshot => {
-            const userDoc = usersSnapshot.docs[0];
-            const exercisesCollectionRef = collection(userDoc.ref, "exercises");
-            const exercisesQuery = query(exercisesCollectionRef, where("hidden", "==", false), where("musclesWorked", "array-contains-any", musclesWorked));
-            onSnapshot(exercisesQuery, exercisesSnapshot => {
-                exercisesSnapshot.docs.forEach(exercisesDoc => {
-                    exercises.current.push(exercisesDoc.data());
-                })
-            })
-        })
-
-        return exercises.current;
-    } catch (error) {
-        alert(`Error: Couldn't retrieve exercises: ${error.message}`);
-    }
-}
+};
 
 export const createNewExercise = async (userID: string, name: string, isUnilateral: boolean, isIsometric: boolean): Promise<void> => {
     try {  
@@ -395,7 +464,7 @@ export const createNewExercise = async (userID: string, name: string, isUnilater
     catch (error) {
         alert(`Error: Couldn't create exercise: ${error.message}`);
     }
-}
+};
 
 export const editSet = async (userID:string, exerciseName: string, exerciseID: number, setID: number, changes: object, xpToChange: number): Promise<void> => {
     try {  
@@ -423,42 +492,7 @@ export const editSet = async (userID:string, exerciseName: string, exerciseID: n
     } catch (error) {
         alert(`Error: couldn't update set fields: ${error.message}`);
    }
-}
-
-export const getUser = async (userID: string): Promise<Account> => {
-    try {
-        const profile = useRef({
-            activityLevel: "",
-            age: 0,
-            experience: 0,
-            gender: "",
-            height: 0,
-            level: 0,
-            name: "",
-            weeklyExperience: 0,
-            weight: 0
-        });
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        onSnapshot(usersQuery, usersSnapshot => {
-            const usersDoc = usersSnapshot.docs[0];
-            profile.current.activityLevel = usersDoc.data().activityLevel;
-            profile.current.age = usersDoc.data().age;
-            profile.current.experience = usersDoc.data().experience;
-            profile.current.gender = usersDoc.data().gender;
-            profile.current.height = usersDoc.data().height;
-            profile.current.level = usersDoc.data().level;
-            profile.current.name = usersDoc.data().name;
-            profile.current.weeklyExperience = usersDoc.data().weeklyExperience;
-            profile.current.weight = usersDoc.data().weight;
-        })
-        return profile.current    
-    } 
-    catch (error) {
-        alert(`Error: couldn't retrieve exercises: ${error.message}`);
-    }
-}
-
+};
 
 export const resetWeeklyExperience = async (userID:string): Promise<void> => {
     try {
@@ -474,7 +508,7 @@ export const resetWeeklyExperience = async (userID:string): Promise<void> => {
     catch (error) {
         alert(`Error: couldn't reset weekly experience:  ${error}`);
     }
-}
+};
 
 export const editProfile = async (userID:string, changes: Account): Promise<void> => {
     try {  
@@ -496,4 +530,17 @@ export const editProfile = async (userID:string, changes: Account): Promise<void
     catch (error) {
         alert(`Error: couldn't find fields: ${error.message}`);
     }
-}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+

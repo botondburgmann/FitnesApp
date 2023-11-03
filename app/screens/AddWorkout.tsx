@@ -1,26 +1,15 @@
 import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../components/SelectMenu'
-import { addSet, getExercises } from '../functions/databaseQueries'
+import { addSet, getExercises, getUsersExercises } from '../functions/databaseQueries'
 import UserContext from '../contexts/UserContext'
 import useFetch from '../hooks/useFetch'
 import { NavigationProp } from '@react-navigation/native'
+import { Exercise, ExerciseSelectOption, ExerciseSet } from '../types and interfaces/types'
+import { onSnapshot, query, collection, where } from 'firebase/firestore'
+import { FIRESTORE_DB } from '../../FirebaseConfig'
 
 
-interface ExerciseSet {
-  sides: string;
-  weights : number;
-  reps?: number;
-  times :  number;
-  restTimes : number;
-};
-
-interface ExerciseSelectOption{
-  label: string;
-  value: string;
-  unilateral: boolean
-  isometric: boolean
-};
 
 
 interface RouterProps {
@@ -50,14 +39,17 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
   const [time, setTime] = useState("");
   const [restTime, setRestTime] = useState("");
   const [sets, setSets] = useState<ExerciseSet[]>([])
-  let exercises = getExercises(userID);
   const [isEnabled, setIsEnabled] =  useState(false)
   const [side, setSide] = useState("both")
-  
-  useEffect(() => {
-    if (exercises) {
+
+  const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  const fetchExercises = async () => {
+    try {
+      const data = await getUsersExercises(userID);
       const exerciseData = [];
-      exercises.forEach(exercise => {
+      data.forEach(exercise => {
         if (!exercise.hidden) {          
           exerciseData.push({
             label: exercise.name,
@@ -67,9 +59,28 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
           });
         }
       });
-      setAllExercises(exerciseData);
+      setAllExercises(exerciseData);      
+      setLoading(false);
+    } 
+    catch (error) {
+      alert(`Couldn't retrieve exercises: ${error.message}`);
     }
-  }, [exercises]);
+  };
+
+  const unsubscribe = onSnapshot(
+    query(collection(FIRESTORE_DB, "Users"), where("userID", "==", userID)),
+    () => {
+      fetchExercises();
+    }
+  );
+
+  return () => {
+    unsubscribe();
+  };
+
+}, [userID]);
+  
+
 
   useEffect(() => {
     if (currentExercise.unilateral)
@@ -100,7 +111,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
     setIsEnabled(previousState => !previousState);
   }
 
-  function addXP(): number {
+ /*  function addXP(): number {
     console.log(sets);
     let currentExperience = 0;
     for (let i = 0; i < selectedExercises.length; i++) {
@@ -118,10 +129,10 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
     }
 
     return currentExperience
-  }
+  } */
   
 
-  function handleAddButton(): void {
+/*   function handleAddButton(): void {
     if (currentExercise.isometric) {
       if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) 
         alert("Time field cannot be empty");
@@ -145,12 +156,12 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
       }
     }
   }
-
+ */
   function handleFinishButton(): void {
     if (sets.length === 0)
       alert("Not enough data");
     else{
-      addSet(userID,date, selectedExercises ,sets, addXP())
+     // addSet(userID,date, selectedExercises ,sets, addXP())
       setSets([]);
       setIsEnabled(false);
       setSide("both");
@@ -224,9 +235,9 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
             onChangeText={(text) => setRestTime(text)}
           />
           <View style={styles.gridContainer}>
-            <Pressable style={styles.button} onPress={() => handleAddButton()}>
+{/*             <Pressable style={styles.button} onPress={() => handleAddButton()}>
                 <Text style={styles.text}>Add set</Text>
-            </Pressable>
+            </Pressable> */}
             <Pressable style={styles.button} onPress={() => handleFinishButton()}>
                 <Text style={styles.text}>Finish</Text>
             </Pressable>

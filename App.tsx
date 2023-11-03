@@ -72,7 +72,7 @@ function WorkoutLayout() {
     <SetupStack.Navigator>
       <SetupStack.Screen name="Log" component={Workouts} options={{ headerShown: false }}/>
       <SetupStack.Screen name="Add" component={AddWorkout}  />
-      <SetupStack.Screen name="Edit bilateral set" component={EditSet}  />
+      <SetupStack.Screen name="Edit set" component={EditSet}  />
       <SetupStack.Screen name="Routine" component={Routines } />
       <SetupStack.Screen name="Focus" component={Focus }/>
       <SetupStack.Screen name="CurrentExercise" component={CurrentExercise }/>

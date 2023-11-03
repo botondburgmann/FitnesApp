@@ -2,18 +2,11 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import NormalSet from './NormalSet';
 import IsometricSet from './IsometricSet';
+import { ExerciseSet } from '../types and interfaces/types';
 
-interface Exercise {
-    exerciseName: string[];
-    reps: number[];
-    weights: number[];
-    times: number[];
-    sides: string[];
-    restTimes: number[];
-};
 
 const DisplaySet = (props) => {
-    const exercise: Exercise  = props.exercise;
+    const exercise: ExerciseSet  = props.exercise;
     const handleDelete: Function = props.handleDelete;
     const navigation = props.navigation;
     const exerciseID : number = props.exerciseID;
@@ -21,7 +14,7 @@ const DisplaySet = (props) => {
     
     const uniqueValues = {
         sides: Array.from(new Set<string>(exercise.sides)),
-        exercise: Array.from(new Set<string>(exercise.exerciseName))
+        exercise: Array.from(new Set<string>(exercise.exercise))
         
     };
     const unilateral : string = uniqueValues.sides.length === 2 ? "(per side)" : "";

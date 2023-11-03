@@ -15,7 +15,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
 
     const { exercise, exerciseID, setID, isIsometric} = route?.params; 
-    const exerciseName = exercise.exerciseName[setID];   
+    const exerciseName = exercise.exercise[setID];   
     const [weight, setWeight] = useState<string>(exercise.weights[setID].toString());
     const [time, setTime] = useState<string>(exercise.times[setID].toString());
     const [reps, setReps] = isIsometric ? useState<string>("") : useState<string>(exercise.reps[setID].toString());

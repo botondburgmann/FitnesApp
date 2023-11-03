@@ -73,8 +73,8 @@ const NormalSet = (props) => {
                             : <></>
                     }
                     <Pressable
-                        onPress={() => navigation.navigate("Edit bilateral set",{exercise: exercise, exerciseID: exerciseID,  setID: index, isIsometric: false})} 
-                        onLongPress={() => handleDelete(exercise.exerciseName[index], exerciseID, index, removeXP(index))}                                
+                        onPress={() => navigation.navigate("Edit set",{exercise: exercise, exerciseID: exerciseID,  setID: index, isIsometric: false})} 
+                        onLongPress={() => handleDelete(exercise.exercise[index], exerciseID, index, removeXP(index))}                                
                     >
                         <Text style={styles.text}>{rep}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]} {outputs.seconds[index]}</Text>                            
                         { exercise.restTimes[index] > 0
