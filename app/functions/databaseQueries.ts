@@ -170,6 +170,23 @@ export const getUser = async (userID: string): Promise<Account> => {
     })
 };
 
+export const getSimilarUsers =async (user:Account): Promise<Account[]> => { 
+    return new Promise((resolve, reject) => {
+        const users = [];
+
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("gender", "==", user.gender), where("weight", "<=", user.weight+5),where("weight", ">=", user.weight-5) );
+        onSnapshot(usersQuery, usersSnapshot => {
+            usersSnapshot.docs.forEach(usersDoc => {
+                users.push(usersDoc.data())
+            })
+            console.log(users);
+            
+            resolve(users);
+        }, error => reject(error));
+    })
+}
+
 export const getExercises = async (userID: string, date: string): Promise<ExerciseSet[]> => {
     return new Promise((resolve, reject) => {
       const exercises = [];
@@ -193,14 +210,12 @@ export const getExercises = async (userID: string, date: string): Promise<Exerci
             }
           });
   
-          resolve(exercises); // Resolve the Promise with the data
-        },
-        (error) => {
-          reject(error); // Reject the Promise if there's an error
-        }
-      );
+          resolve(exercises);
+        }, error => reject(error));
     });
-  };
+};
+
+
   
 
 // setters

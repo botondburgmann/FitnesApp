@@ -18,8 +18,8 @@ const Workouts = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
   const [date, setDate] = useState(new Date());
 
-    const [workout, setWorkout] = useState<ExerciseSet[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [workout, setWorkout] = useState<ExerciseSet[]>([]);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     const fetchExercises = async () => {
