@@ -1,9 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { FIREBASE_AUTH } from '../../FirebaseConfig'
+import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig'
 import { getUser, getBestExercise } from '../functions/databaseQueries'
 import UserContext from '../contexts/UserContext';
 import { NavigationProp } from '@react-navigation/native';
+import { MyUser, BestExercise } from '../types and interfaces/types';
+import { onSnapshot, query, collection, where } from 'firebase/firestore';
 
 interface RouterProps {
   route: any,
@@ -13,9 +15,47 @@ interface RouterProps {
 const Account = ({ route, navigation }: RouterProps) => {
   const userID   = useContext(UserContext);
 
-  let user = getUser(userID);
-  let exerciseWithMostWeight = getBestExercise(userID,"weights", "reps");
-  let exerciseWithMostReps =   getBestExercise(userID, "reps", "weights");
+  const [user, setUser] = useState<MyUser>({
+    activityLevel: "",
+    age: 0,
+    experience: 0,
+    gender: "",
+    height: 0,
+    level: 0,
+    name: "",
+    weeklyExperience:0,
+    weight: 0
+  });
+  const [mostWeightExercise, setmostWeightExercise] = useState<BestExercise>({
+    name: "",
+    weights: 0,
+    reps: 0
+})
+  const [mostRepsExercise, setmostRepsExercise] = useState<BestExercise>({
+    name: "",
+    weights: 0,
+    reps: 0
+})
+
+useEffect(() => {
+  const unsubscribeFromUser = getUser(userID, (userData) => {
+    setUser(userData);
+  });
+  const unsubscribeFromMostWeight = getBestExercise(userID, "weights", "reps", (exerciseData) => {
+    setmostWeightExercise(exerciseData);
+  });
+  const unsubscribeFromMostReps = getBestExercise(userID, "reps", "weight", (exerciseData) => {
+    setmostRepsExercise(exerciseData);
+  });
+
+
+  return () => {
+    unsubscribeFromUser();
+    unsubscribeFromMostWeight();
+    unsubscribeFromMostReps();
+  }
+})
+
   
   
   
@@ -27,20 +67,22 @@ const Account = ({ route, navigation }: RouterProps) => {
   }, [user])
   return (
     <View style={styles.container} >
-          {user && <View>
+   <View>
             <Text style={styles.text}>{user.name}</Text>
             <Text style={styles.text}>Level: {user.level}</Text>
-           <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>
+            <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>
 
             <Text style={styles.text}>Best records</Text>
- 
+
             <Text style={styles.text}>
-              Weight: {( exerciseWithMostWeight).name} {( exerciseWithMostWeight).weights} kg ({(exerciseWithMostWeight).reps} repetitions)
+              Weight: {( mostWeightExercise).name} {( mostWeightExercise).weights} kg ({(mostWeightExercise).reps} repetitions)
             </Text>
             <Text style={styles.text}>
-              Most repetitions: {( exerciseWithMostReps).name} {( exerciseWithMostReps).reps} repetitions ({( exerciseWithMostReps).weights} kg)
+              Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
             </Text> 
-          </View>} 
+          </View>
+
+      
 
       
       <Pressable style={styles.button}>

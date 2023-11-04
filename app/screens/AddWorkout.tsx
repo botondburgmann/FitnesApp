@@ -44,12 +44,10 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
 
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const fetchExercises = async () => {
-    try {
-      const data = await getUsersExercises(userID);
+  useEffect(() => {   
+    const unssubscribeFromExercises = getUsersExercises(userID, (exercises) => {
       const exerciseData = [];
-      data.forEach(exercise => {
+      exercises.forEach(exercise => {
         if (!exercise.hidden) {          
           exerciseData.push({
             label: exercise.name,
@@ -59,26 +57,14 @@ useEffect(() => {
           });
         }
       });
-      setAllExercises(exerciseData);      
-      setLoading(false);
-    } 
-    catch (error) {
-      alert(`Couldn't retrieve exercises: ${error.message}`);
+      setAllExercises(exerciseData);});
+
+  
+  
+    return () => {
+      unssubscribeFromExercises();
     }
-  };
-
-  const unsubscribe = onSnapshot(
-    query(collection(FIRESTORE_DB, "Users"), where("userID", "==", userID)),
-    () => {
-      fetchExercises();
-    }
-  );
-
-  return () => {
-    unsubscribe();
-  };
-
-}, [userID]);
+  })
   
 
 
@@ -89,19 +75,6 @@ useEffect(() => {
       setSide("both");
   }, [currentExercise])
   
-  const changeNormal = {
-    sides : side,
-    weights : parseFloat(weight) ,
-    reps :  parseFloat(reps),
-    times :  parseFloat(time) ,
-    restTimes : parseFloat(restTime)
-  };
-  const changeIsometric = {
-    sides : side,
-    weights : parseFloat(weight) ,
-    times :  parseFloat(time) ,
-    restTimes : parseFloat(restTime)
-  };
 
   function toggleSwitch(): void {
     if (isEnabled)

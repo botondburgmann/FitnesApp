@@ -1,10 +1,9 @@
 import { Auth, createUserWithEmailAndPassword } from "firebase/auth";
-import { addDoc, collection, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
+import { Unsubscribe, addDoc, collection, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 import { validateActivityLevel, validateAge, validateExerciseSet, validateExperience, validateGender, validateHeight, validateWeight } from "./validations";
-import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, Account } from "../types and interfaces/types";
-import { useRef } from "react";
+import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser } from "../types and interfaces/types";
 
 
 // getters
@@ -34,58 +33,51 @@ function getMax(array:number[]): MaxValueAndIndex{
     return max;
 }
 
-export const getBestExercise =  async (userID: string, field:string, secondaryField:string ): Promise<BestExercise> => {
-    return new Promise((resolve, reject) => {
-        const bestExercise = {
-            name: "",
-            weights: 0,
-            reps: 0
+export const getBestExercise = (userID: string, field:string, secondaryField:string, callback: Function ): Unsubscribe => {
+    const bestExercise = {
+        name: "",
+        weights: 0,
+        reps: 0
+    };
+    const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
+    const workoutQuery = query(workoutCollectionRef, where("userID", "==", userID));
+    const unsubscribeFromWorkouts = onSnapshot(workoutQuery, snapshot => {
+        const doc = snapshot.docs[0];
+        for (const exercise of doc.data().Workout) {
+            if (getMax(exercise[field]).value > bestExercise[field]) {
+                bestExercise[field] = getMax(exercise[field]).value;
+                bestExercise.name = exercise.exercise[getMax(exercise.weights).index];
+                bestExercise[secondaryField] = exercise.reps[getMax(exercise[field]).index];
+            }
+            else if (getMax(exercise[field]).value === bestExercise[field]) {
+                if (getMax(exercise[secondaryField]).value > bestExercise[secondaryField]) {
+                    bestExercise[secondaryField] = getMax(exercise[secondaryField]).value;
+                    bestExercise.name = exercise.exercise[getMax(exercise[secondaryField]).index];
+                    bestExercise[field] = exercise.weights[getMax(exercise[secondaryField]).index];
+                }   
+            } 
         };
-        const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
-        const workoutQuery = query(workoutCollectionRef, where("userID", "==", userID));
-        onSnapshot(workoutQuery, snapshot => {
-            const doc = snapshot.docs[0];
-            for (const exercise of doc.data().Workout) {
-                if (getMax(exercise[field]).value > bestExercise[field]) {
-                    bestExercise[field] = getMax(exercise[field]).value;
-                    bestExercise.name = exercise.exercise[getMax(exercise.weights).index];
-                    bestExercise[secondaryField] = exercise.reps[getMax(exercise[field]).index];
-                }
-                else if (getMax(exercise[field]).value === bestExercise[field]) {
-                    if (getMax(exercise[secondaryField]).value > bestExercise[secondaryField]) {
-                        bestExercise[secondaryField] = getMax(exercise[secondaryField]).value;
-                        bestExercise.name = exercise.exercise[getMax(exercise[secondaryField]).index];
-                        bestExercise[field] = exercise.weights[getMax(exercise[secondaryField]).index];
-                    }   
-                } 
-            };                
-            resolve(bestExercise);
-        }, error => reject(error) );
+        callback(bestExercise);             
+    });
 
-    })
-    
+    return unsubscribeFromWorkouts;
 };
   
 
 
-export const getUsersExercises = async (userID: string): Promise<Exercise[]> => {
-    return new Promise((resolve, reject) => {
-        const exercises = [];
+export const getUsersExercises = (userID: string, callback: Function): Unsubscribe => {
+    const exercises = [];
+    const exercisesCollectionRef = collection(FIRESTORE_DB, "Exercises");
+    const unsubscribeFromExercises = onSnapshot(exercisesCollectionRef, (exercisesSnapshot)=> {
+            exercisesSnapshot.docs.forEach((exercisesDoc) => {
+                exercises.push(exercisesDoc.data());
+            })
+            callback(exercises);                
+        })
+        return unsubscribeFromExercises;
+    }
 
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        onSnapshot(usersQuery, async userSnapshot => {
-            const userDoc = userSnapshot.docs[0];
-            const exercisesCollectionRef = collection(userDoc.ref, "exercises");
-            onSnapshot(exercisesCollectionRef, (exercisesSnapshot)=> {
-                exercisesSnapshot.docs.forEach((exercisesDoc) => {
-                    exercises.push(exercisesDoc.data());
-                })
-                resolve(exercises);
-            },error =>  reject(error));
-        });
-    });
-  };
+
 
 export const getExercise = async (userID: string, exerciseName: string): Promise<ExerciseRecords> => {
     return new Promise ((resolve, reject) => {
@@ -138,81 +130,64 @@ export const getExercisesByFocus = async (userID: string, musclesWorked: string[
     })
 };
 
-export const getUser = async (userID: string): Promise<Account> => {
-    return new Promise ((resolve, reject) => {
-        const profile = {
-            activityLevel: "",
-            age: 0,
-            experience: 0,
-            gender: "",
-            height: 0,
-            level: 0,
-            name: "",
-            weeklyExperience: 0,
-            weight: 0
+export const getUser = (userID:string, callback: Function): Unsubscribe => {
+    const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+    const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+    const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
+        if (!usersSnapshot.empty) {
+            const userDoc = usersSnapshot.docs[0];
+            const userData = {
+                activityLevel:  userDoc.data().activityLevel,
+                age:  userDoc.data().age,
+                experience:  userDoc.data().experience,
+                gender:  userDoc.data().gender,
+                height:  userDoc.data().height,
+                level:  userDoc.data().level,
+                name:  userDoc.data().name,
+                weeklyExperience: userDoc.data().weeklyExperience,
+                weight:  userDoc.data().weight
+            };
+
+            callback(userData);
         }
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        onSnapshot(usersQuery, usersSnapshot => {
-            const usersDoc = usersSnapshot.docs[0];
-            profile.activityLevel = usersDoc.data().activityLevel;
-            profile.age = usersDoc.data().age;
-            profile.experience = usersDoc.data().experience;
-            profile.gender = usersDoc.data().gender;
-            profile.height = usersDoc.data().height;
-            profile.level = usersDoc.data().level;
-            profile.name = usersDoc.data().name;
-            profile.weeklyExperience = usersDoc.data().weeklyExperience;
-            profile.weight = usersDoc.data().weight;
-
-            resolve(profile);
-        }, error => reject(error));
     })
-};
 
-export const getSimilarUsers =async (user:Account): Promise<Account[]> => { 
-    return new Promise((resolve, reject) => {
+    return unsubscribeFromUsers;
+}
+export const getAllUsers = (callback): Unsubscribe => { 
+    
+    const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+    const unsubscribeFromUsers = onSnapshot(usersCollectionRef, usersSnapshot => {
         const users = [];
-
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const usersQuery = query(usersCollectionRef, where("gender", "==", user.gender), where("weight", "<=", user.weight+5),where("weight", ">=", user.weight-5) );
-        onSnapshot(usersQuery, usersSnapshot => {
-            usersSnapshot.docs.forEach(usersDoc => {
-                users.push(usersDoc.data())
-            })
-            console.log(users);
-            
-            resolve(users);
-        }, error => reject(error));
+        usersSnapshot.docs.forEach(usersDoc => {
+            users.push(usersDoc.data())
+        })
+        callback(users);    
     })
+    return unsubscribeFromUsers;
 }
 
-export const getExercises = async (userID: string, date: string): Promise<ExerciseSet[]> => {
-    return new Promise((resolve, reject) => {
-      const exercises = [];
-  
-      const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
-      const workoutsQuery = query(workoutCollectionRef, where("userID", "==", userID), where("date", "==", date));
-  
-      onSnapshot(
-        workoutsQuery,
-        async (workoutsSnapshot) => {
-          workoutsSnapshot.docs.forEach((workoutsDoc) => {
+export const getExercises = (userID: string, date: string, callback: Function): Unsubscribe => {
+    const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
+    const workoutsQuery = query(workoutCollectionRef, where("userID", "==", userID), where("date", "==", date));
+    
+    const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
+        const exercises = [];
+        workoutsSnapshot.docs.forEach((workoutsDoc) => {
             for (let i = 0; i < workoutsDoc.data().Workout.length; i++) {
-              exercises.push({
-                exercise: workoutsDoc.data().Workout[i].exercise,
-                weights: workoutsDoc.data().Workout[i].weights,
-                reps: workoutsDoc.data().Workout[i].reps,
-                times: workoutsDoc.data().Workout[i].times,
-                restTimes: workoutsDoc.data().Workout[i].restTimes,
-                sides: workoutsDoc.data().Workout[i].sides,
-              });
+                exercises.push({
+                    exercise: workoutsDoc.data().Workout[i].exercise,
+                    weights: workoutsDoc.data().Workout[i].weights,
+                    reps: workoutsDoc.data().Workout[i].reps,
+                    times: workoutsDoc.data().Workout[i].times,
+                    restTimes: workoutsDoc.data().Workout[i].restTimes,
+                    sides: workoutsDoc.data().Workout[i].sides,
+                });
             }
-          });
-  
-          resolve(exercises);
-        }, error => reject(error));
-    });
+        });
+        callback(exercises);
+    })
+    return unsubscribeFromWorkouts;
 };
 
 
@@ -373,7 +348,7 @@ export const addExperience = async (userID: string, experience: number): Promise
         
         const secondUsersSnapshot = await getDocs(usersQuery);
         const secondUserDoc = secondUsersSnapshot.docs[0];
-        const secondUserData = secondUserDoc.data() as Account;
+        const secondUserData = secondUserDoc.data() as MyUser;
         const secondUpdateData = {
             level: secondUserData.experience < 225 ? 1 : Math.floor(Math.log(secondUserData.experience / 100) / Math.log(1.5)),
         };
@@ -436,7 +411,6 @@ export const deleteSet = async (userID:string, exerciseName: string, exerciseID:
             }
   
         } 
-    console.log(xpToDelete);
       
     validateExperience(xpToDelete);
     addExperience(userID, xpToDelete);
@@ -510,7 +484,7 @@ export const resetWeeklyExperience = async (userID:string): Promise<void> => {
     }
 };
 
-export const editProfile = async (userID:string, changes: Account): Promise<void> => {
+export const editProfile = async (userID:string, changes: MyUser): Promise<void> => {
     try {  
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");    
         const usersQuery = query(usersCollectionRef, where("userID", "==", userID));

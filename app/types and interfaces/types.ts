@@ -32,7 +32,7 @@ export type ExerciseSet = {
     sides: string[]
 }
 
-export type Account = {
+export type MyUser = {
     activityLevel: string;
     age: number;
     experience: number;

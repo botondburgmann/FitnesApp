@@ -1,11 +1,11 @@
 import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import {Table, Row, Rows} from 'react-native-table-component'
-import { getSimilarUsers, getUser, resetWeeklyExperience } from '../functions/databaseQueries';
+import { getAllUsers, getUser, resetWeeklyExperience } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../FirebaseConfig';
-import { Account } from '../types and interfaces/types';
+import { MyUser  } from '../types and interfaces/types';
 
 interface WeekRange{
   start: Date;
@@ -31,45 +31,30 @@ const Toplist = () => {
     tableHead: ["Position", "Name", "Level", "XP this week"],
     tableData: []
   });
+
   
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchExercises = async () => {
-      try {
-        const user = await getUser(userID);
-        const data = await getSimilarUsers(user);
-        if (Array.isArray(data)) {
-          console.log(`getting ${data}`);
-          
-          setTable((prev) => ({
-            ...prev,
-            tableData: []
-          }));            
-          data.map((user, index) => {
-              setTable((prev) => ({
-                ...prev,
-                tableData: [...prev.tableData, [index+1, user.name, user.level, user.weeklyExperience]],
-              }));
-            });
-          }
-        setLoading(false);
-      } 
-      catch (error) {
-        alert(`Couldn't retrieve similar users: ${error.message}`);
-      }
-    };
-
-    const unsubscribe = onSnapshot(
-      query(collection(FIRESTORE_DB, "Users"), where("userID", "==", userID)), 
-      () => fetchExercises());
-
-    return () => {
-      unsubscribe();
-    };
-
-  }, [userID]);
+    const unsubscribeFromUser = getAllUsers((users) => {
+      console.log(users);
+      
+      const updatedTableData = users.map((user, index) => [
+        index + 1,
+        user.name,
+        user.level,
+        user.weeklyExperience,
+      ]);
+      
+      setTable((prev) => ({ ...prev, tableData: updatedTableData }));      setLoading(false);
+    })
     
+    return () => {
+      unsubscribeFromUser()
+    }
+  }, [])
+  
+
 
   
 
@@ -124,10 +109,13 @@ const Toplist = () => {
   return (
     <View style={styles.container}>
     <Text style={styles.label}>{week.start} - {week.end}</Text>
-{loading ? <ActivityIndicator/> : <Table>
-  <Row data={table.tableHead} />
-  <Rows data={table.tableData} />
-</Table>}
+    {loading 
+      ? <ActivityIndicator/> 
+      : <Table>
+          <Row data={table.tableHead} textStyle={styles.text}/>
+          <Rows data={table.tableData} textStyle={styles.text}/>
+        </Table>
+      }
     </View>
   )
 }
@@ -150,12 +138,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   text:{
-    alignSelf: 'center',
-    fontSize: 18,
+    alignSelf: 'flex-start',
+    fontSize: 12,
     color: "#fff",
     textTransform: 'uppercase',
     fontWeight: "600",
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   gridContainer:{
     flexDirection: 'row',

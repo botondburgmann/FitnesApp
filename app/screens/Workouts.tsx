@@ -22,29 +22,16 @@ const Workouts = ({navigation}: RouterProps) => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    const fetchExercises = async () => {
-      try {
-        const data = await getExercises(userID, date.toDateString());
-        setWorkout(data);
-        setLoading(false);
-      } 
-      catch (error) {
-        alert(`Couldn't retrieve exercises: ${error.message}`);
-      }
-    };
-
-    const unsubscribe = onSnapshot(
-      query(collection(FIRESTORE_DB, "Workouts"), where("userID", "==", userID), where("date", "==", date.toDateString())),
-      () => {
-        fetchExercises();
-      }
-    );
-
-    return () => {
-      unsubscribe();
-    };
+    const unsubscribeFromWorkouts = getExercises(userID, date.toDateString(), (exercises) => {
+      setWorkout(exercises);
+      setLoading(false);
+    });
   
-  }, [userID, date]);
+  
+    return () => {
+      unsubscribeFromWorkouts();
+    }
+  })
   
 
   

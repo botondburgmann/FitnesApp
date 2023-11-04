@@ -1,18 +1,12 @@
-import {  Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {  ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import SelectMenu from '../components/SelectMenu'
-import useFetch from '../hooks/useFetch';
 import UserContext from '../contexts/UserContext';
-import { Table, Row, Rows} from 'react-native-table-component';
-import { getExercises, toggleExerciseVisibilty } from '../functions/databaseQueries';
+import { getUsersExercises, toggleExerciseVisibilty } from '../functions/databaseQueries';
 import { NavigationProp } from '@react-navigation/native';
+import { Exercise } from '../types and interfaces/types';
+import { onSnapshot, query, collection, where } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../FirebaseConfig';
 
-
-interface ExerciseSelectOption{
-  label: string;
-  value: string;
-  unilateral: boolean
-}
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -22,45 +16,56 @@ const Exercises = ({navigation}: RouterProps) => {
 
   
   const [exerciseToggled, setExerciseToggled] = useState("")
-  let exercises = getExercises(userID);
 
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const unsubscribeFromUser = getUsersExercises(userID, (exercises) => {
 
+      setExercises(exercises);});
+
+  
+  
+    return () => {
+      unsubscribeFromUser();
+    }
+  })
 
 
 
   const exerciseComponentsList = [];
-    if (exercises) {
-      for (const exercise of exercises) { 
-        exerciseComponentsList.push(
-        <View key={exercise.name} style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, flexWrap: 'wrap',}}>
-          <Pressable style={{   width: '50%' }}>
-            <Text style={{
-                      textAlign: 'left',
-                      fontSize: 16,
-                      color: "#fff",
-                      opacity: exercise.hidden ? 0.5 : 1,
-                      textTransform: 'uppercase',
-                      fontWeight: "600",
-                      paddingVertical: 10,
-            }}>{exercise.name}</Text>
-          </Pressable>
-          <Pressable>
-            {exercise.hidden 
-              ? <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
-              }>Unhide exercise</Text>
-              : <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
-              }>Hide exercise</Text>}
-          </Pressable>
-        </View>)
-      }      
-    }
+  exercises.forEach((exercise, index) => {
+    exerciseComponentsList.push(
+      <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, flexWrap: 'wrap',}}>
+        <Pressable style={{   width: '50%' }}>
+          <Text style={{
+                    textAlign: 'left',
+                    fontSize: 16,
+                    color: "#fff",
+                    opacity: exercise.hidden ? 0.5 : 1,
+                    textTransform: 'uppercase',
+                    fontWeight: "600",
+                    paddingVertical: 10,
+          }}>{exercise.name}</Text>
+        </Pressable>
+        <Pressable>
+          {exercise.hidden 
+            ? <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
+            }>Unhide exercise</Text>
+            : <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
+            }>Hide exercise</Text>}
+        </Pressable>
+      </View>)
+  })
+
+    
   
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>My exercises</Text>
     <ScrollView>
-      {exerciseComponentsList}
+      { exerciseComponentsList}
     </ScrollView>
     <Pressable style={styles.createExerciseButton} onPress={() => navigation.navigate("Create Exercise")}>
         <Text style={styles.createExerciseButtonText}>+</Text>
