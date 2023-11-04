@@ -65,17 +65,39 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
   
 
 
-export const getUsersExercises = (userID: string, callback: Function): Unsubscribe => {
-    const exercises = [];
-    const exercisesCollectionRef = collection(FIRESTORE_DB, "Exercises");
-    const unsubscribeFromExercises = onSnapshot(exercisesCollectionRef, (exercisesSnapshot)=> {
-            exercisesSnapshot.docs.forEach((exercisesDoc) => {
-                exercises.push(exercisesDoc.data());
-            })
-            callback(exercises);                
+export const getAvailableExercises = (userID: string, callback: Function): Unsubscribe => {
+    try {
+        const exercises: Exercise[] = [];
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        
+        const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
+            if (!usersSnapshot.empty) {
+                const userDocRef = usersSnapshot.docs[0].ref;
+                const exercisesCollectionRef = collection(userDocRef, "exercises");
+                const exercisesQuery = query(exercisesCollectionRef, where("hidden", "==", false));
+                const unsubscribeFromExercises = onSnapshot(exercisesQuery, exercisesSnapshot => {
+                    exercisesSnapshot.docs.forEach(exerciseDoc => {
+                        exercises.push({
+                            hidden: exerciseDoc.data().hidden,
+                            isometric: exerciseDoc.data().isometric,
+                            name: exerciseDoc.data().name,
+                            musclesWorked: exerciseDoc.data().musclesWorked,
+                            unilateral: exerciseDoc.data().unilateral
+                        })
+                    }) 
+                    callback(exercises);                   
+                })
+                unsubscribeFromExercises;
+            }
+            else 
+                throw new Error("user doesn't exist");
         })
-        return unsubscribeFromExercises;
+        return unsubscribeFromUsers;
+    } catch (error) {
+        alert(`Error: Couldn't fetch exercises: ${error}`)
     }
+};
 
 
 
@@ -167,7 +189,7 @@ export const getAllUsers = (callback): Unsubscribe => {
     return unsubscribeFromUsers;
 }
 
-export const getExercises = (userID: string, date: string, callback: Function): Unsubscribe => {
+/* export const getExercises = (userID: string, date: string, callback: Function): Unsubscribe => {
     const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
     const workoutsQuery = query(workoutCollectionRef, where("userID", "==", userID), where("date", "==", date));
     
@@ -188,13 +210,50 @@ export const getExercises = (userID: string, date: string, callback: Function): 
         callback(exercises);
     })
     return unsubscribeFromWorkouts;
-};
+}; */
 
+export const getWorkout = (userID: string, date: string, callback: Function): Unsubscribe => {
+    try {
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID), where("date", "==", date));
+        
+        const unsubscribe = onSnapshot(workoutsQuery, workoutsSnapshot => {
+            if (!workoutsSnapshot.empty) {
+                const allExercises: ExerciseSet[] = [];
+                workoutsSnapshot.docs.forEach(workout => {
+                    if (workout.data().Workout.length > 0) {
+                        let currentExercise: ExerciseSet = {
+                            exercise : [],
+                            weights: [],
+                            reps: [],
+                            times: [],
+                            restTimes: [],
+                            sides: []
+                        };
+                        for (const exercise of workout.data().Workout) {
+                            currentExercise.exercise = exercise.exercise;
+                            currentExercise.reps = exercise.reps;
+                            currentExercise.restTimes = exercise.restTimes;
+                            currentExercise.sides = exercise.sides;
+                            currentExercise.times = exercise.times;
+                            currentExercise.weights = exercise.weights;   
+                        }
+                        allExercises.push(currentExercise);
+                    }
+                })
+                callback(allExercises);
+            }
+        })
+        return unsubscribe;
+    } catch (error) {
+        alert(`Error: couldn't fetch workout for ${date}`);
+    }
+}
 
   
 
 // setters
-export const signUp =async (name:string, setLoading:Function, auth:Auth, email:string, password:string): Promise<void> => {
+export const signUp = async (name:string, setLoading:Function, auth:Auth, email:string, password:string): Promise<void> => {
     setLoading(true);
     try {
         if (name === "")
@@ -287,7 +346,7 @@ export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToA
         const workoutsQuery = query(workoutsCollection, where("date", "==", date), where("userID", "==", userID) );
 
         const workoutsSnapshot = await getDocs(workoutsQuery);
-        if(workoutsSnapshot.empty){
+        if(!workoutsSnapshot.empty){
             const data = {
                 exercise : set.exercise,
                 weights: set.weights,
@@ -298,10 +357,12 @@ export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToA
             };
             validateExerciseSet(data);
 
+            const newWorkout = [...workoutsSnapshot.docs[0].data().Workout, data]
+
             await addDoc(workoutsCollection, {
                 date: date,
                 userID: userID,
-                Workout: data
+                Workout: newWorkout
             });
         
         } else {
@@ -313,16 +374,15 @@ export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToA
                 restTimes: set.restTimes,
                 sides: set.sides
             };
+            const workout = [];
+            workout.push(data);
             validateExerciseSet(data);
-
-            for (const docSnapshot of workoutsSnapshot.docs) {
-                const updatedData = [...docSnapshot.data().Workout ];
-                updatedData.push(data)
-                await updateDoc(doc(FIRESTORE_DB, 'Workouts', docSnapshot.id), {
-                    Workout: updatedData
-                });     
-            }
-        } 
+            await addDoc(workoutsCollection, {
+                date: date,
+                userID: userID,
+                Workout: workout
+            });
+        }         
         addExperience(userID, xpToAdd);
     } 
     catch (error) {
@@ -336,7 +396,7 @@ export const addExperience = async (userID: string, experience: number): Promise
         const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
         const firstUsersSnapshot = await getDocs(usersQuery);
         const firstUserDoc = firstUsersSnapshot.docs[0];
-
+        
         validateExperience(experience);
 
         const firstUpdatedData = {
@@ -461,6 +521,7 @@ export const editSet = async (userID:string, exerciseName: string, exerciseID: n
                 }
             }  
         }
+        
         addExperience(userID, xpToChange);
 
     } catch (error) {

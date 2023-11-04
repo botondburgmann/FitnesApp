@@ -1,13 +1,10 @@
 import { View, TextInput, StyleSheet, Pressable, Text } from 'react-native'
 import React, { useContext, useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
 import { setUpProfile } from '../functions/databaseQueries';
 import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
-
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-}
+import { SelectItem } from '../types and interfaces/types';
+import { RouterProps } from '../types and interfaces/interfaces';
 
 
 const Height = ({navigation}: RouterProps) => {
@@ -15,7 +12,7 @@ const Height = ({navigation}: RouterProps) => {
 
   const [height, setHeight] = useState<string>();
   const [value, setValue] = useState<string>();
-  const [items] = useState<object[]>([
+  const [items] = useState<SelectItem[]>([
     {label: 'Metric (m)', value: 'm'},
     {label: 'Imperial (ft)', value: 'ft'}
   ]);

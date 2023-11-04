@@ -84,10 +84,9 @@ export const validateExerciseSet = (set: ExerciseSet) => {
 }
 
 
-export const validateExperience = (experience: number) => {
-    if (experience !== undefined)
-        throw new Error("experience must be a set");
-
+export const validateExperience = (experience: number) => {    
+    if (experience === undefined)
+        throw new Error("experience must be a set");    
     if (typeof(experience) !== "number" || Number.isNaN(experience))
         throw new Error("experience must be a number");
     

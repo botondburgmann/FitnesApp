@@ -2,11 +2,9 @@ import { View, StyleSheet, TextInput, ActivityIndicator, Pressable, Text } from 
 import React, { useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { NavigationProp } from '@react-navigation/native';
+import { RouterProps } from '../types and interfaces/interfaces';
 
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-}
+
 
 const Login = ({navigation}: RouterProps) => {
   const [email, setEmail] = useState<string>();
@@ -14,15 +12,17 @@ const Login = ({navigation}: RouterProps) => {
   const [loading, setLoading] = useState(false);
   const auth = FIREBASE_AUTH;
 
-  const signIn =async () => {
+  async function signIn() {
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email,password);
-    } catch (error: any) {
-      alert('Sign In failed: ' + error.message);
-    } finally{
-      setLoading(false);
+      await signInWithEmailAndPassword(auth, email, password);
+    } 
+    catch (error:any) {
+      alert(`Error: Sign in failed: ${error.message}`);
     }
+    finally {
+      setLoading(false);
+    } 
   }
 
 

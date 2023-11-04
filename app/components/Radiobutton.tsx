@@ -3,11 +3,11 @@ import {  View, StyleSheet } from "react-native";
 import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
 
 const Radiobutton = (props) => {
-    const selectedValue = props.selectedValue;
-    const setselectedValue = props.setselectedValue;
-    const options = props.options;
+    const selectedValue: string = props.selectedValue;
+    const setselectedValue: Function = props.setselectedValue;
+    const options: string = props.options;
 
-    const radioButtonItems = [];
+    const radioButtonItems: RadioButtonItem = [];
     for (let i = 0; i < options.length; i++)
         radioButtonItems.push(<RadioButtonItem  key={i} value={options[i]} label={options[i]} />);
 

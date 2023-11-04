@@ -3,25 +3,24 @@ import React, { useContext, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import { editSet } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
+import { addXP, removeXP } from '../functions/otherFunctions';
+
 
 interface RouterProps {
-    route: any,
-    navigation: NavigationProp<any, any>;
-}
-
-
+  route: any,
+  navigation: NavigationProp<any, any>;
+};
 
 const EditSet = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
 
-    const { exercise, exerciseID, setID, isIsometric} = route?.params; 
-    const exerciseName = exercise.exercise[setID];   
-    const [weight, setWeight] = useState<string>(exercise.weights[setID].toString());
-    const [time, setTime] = useState<string>(exercise.times[setID].toString());
-    const [reps, setReps] = isIsometric ? useState<string>("") : useState<string>(exercise.reps[setID].toString());
-    const [restTime, setRestTime] = useState<string>(exercise.restTimes[setID].toString());
-    const [isEnabled, setIsEnabled] = exercise.sides[setID] === "left" ? useState(false) : useState(true);
-    const [side, setSide] = useState<string>(exercise.sides[setID]);
+    const { set, exerciseID, setID, isIsometric} = route?.params; 
+    const [weight, setWeight] = useState<string>(set.weight.toString());
+    const [time, setTime] = useState<string>(set.time.toString());
+    const [reps, setReps] = isIsometric ? useState<string>("") : useState<string>(set.reps.toString());
+    const [restTime, setRestTime] = useState<string>(set.restTime.toString());
+    const [isEnabled, setIsEnabled] = set.side === "left" ? useState(false) : useState(true);
+    const [side, setSide] = useState<string>(set.side);
 
     const changeNormal = {
         sides : side,
@@ -45,52 +44,21 @@ const EditSet = ({ route, navigation }: RouterProps) => {
         setIsEnabled(previousState => !previousState);
     }
 
-    function addXP(): number {
-        let currentExperience = 0;
-        if (!isIsometric) {
-            if (changeNormal.weights === 0 && Number.isNaN(changeNormal.weights))
-                currentExperience += changeNormal.reps;
-            else
-                currentExperience += changeNormal.reps * changeNormal.weights;
-        }
-        else {
-            if (changeNormal.weights === 0 && Number.isNaN(changeNormal.weights))
-                currentExperience += changeNormal.times;
-            else
-                currentExperience += changeNormal.times * changeNormal.weights;
-        }        
-        return currentExperience;
-    }
-    function removeXP(): number {
-        let currentExperience = 0;
-        if (!isIsometric) {
-            if (exercise.weights[setID] === 0 && Number.isNaN(exercise.weights[setID]))
-                currentExperience -= exercise.reps[setID];
-            else
-                currentExperience -= exercise.reps[setID] * exercise.weights[setID];
-        }
-        else {
-            if (changeNormal.weights === 0 && Number.isNaN(changeNormal.weights))
-                currentExperience -= exercise.times[setID];
-            else 
-                currentExperience -= exercise.times[setID] * exercise.weights[setID];
-        }
-        return currentExperience
-    }
 
-    function handleModifyButton(): void {
+
+    function handleModifyButton(isIsometric, changeIsometric, changeNormal, set): void {
         if (isIsometric) {
             if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) 
                 alert("Time field cannot be empty");
             else{
-                editSet(userID,exercise.exerciseName[setID],exerciseID,setID,changeIsometric, (addXP()+removeXP()))
+                editSet(userID,set.exercise,exerciseID,setID,changeIsometric, (addXP(isIsometric, changeIsometric)+removeXP(set.time, set.weight)))
                 navigation.navigate("Log")
             }
         } else {
             if (changeNormal.reps === 0 || Number.isNaN(changeNormal.reps))
                 alert("Reps field cannot be empty"); 
             else{
-                editSet(userID,exercise.exerciseName[setID], exerciseID, setID,changeNormal, (addXP()-removeXP()))
+                editSet(userID,set.exercise, exerciseID, setID,changeNormal, (addXP(isIsometric, changeNormal)+removeXP(set.reps, set.weight)))
                 navigation.navigate("Log")
             }
         }
@@ -98,7 +66,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Edit {exerciseName}</Text>
+            <Text style={styles.label}>Edit {set.exercise}</Text>
             { side !== "both"
                 ?<View style={styles.gridContainer}>
                     <Text style={styles.text}>{side} side</Text>
@@ -153,7 +121,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                 autoCapitalize='none'
                 onChangeText={(text) => setRestTime(text)}
             />
-            <Pressable style={styles.button} onPress={() => handleModifyButton()}>
+            <Pressable style={styles.button} onPress={() => handleModifyButton(isIsometric, changeIsometric, changeNormal, set)}>
                 <Text style={styles.text}>Modify</Text>                   
             </Pressable>
         </View>

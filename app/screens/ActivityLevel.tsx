@@ -1,14 +1,11 @@
 import { View, StyleSheet, Pressable, Text } from 'react-native'
 import React, { useContext, useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
 import { setUpProfile } from '../functions/databaseQueries';
 import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
 import { SelectItem } from '../types and interfaces/types';
+import { RouterProps } from '../types and interfaces/interfaces';
 
-interface RouterProps {
-    navigation: NavigationProp<any, any>;
-}
 
 
 

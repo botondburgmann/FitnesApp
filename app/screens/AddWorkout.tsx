@@ -1,30 +1,22 @@
 import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../components/SelectMenu'
-import { addSet, getExercises, getUsersExercises } from '../functions/databaseQueries'
+import { addSet, getAvailableExercises } from '../functions/databaseQueries'
 import UserContext from '../contexts/UserContext'
-import useFetch from '../hooks/useFetch'
+import {ExerciseSelectOption, ExerciseSet } from '../types and interfaces/types'
+import { addXP } from '../functions/otherFunctions'
 import { NavigationProp } from '@react-navigation/native'
-import { Exercise, ExerciseSelectOption, ExerciseSet } from '../types and interfaces/types'
-import { onSnapshot, query, collection, where } from 'firebase/firestore'
-import { FIRESTORE_DB } from '../../FirebaseConfig'
-
-
-
 
 interface RouterProps {
   route: any,
   navigation: NavigationProp<any, any>;
 };
 
-type DateParams = {
-    date: string; 
-  };
-
 const AddWorkout = ({ route, navigation }: RouterProps) => {
   const userID = useContext(UserContext);
 
-  const { date } = route.params as DateParams;
+
+  const { date } = route?.params;
 
   const [allExercises, setAllExercises] = useState<ExerciseSelectOption[]>();
   const [currentExercise, setCurrentExercise] = useState<ExerciseSelectOption>({
@@ -38,33 +30,38 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
   const [reps, setReps] = useState("");
   const [time, setTime] = useState("");
   const [restTime, setRestTime] = useState("");
-  const [sets, setSets] = useState<ExerciseSet[]>([])
-  const [isEnabled, setIsEnabled] =  useState(false)
+  const [sets, setSets] = useState<ExerciseSet>({
+    exercise : [],
+    weights: [],
+    reps: [],
+    times: [],
+    restTimes: [],
+    sides: []
+  });
+  const [isEnabled, setIsEnabled] =  useState(false);
   const [side, setSide] = useState("both")
 
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {   
-    const unssubscribeFromExercises = getUsersExercises(userID, (exercises) => {
+  useEffect(() => {
+    const unssubscribeFromExercises = getAvailableExercises(userID, (exercises) => {
       const exerciseData = [];
-      exercises.forEach(exercise => {
-        if (!exercise.hidden) {          
+        exercises.forEach((exercise) => {
           exerciseData.push({
             label: exercise.name,
             value: exercise.name,
             unilateral: exercise.unilateral,
-            isometric: exercise.isometric
+            isometric: exercise.isometric,
           });
-        }
-      });
-      setAllExercises(exerciseData);});
+        });
 
-  
+        setAllExercises(exerciseData);
+    });
   
     return () => {
       unssubscribeFromExercises();
-    }
-  })
+    };
+  }, []);
+  
   
 
 
@@ -84,65 +81,59 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
     setIsEnabled(previousState => !previousState);
   }
 
- /*  function addXP(): number {
-    console.log(sets);
-    let currentExperience = 0;
-    for (let i = 0; i < selectedExercises.length; i++) {
-      if (Number.isNaN(sets[i].weights)) {
-        if (selectedExercises[i].isometric)
-          currentExperience += sets[i].times;
-        else
-          currentExperience += sets[i].reps;
-      } else {
-          if (selectedExercises[i].isometric)
-            currentExperience += sets[i].times * sets[i].weights;
-          else
-            currentExperience += sets[i].reps * sets[i].weights;      
-      } 
-    }
-
-    return currentExperience
-  } */
-  
-
-/*   function handleAddButton(): void {
-    if (currentExercise.isometric) {
-      if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) 
-        alert("Time field cannot be empty");
-      else{
-        setSets((prev) => [...prev,changeIsometric])
-        setSelectedExercises((prev) => [...prev,currentExercise])
-        setTime("");
-        setWeight("");
-        setRestTime("");  
-      }
-    } else {
-      if (changeNormal.reps === 0 || Number.isNaN(changeNormal.reps))
-        alert("Reps field cannot be empty"); 
-      else{
-        setSets((prev) => [...prev,changeNormal]);
-        setSelectedExercises((prev) => [...prev,currentExercise]);
-        setTime("");
-        setWeight("");
-        setRestTime("");  
-        setReps("");        
-      }
-    }
-  }
- */
-  function handleFinishButton(): void {
-    if (sets.length === 0)
-      alert("Not enough data");
+  function handleFinishButton(selectedExercises, sets): void {
+    if (sets.exercise.length === 0)
+      throw new Error("Not enough data");
     else{
-     // addSet(userID,date, selectedExercises ,sets, addXP())
-      setSets([]);
-      setIsEnabled(false);
-      setSide("both");
+      for (const exercise of selectedExercises) {
+        if (exercise.isometric)
+          addSet(userID,date, sets , addXP(true, sets))
+        else
+          addSet(userID,date, sets , addXP(false, sets))
+      }
+      setSets({
+        exercise : [],
+        weights: [],
+        reps: [],
+        times: [],
+        restTimes: [],
+        sides: []
+      });
+      setSelectedExercises([]);
       navigation.navigate("Log")
     }
   }
 
   
+  function handleAddButton(time, reps, restTime, side, weight): void {
+    if (currentExercise.isometric && (time === 0 || Number.isNaN(time)))
+      throw new Error("time field cannot be empty for isometric exercises");
+    if (!currentExercise.isometric && (reps === 0 || Number.isNaN(reps)))
+      throw new Error("reps field cannot be empty for non-isometric exercises");
+    else {
+      sets.exercise.push(currentExercise.value);
+      Number.isNaN(reps) ? sets.reps.push(0) : sets.reps.push(reps) ;
+      Number.isNaN(restTime) ? sets.restTimes.push(0) : sets.restTimes.push(restTime) ;
+      sets.sides.push(side);
+      Number.isNaN(time) ? sets.times.push(0) : sets.times.push(time) ;
+      Number.isNaN(weight) ? sets.weights.push(0) : sets.weights.push(weight) ;
+      selectedExercises.push(currentExercise);
+      setReps("");
+      setRestTime("");
+      setTime("");
+      setWeight("");
+      setCurrentExercise({
+        label: "",
+        value: "",
+        unilateral: undefined,
+        isometric: undefined
+      });
+      setIsEnabled(false);
+      setSide("both");
+
+    }
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.label}>Add new execise</Text>
@@ -208,14 +199,14 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
             onChangeText={(text) => setRestTime(text)}
           />
           <View style={styles.gridContainer}>
-{/*             <Pressable style={styles.button} onPress={() => handleAddButton()}>
+            <Pressable style={styles.button} onPress={() => handleAddButton(parseInt(time),parseFloat(reps),parseInt(restTime),side,parseFloat(weight))}>
                 <Text style={styles.text}>Add set</Text>
-            </Pressable> */}
-            <Pressable style={styles.button} onPress={() => handleFinishButton()}>
+            </Pressable> 
+            <Pressable style={styles.button} onPress={() => handleFinishButton(selectedExercises, sets)}>
                 <Text style={styles.text}>Finish</Text>
             </Pressable>
           </View>
-          <Text style={styles.text}>Total sets: {selectedExercises.length}</Text>
+            <Text style={styles.text}>Total sets: {sets.exercise.length}</Text>
         </View>
       }
     </ScrollView>

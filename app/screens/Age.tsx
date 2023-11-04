@@ -1,13 +1,9 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React, { useContext, useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
 import { setUpProfile } from '../functions/databaseQueries';
 import Datepicker from '../components/Datepicker';
 import UserContext from '../contexts/UserContext';
-
-interface RouterProps {
-    navigation: NavigationProp<any, any>;
-}
+import { RouterProps } from '../types and interfaces/interfaces';
 
 
 

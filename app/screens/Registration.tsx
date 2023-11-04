@@ -1,13 +1,10 @@
 import { View, StyleSheet, TextInput, ActivityIndicator, Pressable, Text } from 'react-native'
 import React, { useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
-import { NavigationProp } from '@react-navigation/native';
 import { signUp } from '../functions/databaseQueries';
+import { RouterProps } from '../types and interfaces/interfaces';
 
 
-interface RouterProps {
-    navigation: NavigationProp<any, any>;
-}
 
 const Registration = ({navigation}: RouterProps) => {
     const [name, setName] = useState<string>();

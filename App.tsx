@@ -11,7 +11,7 @@ import Weight from './app/screens/Weight';
 import Gender from './app/screens/Gender';
 import Height from './app/screens/Height';
 import ActivityLevel from './app/screens/ActivityLevel';
-import Workouts from './app/screens/Workouts';
+import Log from './app/screens/Log';
 import AddWorkout from './app/screens/AddWorkout';
 import Account from './app/screens/Account';
 import Routines from './app/screens/Routines';
@@ -49,7 +49,7 @@ function SetUpLayout() {
 function InsideLayout() {
   return( 
       <Tab.Navigator screenOptions={{ tabBarStyle: {backgroundColor: '#ff0000'}, tabBarInactiveTintColor: '#fff'}}>
-        <Tab.Screen name='Workouts' component={WorkoutLayout}  options={{ headerShown: false }} />
+        <Tab.Screen name='Workouts' component={WorkoutsLayout}  options={{ headerShown: false }} />
         <Tab.Screen name='Toplist' component={Toplist}  options={{ headerShown: false }} />
         <Tab.Screen name='Exercises' component={ExercisesLayout} options={{ headerShown: false }} />
         <Tab.Screen name='Profile' component={ProfileLayout} options={{ headerShown: false }} />
@@ -67,10 +67,10 @@ function ProfileLayout() {
   )
 }
 
-function WorkoutLayout() {
+function WorkoutsLayout() {
   return( 
     <SetupStack.Navigator>
-      <SetupStack.Screen name="Log" component={Workouts} options={{ headerShown: false }}/>
+      <SetupStack.Screen name="Log" component={Log} options={{ headerShown: false }}/>
       <SetupStack.Screen name="Add" component={AddWorkout}  />
       <SetupStack.Screen name="Edit set" component={EditSet}  />
       <SetupStack.Screen name="Routine" component={Routines } />
@@ -96,10 +96,8 @@ export default function App() {
   
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, async (user)=>{
-      
       setUser(user);
       if(user){
-        
         const setUpValue = getSetUpValue(user.uid);
         setAlreadySetUp(await setUpValue)
       }

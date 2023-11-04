@@ -1,13 +1,10 @@
 import React, { useContext, useState } from "react";
 import {  View, Pressable, Text, StyleSheet } from "react-native";
-import { NavigationProp } from '@react-navigation/native';
 import { setUpProfile } from "../functions/databaseQueries";
 import Radiobutton from "../components/Radiobutton";
 import UserContext from "../contexts/UserContext";
+import { RouterProps } from "../types and interfaces/interfaces";
 
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-}
 
 const Gender = ( {navigation}: RouterProps) => {
   const userID = useContext(UserContext);

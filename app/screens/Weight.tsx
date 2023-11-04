@@ -1,13 +1,10 @@
 import { View, TextInput, StyleSheet, Pressable, Text } from 'react-native'
 import React, { useContext, useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
 import { setUpProfile } from '../functions/databaseQueries';
 import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
-
-interface RouterProps {
-    navigation: NavigationProp<any, any>;
-}
+import { RouterProps } from '../types and interfaces/interfaces';
+import { SelectItem } from '../types and interfaces/types';
 
 
 
@@ -16,7 +13,7 @@ const Weight = ({navigation}: RouterProps) => {
 
   const [weight, setWeight] = useState<string>();
   const [value, setValue] = useState<string>();
-  const [items] = useState<object[]>([
+  const [items] = useState<SelectItem[]>([
     {label: 'Metric (kg)', value: 'kg'},
     {label: 'Imperial (lbs)', value: 'lbs'}
   ]);
