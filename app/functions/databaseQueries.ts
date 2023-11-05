@@ -133,23 +133,39 @@ export const getExercise = async (userID: string, exerciseName: string): Promise
     })
 };
 
-export const getExercisesByFocus = async (userID: string, musclesWorked: string[]): Promise<Exercise[]> => {
-    return new Promise ((resolve, reject) => {
-        const exercises = [];
+export const getExercisesByFocus = (userID: string, musclesWorked: string[], callback: Function): Unsubscribe => {
+    try {
+        const exercises: Exercise[] = [];
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
         const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        onSnapshot(usersQuery, usersSnapshot => {
-            const userDoc = usersSnapshot.docs[0];
-            const exercisesCollectionRef = collection(userDoc.ref, "exercises");
-            const exercisesQuery = query(exercisesCollectionRef, where("hidden", "==", false), where("musclesWorked", "array-contains-any", musclesWorked));
-            onSnapshot(exercisesQuery, exercisesSnapshot => {
-                exercisesSnapshot.docs.forEach(exercisesDoc => {
-                    exercises.push(exercisesDoc.data());
+        
+        const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
+            if (!usersSnapshot.empty) {
+                const userDocRef = usersSnapshot.docs[0].ref;
+                const exercisesCollectionRef = collection(userDocRef, "exercises");
+                const exercisesQuery = query(exercisesCollectionRef, where("hidden", "==", false), where("musclesWorked", "array-contains-any", musclesWorked));
+                const unsubscribeFromExercises = onSnapshot(exercisesQuery, exercisesSnapshot => {
+                    exercisesSnapshot.docs.forEach(exerciseDoc => {
+                        exercises.push({
+                            hidden: exerciseDoc.data().hidden,
+                            isometric: exerciseDoc.data().isometric,
+                            name: exerciseDoc.data().name,
+                            musclesWorked: exerciseDoc.data().musclesWorked,
+                            unilateral: exerciseDoc.data().unilateral
+                        })
+                    }) 
+                    callback(exercises);                   
                 })
-                resolve(exercises);
-            }, error => reject(error));
+                unsubscribeFromExercises;
+            }
+            else 
+                throw new Error("user doesn't exist");
         })
-    })
+        return unsubscribeFromUsers;
+        
+    } catch (error) {
+        alert(`Error: couldn't fetch exercises for ${[...musclesWorked]}: ${error.message}`);
+    }
 };
 
 export const getUser = (userID:string, callback: Function): Unsubscribe => {

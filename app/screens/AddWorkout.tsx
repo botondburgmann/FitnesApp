@@ -4,7 +4,7 @@ import SelectMenu from '../components/SelectMenu'
 import { addSet, getAvailableExercises } from '../functions/databaseQueries'
 import UserContext from '../contexts/UserContext'
 import {ExerciseSelectOption, ExerciseSet } from '../types and interfaces/types'
-import { addXP } from '../functions/otherFunctions'
+import { addXP, handleAddButton } from '../functions/otherFunctions'
 import { NavigationProp } from '@react-navigation/native'
 
 interface RouterProps {
@@ -105,34 +105,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
   }
 
   
-  function handleAddButton(time, reps, restTime, side, weight): void {
-    if (currentExercise.isometric && (time === 0 || Number.isNaN(time)))
-      throw new Error("time field cannot be empty for isometric exercises");
-    if (!currentExercise.isometric && (reps === 0 || Number.isNaN(reps)))
-      throw new Error("reps field cannot be empty for non-isometric exercises");
-    else {
-      sets.exercise.push(currentExercise.value);
-      Number.isNaN(reps) ? sets.reps.push(0) : sets.reps.push(reps) ;
-      Number.isNaN(restTime) ? sets.restTimes.push(0) : sets.restTimes.push(restTime) ;
-      sets.sides.push(side);
-      Number.isNaN(time) ? sets.times.push(0) : sets.times.push(time) ;
-      Number.isNaN(weight) ? sets.weights.push(0) : sets.weights.push(weight) ;
-      selectedExercises.push(currentExercise);
-      setReps("");
-      setRestTime("");
-      setTime("");
-      setWeight("");
-      setCurrentExercise({
-        label: "",
-        value: "",
-        unilateral: undefined,
-        isometric: undefined
-      });
-      setIsEnabled(false);
-      setSide("both");
 
-    }
-  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -199,7 +172,9 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
             onChangeText={(text) => setRestTime(text)}
           />
           <View style={styles.gridContainer}>
-            <Pressable style={styles.button} onPress={() => handleAddButton(parseInt(time),parseFloat(reps),parseInt(restTime),side,parseFloat(weight))}>
+            <Pressable style={styles.button} onPress={() => handleAddButton(parseInt(time), setTime, parseFloat(reps), setReps, 
+                                                                            parseInt(restTime), setRestTime, side, setSide,parseFloat(weight), setWeight, 
+                                                                            currentExercise, setCurrentExercise, sets, setIsEnabled, selectedExercises)}>
                 <Text style={styles.text}>Add set</Text>
             </Pressable> 
             <Pressable style={styles.button} onPress={() => handleFinishButton(selectedExercises, sets)}>

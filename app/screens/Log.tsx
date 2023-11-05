@@ -30,7 +30,7 @@ const Log = ({navigation}: RouterProps) => {
           <Text style={styles.text}>Add new Exercise</Text>
         </Pressable>
         
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Routine')}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('Routines')}>
           <Text style={styles.text}>Ask for routine</Text>
         </Pressable>
       </View>     

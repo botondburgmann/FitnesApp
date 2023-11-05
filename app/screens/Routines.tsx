@@ -1,20 +1,12 @@
-import {ScrollView, StyleSheet, Text, Image } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
+import {ScrollView, StyleSheet} from 'react-native'
+import React from 'react'
 import Routine from '../components/Routine';
-import UserContext from '../contexts/UserContext';
-import useFetch from '../hooks/useFetch';
-import { getUser } from '../functions/databaseQueries';
+import NavigationContext from '../contexts/NavigationContext';
+import { RouterProps } from '../types and interfaces/interfaces';
 
-
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-}
 
 
 const Routines = ({navigation}: RouterProps) => {
-  const userID = useContext(UserContext)
-  let user = getUser(userID);  
   
 
     const workoutTypes = ['Full body', 'Push', 'Pull', 'Leg', 'Back', 
@@ -25,13 +17,15 @@ const Routines = ({navigation}: RouterProps) => {
     const routineComponents = [];
     for (let i = 0; i < workoutTypes.length; i++) {
       routineComponents.push(
-        <Routine key={i} workoutType={workoutTypes[i]} navigation={navigation}  />
+        <Routine key={i} workoutType={workoutTypes[i]}/>
       );
     }
         
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {user && routineComponents}
+      <NavigationContext.Provider value={navigation}>
+        {routineComponents}
+      </NavigationContext.Provider>
      </ScrollView>
   )
 }

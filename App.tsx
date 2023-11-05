@@ -21,7 +21,6 @@ import Exercises from './app/screens/Exercises';
 import Focus from './app/screens/Focus';
 import UserContext from './app/contexts/UserContext';
 import CurrentExercise from './app/screens/CurrentExercise';
-import Rest from './app/screens/Rest';
 import CreateExercise from './app/screens/CreateExercise';
 import EditSet from './app/screens/EditSet';
 import EditProfile from './app/screens/EditProfile';
@@ -73,10 +72,9 @@ function WorkoutsLayout() {
       <SetupStack.Screen name="Log" component={Log} options={{ headerShown: false }}/>
       <SetupStack.Screen name="Add" component={AddWorkout}  />
       <SetupStack.Screen name="Edit set" component={EditSet}  />
-      <SetupStack.Screen name="Routine" component={Routines } />
+      <SetupStack.Screen name="Routines" component={Routines } />
       <SetupStack.Screen name="Focus" component={Focus }/>
       <SetupStack.Screen name="CurrentExercise" component={CurrentExercise }/>
-      <SetupStack.Screen name="Rest" component={Rest }/>
     </SetupStack.Navigator>
   )
 }

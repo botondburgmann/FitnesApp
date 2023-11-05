@@ -1,5 +1,6 @@
 import { Alert } from "react-native";
 import { deleteSet } from "./databaseQueries";
+import { ExerciseSelectOption, ExerciseSet } from "../types and interfaces/types";
 
 export const addXP = (isIsometric: boolean, set): number => {
     let currentExperience = 0;
@@ -79,3 +80,35 @@ export const isDecreasing = (array: number[]): boolean => {
             return false;
     return true;
 };
+export const handleAddButton = (time: number, setTime: Function, reps: number, setReps: Function,
+                                 restTime: number, setRestTime: Function, side: string, setSide: Function, 
+                                 weight: number, setWeight: Function, currentExercise: ExerciseSelectOption,
+                                setCurrentExercise: Function, sets: ExerciseSet, setIsEnabled: Function,
+                                selectedExercises:ExerciseSelectOption[]): void => {
+    if (currentExercise.isometric && (time === 0 || Number.isNaN(time)))
+      throw new Error("time field cannot be empty for isometric exercises");
+    if (!currentExercise.isometric && (reps === 0 || Number.isNaN(reps)))
+      throw new Error("reps field cannot be empty for non-isometric exercises");
+    else {
+      sets.exercise.push(currentExercise.value);
+      Number.isNaN(reps) ? sets.reps.push(0) : sets.reps.push(reps) ;
+      Number.isNaN(restTime) ? sets.restTimes.push(0) : sets.restTimes.push(restTime) ;
+      sets.sides.push(side);
+      Number.isNaN(time) ? sets.times.push(0) : sets.times.push(time) ;
+      Number.isNaN(weight) ? sets.weights.push(0) : sets.weights.push(weight) ;
+      selectedExercises.push(currentExercise);
+      setReps("");
+      setRestTime("");
+      setTime("");
+      setWeight("");
+      setCurrentExercise({
+        label: "",
+        value: "",
+        unilateral: undefined,
+        isometric: undefined
+      });
+      setIsEnabled(false);
+      setSide("both");
+
+    }
+  }

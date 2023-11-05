@@ -1,5 +1,5 @@
-import { Button, Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useContext, useState } from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+import React, { useState } from 'react'
 import Radiobutton from '../components/Radiobutton';
 import { NavigationProp } from '@react-navigation/native';
 
