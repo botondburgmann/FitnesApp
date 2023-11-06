@@ -1,12 +1,9 @@
 import {  ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../contexts/UserContext';
-import { getUsersExercises, toggleExerciseVisibilty } from '../functions/databaseQueries';
+import { getAllExercises, toggleExerciseVisibilty } from '../functions/databaseQueries';
 import { NavigationProp } from '@react-navigation/native';
 import { Exercise } from '../types and interfaces/types';
-import { onSnapshot, query, collection, where } from 'firebase/firestore';
-import { FIRESTORE_DB } from '../../FirebaseConfig';
-
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -20,9 +17,10 @@ const Exercises = ({navigation}: RouterProps) => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const unsubscribeFromUser = getUsersExercises(userID, (exercises) => {
-
-      setExercises(exercises);});
+    const unsubscribeFromUser = getAllExercises(userID, (exercises) => {
+      setExercises(exercises);
+      setLoading(false);
+    });
 
   
   
@@ -37,7 +35,7 @@ const Exercises = ({navigation}: RouterProps) => {
   exercises.forEach((exercise, index) => {
     exerciseComponentsList.push(
       <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, flexWrap: 'wrap',}}>
-        <Pressable style={{   width: '50%' }}>
+        <Pressable style={{   width: '50%' }} onPress={()=>navigation.navigate('Details', {exercise: exercise.name})}>
           <Text style={{
                     textAlign: 'left',
                     fontSize: 16,

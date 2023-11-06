@@ -65,6 +65,38 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
   
 
 
+export const getAllExercises = (userID: string, callback: Function): Unsubscribe => {
+    try {
+        const exercises: Exercise[] = [];
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        
+        const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
+            if (!usersSnapshot.empty) {
+                const userDocRef = usersSnapshot.docs[0].ref;
+                const exercisesCollectionRef = collection(userDocRef, "exercises");
+                const unsubscribeFromExercises = onSnapshot(exercisesCollectionRef, exercisesSnapshot => {
+                    exercisesSnapshot.docs.forEach(exerciseDoc => {
+                        exercises.push({
+                            hidden: exerciseDoc.data().hidden,
+                            isometric: exerciseDoc.data().isometric,
+                            name: exerciseDoc.data().name,
+                            musclesWorked: exerciseDoc.data().musclesWorked,
+                            unilateral: exerciseDoc.data().unilateral
+                        })
+                    }) 
+                    callback(exercises);                   
+                })
+                unsubscribeFromExercises;
+            }
+            else 
+                throw new Error("user doesn't exist");
+        })
+        return unsubscribeFromUsers;
+    } catch (error) {
+        alert(`Error: Couldn't fetch exercises: ${error}`)
+    }
+};
 export const getAvailableExercises = (userID: string, callback: Function): Unsubscribe => {
     try {
         const exercises: Exercise[] = [];
@@ -101,19 +133,18 @@ export const getAvailableExercises = (userID: string, callback: Function): Unsub
 
 
 
-export const getExercise = async (userID: string, exerciseName: string): Promise<ExerciseRecords> => {
-    return new Promise ((resolve, reject) => {
-        const exerciseRecords = {
-            weights: [],
-            reps: [],
-            times: [],
-            restTimes: [],
-            dates: [],
-        }
-        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
-        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+export const getExercise = (userID: string, exerciseName: string, callback): Unsubscribe => {
+    const exerciseRecords: ExerciseRecords = {
+        weights: [],
+        reps: [],
+        times: [],
+        dates: [],
+    }
+    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
+    const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
 
-        onSnapshot(workoutsQuery, workoutSnapshot => {
+    const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutSnapshot => {
+        if (!workoutSnapshot.empty) {
             workoutSnapshot.docs.forEach(workoutDoc => {
                 for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
                     let set = workoutDoc.data().Workout[i];
@@ -122,15 +153,14 @@ export const getExercise = async (userID: string, exerciseName: string): Promise
                             exerciseRecords.weights.push(set.weights[i])
                             exerciseRecords.reps.push(set.reps[i])
                             exerciseRecords.times.push(set.times[i])
-                            exerciseRecords.restTimes.push(set.restTimes[i])
                             exerciseRecords.dates.push(workoutDoc.data().date)
                         }
                 }
             })
-            resolve(exerciseRecords);
-
-        }, error => reject(error));
+            callback(exerciseRecords);    
+        }
     })
+    return unsubscribeFromWorkouts;
 };
 
 export const getExercisesByFocus = (userID: string, musclesWorked: string[], callback: Function): Unsubscribe => {

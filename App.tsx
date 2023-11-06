@@ -24,6 +24,7 @@ import CurrentExercise from './app/screens/CurrentExercise';
 import CreateExercise from './app/screens/CreateExercise';
 import EditSet from './app/screens/EditSet';
 import EditProfile from './app/screens/EditProfile';
+import Details from './app/screens/Details';
 
 
 const Stack = createNativeStackNavigator();
@@ -83,6 +84,7 @@ function ExercisesLayout() {
     <SetupStack.Navigator>
       <SetupStack.Screen name="Exercise List" component={Exercises} options={{ headerShown: false }}/>
       <SetupStack.Screen name="Create Exercise" component={CreateExercise}  />
+      <SetupStack.Screen name="Details" component={Details}  />
     </SetupStack.Navigator>
   )
 }

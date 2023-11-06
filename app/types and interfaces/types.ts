@@ -48,8 +48,7 @@ export type ExerciseRecords = {
     weights: number[],
     reps: number[],
     times: number[],
-    restTimes: number[],
-    dates: number[],
+    dates: string[],
 }
 
 export type ExerciseSelectOption = {
@@ -57,4 +56,10 @@ export type ExerciseSelectOption = {
     value: string;
     unilateral: boolean,
     isometric: boolean
+}
+export type TableRow = (string | number)[]; // Define a type for a single row
+
+export type TableState = {
+  tableHead: string[];
+  tableData: TableRow[]; // Use the TableRow type for tableData
 }
