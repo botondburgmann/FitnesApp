@@ -1,7 +1,7 @@
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
-import {BestExercise, ExerciseRecords, TableState } from '../types and interfaces/types';
+import {BestExercise, ExerciseRecords, TableRow, TableState } from '../types and interfaces/types';
 import { getExercise } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import {Table, Row, Rows} from 'react-native-table-component'
@@ -17,12 +17,7 @@ const Details = ({ route, navigation }: RouterProps) => {
 
   const { exercise } = route?.params;
 
-  const [records, setRecords] = useState<ExerciseRecords>({
-    weights: [],
-    reps: [],
-    times: [],
-    dates: [],
-  })
+
 
   const [loading, setLoading] = useState(true);
   const [table, setTable] = useState<TableState>({
@@ -30,6 +25,17 @@ const Details = ({ route, navigation }: RouterProps) => {
     tableData: []
   });
 
+/*   let mostWeight ={
+    name: exercise,
+    weights: 0,
+    reps: 0
+  }
+  let mostReps = {
+    name: exercise,
+    weights: 0,
+    reps: 0
+  }
+ */
   const [mostWeight, setMostWeight] = useState<BestExercise>({
     name: exercise,
     weights: 0,
@@ -40,67 +46,98 @@ const Details = ({ route, navigation }: RouterProps) => {
     weights: 0,
     reps: 0
   })
-
-
+  const [records, setRecords] = useState<ExerciseRecords>({
+    weights: [],
+    reps: [],
+    times: [],
+    dates: [],
+})
   useEffect(() => {
-    const unsubscribe = getExercise(userID, exercise, response => {      
-      setRecords(response);
-      setLoading(false);
-  
-    })
+    const unsubscribe = getExercise(userID, exercise, (response) => {
+      setRecords(response)      
 
-    
-    return () => {
+      setLoading(false);
+    });
+
+    return () => {        
       unsubscribe()
-    }
+      setTable({
+        tableHead: ["Date", "Weight (kg)", "Repetitons", "Time (seconds)"],
+        tableData: []
+      });
+      
+    };
   }, [userID, exercise]);
   
 
   useEffect(() => {
-    if (!loading) {      
-      fillTable(records, table);
-      setMostWeight(findMaxWeight(records, exercise));
-      setMostReps(findMaxReps(records, exercise)); 
+    fillTable(records, setTable);
+    if (!loading) {
+          setMostWeight(findMaxWeight(records, exercise));
+          setMostReps(findMaxReps(records, exercise));
+          
     }
-
   
-   
+
   }, [records])
   
-
-
-  function sortRecords(records:ExerciseRecords): ExerciseRecords {
-    for (let i = 1; i <= records.dates.length; i++) {
-      let dateOne = new Date(records.dates[i-1]);
-      let dateTwo = new Date(records.dates[i]);
-      if (dateOne > dateTwo) {
-        for (const key in records) {
-          let temp = records[key][i];
-          records[key][i] = records[key][i-1];
-          records[key][i] = temp;
-        }
-      }      
+  
+  function sortRecords(records: ExerciseRecords): ExerciseRecords {
+    const datesWithIndexes = records.dates.map((date, index) => ({
+      date,
+      index,
+    }));
+  
+    datesWithIndexes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+    const sortedRecords: ExerciseRecords = {
+      dates: [],
+      weights: [],
+      reps: [],
+      times: [],
+    };
+  
+    for (const { date, index } of datesWithIndexes) {
+      sortedRecords.dates.push(date);
+      sortedRecords.weights.push(records.weights[index]);
+      sortedRecords.reps.push(records.reps[index]);
+      sortedRecords.times.push(records.times[index]);
     }
-    return records;
+  
+    return sortedRecords;
   }
+  
+  
+  
 
-  function fillTable(records:ExerciseRecords, table: TableState): void{
+  function fillTable(records: ExerciseRecords, setTable: (table: TableState) => void) {
     const sortedRecords = sortRecords(records);
-    for (let i = 0; i < sortedRecords.dates.length; i++) {
-      let row = [sortedRecords.dates[i], sortedRecords.weights[i], sortedRecords.reps[i], sortedRecords.times[i]];
-      
-      table.tableData.push(row);
-    }
+  
+    const newTableData: TableRow[] = sortedRecords.dates.map((date, i) => [
+      date,
+      sortedRecords.weights[i],
+      sortedRecords.reps[i],
+      sortedRecords.times[i],
+    ]);
+  
+    const newTableState: TableState = {
+      tableHead: ["Date", "Weight (kg)", "Repetitions", "Time (seconds)"],
+      tableData: newTableData,
+    };
+  
+    setTable(newTableState);
   }
+  
+  
+  
 
   function findMaxWeight(records:ExerciseRecords, exercise: string): BestExercise {
-    if (!loading) {
       let currentMax = {
         name: exercise,
         weights: 0,
         reps: 0
       }
-  
+      
       for (let i = 0; i < records.weights.length; i++) {
         if (records.weights[i]>currentMax.weights) {
           currentMax.weights = records.weights[i];
@@ -111,11 +148,11 @@ const Details = ({ route, navigation }: RouterProps) => {
             currentMax.weights = records.weights[i];
             currentMax.reps = records.reps[i];
           }
+          
         }
-      }
       
+      }
       return currentMax;
-    }
   }
   function findMaxReps(records:ExerciseRecords, exercise: string): BestExercise {
     let currentMax = {
@@ -137,6 +174,7 @@ const Details = ({ route, navigation }: RouterProps) => {
     }
     return currentMax;
   }
+
 
 
   return (
