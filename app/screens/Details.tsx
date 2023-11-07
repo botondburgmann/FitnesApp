@@ -1,9 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
-import {ExerciseRecords, TableState } from '../types and interfaces/types';
+import {BestExercise, ExerciseRecords, TableState } from '../types and interfaces/types';
 import { getExercise } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
+import {Table, Row, Rows} from 'react-native-table-component'
+
 
 interface RouterProps {
   route: any,
@@ -24,15 +26,28 @@ const Details = ({ route, navigation }: RouterProps) => {
 
   const [loading, setLoading] = useState(true);
   const [table, setTable] = useState<TableState>({
-    tableHead: ["Date", "Weight", "Repetitons", "Time"],
+    tableHead: ["Date", "Weight (kg)", "Repetitons", "Time (seconds)"],
     tableData: []
   });
 
+  let mostWeight ={
+    name: exercise,
+    weights: 0,
+    reps: 0
+  }
+  let mostReps = {
+    name: exercise,
+    weights: 0,
+    reps: 0
+  }
+
   useEffect(() => {
-    const unsubscribe = getExercise(userID, exercise, records => {
+    const unsubscribe = getExercise(userID, exercise, records => {      
       setRecords(records);
-      setLoading(false);      
+      setLoading(false);
+  
     })
+
     
     return () => {
       unsubscribe()
@@ -41,41 +56,97 @@ const Details = ({ route, navigation }: RouterProps) => {
   
 
   function sortRecords(records:ExerciseRecords): ExerciseRecords {
-    if (loading ===  false) {   
-      for (let i = 1; i <= records.dates.length; i++) {
-        let dateOne = new Date(records.dates[i-1]);
-        let dateTwo = new Date(records.dates[i]);
-        if (dateOne > dateTwo) {
-          for (const key in records) {
-            let temp = records[key][i];
-            records[key][i] = records[key][i-1];
-            records[key][i] = temp;
+    for (let i = 1; i <= records.dates.length; i++) {
+      let dateOne = new Date(records.dates[i-1]);
+      let dateTwo = new Date(records.dates[i]);
+      if (dateOne > dateTwo) {
+        for (const key in records) {
+          let temp = records[key][i];
+          records[key][i] = records[key][i-1];
+          records[key][i] = temp;
+        }
+      }      
+    }
+    return records;
+  }
+
+  function fillTable(records:ExerciseRecords, table: TableState): void{
+    const sortedRecords = sortRecords(records);
+    for (let i = 0; i < sortedRecords.dates.length; i++) {
+      let row = [sortedRecords.dates[i], sortedRecords.weights[i], sortedRecords.reps[i], sortedRecords.times[i]];
+      
+      table.tableData.push(row);
+    }
+  }
+
+  function findMaxWeight(records:ExerciseRecords, exercise: string): BestExercise {
+    if (!loading) {
+      let currentMax = {
+        name: exercise,
+        weights: 0,
+        reps: 0
+      }
+  
+      for (let i = 0; i < records.weights.length; i++) {
+        if (records.weights[i]>currentMax.weights) {
+          currentMax.weights = records.weights[i];
+          currentMax.reps = records.reps[i];
+        }
+        else if (records.weights[i] === currentMax.weights){
+          if (records.reps[i] > currentMax.reps) {
+            currentMax.weights = records.weights[i];
+            currentMax.reps = records.reps[i];
           }
-        }      
+        }
       }
-      return records;
+      
+      return currentMax;
     }
   }
-
-  function fillTable(records:ExerciseRecords, table: TableState): TableState{
-    if (loading === false) {
-      const sortedRecords = sortRecords(records);
-      for (let i = 0; i < sortedRecords.dates.length; i++) {
-        let row = [sortedRecords.dates[i], sortedRecords.weights[i], sortedRecords.reps[i], sortedRecords.times[i]];
-        console.log(row);
-        
-        table.tableData.push(row);
-      }
-      return table;
+  function findMaxReps(records:ExerciseRecords, exercise: string): BestExercise {
+    let currentMax = {
+      name: exercise,
+      weights: 0,
+      reps: 0
     }
-    
+    for (let i = 0; i < records.weights.length; i++) {
+      if (records.reps[i]>currentMax.reps) {
+        currentMax.weights = records.weights[i];
+        currentMax.reps = records.reps[i];
+      }
+      else if (records.reps[i] === currentMax.reps){
+        if (records.weights[i] > currentMax.weights) {
+          currentMax.weights = records.weights[i];
+          currentMax.reps = records.reps[i];
+        }
+      }
+    }
+    return currentMax;
   }
 
-  fillTable(records, table);
+  if (!loading){
+    mostWeight = findMaxWeight(records, exercise);
+    mostReps = findMaxReps(records, exercise)
+
+    fillTable(records, table);
+
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{exercise}</Text>
+      {loading 
+      ? <ActivityIndicator/> 
+      : <ScrollView>
+        <Text style={styles.text}>Maximum weight: {mostWeight.weights} kg for {mostWeight.reps} repetitons</Text>
+        <Text style={styles.text}>Most repetitions: {mostReps.reps} with {mostReps.weights} kg</Text>
+        <Table>
+          <Row data={table.tableHead} textStyle={styles.text}/>
+          <Rows data={table.tableData} textStyle={styles.text}/>
+        </Table>
+      </ScrollView> 
+      
+      }
     </View>
   )
 }
@@ -93,7 +164,7 @@ const styles = StyleSheet.create({
   },
   text:{
     textAlign: 'left',
-    fontSize: 16,
+    fontSize: 12,
     color: "#fff",
     textTransform: 'uppercase',
     fontWeight: "600",

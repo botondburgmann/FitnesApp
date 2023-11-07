@@ -16,10 +16,10 @@ const CurrentExercise = ({route}) => {
 
   const muscles ={
     'Full body': ['Calves', 'Quadriceps', 'Glutes', 'Hamstrings', 'Abs', 'Obliques', 'Chest', 'Lower back', 'Upper back', 'Traps', 'Lats', 'Front delts', 'Middle delts', 
-                  'Rear delts', 'Biceps', 'Triceps', 'Forearms'],
+                  'Rear delts', 'Biceps', 'Triceps', 'Forearms', 'Adductors'],
     'Push': ['Chest', 'Front delts', 'Triceps', 'Middle delts'],
     'Pull': ['Lower back', 'Upper back', 'Traps', 'Lats', 'Biceps', 'Forearms', 'Rear delts'],
-    'Leg': ['Calves', 'Quadriceps', 'Glutes', 'Hamstrings'],
+    'Leg': ['Calves', 'Quadriceps', 'Glutes', 'Hamstrings', 'Adductors'],
     'Back' : ['Lower back', 'Upper back', 'Traps', 'Lats', 'Rear delts'],
     'Chest' : ['Chest'],
     'Bicep' : ['Biceps'],
@@ -30,7 +30,7 @@ const CurrentExercise = ({route}) => {
     'Forearm': ['Forearms'],
     'Upper body': ['Abs', 'Obliques', 'Chest', 'Lower back', 'Upper back', 'Traps', 'Lats', 'Front delts', 'Middle delts', 
                   'Rear delts', 'Biceps', 'Triceps', 'Forearms'],
-    'Full body pull' : ['Glutes', 'Hamstrings', 'Lower back', 'Upper back', 'Traps', 'Lats', 'Rear delts', 'Biceps',  'Forearms'],
+    'Full body pull' : ['Glutes', 'Hamstrings', 'Lower back', 'Upper back', 'Traps', 'Lats', 'Rear delts', 'Biceps',  'Forearms', 'Adductors'],
     'Full body push' : ['Calves', 'Quadriceps', 'Chest', 'Front delts',  'Middle delts', 'Triceps'],
   }
   const [exercises, setExercises] = useState<Exercise[]>([]);

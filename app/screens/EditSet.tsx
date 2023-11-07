@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import { editSet } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
-import { addXP, removeXP } from '../functions/otherFunctions';
+import { addXPForOneSet, removeXP } from '../functions/otherFunctions';
 
 
 interface RouterProps {
@@ -51,14 +51,14 @@ const EditSet = ({ route, navigation }: RouterProps) => {
             if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) 
                 alert("Time field cannot be empty");
             else{
-                editSet(userID,set.exercise,exerciseID,setID,changeIsometric, (addXP(isIsometric, changeIsometric)+removeXP(set.time, set.weight)))
+                editSet(userID,set.exercise,exerciseID,setID,changeIsometric, (addXPForOneSet(isIsometric, changeIsometric)+removeXP(set.time, set.weight)))
                 navigation.navigate("Log")
             }
         } else {
             if (changeNormal.reps === 0 || Number.isNaN(changeNormal.reps))
                 alert("Reps field cannot be empty"); 
             else{
-                editSet(userID,set.exercise, exerciseID, setID,changeNormal, (addXP(isIsometric, changeNormal)+removeXP(set.reps, set.weight)))
+                editSet(userID,set.exercise, exerciseID, setID,changeNormal, (addXPForOneSet(isIsometric, changeNormal)+removeXP(set.reps, set.weight)))
                 navigation.navigate("Log")
             }
         }

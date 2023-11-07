@@ -14,7 +14,7 @@ const DisplaySets = (props) => {
     useEffect(() => {
       const unsubscribeFromWorkouts = getWorkout(userID, date, (exercises) => {
         const exerciseComponents = [];
-  
+        
         exercises.forEach((exercise, index) => {
           if (exercise.reps[0] > 0) {
             exerciseComponents.push(<NormalExercise exercise={exercise} exerciseID={index} key={index} />);
@@ -22,14 +22,15 @@ const DisplaySets = (props) => {
             exerciseComponents.push(<IsometricExercise exercise={exercise} exerciseID={index} key={index} />);
           } else {
             console.error("Error: Invalid rep number. Reps can't be negative");
-          }
+          }          
         });
   
         setAllExercises(exerciseComponents); // Update the state with the components
       });
   
-      return () => {
+      return () => {        
         unsubscribeFromWorkouts();
+        setAllExercises([]);
       };
     }, [userID, date]);
 

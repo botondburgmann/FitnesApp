@@ -148,11 +148,11 @@ export const getExercise = (userID: string, exerciseName: string, callback): Uns
             workoutSnapshot.docs.forEach(workoutDoc => {
                 for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
                     let set = workoutDoc.data().Workout[i];
-                    for (let j = 0; j < set.exercise.length; j++)
+                    for (let j = set.exercise.length-1; j >= 0 ; j--)
                         if (set.exercise[j] === exerciseName) {
-                            exerciseRecords.weights.push(set.weights[i])
-                            exerciseRecords.reps.push(set.reps[i])
-                            exerciseRecords.times.push(set.times[i])
+                            exerciseRecords.weights.push(set.weights[j])
+                            exerciseRecords.reps.push(set.reps[j])
+                            exerciseRecords.times.push(set.times[j])
                             exerciseRecords.dates.push(workoutDoc.data().date)
                         }
                 }
@@ -267,26 +267,24 @@ export const getWorkout = (userID: string, date: string, callback: Function): Un
             if (!workoutsSnapshot.empty) {
                 const allExercises: ExerciseSet[] = [];
                 workoutsSnapshot.docs.forEach(workout => {
-                    if (workout.data().Workout.length > 0) {
+                    for (let i = 0; i < workout.data().Workout.length; i++) {
                         let currentExercise: ExerciseSet = {
-                            exercise : [],
-                            weights: [],
-                            reps: [],
-                            times: [],
-                            restTimes: [],
-                            sides: []
+                            exercise :  workout.data().Workout[i].exercise,
+                            weights: workout.data().Workout[i].weights,
+                            reps: workout.data().Workout[i].reps,
+                            times: workout.data().Workout[i].times,
+                            restTimes: workout.data().Workout[i].restTimes,
+                            sides: workout.data().Workout[i].sides
                         };
-                        for (const exercise of workout.data().Workout) {
-                            currentExercise.exercise = exercise.exercise;
-                            currentExercise.reps = exercise.reps;
-                            currentExercise.restTimes = exercise.restTimes;
-                            currentExercise.sides = exercise.sides;
-                            currentExercise.times = exercise.times;
-                            currentExercise.weights = exercise.weights;   
-                        }
                         allExercises.push(currentExercise);
+                        
+                        
                     }
+
+
+            
                 })
+                
                 callback(allExercises);
             }
         })
@@ -405,9 +403,7 @@ export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToA
 
             const newWorkout = [...workoutsSnapshot.docs[0].data().Workout, data]
 
-            await addDoc(workoutsCollection, {
-                date: date,
-                userID: userID,
+            await updateDoc(doc(FIRESTORE_DB, "Workouts", workoutsSnapshot.docs[0].id), {
                 Workout: newWorkout
             });
         

@@ -81,16 +81,20 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
     setIsEnabled(previousState => !previousState);
   }
 
-  function handleFinishButton(selectedExercises, sets): void {
+  function handleFinishButton(selectedExercises, sets: ExerciseSet): void {
     if (sets.exercise.length === 0)
       throw new Error("Not enough data");
     else{
-      for (const exercise of selectedExercises) {
-        if (exercise.isometric)
-          addSet(userID,date, sets , addXP(true, sets))
-        else
-          addSet(userID,date, sets , addXP(false, sets))
-      }
+        let experience = 0;
+        for (const exercise of selectedExercises) {
+          if (exercise.isometric)
+            experience = addXP(true, sets);
+          else
+            experience = addXP(false, sets);
+        }
+        console.log(experience);
+        
+        addSet(userID, date, sets, experience);
       setSets({
         exercise : [],
         weights: [],

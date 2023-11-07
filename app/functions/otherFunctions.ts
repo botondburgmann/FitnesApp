@@ -2,8 +2,27 @@ import { Alert } from "react-native";
 import { deleteSet } from "./databaseQueries";
 import { ExerciseSelectOption, ExerciseSet } from "../types and interfaces/types";
 
-export const addXP = (isIsometric: boolean, set): number => {
+export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     let currentExperience = 0;
+    if (isIsometric) 
+        for (let i = 0; i < sets.times.length; i++) {
+            if (sets.weights[i] === 0 || Number.isNaN(sets.weights[i]))
+                currentExperience += sets.times[i];
+            else
+                currentExperience += sets.times[i] * sets.weights[i];
+        }
+    else
+        for (let i = 0; i < sets.reps.length; i++) {
+            if (sets.weights[i] === 0 || Number.isNaN(sets.weights[i]))
+                currentExperience += sets.reps[i];
+            else
+                currentExperience += sets.reps[i] * sets.weights[i];
+        }
+    return currentExperience;
+}
+
+export const addXPForOneSet = (isIsometric: boolean, set): number => {
+    let currentExperience = 0
     if (!isIsometric) {
         if (set.weights === 0 && Number.isNaN(set.weights))
             currentExperience += set.reps;
@@ -15,7 +34,7 @@ export const addXP = (isIsometric: boolean, set): number => {
             currentExperience += set.times;
         else
             currentExperience += set.times * set.weights;
-    }            
+    }             
     return currentExperience;
 }
 
@@ -101,14 +120,10 @@ export const handleAddButton = (time: number, setTime: Function, reps: number, s
       setRestTime("");
       setTime("");
       setWeight("");
-      setCurrentExercise({
-        label: "",
-        value: "",
-        unilateral: undefined,
-        isometric: undefined
-      });
       setIsEnabled(false);
       setSide("both");
 
     }
+    console.log(sets);
+    
   }
