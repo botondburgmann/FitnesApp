@@ -53,7 +53,6 @@ export const showDeleteConfirmation = (userID: string, exerciseName: string, exe
       'Are you sure you want to delete this item?',
       [{
         text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
         style: 'cancel',
       },
       {
@@ -65,7 +64,7 @@ export const showDeleteConfirmation = (userID: string, exerciseName: string, exe
   };
 
 export const isSuperSet = (restTimes: number[], uniqueExerciseLength: number): boolean => {
-    for (let i = 0; i < restTimes.length-1; i++) 
+    for (let i = 0; i < restTimes.length; i+=uniqueExerciseLength) 
         if (restTimes[i] > 0) 
             return false;
     if (uniqueExerciseLength === 1)
@@ -109,21 +108,24 @@ export const handleAddButton = (time: number, setTime: Function, reps: number, s
     if (!currentExercise.isometric && (reps === 0 || Number.isNaN(reps)))
       throw new Error("reps field cannot be empty for non-isometric exercises");
     else {
-      sets.exercise.push(currentExercise.value);
-      Number.isNaN(reps) ? sets.reps.push(0) : sets.reps.push(reps) ;
-      Number.isNaN(restTime) ? sets.restTimes.push(0) : sets.restTimes.push(restTime) ;
-      sets.sides.push(side);
-      Number.isNaN(time) ? sets.times.push(0) : sets.times.push(time) ;
-      Number.isNaN(weight) ? sets.weights.push(0) : sets.weights.push(weight) ;
-      selectedExercises.push(currentExercise);
-      setReps("");
-      setRestTime("");
-      setTime("");
-      setWeight("");
-      setIsEnabled(false);
-      setSide("both");
+        sets.exercise.push(currentExercise.value);
+        Number.isNaN(reps) ? sets.reps.push(0) : sets.reps.push(reps) ;
+        Number.isNaN(restTime) ? sets.restTimes.push(0) : sets.restTimes.push(restTime) ;
+        sets.sides.push(side);
+        Number.isNaN(time) ? sets.times.push(0) : sets.times.push(time) ;
+        Number.isNaN(weight) ? sets.weights.push(0) : sets.weights.push(weight) ;
+        selectedExercises.push(currentExercise);
+        setReps("");
+        setRestTime("");
+        setTime("");
+        setWeight("");
+        setIsEnabled(false);
+        if (currentExercise.unilateral)
+            setSide("left");
+        else
+            setSide("both");
+
 
     }
-    console.log(sets);
     
   }

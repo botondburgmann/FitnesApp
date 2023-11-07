@@ -116,7 +116,6 @@ const CurrentExercise = ({route}) => {
           if (exercise.musclesWorked.length === 1 && workout.length < 6)
             workout.push(exercise);
       default:
-        console.log(activityLevel);
         
         //throw new Error("invalid activityLevel");
       }

@@ -30,20 +30,21 @@ const Details = ({ route, navigation }: RouterProps) => {
     tableData: []
   });
 
-  let mostWeight ={
+  const [mostWeight, setMostWeight] = useState<BestExercise>({
     name: exercise,
     weights: 0,
     reps: 0
-  }
-  let mostReps = {
+  })
+  const [mostReps, setMostReps] = useState<BestExercise>({
     name: exercise,
     weights: 0,
     reps: 0
-  }
+  })
+
 
   useEffect(() => {
-    const unsubscribe = getExercise(userID, exercise, records => {      
-      setRecords(records);
+    const unsubscribe = getExercise(userID, exercise, response => {      
+      setRecords(response);
       setLoading(false);
   
     })
@@ -54,6 +55,19 @@ const Details = ({ route, navigation }: RouterProps) => {
     }
   }, [userID, exercise]);
   
+
+  useEffect(() => {
+    if (!loading) {      
+      fillTable(records, table);
+      setMostWeight(findMaxWeight(records, exercise));
+      setMostReps(findMaxReps(records, exercise)); 
+    }
+
+  
+   
+  }, [records])
+  
+
 
   function sortRecords(records:ExerciseRecords): ExerciseRecords {
     for (let i = 1; i <= records.dates.length; i++) {
@@ -124,13 +138,6 @@ const Details = ({ route, navigation }: RouterProps) => {
     return currentMax;
   }
 
-  if (!loading){
-    mostWeight = findMaxWeight(records, exercise);
-    mostReps = findMaxReps(records, exercise)
-
-    fillTable(records, table);
-
-  }
 
   return (
     <View style={styles.container}>

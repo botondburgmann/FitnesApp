@@ -92,7 +92,6 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
           else
             experience = addXP(false, sets);
         }
-        console.log(experience);
         
         addSet(userID, date, sets, experience);
       setSets({
