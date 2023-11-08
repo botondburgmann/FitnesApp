@@ -55,17 +55,17 @@ const Details = ({ route, navigation }: RouterProps) => {
   useEffect(() => {
     const unsubscribe = getExercise(userID, exercise, (response) => {
       setRecords(response)      
-
       setLoading(false);
     });
 
     return () => {        
       unsubscribe()
-      setTable({
-        tableHead: ["Date", "Weight (kg)", "Repetitons", "Time (seconds)"],
-        tableData: []
+      setRecords({
+        weights: [],
+        reps: [],
+        times: [],
+        dates: [],
       });
-      
     };
   }, [userID, exercise]);
   
@@ -77,8 +77,13 @@ const Details = ({ route, navigation }: RouterProps) => {
           setMostReps(findMaxReps(records, exercise));
           
     }
-  
 
+    return () => {
+      setTable({
+        tableHead: ["Date", "Weight (kg)", "Repetitons", "Time (seconds)"],
+        tableData: []
+      });
+    };
   }, [records])
   
   

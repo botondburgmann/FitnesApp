@@ -89,10 +89,11 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                 gender: gender,
                 weight: weight,
                 height: height,
-                activityLevel: activityValue
-            }
-            console.log(changes);
-            
+                activityLevel: activityValue,
+                experience: user.experience,
+                level: user.level,
+                weeklyExperience: user.weeklyExperience
+            }            
             editProfile(userID,changes)
             navigation.navigate("Account")
         }

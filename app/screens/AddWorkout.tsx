@@ -43,7 +43,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
 
 
   useEffect(() => {
-    const unssubscribeFromExercises = getAvailableExercises(userID, (exercises) => {
+    const unsubscribe = getAvailableExercises(userID, (exercises) => {
       const exerciseData = [];
         exercises.forEach((exercise) => {
           exerciseData.push({
@@ -58,7 +58,8 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
     });
   
     return () => {
-      unssubscribeFromExercises();
+      unsubscribe();
+      setAllExercises([]);
     };
   }, []);
   

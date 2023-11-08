@@ -53,8 +53,29 @@ useEffect(() => {
     unsubscribeFromUser();
     unsubscribeFromMostWeight();
     unsubscribeFromMostReps();
+    setUser({
+      activityLevel: "",
+      age: 0,
+      experience: 0,
+      gender: "",
+      height: 0,
+      level: 0,
+      name: "",
+      weeklyExperience:0,
+      weight: 0
+    });
+    setmostWeightExercise({
+      name: "",
+      weights: 0,
+      reps: 0
+    });
+    setmostRepsExercise({
+      name: "",
+      weights: 0,
+      reps: 0
+    })
   }
-})
+},[userID])
 
   
   

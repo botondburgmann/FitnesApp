@@ -36,17 +36,18 @@ const Toplist = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribeFromUser = getAllUsers((users) => {
-      console.log(users);
-      
-      const updatedTableData = users.map((user, index) => [
+    const unsubscribeFromUser = getAllUsers((users) => { 
+
+      const sortedUsers = sortUsers(users);
+      const updatedTableData = sortedUsers.map((user, index) => [
         index + 1,
         user.name,
         user.level,
         user.weeklyExperience,
       ]);
       
-      setTable((prev) => ({ ...prev, tableData: updatedTableData }));      setLoading(false);
+      setTable((prev) => ({ ...prev, tableData: updatedTableData }));      
+      setLoading(false);
     })
     
     return () => {
@@ -56,7 +57,20 @@ const Toplist = () => {
   
 
 
-  
+  function sortUsers(users: MyUser[]): MyUser[] {
+    const sortedUsers = [...users];
+    const n = sortedUsers.length;
+
+    for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+            if (sortedUsers[j].weeklyExperience < sortedUsers[j + 1].weeklyExperience) {
+                [sortedUsers[j], sortedUsers[j + 1]] = [sortedUsers[j + 1], sortedUsers[j]];
+            }
+        }
+    }
+
+    return sortedUsers;
+}
 
   const [week, setWeek] = useState({
     start: undefined,

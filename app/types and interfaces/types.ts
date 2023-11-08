@@ -63,3 +63,8 @@ export type TableState = {
   tableHead: string[];
   tableData: TableRow[]; // Use the TableRow type for tableData
 }
+
+export type WeekRange = {
+    start: Date;
+    end: Date;
+  }

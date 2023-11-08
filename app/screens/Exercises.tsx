@@ -11,13 +11,10 @@ interface RouterProps {
 const Exercises = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
 
-  
-  const [exerciseToggled, setExerciseToggled] = useState("")
-
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const unsubscribeFromUser = getAllExercises(userID, (exercises) => {
+    const unsubscribe = getAllExercises(userID, (exercises) => {
       setExercises(exercises);
       setLoading(false);
     });
@@ -25,9 +22,10 @@ const Exercises = ({navigation}: RouterProps) => {
   
   
     return () => {
-      unsubscribeFromUser();
+      unsubscribe();
+      setExercises([])
     }
-  })
+  }, [userID]);
 
 
 
@@ -62,9 +60,12 @@ const Exercises = ({navigation}: RouterProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>My exercises</Text>
-    <ScrollView>
-      { exerciseComponentsList}
-    </ScrollView>
+      {loading 
+      ? <ActivityIndicator/> 
+      :  <ScrollView>
+          { exerciseComponentsList}
+        </ScrollView>
+      }
     <Pressable style={styles.createExerciseButton} onPress={() => navigation.navigate("Create Exercise")}>
         <Text style={styles.createExerciseButtonText}>+</Text>
       </Pressable>

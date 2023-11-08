@@ -9,10 +9,10 @@ import UserContext from '../contexts/UserContext';
 const DisplaySets = (props) => {
     const userID = useContext(UserContext);
     const date = props.date
-    const [allExercises, setAllExercises] = useState([]); // Use state to store the components
+    const [allExercises, setAllExercises] = useState([]);
 
     useEffect(() => {
-      const unsubscribeFromWorkouts = getWorkout(userID, date, (exercises) => {
+      const unsubscribe = getWorkout(userID, date, (exercises) => {
         const exerciseComponents = [];
         
         exercises.forEach((exercise, index) => {
@@ -21,15 +21,15 @@ const DisplaySets = (props) => {
           } else if (exercise.reps[0] === 0) {
             exerciseComponents.push(<IsometricExercise exercise={exercise} exerciseID={index} key={index} />);
           } else {
-            console.error("Error: Invalid rep number. Reps can't be negative");
+            alert("Error: Invalid rep number. Reps can't be negative");
           }          
         });
   
-        setAllExercises(exerciseComponents); // Update the state with the components
+        setAllExercises(exerciseComponents);
       });
   
       return () => {        
-        unsubscribeFromWorkouts();
+        unsubscribe();
         setAllExercises([]);
       };
     }, [userID, date]);

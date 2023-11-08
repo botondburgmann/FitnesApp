@@ -12,13 +12,14 @@ const Routine = (props) => {
   const [gender, setGender] = useState("");
   const [loading, setLoading] = useState(true);
     useEffect(() => {
-      const unsubscribeFromUsers = getUser(userID, (user) => {
+      const unsubscribe = getUser(userID, (user) => {
         setGender(user.gender);
         setLoading(false);
 
       })
       return () => {
-        unsubscribeFromUsers();
+        unsubscribe();
+        setGender("");
       }
     }, [userID]);
     
