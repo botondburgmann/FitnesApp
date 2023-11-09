@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import { deleteSet } from "./databaseQueries";
-import { ExerciseSelectOption, ExerciseSet } from "../types and interfaces/types";
+import { Exercise, ExerciseSelectOption, ExerciseSet } from "../types and interfaces/types";
 
 export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     let currentExperience = 0;
@@ -128,4 +128,64 @@ export const handleAddButton = (time: number, setTime: Function, reps: number, s
 
     }
     
+  };
+
+export const calculateNumberOfSet = (focus:string, activityLevel: string): number => {
+    let numberOfSet = 0;
+    switch (activityLevel) {
+      case "beginner":
+        numberOfSet = focus === "strength" ?  1 : Math.floor(Math.random() * (3 - 2 + 1) + 2);
+        break;
+      case "intermediate":
+        numberOfSet =  focus === "strength" ? 2 : Math.floor(Math.random() * (3 - 2 + 1) + 2);
+        break;
+      case "advanced":
+        numberOfSet = focus === "strength" ?  numberOfSet = Math.floor(Math.random() * (3 - 2 + 1) + 2): Math.floor(Math.random() * (4 - 3 + 1) + 3);
+      default:
+        throw new Error("invalid activity level");
+    }
+    return numberOfSet;
+};
+export const shuffleArray = (array: any[]): any[]=> {
+    const shuffledArray = [...array];
+  
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+  
+      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    }
+  
+    return shuffledArray;
+};
+
+
+export const chooseExercises = (exercises:Exercise[], activityLevel: string ): Exercise[] => {    
+    const shuffledExercises = shuffleArray(exercises);
+    const workout = [];
+    switch (activityLevel) {
+      case "beginner":
+        for (const exercise of shuffledExercises)
+          if (exercise.musclesWorked.length > 1 && workout.length < 3)
+            workout.push(exercise);
+        break;
+      case "intermediate":
+        for (const exercise of shuffledExercises)
+          if (exercise.musclesWorked.length > 1 && workout.length < 3)
+            workout.push(exercise);
+        for (const exercise of shuffledExercises)
+          if (exercise.musclesWorked.length === 1 && workout.length < 5)
+            workout.push(exercise);
+        break;
+      case "advanced":
+        for (const exercise of shuffledExercises)
+          if (exercise.musclesWorked.length > 1 && workout.length < 3)
+            workout.push(exercise);
+        for (const exercise of shuffledExercises)
+          if (exercise.musclesWorked.length === 1 && workout.length < 6)
+            workout.push(exercise);
+        break;
+      default:
+        throw new Error("invalid activityLevel");
+      }      
+      return workout;
   }

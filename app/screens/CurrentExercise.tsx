@@ -5,15 +5,13 @@ import {  getExercisesByFocus, getUser } from '../functions/databaseQueries';
 import { Exercise, ExerciseSet } from '../types and interfaces/types';
 import Set from '../components/Set';
 import Rest from '../components/Rest';
+import { calculateNumberOfSet, chooseExercises } from '../functions/otherFunctions';
 
 
 
 const CurrentExercise = ({route}) => {
-  const { workoutType, focus, act } = route?.params;
   const userID = useContext(UserContext)
-
-
-
+  const { workoutType, focus } = route?.params;
   const muscles ={
     'Full body': ['Calves', 'Quadriceps', 'Glutes', 'Hamstrings', 'Abs', 'Obliques', 'Chest', 'Lower back', 'Upper back', 'Traps', 'Lats', 'Front delts', 'Middle delts', 
                   'Rear delts', 'Biceps', 'Triceps', 'Forearms', 'Adductors'],
@@ -34,131 +32,120 @@ const CurrentExercise = ({route}) => {
     'Full body push' : ['Calves', 'Quadriceps', 'Chest', 'Front delts',  'Middle delts', 'Triceps'],
   }
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
   const [loadingExercises, setLoadingExercises] = useState(true);
+  const [activityLevel, setActivityLevel] = useState("");
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [workout, setWorkout] = useState([]);
+
+  const [sets, setSets] = useState<ExerciseSet>({
+      exercise : [],
+      weights: [],
+      reps: [],
+      times: [],
+      restTimes: [],
+      sides: []
+    });
+
   
   useEffect(() => {
-    const unsubscribeFromExercises = getExercisesByFocus(userID, muscles[workoutType], (exercises) => {
+    const unsubscribe = getExercisesByFocus(userID, muscles[workoutType], (exercises) => {
       setExercises(exercises);
       setLoadingExercises(false);
     })
   
     return () => {
-      unsubscribeFromExercises();
+      unsubscribe();
+      setExercises([]);
+      setLoadingExercises(true);
     }
   }, [userID, workoutType]);
   
-  const [activityLevel, setActivityLevel] = useState("");
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [allExercises, setAllExercises] = useState<Exercise[]>([])
-    useEffect(() => {
-      const unsubscribeFromUsers = getUser(userID, (user) => {
+  useEffect(() => {
+    const unsubscribe = getUser(userID, (user) => {
         setActivityLevel(user.activityLevel);
-        
         setLoadingUser(false);
 
       })
       return () => {
-        unsubscribeFromUsers();
+        unsubscribe();
+        setActivityLevel("");
+        setLoadingUser(true);
       }
     }, [userID]);
   
-  function calculateNumberOfSet(focus:string, activityLevel: string): number {
-    let numberOfSet = 0;
-    switch (activityLevel) {
-      case "beginner":
-        numberOfSet = focus === "strength" ?  1 : Math.floor(Math.random() * (3 - 2 + 1) + 2);
-        break;
-      case "intermediate":
-        numberOfSet =  focus === "strength" ? 2 : Math.floor(Math.random() * (3 - 2 + 1) + 2);
-        break;
-      case "advanced":
-        numberOfSet = focus === "strength" ?  numberOfSet = Math.floor(Math.random() * (3 - 2 + 1) + 2): Math.floor(Math.random() * (4 - 3 + 1) + 3);
-      default:
-        throw new Error("invalid activityLevel");
-    }
-    return numberOfSet;
-  }
+ 
 
-  function shuffleArray(array) {
-    const shuffledArray = [...array];
-  
-    for (let i = shuffledArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-  
-      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-    }
-  
-    return shuffledArray;
-  }
   
 
-  function chooseExercises(exercises:Exercise[], activityLevel: string ): Exercise[] {
-    const shuffledExercises = shuffleArray(exercises);
-    const workout = [];
-    switch (activityLevel) {
-      case "beginner":
-        for (const exercise of shuffledExercises)
-          if (exercise.musclesWorked.length > 1 && workout.length < 3)
-            workout.push(exercise);
-        break;
-      case "intermediate":
-        for (const exercise of shuffledExercises)
-          if (exercise.musclesWorked.length > 1 && workout.length < 3)
-            workout.push(exercise);
-        for (const exercise of shuffledExercises)
-          if (exercise.musclesWorked.length === 1 && workout.length < 5)
-            workout.push(exercise);
-      case "advanced":
-        for (const exercise of shuffledExercises)
-          if (exercise.musclesWorked.length > 1 && workout.length < 3)
-            workout.push(exercise);
-        for (const exercise of shuffledExercises)
-          if (exercise.musclesWorked.length === 1 && workout.length < 6)
-            workout.push(exercise);
-      default:
-        
-        //throw new Error("invalid activityLevel");
-      }
-      return workout;
-  }
+
   
 
-  const workout = [];
-
-if (activityLevel) {
-  const selectedExercises = chooseExercises(exercises, activityLevel);
-  const numberOfSets = calculateNumberOfSet(focus, activityLevel);
-
-  for (let i = 0; i < selectedExercises.length; i++) {
-    for (let j = 0; j < numberOfSets; j++) {
-      workout.push(<Set exercise={selectedExercises[i]} focus={focus}/>)
-
-      workout.push(<Rest/>)
-    }
+  
+  useEffect(() => {
+    if (!loadingUser && !loadingExercises) {
+    const workout = [];    
+    const selectedExercises: Exercise[] = chooseExercises(exercises, activityLevel);
+    const numberOfSets = calculateNumberOfSet(focus, activityLevel);
+    setSelectedExercises(selectedExercises);
     
-  }
-  workout.push(<View><Text>Congrasts</Text></View>)
+    for (let i = 0; i < selectedExercises.length; i++) {
+       for (let j = 0; j < numberOfSets; j++) {
+        workout.push(<Set  key={`set-${selectedExercises[i].name}-${j}`} 
+          exercise={selectedExercises[i]} 
+          focus={focus}
+          setGoToNextPage={setGoToNextPage}
+          setSets={setSets}/>)
+        if (j < numberOfSets-1 || i < selectedExercises.length-1)
+          workout.push(<Rest key={`rest-${selectedExercises[i].name}-${j}`} exercise={selectedExercises[i]} 
+          setGoToNextPage={setGoToNextPage} setSets={setSets}/>)
+      } 
+      
+    }
+    workout.push(<View><Text>Congrasts</Text></View>)
+    setWorkout(workout)
+    
+  
 }
 
-const [currentIndex, setCurrentIndex] = useState(0);
+}, [loadingExercises, loadingUser])
 
-  const nextComponent = () => {
+
+const [currentIndex, setCurrentIndex] = useState(0);
+const [goToNextPage, setGoToNextPage] = useState(false);
+
+useEffect(() => {
+  if (goToNextPage) {
     if (currentIndex < workout  .length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
-  };
+
+    if (currentIndex % 2 === 1) {
+      console.log(sets.exercise);
+      console.log(sets.reps);
+      console.log(sets.restTimes);
+      console.log(sets.sides);
+      console.log(sets.times);
+      console.log(sets.weights);
+      
+    }
+    
+    setGoToNextPage(false)
+  }
+}, [goToNextPage])
+
   return (
-    <View>
+    <View style={styles.container}>
       {
-        loadingExercises ? <ActivityIndicator />
+        loadingExercises || loadingUser ? <ActivityIndicator />
         :
       <ScrollView>
       {workout[currentIndex]}
-      <Pressable style={styles.button} onPress={nextComponent}>
+{/*       <Pressable style={styles.button} onPress={nextComponent}>
             <Text style={styles.text}>Next</Text>                   
-        </Pressable>
+        </Pressable>  */}
         </ScrollView>
-/*         <ScrollView>
+  /*       <ScrollView>
       {workout}
         </ScrollView> */
       }
@@ -170,18 +157,10 @@ export default CurrentExercise
 
 const styles = StyleSheet.create({
   container: {
-      flex: 1,
-      backgroundColor: '#ff0000'
-  },
-  input: {
-      marginHorizontal: 10,
-      marginVertical: 4,
-      height: 50,
-      borderWidth: 1,
-      borderRadius: 4,
-      padding: 10,
-      backgroundColor: '#fff'
-  },
+    flex:1,
+    backgroundColor: '#ff0000'
+},
+ 
   text:{
       alignSelf: 'center',
       fontSize: 18,
@@ -190,24 +169,11 @@ const styles = StyleSheet.create({
       fontWeight: "600",
       paddingVertical: 10,
   },
-  gridContainer:{
-      flexDirection: 'row',
-      marginHorizontal: 10,
-      justifyContent: 'center'
-  },
   button:{
       width: 100,
       paddingHorizontal: 5,
       marginHorizontal: 20,
       alignSelf: "center",
       backgroundColor: "#000",
-  },
-  label: {
-      fontSize: 20,
-      fontWeight: "800",
-      color: "#fff",
-      textTransform: 'uppercase',
-      textAlign: 'center',
-      marginVertical: 50
   },
 });
