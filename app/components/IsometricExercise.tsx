@@ -72,8 +72,14 @@ const IsometricExercise = (props) => {
                     : <></>
             }
             <Pressable
-                onPress={() => navigation.navigate("Edit set",{exercise: exercise, exerciseID: exerciseID,  setID: index, isIsometric: true})} 
-                onLongPress={() => showDeleteConfirmation(userID, exercise.exercise[index], exerciseID, index, removeXP(index,exercise.times,exercise.weights))}                                
+                onPress={() => navigation.navigate("Edit set",{set: {exercise : exercise.exercise[index],
+                    reps: exercise.reps[index],
+                    restTime: exercise.restTimes[index],
+                    side: exercise.sides[index],
+                    time: exercise.times[index],
+                    weight: exercise.weights[index],
+                    }, exerciseID: exerciseID, setID: index, isIsometric: false})} 
+                onLongPress={() => showDeleteConfirmation(userID, exercise.exercise[index], exerciseID, index, removeXP(exercise.times[index],exercise.weights[index]))}                                
             >
                 <Text style={styles.text}>{second}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]}</Text>
                 { exercise.restTimes[index] > 0
