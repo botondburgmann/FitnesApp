@@ -188,4 +188,6 @@ export const chooseExercises = (exercises:Exercise[], activityLevel: string ): E
         throw new Error("invalid activityLevel");
       }      
       return workout;
-  }
+  };
+
+  

@@ -20,9 +20,11 @@ const Set = (props) => {
             if (Number.isNaN(weight))
                 weight = 0;
             if (Number.isNaN(time))
-                time = 0;
+                time = 0;            
+            if (Number.isNaN(reps))
+                reps = 0;            
             const newSet = {
-                exercise: exercise.unilateral ? [exercise, exercise] : [exercise],
+                exercise: exercise.unilateral ? [exercise.name, exercise.name] : [exercise.name],
                 weights: exercise.unilateral ? [weight, weight] : [weight],
                 reps: exercise.unilateral ? [reps, reps] : [reps],
                 times: exercise.unilateral ? [time, time] : [time],
@@ -87,7 +89,7 @@ const Set = (props) => {
             />
         </>
         }
-        <Pressable style={styles.button} onPress={() => handleCompleteSetButton(exercise.name, parseFloat(weight), 
+        <Pressable style={styles.button} onPress={() => handleCompleteSetButton(exercise, parseFloat(weight), 
                                                                                 parseFloat(time),
                                                                                 parseFloat(reps))}>
             <Text style={styles.text}>Next</Text>                   

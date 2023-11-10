@@ -7,7 +7,8 @@ const Rest = (props) => {
   const setGoToNextPage = props.setGoToNextPage
   const setSets = props.setSets;
   const exercise = props.exercise;
-  const duration = exercise.musclesWorked.length > 1 ? 10 : 20;
+  const duration = exercise.musclesWorked.length > 1 ? 2 : 1;
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Rest</Text>
@@ -22,7 +23,7 @@ const Rest = (props) => {
             weights: [],
             reps: [],
             times: [],
-            restTimes: exercise.unilateral ? [30, 30] : [30],
+            restTimes: exercise.unilateral ? [duration, duration] : [duration],
             sides: [],
         }
         setSets(prevSets => ({

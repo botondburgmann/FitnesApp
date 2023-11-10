@@ -610,6 +610,17 @@ export const editProfile = async (userID:string, changes: MyUser): Promise<void>
     }
 };
 
+export const addWorkout =async (userID:string, date: string, workout: ExerciseSet[], xpToAdd: number): Promise<void> => {
+    const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
+    await addDoc(workoutCollectionRef, {
+        date: date,
+        userID: userID,
+        Workout: workout
+    });     
+    addExperience(userID, xpToAdd);
+    
+}
+
 
 
 

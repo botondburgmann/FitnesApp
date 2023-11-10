@@ -1,15 +1,20 @@
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../contexts/UserContext';
-import {  getExercisesByFocus, getUser } from '../functions/databaseQueries';
+import {  addWorkout, getExercisesByFocus, getUser } from '../functions/databaseQueries';
 import { Exercise, ExerciseSet } from '../types and interfaces/types';
 import Set from '../components/Set';
 import Rest from '../components/Rest';
-import { calculateNumberOfSet, chooseExercises } from '../functions/otherFunctions';
+import { addXP, calculateNumberOfSet, chooseExercises } from '../functions/otherFunctions';
+import { NavigationProp } from '@react-navigation/native';
 
 
+interface RouterProps {
+  route: any,
+  navigation: NavigationProp<any, any>;
+}
 
-const CurrentExercise = ({route}) => {
+const CurrentExercise = ({ route, navigation }: RouterProps) => {
   const userID = useContext(UserContext)
   const { workoutType, focus } = route?.params;
   const muscles ={
@@ -36,7 +41,10 @@ const CurrentExercise = ({route}) => {
   const [loadingExercises, setLoadingExercises] = useState(true);
   const [activityLevel, setActivityLevel] = useState("");
   const [loadingUser, setLoadingUser] = useState(true);
-  const [workout, setWorkout] = useState([]);
+  const [workoutComponents, setWorkoutComponents] = useState([]);
+  const [workout, setWorkout] = useState<ExerciseSet[]>([]);
+  const [isFinal, setIsFinal] = useState(false);
+  const [totalXP, setTotalXP] = useState(0);
 
   const [sets, setSets] = useState<ExerciseSet>({
       exercise : [],
@@ -58,6 +66,8 @@ const CurrentExercise = ({route}) => {
       unsubscribe();
       setExercises([]);
       setLoadingExercises(true);
+      setWorkout([]);
+
     }
   }, [userID, workoutType]);
   
@@ -96,14 +106,14 @@ const CurrentExercise = ({route}) => {
           focus={focus}
           setGoToNextPage={setGoToNextPage}
           setSets={setSets}/>)
-        if (j < numberOfSets-1 || i < selectedExercises.length-1)
+        if (j < numberOfSets-1 || i < selectedExercises.length-1){
           workout.push(<Rest key={`rest-${selectedExercises[i].name}-${j}`} exercise={selectedExercises[i]} 
           setGoToNextPage={setGoToNextPage} setSets={setSets}/>)
+        }
       } 
       
     }
-    workout.push(<View><Text>Congrasts</Text></View>)
-    setWorkout(workout)
+    setWorkoutComponents(workout)
     
   
 }
@@ -116,17 +126,55 @@ const [goToNextPage, setGoToNextPage] = useState(false);
 
 useEffect(() => {
   if (goToNextPage) {
-    if (currentIndex < workout  .length - 1) {
+    if (currentIndex < workoutComponents  .length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
+    if (currentIndex === workoutComponents  .length - 1) {
+      setIsFinal(true)
+      sets.restTimes.push(0);
+      setWorkout(prev => [...prev, sets]);
+      if (sets.reps[0] === 0) {
+        console.log("add iso");
+        
+        setTotalXP(prev => { return prev + addXP(true, sets)})
+      }
+      else {
+        console.log("add norm");
 
-    if (currentIndex % 2 === 1) {
-      console.log(sets.exercise);
-      console.log(sets.reps);
-      console.log(sets.restTimes);
-      console.log(sets.sides);
-      console.log(sets.times);
-      console.log(sets.weights);
+        setTotalXP(prev => { return prev + addXP(false, sets)})
+      }
+
+    } 
+    
+    
+    if (currentIndex % 2 === 1 && sets.exercise[sets.exercise.length-1] !== sets.exercise[sets.exercise.length-2] && sets.exercise.length > 1) {
+      const newExercise: ExerciseSet = {
+        exercise: sets.exercise.slice(0,-1),
+        reps: sets.reps.slice(0,-1),
+        restTimes: sets.restTimes.slice(0,-1),
+        sides: sets.sides.slice(0,-1),
+        times: sets.times.slice(0,-1),
+        weights: sets.weights.slice(0,-1)
+      }
+      setWorkout(prev => [...prev, newExercise]);
+      if (newExercise.reps[0] === 0) {
+        console.log("add iso");
+        
+        setTotalXP(prev => { return prev + addXP(true, newExercise)})
+      }
+      else {
+        console.log("add norm");
+
+        setTotalXP(prev => { return prev + addXP(false, newExercise)})
+      }
+      
+      sets.exercise.splice(0, sets.exercise.length-1);
+      sets.reps.splice(0, sets.reps.length-1);
+      sets.restTimes.splice(0, sets.restTimes.length-1);
+      sets.sides.splice(0, sets.sides.length-1);
+      sets.times.splice(0, sets.times.length-1);
+      sets.weights.splice(0, sets.weights.length-1);
+      
       
     }
     
@@ -134,20 +182,27 @@ useEffect(() => {
   }
 }, [goToNextPage])
 
+  function handleFinishWorkoutButton(workout: ExerciseSet[], userID: string, date: string, totalXP: number): void {
+    console.log(totalXP);
+    
+    addWorkout(userID, date, workout, totalXP );
+    navigation.navigate("Log");
+  }
+
   return (
     <View style={styles.container}>
       {
         loadingExercises || loadingUser ? <ActivityIndicator />
-        :
+        : !isFinal ?
       <ScrollView>
-      {workout[currentIndex]}
-{/*       <Pressable style={styles.button} onPress={nextComponent}>
-            <Text style={styles.text}>Next</Text>                   
-        </Pressable>  */}
+      {workoutComponents[currentIndex]}
         </ScrollView>
-  /*       <ScrollView>
-      {workout}
-        </ScrollView> */
+      : <View>
+        <Text style={styles.text}>Congrats</Text>
+        <Pressable style={styles.button} onPress={() => handleFinishWorkoutButton(workout, userID, new Date().toDateString(), totalXP)}>
+            <Text style={styles.text}>Next</Text>                   
+        </Pressable>
+      </View>
       }
     </View>
   )
