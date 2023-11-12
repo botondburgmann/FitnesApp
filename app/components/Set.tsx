@@ -6,7 +6,7 @@ const Set = (props) => {
     const exercise = props.exercise;
     const focus = props.focus;
     const setGoToNextPage = props.setGoToNextPage
-    const setSets = props.setSets
+    const currentExercise: ExerciseSet = props.currentExercise
     const [weight, setWeight] = useState("");
     const [time, setTime] = useState("");
     const [reps, setReps] = useState("");
@@ -22,37 +22,44 @@ const Set = (props) => {
             if (Number.isNaN(time))
                 time = 0;            
             if (Number.isNaN(reps))
-                reps = 0;            
-            const newSet = {
-                exercise: exercise.unilateral ? [exercise.name, exercise.name] : [exercise.name],
-                weights: exercise.unilateral ? [weight, weight] : [weight],
-                reps: exercise.unilateral ? [reps, reps] : [reps],
-                times: exercise.unilateral ? [time, time] : [time],
-                restTimes: [],
-                sides: exercise.unilateral ? ["left", "right"] : ["both"],
+                reps = 0;         
+            if (exercise.unilateral) {
+                currentExercise.exercise.push(...[exercise.name, exercise.name])
+                currentExercise.reps.push(...[reps, reps])
+                currentExercise.sides.push(...["left", "right"]);
+                currentExercise.times.push(...[time, time]);
+                currentExercise.weights.push(...[weight, weight]);
             }
-            setSets(prevSets => ({
-                ...prevSets,
-                exercise: [...prevSets.exercise, ...newSet.exercise],
-                weights: [...prevSets.weights, ...newSet.weights],
-                reps: [...prevSets.reps, ...newSet.reps],
-                times: [...prevSets.times, ...newSet.times],
-                restTimes: [...prevSets.restTimes, ...newSet.restTimes],
-                sides: [...prevSets.sides, ...newSet.sides],
-              }));
-              setGoToNextPage(true)
+            else {
+                currentExercise.exercise.push(exercise.name)
+                currentExercise.reps.push(reps)
+                currentExercise.sides.push("both");
+                currentExercise.times.push(time);
+                currentExercise.weights.push(weight);                
+            }
+            setGoToNextPage(true)
         }
       }
   return (
     <View>
         <Text style={styles.label}>{exercise.name}</Text>
-        {exercise.musclesWorked.length === 1 && focus === "strength" 
-        ? exercise.unilateral 
-        ? <Text style={styles.text}>Do 2-3 repetitons each side</Text>
-        :  <Text style={styles.text}>Do 2-3 repetitons</Text>
-        : exercise.unilateral 
-        ? <Text style={styles.text}>Do 6-8 repetitons each side</Text>
-        :  <Text style={styles.text}>Do 6-8 repetitons</Text>
+        {exercise.isometric
+            ? exercise.musclesWorked.length === 1 && focus === "strength"
+                ? exercise.unilateral 
+                    ? <Text style={styles.text}>Do 20-30 seconds each side</Text>
+                    :  <Text style={styles.text}>Do 20-30 seconds</Text>
+                : exercise.unilateral 
+                    ? <Text style={styles.text}>Do 30-60 seconds each side</Text>
+                    :  <Text style={styles.text}>Do 30-60 seconds</Text>
+            :
+            exercise.musclesWorked.length === 1 && focus === "strength" 
+                ? exercise.unilateral 
+                    ? <Text style={styles.text}>Do 2-3 repetitons each side</Text>
+                    :  <Text style={styles.text}>Do 2-3 repetitons</Text>
+                : exercise.unilateral 
+                    ? <Text style={styles.text}>Do 6-8 repetitons each side</Text>
+                    :  <Text style={styles.text}>Do 6-8 repetitons</Text>
+
         }
         
         <Text style={styles.text}>weight (kg)</Text>

@@ -1,11 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
+import { ExerciseSet } from '../types and interfaces/types'
 
 
 const Rest = (props) => {
   const setGoToNextPage = props.setGoToNextPage
-  const setSets = props.setSets;
+  const currentExercise: ExerciseSet = props.currentExercise;
   const exercise = props.exercise;
   const duration = exercise.musclesWorked.length > 1 ? 2 : 1;
 
@@ -18,23 +19,10 @@ const Rest = (props) => {
         colors={['#004777', '#F7B801', '#A30000', '#A30000']}
         colorsTime={[30, 25, 10, 0]}
         onComplete={() => {
-          const newSet = {
-            exercise: [],
-            weights: [],
-            reps: [],
-            times: [],
-            restTimes: exercise.unilateral ? [duration, duration] : [duration],
-            sides: [],
-        }
-        setSets(prevSets => ({
-            ...prevSets,
-            exercise: [...prevSets.exercise, ...newSet.exercise],
-            weights: [...prevSets.weights, ...newSet.weights],
-            reps: [...prevSets.reps, ...newSet.reps],
-            times: [...prevSets.times, ...newSet.times],
-            restTimes: [...prevSets.restTimes, ...newSet.restTimes],
-            sides: [...prevSets.sides, ...newSet.sides],
-          }));
+          if (exercise.unilateral)
+            currentExercise.restTimes.push(...[0, duration]);
+          else                
+            currentExercise.restTimes.push(duration);
           setGoToNextPage(true)
         }}
       >
