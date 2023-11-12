@@ -25,6 +25,7 @@ import CreateExercise from './app/screens/CreateExercise';
 import EditSet from './app/screens/EditSet';
 import EditProfile from './app/screens/EditProfile';
 import Details from './app/screens/Details';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 
 const Stack = createNativeStackNavigator();
@@ -48,12 +49,32 @@ function SetUpLayout() {
 
 function InsideLayout() {
   return( 
-      <Tab.Navigator screenOptions={{ tabBarStyle: {backgroundColor: '#ff0000'}, tabBarInactiveTintColor: '#fff'}}>
-        <Tab.Screen name='Workouts' component={WorkoutsLayout}  options={{ headerShown: false }} />
-        <Tab.Screen name='Toplist' component={Toplist}  options={{ headerShown: false }} />
-        <Tab.Screen name='Exercises' component={ExercisesLayout} options={{ headerShown: false }} />
-        <Tab.Screen name='Profile' component={ProfileLayout} options={{ headerShown: false }} />
-      </Tab.Navigator>
+    <Tab.Navigator
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ color, size }) => {
+        let iconName;
+
+        if (route.name === 'Workouts') {
+          iconName = 'dumbbell'; // Customize with the appropriate FontAwesome icon name
+        } else if (route.name === 'Toplist') {
+          iconName = 'trophy'; // Customize with the appropriate FontAwesome icon name
+        } else if (route.name === 'Exercises') {
+          iconName = 'list'; // Customize with the appropriate FontAwesome icon name
+        } else if (route.name === 'Profile') {
+          iconName = 'user-alt'; // Customize with the appropriate FontAwesome icon name
+        }
+
+        return <FontAwesome5 name={iconName} size={size} color={color} />;
+      },
+      tabBarStyle: { backgroundColor: '#ff0000' },
+      tabBarInactiveTintColor: '#fff',
+    })}
+  >
+    <Tab.Screen name='Workouts' component={WorkoutsLayout} options={{ headerShown: false }} />
+    <Tab.Screen name='Toplist' component={Toplist} options={{ headerShown: false }} />
+    <Tab.Screen name='Exercises' component={ExercisesLayout} options={{ headerShown: false }} />
+    <Tab.Screen name='Profile' component={ProfileLayout} options={{ headerShown: false }} />
+  </Tab.Navigator>
   );
 }
 

@@ -1,6 +1,8 @@
 import { Pressable, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { FontAwesome5 } from '@expo/vector-icons';
+
 
 
 const Datepicker = (props) => {
@@ -19,7 +21,7 @@ const Datepicker = (props) => {
   return (
     <View style={{marginTop: 50, alignSelf: 'center' }}>
       <Pressable onPress={() => setShowDate(true)}>
-        <Text>Calendar icon here</Text>
+      <FontAwesome5 name="calendar-alt" size={50} color={"#fff"} />      
       </Pressable>
       
       {showDate && (

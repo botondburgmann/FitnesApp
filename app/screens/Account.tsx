@@ -95,12 +95,12 @@ useEffect(() => {
 
             <Text style={styles.text}>Best records</Text>
 
-            <Text style={styles.text}>
+           {/*  <Text style={styles.text}>
               Weight: {( mostWeightExercise).name} {( mostWeightExercise).weights} kg ({(mostWeightExercise).reps} repetitions)
             </Text>
             <Text style={styles.text}>
               Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
-            </Text> 
+            </Text>  */}
           </View>
 
       
