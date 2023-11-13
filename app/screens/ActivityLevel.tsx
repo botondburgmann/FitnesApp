@@ -5,6 +5,7 @@ import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
 import { SelectItem } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
 
@@ -23,7 +24,9 @@ const ActivityLevel = ({navigation}: RouterProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Please, select your activity level</Text>
-      <Text style={styles.icon}>Icon here</Text>
+      <View style={styles.icon}>
+        <MaterialCommunityIcons name="weight-lifter" size={60} color="#fff" />
+      </View>
 
       <View style={styles.selectMenuContainer}>
         <SelectMenu data={items} setSelectedValue={setValue} title={"Activity level"} />

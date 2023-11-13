@@ -5,6 +5,7 @@ import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
 import { RouterProps } from '../types and interfaces/interfaces';
 import { SelectItem } from '../types and interfaces/types';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 
 
@@ -23,7 +24,9 @@ const Weight = ({navigation}: RouterProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Please, select your weight</Text>
-      <Text style={styles.icon}>Icon here</Text>
+      <View style={styles.icon}>
+        <FontAwesome5 name="weight" size={60} color="#fff"/>
+      </View>
       <View style={styles.inputGroup}>
         <TextInput
           keyboardType='numeric'

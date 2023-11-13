@@ -1,10 +1,8 @@
 import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import {Table, Row, Rows} from 'react-native-table-component'
-import { getAllUsers, getUser, resetWeeklyExperience } from '../functions/databaseQueries';
+import { getAllUsers, resetWeeklyExperience } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
-import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestore';
-import { FIRESTORE_DB } from '../../FirebaseConfig';
 import { MyUser  } from '../types and interfaces/types';
 
 interface WeekRange{
@@ -78,17 +76,26 @@ const Toplist = () => {
   })
 
   const [today, setToday] = useState(new Date());
+  function update(callback) {
+    const timeUntilMonday = ((1 - today.getDay() + 7) % 7) * 24 * 60 * 60 * 1000;
+    const timeUntilMidnight = (24 - today.getHours()) * 60 * 60 * 1000 - today.getMinutes() * 60 * 1000 - today.getSeconds() * 1000;
+    const initialDelay = timeUntilMonday + timeUntilMidnight;
+    callback();
+    setInterval(() => {
+      callback();
+    }, 7 * 24 * 60 * 60 * 1000);
 
-  function update() {
-    setToday(new Date());
+    setTimeout(() => {
+      setInterval(() => {
+        callback();
+      }, 7 * 24 * 60 * 60 * 1000);
+    }, initialDelay);
+
   }
 
-  //setTimeout(update, 1000);
-
+  update(() => resetWeeklyExperience(userID))
   useEffect(() => {
     setWeek(calculateWeekRange(today))
-    if (today.getDay() === 1)
-      resetWeeklyExperience(userID);
   }, [today])
   
 

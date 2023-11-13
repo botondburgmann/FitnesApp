@@ -55,19 +55,20 @@ function InsideLayout() {
         let iconName;
 
         if (route.name === 'Workouts') {
-          iconName = 'dumbbell'; // Customize with the appropriate FontAwesome icon name
+          iconName = 'dumbbell';
         } else if (route.name === 'Toplist') {
-          iconName = 'trophy'; // Customize with the appropriate FontAwesome icon name
+          iconName = 'trophy';
         } else if (route.name === 'Exercises') {
-          iconName = 'list'; // Customize with the appropriate FontAwesome icon name
+          iconName = 'list';
         } else if (route.name === 'Profile') {
-          iconName = 'user-alt'; // Customize with the appropriate FontAwesome icon name
+          iconName = 'user-alt';
         }
 
         return <FontAwesome5 name={iconName} size={size} color={color} />;
       },
       tabBarStyle: { backgroundColor: '#ff0000' },
       tabBarInactiveTintColor: '#fff',
+      tabBarActiveTintColor: '#b0a2a2'
     })}
   >
     <Tab.Screen name='Workouts' component={WorkoutsLayout} options={{ headerShown: false }} />

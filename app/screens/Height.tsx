@@ -5,6 +5,7 @@ import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
 import { SelectItem } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
 const Height = ({navigation}: RouterProps) => {
@@ -13,14 +14,16 @@ const Height = ({navigation}: RouterProps) => {
   const [height, setHeight] = useState<string>();
   const [value, setValue] = useState<string>();
   const [items] = useState<SelectItem[]>([
-    {label: 'Metric (m)', value: 'm'},
+    {label: 'Metric (cm)', value: 'm'},
     {label: 'Imperial (ft)', value: 'ft'}
   ]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Please, select your height</Text>
-      <Text style={styles.icon}>Icon here</Text>
+      <View style={styles.icon}>
+        <MaterialCommunityIcons name="human-male-height" size={60} color="#fff" />
+      </View>
       <View style={styles.inputGroup}>
         <TextInput
           keyboardType='numeric'

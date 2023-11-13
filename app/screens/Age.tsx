@@ -15,8 +15,10 @@ const Age = ({navigation}: RouterProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Please, select your date of birth</Text>
-      <Datepicker date={birthDate} setDate={setBirthDate} />
-      <Text>{birthDate.toDateString()}</Text>
+      <View style={styles.icon}>
+        <Datepicker date={birthDate} setDate={setBirthDate} />
+      </View>
+      <Text style={styles.text}>{birthDate.toDateString()}</Text>
       <View style={styles.buttonGroup}>
         <Pressable style={styles.button} onPress={() => navigation.navigate('Gender')}>
           <Text style={styles.text}>Go back</Text>
@@ -62,7 +64,6 @@ const styles = StyleSheet.create({
      fontWeight: "800",
      color: "#fff",
      textTransform: 'uppercase',
-     marginBottom: 50,
      marginHorizontal: 50,
      textAlign: 'center',
      lineHeight: 40
@@ -70,5 +71,11 @@ const styles = StyleSheet.create({
    buttonGroup: {
     marginTop: 100,
     flexDirection: 'row'
-   }
+   },
+   icon: {
+    alignSelf: 'center',
+    fontSize: 18,
+    color: "#fff",
+    marginBottom: 50,
+  }
 });
