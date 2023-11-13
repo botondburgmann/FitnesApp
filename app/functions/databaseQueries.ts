@@ -42,21 +42,22 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
     const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
     const workoutQuery = query(workoutCollectionRef, where("userID", "==", userID));
     const unsubscribeFromWorkouts = onSnapshot(workoutQuery, snapshot => {
-        const doc = snapshot.docs[0];
-        for (const exercise of doc.data().Workout) {
-            if (getMax(exercise[field]).value > bestExercise[field]) {
-                bestExercise[field] = getMax(exercise[field]).value;
-                bestExercise.name = exercise.exercise[getMax(exercise.weights).index];
-                bestExercise[secondaryField] = exercise.reps[getMax(exercise[field]).index];
-            }
-            else if (getMax(exercise[field]).value === bestExercise[field]) {
-                if (getMax(exercise[secondaryField]).value > bestExercise[secondaryField]) {
-                    bestExercise[secondaryField] = getMax(exercise[secondaryField]).value;
-                    bestExercise.name = exercise.exercise[getMax(exercise[secondaryField]).index];
-                    bestExercise[field] = exercise.weights[getMax(exercise[secondaryField]).index];
-                }   
-            } 
-        };
+        snapshot.docs.forEach(doc => {
+            for (const exercise of doc.data().Workout) {
+                if (getMax(exercise[field]).value > bestExercise[field]) {
+                    bestExercise[field] = getMax(exercise[field]).value;
+                    bestExercise.name = exercise.exercise[getMax(exercise.weights).index];
+                    bestExercise[secondaryField] = exercise.reps[getMax(exercise[field]).index];
+                }
+                else if (getMax(exercise[field]).value === bestExercise[field]) {
+                    if (getMax(exercise[secondaryField]).value > bestExercise[secondaryField]) {
+                        bestExercise[secondaryField] = getMax(exercise[secondaryField]).value;
+                        bestExercise.name = exercise.exercise[getMax(exercise[secondaryField]).index];
+                        bestExercise[field] = exercise.weights[getMax(exercise[secondaryField]).index];
+                    }   
+                } 
+            };
+        })
         callback(bestExercise);             
     });
 
