@@ -34,7 +34,7 @@ function getMax(array:number[]): MaxValueAndIndex{
 }
 
 export const getBestExercise = (userID: string, field:string, secondaryField:string, callback: Function ): Unsubscribe => {
-    const bestExercise = {
+    const bestExercise: BestExercise = {
         name: "",
         weights: 0,
         reps: 0
@@ -237,29 +237,6 @@ export const getAllUsers = (callback): Unsubscribe => {
     return unsubscribeFromUsers;
 }
 
-/* export const getExercises = (userID: string, date: string, callback: Function): Unsubscribe => {
-    const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
-    const workoutsQuery = query(workoutCollectionRef, where("userID", "==", userID), where("date", "==", date));
-    
-    const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
-        const exercises = [];
-        workoutsSnapshot.docs.forEach((workoutsDoc) => {
-            for (let i = 0; i < workoutsDoc.data().Workout.length; i++) {
-                exercises.push({
-                    exercise: workoutsDoc.data().Workout[i].exercise,
-                    weights: workoutsDoc.data().Workout[i].weights,
-                    reps: workoutsDoc.data().Workout[i].reps,
-                    times: workoutsDoc.data().Workout[i].times,
-                    restTimes: workoutsDoc.data().Workout[i].restTimes,
-                    sides: workoutsDoc.data().Workout[i].sides,
-                });
-            }
-        });
-        callback(exercises);
-    })
-    return unsubscribeFromWorkouts;
-}; */
-
 export const getWorkout = (userID: string, date: string, callback: Function): Unsubscribe => {
     try {
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
@@ -443,6 +420,8 @@ export const addExperience = async (userID: string, experience: number): Promise
         
         validateExperience(experience);
 
+        console.log(experience);
+        
         const firstUpdatedData = {
             experience: firstUserDoc.data().experience+experience,
             weeklyExperience: firstUserDoc.data().weeklyExperience+experience,

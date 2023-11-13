@@ -76,7 +76,7 @@ const Toplist = () => {
   })
 
   const [today, setToday] = useState(new Date());
-  function update(callback) {
+/*   function update(callback) {
     const timeUntilMonday = ((1 - today.getDay() + 7) % 7) * 24 * 60 * 60 * 1000;
     const timeUntilMidnight = (24 - today.getHours()) * 60 * 60 * 1000 - today.getMinutes() * 60 * 1000 - today.getSeconds() * 1000;
     const initialDelay = timeUntilMonday + timeUntilMidnight;
@@ -93,7 +93,7 @@ const Toplist = () => {
 
   }
 
-  update(() => resetWeeklyExperience(userID))
+  update(() => resetWeeklyExperience(userID)) */
   useEffect(() => {
     setWeek(calculateWeekRange(today))
   }, [today])

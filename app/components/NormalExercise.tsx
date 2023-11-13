@@ -105,7 +105,7 @@ const NormalExercise = (props) => {
                     ? <Text style={styles.exercise}>1 superset of</Text>
                     : <Text style={styles.exercise}>{numberOfSets} supersets</Text>
                 }     
-                <View style={styles.gridContainer}>
+                <View>
                     {uniqueValues.exercise.map((exercise,index) =>  
                     index !== uniqueValues.exercise.length-1
                         ? <Text style={styles.exercise} key={index}>{exercise} and </Text>
@@ -155,11 +155,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         letterSpacing: 0.25,
         color: 'white',
-        textAlign: 'center'
+        textAlign: 'center',
+        flexWrap: 'wrap'
     },
-    gridContainer:{
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginHorizontal: 10,
-    }
+
 })
