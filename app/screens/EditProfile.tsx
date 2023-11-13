@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import { editProfile, editSet } from '../functions/databaseQueries';
@@ -100,7 +100,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
     }
 
     return (
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.gridContainer}>
                 <Text style={styles.text}>Name</Text>
                 <TextInput
@@ -111,10 +111,10 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                     onChangeText={(text) => setName(text)}
                 />
             </View>
-            <View style={styles.gridContainer}>
-                <Text style={styles.text}>Birthday</Text>
+            <View style={styles.dateGridContainer}>
+                <Text style={styles.text}>Birthday:</Text>
+                <Text style={styles.text}>{birthDate.toDateString()}</Text>
                 <Datepicker date={birthDate} setDate={setBirthDate} />
-                <Text>{birthDate.toDateString()}</Text>
             </View>
             <View style={styles.gridContainer}>
                 <Text style={styles.text}>Gender</Text>
@@ -154,7 +154,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
             <Pressable style={styles.button} onPress={() => handleModifyButton()}>
                 <Text style={styles.text}>Modify</Text>                   
             </Pressable>
-        </View>
+        </ScrollView>
     )
 }
 
@@ -178,11 +178,10 @@ const styles = StyleSheet.create({
     },
     text:{
         alignSelf: 'center',
-        fontSize: 18,
+        fontSize: 16,
         color: "#fff",
         textTransform: 'uppercase',
         fontWeight: "600",
-        paddingVertical: 10,
         marginHorizontal: 10
     },
     gridContainer:{
@@ -190,7 +189,13 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         justifyContent: 'flex-start',
         alignItems: 'center',
-        marginVertical: 10
+        marginVertical: 5
+    },
+    dateGridContainer : {
+        flexDirection: 'row',
+        marginHorizontal: 10,
+        justifyContent: 'flex-start',
+        alignItems: 'baseline',
     },
     activitySelectMenuContainer: {
         backgroundColor: "#fff",
@@ -204,10 +209,11 @@ const styles = StyleSheet.create({
       },
     button:{
         marginTop: 20,
-        width: 100,
-        paddingHorizontal: 5,
-        marginHorizontal: 20,
+        width: 150,
+        height: 50,
         alignSelf: "center",
+        alignContent: 'center',
+        justifyContent: 'center',
         backgroundColor: "#000",
     },
   });

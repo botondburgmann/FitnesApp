@@ -27,8 +27,7 @@ const Routine = (props) => {
     const workoutType = props.workoutType;
   return (
     <Pressable style={styles.container} onPress={() => navigation.navigate('Focus',{workoutType: workoutType})}>
-       {/*  <Image style={styles.image} source={imageSource} /> */}
-        <Text>{workoutType}</Text>
+        <Text style={styles.text}>{workoutType} workout</Text>
     </Pressable>
   )
 }
@@ -37,16 +36,24 @@ export default Routine
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 50,
+    marginTop: 30,
     flexDirection:'row',
     justifyContent: 'space-evenly',
-    backgroundColor:'green',    
+    backgroundColor:'#808080',    
     alignItems: 'center',
-    borderWidth: 5,
-    borderColor: 'red'
+    borderWidth: 2,
+    borderColor: '#000',
   },
   image: {
     width: 50,
     height: 100,
+  },
+  text:{
+    alignSelf: 'flex-start',
+    fontSize: 18,
+    color: "#fff",
+    textTransform: 'uppercase',
+    fontWeight: "800",
+    paddingVertical: 30,
   },
 });

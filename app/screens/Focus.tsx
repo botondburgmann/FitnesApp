@@ -14,7 +14,10 @@ const [focus, setFocus] = useState<string>();
 const options = ["Strength", "Hypertrophy"];
   return (
     <View style={styles.container}>
-        <Radiobutton selectedValue={focus} setselectedValue={setFocus} options={options} />
+        <Text style={styles.label}>What would you like to focus on?</Text>
+        <View style={styles.radioButtonContainer}>
+          <Radiobutton selectedValue={focus} setselectedValue={setFocus} options={options} />
+        </View>
         <Pressable style={styles.button} onPress={() => navigation.navigate('CurrentExercise',{workoutType: workoutType, focus:focus})}>
           <Text style={styles.text}>Start Workout</Text>
       </Pressable>
@@ -29,6 +32,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#ff0000'
+  },
+  radioButtonContainer: {
+    alignItems: 'center'
   },
   text:{
     alignSelf: 'center',
@@ -45,5 +51,15 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     alignSelf: "center",
     backgroundColor: "#000",
+  },
+  label: {
+    alignSelf: 'center',
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#fff",
+    textTransform: 'uppercase',
+    marginVertical: 10,
+    textAlign: 'center',
+    lineHeight: 40
   },
 });

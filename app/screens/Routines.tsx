@@ -1,4 +1,4 @@
-import {ScrollView, StyleSheet} from 'react-native'
+import {ScrollView, StyleSheet, Text} from 'react-native'
 import React from 'react'
 import Routine from '../components/Routine';
 import NavigationContext from '../contexts/NavigationContext';
@@ -24,6 +24,7 @@ const Routines = ({navigation}: RouterProps) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <NavigationContext.Provider value={navigation}>
+        <Text style={styles.label}>Choose workout type</Text>
         {routineComponents}
       </NavigationContext.Provider>
      </ScrollView>
@@ -52,5 +53,14 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     alignSelf: "center",
     backgroundColor: "#000",
+  },
+  label: {
+    alignSelf: 'center',
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#fff",
+    textTransform: 'uppercase',
+    marginTop: 30,
+    textAlign: 'center',
   },
 });
