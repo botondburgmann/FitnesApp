@@ -84,7 +84,7 @@ const Details = ({ route, navigation }: RouterProps) => {
         tableData: []
       });
     };
-  }, [records])
+  }, [records, loading])
   
   
   function sortRecords(records: ExerciseRecords): ExerciseRecords {
@@ -207,7 +207,9 @@ const styles = StyleSheet.create({
     container: {
     flex: 1,
     justifyContent: 'flex-start',
-    backgroundColor: '#ff0000'
+    backgroundColor: '#ff0000',
+    paddingHorizontal: 20
+
   },
   tableContainer:{
     marginHorizontal:10
