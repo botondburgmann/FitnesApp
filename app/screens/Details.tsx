@@ -190,9 +190,9 @@ const Details = ({ route, navigation }: RouterProps) => {
       : <ScrollView>
         <Text style={styles.text}>Maximum weight: {mostWeight.weights} kg for {mostWeight.reps} repetitons</Text>
         <Text style={styles.text}>Most repetitions: {mostReps.reps} with {mostReps.weights} kg</Text>
-        <Table>
-          <Row data={table.tableHead} textStyle={styles.text}/>
-          <Rows data={table.tableData} textStyle={styles.text}/>
+        <Table borderStyle={{borderWidth: 2, borderColor: '#b0a2a2'}}>
+          <Row data={table.tableHead} style={styles.head} textStyle={styles.headText}/>
+          <Rows data={table.tableData} textStyle={styles.cellText}/>
         </Table>
       </ScrollView> 
       
@@ -219,6 +219,23 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight: "600",
     paddingVertical: 10,
+  },
+  head:{
+    height: 50,
+  },
+  headText:{
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "800",
+    textTransform: 'uppercase',
+    textAlign: 'center'
+  },  
+  cellText:{
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
+    paddingVertical: 5,
+    textAlign: 'center'
   },
   selectedExercise:{    alignSelf: 'center',
   fontSize: 20,

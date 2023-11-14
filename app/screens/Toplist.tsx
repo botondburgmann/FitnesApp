@@ -132,10 +132,12 @@ const Toplist = () => {
     <Text style={styles.label}>{week.start} - {week.end}</Text>
     {loading 
       ? <ActivityIndicator/> 
-      : <Table>
-          <Row data={table.tableHead} textStyle={styles.text}/>
-          <Rows data={table.tableData} textStyle={styles.text}/>
-        </Table>
+      : 
+        <Table borderStyle={{borderWidth: 2, borderColor: '#b0a2a2'}}>
+            <Row data={table.tableHead} style={styles.head} textStyle={styles.headText}/>
+            <Rows data={table.tableData} textStyle={styles.cellText}/>
+          </Table>
+      
       }
     </View>
   )
@@ -147,8 +149,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#ff0000'
+    backgroundColor: '#ff0000',
+    paddingHorizontal: 20
   },
+
   input: {
     marginHorizontal: 10,
     marginVertical: 4,
@@ -166,6 +170,23 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     paddingVertical: 5,
   },
+  head:{
+    height: 50,
+  },
+  headText:{
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "800",
+    textTransform: 'uppercase',
+    textAlign: 'center'
+  },  
+  cellText:{
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
+    paddingVertical: 5,
+    textAlign: 'center'
+  },
   gridContainer:{
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -182,11 +203,12 @@ const styles = StyleSheet.create({
   },
   label: {
     alignSelf: 'center',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "800",
     color: "#fff",
     textTransform: 'uppercase',
-    marginVertical: 10,
+    marginTop: 10,
+    marginBottom: 50,
     textAlign: 'center',
     lineHeight: 40
   },

@@ -419,8 +419,6 @@ export const addExperience = async (userID: string, experience: number): Promise
         const firstUserDoc = firstUsersSnapshot.docs[0];
         
         validateExperience(experience);
-
-        console.log(experience);
         
         const firstUpdatedData = {
             experience: firstUserDoc.data().experience+experience,
