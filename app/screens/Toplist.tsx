@@ -1,4 +1,4 @@
-import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Button, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import {Table, Row, Rows} from 'react-native-table-component'
 import { getAllUsers, resetWeeklyExperience } from '../functions/databaseQueries';
@@ -10,50 +10,47 @@ interface WeekRange{
   end: Date;
 }
 
-interface User {
-  activityLevel: string;
-  age: number;
-  weeklyExperience:number;
-  experience: number;
-  gender: string;
-  height: number;
-  level: number;
-  name: string;
-  weight: number;
+type Columns = {
+  levels: number[],
+  names: string[],
+  positions: number[],
+  userIDs: string [],
+  weeklyExperiences: number[]
+
+
 }
 const Toplist = () => {
-  const userID = useContext(UserContext);
-
-
-  const [table, setTable] = useState({
-    tableHead: ["Position", "Name", "Level", "XP this week"],
-    tableData: []
-  });
-
-  
+  const [users, setUsers] = useState<MyUser[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    const unsubscribeFromUser = getAllUsers((users) => { 
-
+    const unsubscribe = getAllUsers((users) => {
       const sortedUsers = sortUsers(users);
-      const updatedTableData = sortedUsers.map((user, index) => [
-        index + 1,
-        user.name,
-        user.level,
-        user.weeklyExperience,
-      ]);
-      
-      setTable((prev) => ({ ...prev, tableData: updatedTableData }));      
+      setUsers(sortedUsers);
       setLoading(false);
-    })
-    
-    return () => {
-      unsubscribeFromUser()
-    }
-  }, [])
-  
+    });
 
+  
+  
+    return () => {
+      unsubscribe();
+      setUsers([])
+    }
+  }, []);
+
+
+  const components = [];
+  users.forEach((user, index) => {
+    components.push(
+      <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, flexWrap:'wrap'}}>
+        <Text style={styles.text}>{index + 1}</Text>
+        <Pressable onPress={() => alert(user.userID)}>
+          <Text style={styles.text}>{user.name}</Text>
+        </Pressable>
+        <Text style={styles.text}>level {user.level}</Text>
+        <Text style={styles.text}>{user.weeklyExperience} XP</Text>
+
+      </View>)
+  })
 
   function sortUsers(users: MyUser[]): MyUser[] {
     const sortedUsers = [...users];
@@ -129,15 +126,12 @@ const Toplist = () => {
 
   return (
     <View style={styles.container}>
-    <Text style={styles.label}>{week.start} - {week.end}</Text>
-    {loading 
+      <Text style={styles.label}>{week.start} - {week.end}</Text>
+      {loading 
       ? <ActivityIndicator/> 
-      : 
-        <Table borderStyle={{borderWidth: 2, borderColor: '#b0a2a2'}}>
-            <Row data={table.tableHead} style={styles.head} textStyle={styles.headText}/>
-            <Rows data={table.tableData} textStyle={styles.cellText}/>
-          </Table>
-      
+      :  <ScrollView>
+          { components}
+        </ScrollView>
       }
     </View>
   )
@@ -148,58 +142,8 @@ export default Toplist
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ff0000',
-    paddingHorizontal: 20
-  },
-
-  input: {
-    marginHorizontal: 10,
-    marginVertical: 4,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 10,
-    backgroundColor: '#fff'
-  },
-  text:{
-    alignSelf: 'flex-start',
-    fontSize: 12,
-    color: "#fff",
-    textTransform: 'uppercase',
-    fontWeight: "600",
-    paddingVertical: 5,
-  },
-  head:{
-    height: 50,
-  },
-  headText:{
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "800",
-    textTransform: 'uppercase',
-    textAlign: 'center'
-  },  
-  cellText:{
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "600",
-    paddingVertical: 5,
-    textAlign: 'center'
-  },
-  gridContainer:{
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: 10,
-    marginVertical: 20,
-    justifyContent: 'center'
-  },
-  button:{
-    width: 100,
     paddingHorizontal: 5,
-    marginHorizontal: 20,
-    alignSelf: "center",
-    backgroundColor: "#000",
+    backgroundColor: '#ff0000'
   },
   label: {
     alignSelf: 'center',
@@ -207,15 +151,15 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#fff",
     textTransform: 'uppercase',
-    marginTop: 10,
-    marginBottom: 50,
-    textAlign: 'center',
-    lineHeight: 40
+    marginTop: 100,
+    marginBottom: 20
   },
-  selectMenuContainer: {
-    backgroundColor: "#fff",
-    padding: 5,
-    marginHorizontal: 10,
-    marginVertical: 4, 
-},
+  text:{
+    fontSize: 14,
+    color: "#fff",
+    textTransform: 'uppercase',
+    fontWeight: "600",
+    paddingVertical: 10,
+    paddingHorizontal: 5
+  },
 });

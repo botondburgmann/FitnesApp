@@ -42,6 +42,7 @@ export type MyUser = {
     name: string;
     weeklyExperience:number;
     weight: number;
+    userID: string;
 }
 
 export type ExerciseRecords = {

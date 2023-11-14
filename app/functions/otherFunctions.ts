@@ -158,7 +158,6 @@ export const shuffleArray = (array: any[]): any[]=> {
     return shuffledArray;
 };
 
-
 export const chooseExercises = (exercises:Exercise[], activityLevel: string ): Exercise[] => {    
     const shuffledExercises = shuffleArray(exercises);
     const workout = [];
@@ -188,6 +187,6 @@ export const chooseExercises = (exercises:Exercise[], activityLevel: string ): E
         throw new Error("invalid activityLevel");
       }      
       return workout;
-  };
+};
 
   

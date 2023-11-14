@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   headText:{
     color: "#fff",
-    fontSize: 14,
+    fontSize: 12  ,
     fontWeight: "800",
     textTransform: 'uppercase',
     textAlign: 'center'

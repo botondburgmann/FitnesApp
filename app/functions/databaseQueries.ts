@@ -231,7 +231,7 @@ export const getAllUsers = (callback): Unsubscribe => {
         const users = [];
         usersSnapshot.docs.forEach(usersDoc => {
             users.push(usersDoc.data())
-        })
+        })        
         callback(users);    
     })
     return unsubscribeFromUsers;
