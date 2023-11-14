@@ -4,22 +4,14 @@ import {Table, Row, Rows} from 'react-native-table-component'
 import { getAllUsers, resetWeeklyExperience } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { MyUser  } from '../types and interfaces/types';
+import { RouterProps } from '../types and interfaces/interfaces';
 
 interface WeekRange{
   start: Date;
   end: Date;
 }
 
-type Columns = {
-  levels: number[],
-  names: string[],
-  positions: number[],
-  userIDs: string [],
-  weeklyExperiences: number[]
-
-
-}
-const Toplist = () => {
+const Toplist = ({navigation}: RouterProps) => {
   const [users, setUsers] = useState<MyUser[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -43,7 +35,7 @@ const Toplist = () => {
     components.push(
       <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, flexWrap:'wrap'}}>
         <Text style={styles.text}>{index + 1}</Text>
-        <Pressable onPress={() => alert(user.userID)}>
+        <Pressable onPress={()=>navigation.navigate('User', {userID: user.userID})}>
           <Text style={styles.text}>{user.name}</Text>
         </Pressable>
         <Text style={styles.text}>level {user.level}</Text>

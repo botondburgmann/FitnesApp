@@ -13,7 +13,8 @@ interface RouterProps {
 }
 
 const Account = ({ route, navigation }: RouterProps) => {
-  const userID   = useContext(UserContext);
+  const loggedInUserID   = useContext(UserContext);
+  const { userID } = route?.params;
 
   const [user, setUser] = useState<MyUser>({
     activityLevel: "",
@@ -23,6 +24,7 @@ const Account = ({ route, navigation }: RouterProps) => {
     height: 0,
     level: 0,
     name: "",
+    userID: "",
     weeklyExperience:0,
     weight: 0
   });
@@ -62,7 +64,8 @@ useEffect(() => {
       level: 0,
       name: "",
       weeklyExperience:0,
-      weight: 0
+      weight: 0,
+      userID: ""
     });
     setmostWeightExercise({
       name: "",
@@ -94,24 +97,41 @@ useEffect(() => {
             <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>
 
             <Text style={styles.text}>Best records</Text>
+            {
+              mostWeightExercise.name === "" 
+              ? <Text style={styles.text}>
+                 Max weight: No data
+                </Text>
+              : <Text style={styles.text}>
+                  Max weight: {( mostWeightExercise).name} {( mostWeightExercise).weights} kg ({(mostWeightExercise).reps} repetitions)
+                </Text>
+            }
+            {
+              mostRepsExercise.name === "" 
+              ? <Text style={styles.text}>
+                 Most repetitions: No data
+                </Text>
+              : <Text style={styles.text}>
+                  Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
+                </Text>
+            }
 
-            <Text style={styles.text}>
-              Weight: {( mostWeightExercise).name} {( mostWeightExercise).weights} kg ({(mostWeightExercise).reps} repetitions)
-            </Text>
-            <Text style={styles.text}>
-              Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
-            </Text>
+
           </View>
 
       
 
-      
-      <Pressable style={styles.button}>
-          <Text style={styles.text} onPress={() => navigation.navigate("Edit profile", {user: user})}>Edit profile</Text>
-      </Pressable>
-      <Pressable style={styles.button}>
-          <Text style={styles.text} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>
-      </Pressable> 
+      {userID === loggedInUserID &&
+      <View>
+        <Pressable style={styles.button}>
+            <Text style={styles.text} onPress={() => navigation.navigate("Edit profile", {user: user})}>Edit profile</Text>
+        </Pressable>
+        <Pressable style={styles.button}>
+            <Text style={styles.text} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>
+        </Pressable>
+      </View>
+      }
+ 
     </View>
   )
 }

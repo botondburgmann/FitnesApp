@@ -2,12 +2,9 @@ import {  ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } fro
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../contexts/UserContext';
 import { getAllExercises, toggleExerciseVisibilty } from '../functions/databaseQueries';
-import { NavigationProp } from '@react-navigation/native';
 import { Exercise } from '../types and interfaces/types';
+import { RouterProps } from '../types and interfaces/interfaces';
 
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-}
 const Exercises = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
 

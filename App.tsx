@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Login from './app/screens/Login';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { FIREBASE_AUTH} from './FirebaseConfig';
 import Registration from './app/screens/Registration';
@@ -72,18 +72,28 @@ function InsideLayout() {
     })}
   >
     <Tab.Screen name='Workouts' component={WorkoutsLayout} options={{ headerShown: false }} />
-    <Tab.Screen name='Toplist' component={Toplist} options={{ headerShown: false }} />
+    <Tab.Screen name='Toplist' component={ToplistLayout} options={{ headerShown: false }} />
     <Tab.Screen name='Exercises' component={ExercisesLayout} options={{ headerShown: false }} />
     <Tab.Screen name='Profile' component={ProfileLayout} options={{ headerShown: false }} />
   </Tab.Navigator>
   );
 }
 
-function ProfileLayout() {
+function ToplistLayout() {
   return( 
     <SetupStack.Navigator>
-        <Tab.Screen name='Account' component={Account} options={{ headerShown: false }} />
-        <Tab.Screen name='Edit profile' component={EditProfile} />
+        <Tab.Screen name='Leaderboard' component={Toplist} options={{ headerShown: false }}/>
+        <Tab.Screen name='User' component={Account}/>
+    </SetupStack.Navigator>
+  )
+}
+
+function ProfileLayout() {
+  const userID   = useContext(UserContext);
+  return( 
+    <SetupStack.Navigator>
+        <Tab.Screen name='Account' component={Account} options={{ headerShown: false }} initialParams={{userID: userID  }}/>
+        <Tab.Screen name='Edit profile' component={EditProfile}/>
 
     </SetupStack.Navigator>
   )
