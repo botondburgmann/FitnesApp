@@ -6,6 +6,7 @@ import UserContext from '../contexts/UserContext';
 import Datepicker from '../components/Datepicker';
 import Radiobutton from '../components/Radiobutton';
 import SelectMenu from '../components/SelectMenu';
+import { globalStyles } from '../assets/styles';
 
 interface RouterProps {
     route: any,
@@ -92,7 +93,8 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                 activityLevel: activityValue,
                 experience: user.experience,
                 level: user.level,
-                weeklyExperience: user.weeklyExperience
+                weeklyExperience: user.weeklyExperience,
+                userID: user.userID
             }            
             editProfile(userID,changes)
             navigation.navigate("Account")
@@ -100,11 +102,11 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={[globalStyles.container, {flex: 1}]}>
             <View style={styles.gridContainer}>
                 <Text style={styles.text}>Name</Text>
                 <TextInput
-                    style={styles.input}
+                    style={[globalStyles.input,{flex: 1}]}
                     value={name}
                     placeholder="name"
                     autoCapitalize='none'
@@ -125,7 +127,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                 <TextInput
                     keyboardType='numeric'
                     value={weight.toString()}
-                    style={styles.input}
+                    style={globalStyles.input}
                     placeholder={systemValueWeight === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
                     autoCapitalize='none'
                     onChangeText={(text) => setWeight(parseFloat(text))}
@@ -139,7 +141,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                 <TextInput
                     keyboardType='numeric'
                     value={height.toString()}
-                    style={styles.input}
+                    style={globalStyles.input}
                     placeholder={systemValueHeight === "ft" ? "height (ft)" : "height (cm)" }
                     autoCapitalize='none'
                     onChangeText={(text) => setHeight(parseFloat(text))}
@@ -151,8 +153,8 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
             <View style={styles.activitySelectMenuContainer}>
                 <SelectMenu data={activityItems} setSelectedValue={setActivityValue} title={"Activity level"} />
             </View> 
-            <Pressable style={styles.button} onPress={() => handleModifyButton()}>
-                <Text style={styles.text}>Modify</Text>                   
+            <Pressable style={[globalStyles.button, {marginTop: 20,width: 150, height: 50,}]} onPress={() => handleModifyButton()}>
+                <Text style={globalStyles.buttonText}>Modify</Text>                   
             </Pressable>
         </ScrollView>
     )
@@ -161,21 +163,6 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
 export default EditProfile
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        backgroundColor: '#ff0000'
-    },
-    input: {
-        marginHorizontal: 10,
-        flex: 1,
-        marginVertical: 4,
-        height: 50,
-        borderWidth: 1,
-        borderRadius: 4,
-        padding: 10,
-        backgroundColor: '#fff'
-    },
     text:{
         alignSelf: 'center',
         fontSize: 16,
@@ -207,13 +194,4 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         padding: 5
       },
-    button:{
-        marginTop: 20,
-        width: 150,
-        height: 50,
-        alignSelf: "center",
-        alignContent: 'center',
-        justifyContent: 'center',
-        backgroundColor: "#000",
-    },
   });

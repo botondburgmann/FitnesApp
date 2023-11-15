@@ -6,6 +6,7 @@ import UserContext from '../contexts/UserContext';
 import { SelectItem } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { globalStyles } from '../assets/styles';
 
 
 const Height = ({navigation}: RouterProps) => {
@@ -19,7 +20,7 @@ const Height = ({navigation}: RouterProps) => {
   ]);
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.container}>
       <Text style={styles.label}>Please, select your height</Text>
       <View style={styles.icon}>
         <MaterialCommunityIcons name="human-male-height" size={60} color="#fff" />
@@ -28,7 +29,7 @@ const Height = ({navigation}: RouterProps) => {
         <TextInput
           keyboardType='numeric'
           value={height}
-          style={styles.input}
+          style={globalStyles.input}
           placeholder={value === "ft" ? "Height (ft)" : "Height (cm)" }
           autoCapitalize='none'
           onChangeText={(text) => setHeight(text)}
@@ -38,11 +39,11 @@ const Height = ({navigation}: RouterProps) => {
         </View>
       </View>  
       <View style={styles.buttonGroup}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Weight')}>
+        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Weight')}>
           <Text style={styles.text}>Go back</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => setUpProfile('height', parseFloat(height), userID, navigation, 'ActivityLevel', value)}>
-          <Text style={styles.text}>Next</Text>
+        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => setUpProfile('height', parseFloat(height), userID, navigation, 'ActivityLevel', value)}>
+          <Text style={globalStyles.buttonText}>Next</Text>
         </Pressable>
       </View>            
     </View>
@@ -52,20 +53,6 @@ const Height = ({navigation}: RouterProps) => {
 export default Height
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ff0000'
-  },
- input: {
-    marginHorizontal: 10,
-    marginVertical: 4,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 10,
-    backgroundColor: '#fff'
-  },
   text:{
     alignSelf: 'center',
     fontSize: 18,
@@ -73,13 +60,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight: "600",
     paddingVertical: 10,
-  },
-  button:{
-    width: 100,
-    paddingHorizontal: 5,
-    marginHorizontal: 20,
-    alignSelf: "center",
-    backgroundColor: "#000",
   },
   label: {
     alignSelf: 'center',

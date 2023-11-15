@@ -6,6 +6,7 @@ import UserContext from '../contexts/UserContext';
 import { SelectItem } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { globalStyles } from '../assets/styles';
 
 
 
@@ -22,7 +23,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
 
 
   return (
-    <View style={styles.container}>
+    <View style={[globalStyles.container, {flex: 1}]}>
       <Text style={styles.label}>Please, select your activity level</Text>
       <View style={styles.icon}>
         <MaterialCommunityIcons name="weight-lifter" size={60} color="#fff" />
@@ -32,11 +33,11 @@ const ActivityLevel = ({navigation}: RouterProps) => {
         <SelectMenu data={items} setSelectedValue={setValue} title={"Activity level"} />
       </View>      
       <View style={styles.buttonGroup}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Height')}>
-          <Text style={styles.text}>Go back</Text>
+        <Pressable style={globalStyles.button} onPress={() => navigation.navigate('Height')}>
+          <Text style={globalStyles.buttonText}>Go back</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'InsideLayout')}>
-          <Text style={styles.text}>Finish</Text>
+        <Pressable style={globalStyles.button} onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'InsideLayout')}>
+          <Text style={globalStyles.buttonText}>Finish</Text>
         </Pressable>
       </View>  
     </View>
@@ -46,11 +47,6 @@ const ActivityLevel = ({navigation}: RouterProps) => {
 export default ActivityLevel
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ff0000'
-  },
   text:{
     alignSelf: 'center',
     fontSize: 18,
@@ -59,14 +55,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     paddingVertical: 10,
   },
-  button:{
-    width: 100,
-    paddingHorizontal: 5,
-    marginHorizontal: 20,
-    alignSelf: "center",
-    backgroundColor: "#000",
-  },
-
   label: {
     alignSelf: 'center',
     fontSize: 20,

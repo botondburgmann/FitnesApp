@@ -3,6 +3,7 @@ import React from 'react'
 import Routine from '../components/Routine';
 import NavigationContext from '../contexts/NavigationContext';
 import { RouterProps } from '../types and interfaces/interfaces';
+import { globalStyles } from '../assets/styles';
 
 
 
@@ -22,7 +23,7 @@ const Routines = ({navigation}: RouterProps) => {
     }
         
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={globalStyles.container}>
       <NavigationContext.Provider value={navigation}>
         <Text style={styles.label}>Choose workout type</Text>
         {routineComponents}
@@ -34,10 +35,6 @@ const Routines = ({navigation}: RouterProps) => {
 export default Routines
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    backgroundColor: '#ff0000'
-  },
   text:{
     alignSelf: 'center',
     fontSize: 18,
@@ -45,14 +42,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight: "600",
     paddingVertical: 10,
-  },
-  button:{
-    width: 250,
-    paddingHorizontal: 5,
-    marginHorizontal: 20,
-    marginVertical: 10,
-    alignSelf: "center",
-    backgroundColor: "#000",
   },
   label: {
     alignSelf: 'center',

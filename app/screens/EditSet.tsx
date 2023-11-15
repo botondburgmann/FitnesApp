@@ -4,6 +4,7 @@ import { NavigationProp } from '@react-navigation/native';
 import { editSet } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { addXPForOneSet, removeXP } from '../functions/otherFunctions';
+import { globalStyles } from '../assets/styles';
 
 
 interface RouterProps {
@@ -65,7 +66,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[globalStyles.container, {flex: 1}]}>
             <Text style={styles.label}>Edit {set.exercise}</Text>
             { side !== "both"
                 ?<View style={styles.gridContainer}>
@@ -82,7 +83,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
             <Text style={styles.text}>weight (kg)</Text>
             <TextInput
                 keyboardType='numeric'
-                style={styles.input}
+                style={globalStyles.input}
                 value={weight}
                 placeholder="Weight"
                 autoCapitalize='none'
@@ -93,7 +94,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                 <Text style={styles.text}>reps</Text>
                 <TextInput
                     keyboardType='numeric'
-                    style={styles.input}
+                    style={globalStyles.input}
                     value={reps}
                     placeholder="Reps"
                     autoCapitalize='none'
@@ -106,7 +107,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
             <Text style={styles.text}>time (seconds)</Text>
             <TextInput
                 keyboardType='numeric'
-                style={styles.input}
+                style={globalStyles.input}
                 value={time}
                 placeholder="Time (in seconds)"
                 autoCapitalize='none'
@@ -115,14 +116,14 @@ const EditSet = ({ route, navigation }: RouterProps) => {
             <Text style={styles.text}>Rest time (seconds)</Text>
             <TextInput
                 keyboardType='numeric'
-                style={styles.input}
+                style={globalStyles.input}
                 value={restTime}
                 placeholder="Rest time (in seconds)"
                 autoCapitalize='none'
                 onChangeText={(text) => setRestTime(text)}
             />
-            <Pressable style={styles.button} onPress={() => handleModifyButton(isIsometric, changeIsometric, changeNormal, set)}>
-                <Text style={styles.text}>Modify</Text>                   
+            <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleModifyButton(isIsometric, changeIsometric, changeNormal, set)}>
+                <Text style={globalStyles.buttonText}>Modify</Text>                   
             </Pressable>
         </View>
     )
@@ -131,19 +132,6 @@ const EditSet = ({ route, navigation }: RouterProps) => {
 export default EditSet
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#ff0000'
-    },
-    input: {
-        marginHorizontal: 10,
-        marginVertical: 4,
-        height: 50,
-        borderWidth: 1,
-        borderRadius: 4,
-        padding: 10,
-        backgroundColor: '#fff'
-    },
     text:{
         alignSelf: 'center',
         fontSize: 18,
@@ -156,13 +144,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginHorizontal: 10,
         justifyContent: 'center'
-    },
-    button:{
-        width: 100,
-        paddingHorizontal: 5,
-        marginHorizontal: 20,
-        alignSelf: "center",
-        backgroundColor: "#000",
     },
     label: {
         fontSize: 20,

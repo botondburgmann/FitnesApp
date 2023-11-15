@@ -6,6 +6,7 @@ import UserContext from '../contexts/UserContext';
 import { MyUser  } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
 import { selectLoggedInUser, selectSimilarUsers, sortUsers } from '../functions/otherFunctions';
+import { globalStyles } from '../assets/styles';
 
 interface WeekRange{
   start: Date;
@@ -108,7 +109,7 @@ const Toplist = ({navigation}: RouterProps) => {
   
 
   return (
-    <View style={styles.container}>
+    <View style={[globalStyles.container, {flex: 1}]}>
       <Text style={styles.label}>{week.start} - {week.end}</Text>
       {loading 
       ? <ActivityIndicator/> 
@@ -123,11 +124,6 @@ const Toplist = ({navigation}: RouterProps) => {
 export default Toplist
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 5,
-    backgroundColor: '#ff0000'
-  },
   label: {
     alignSelf: 'center',
     fontSize: 18,

@@ -7,6 +7,7 @@ import Set from '../components/Set';
 import Rest from '../components/Rest';
 import { addXP, calculateNumberOfSet, chooseExercises } from '../functions/otherFunctions';
 import { NavigationProp } from '@react-navigation/native';
+import { globalStyles } from '../assets/styles';
 
 
 interface RouterProps {
@@ -168,7 +169,7 @@ useEffect(() => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[globalStyles.container, {flex: 1}]}>
       {
         loadingExercises || loadingUser 
           ? <ActivityIndicator />
@@ -179,8 +180,8 @@ useEffect(() => {
               </ScrollView>
             : <View>
                 <Text style={styles.text}>Congrats</Text>
-                <Pressable style={styles.button} onPress={() => handleFinishWorkoutButton(workout.current, userID, new Date().toDateString(), totalXP.current, navigation)}>
-                    <Text style={styles.text}>Next</Text>                   
+                <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleFinishWorkoutButton(workout.current, userID, new Date().toDateString(), totalXP.current, navigation)}>
+                    <Text style={globalStyles.buttonText}>Next</Text>                   
                 </Pressable>
               </View>
       }
@@ -191,11 +192,6 @@ useEffect(() => {
 export default CurrentExercise
 
 const styles = StyleSheet.create({
-  container: {
-    flex:1,
-    backgroundColor: '#ff0000'
-},
- 
   text:{
       alignSelf: 'center',
       fontSize: 18,
@@ -203,12 +199,5 @@ const styles = StyleSheet.create({
       textTransform: 'uppercase',
       fontWeight: "600",
       paddingVertical: 10,
-  },
-  button:{
-      width: 100,
-      paddingHorizontal: 5,
-      marginHorizontal: 20,
-      alignSelf: "center",
-      backgroundColor: "#000",
   },
 });

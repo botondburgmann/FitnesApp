@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import Radiobutton from '../components/Radiobutton';
 import { NavigationProp } from '@react-navigation/native';
+import { globalStyles } from '../assets/styles';
 
 interface RouterProps {
   route: any,
@@ -13,13 +14,13 @@ const { workoutType } = route?.params;
 const [focus, setFocus] = useState<string>();
 const options = ["Strength", "Hypertrophy"];
   return (
-    <View style={styles.container}>
+    <View style={[globalStyles.container, {flex: 1}]}>
         <Text style={styles.label}>What would you like to focus on?</Text>
         <View style={styles.radioButtonContainer}>
           <Radiobutton selectedValue={focus} setselectedValue={setFocus} options={options} />
         </View>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('CurrentExercise',{workoutType: workoutType, focus:focus})}>
-          <Text style={styles.text}>Start Workout</Text>
+        <Pressable style={globalStyles.button} onPress={() => navigation.navigate('CurrentExercise',{workoutType: workoutType, focus:focus})}>
+          <Text style={globalStyles.buttonText}>Start Workout</Text>
       </Pressable>
     </View>
   )
@@ -28,11 +29,6 @@ const options = ["Strength", "Hypertrophy"];
 export default Focus
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ff0000'
-  },
   radioButtonContainer: {
     alignItems: 'center'
   },
@@ -43,14 +39,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight: "600",
     paddingVertical: 10,
-  },
-  button:{
-    width: 250,
-    paddingHorizontal: 5,
-    marginHorizontal: 20,
-    marginVertical: 10,
-    alignSelf: "center",
-    backgroundColor: "#000",
   },
   label: {
     alignSelf: 'center',

@@ -4,6 +4,7 @@ import { setUpProfile } from "../functions/databaseQueries";
 import Radiobutton from "../components/Radiobutton";
 import UserContext from "../contexts/UserContext";
 import { RouterProps } from "../types and interfaces/interfaces";
+import { globalStyles } from "../assets/styles";
 
 
 const Gender = ( {navigation}: RouterProps) => {
@@ -12,12 +13,12 @@ const Gender = ( {navigation}: RouterProps) => {
   const options = ["Male", "Female"];
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.container}>
       <Text style={styles.label}>Please, select your gender</Text>
       <Radiobutton selectedValue={gender} setselectedValue={setGender} options={options} />
 
-      <Pressable style={styles.button} onPress={() => setUpProfile('gender', gender, userID, navigation, 'Age')}>
-          <Text style={styles.text}>Next</Text>
+      <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => setUpProfile('gender', gender, userID, navigation, 'Age')}>
+          <Text style={globalStyles.buttonText}>Next</Text>
       </Pressable>
     </View>
   )
@@ -26,13 +27,6 @@ const Gender = ( {navigation}: RouterProps) => {
 export default Gender
 
 const styles = StyleSheet.create({
-     container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#ff0000'
-    },
-
     text:{
       alignSelf: 'center',
       fontSize: 18,
@@ -40,12 +34,6 @@ const styles = StyleSheet.create({
       textTransform: 'uppercase',
       fontWeight: "600",
       paddingVertical: 10,
-    },
-    button:{
-        width: 80,
-        paddingHorizontal: 5,
-        alignSelf: "center",
-        backgroundColor: "#000",
     },
     radioGroup :{
         marginVertical: 20,

@@ -5,6 +5,7 @@ import {BestExercise, ExerciseRecords, TableRow, TableState } from '../types and
 import { getExercise } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import {Table, Row, Rows} from 'react-native-table-component'
+import { globalStyles } from '../assets/styles';
 
 
 interface RouterProps {
@@ -183,7 +184,7 @@ const Details = ({ route, navigation }: RouterProps) => {
 
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.container}>
       <Text style={styles.label}>{exercise}</Text>
       {loading 
       ? <ActivityIndicator/> 
@@ -204,13 +205,7 @@ const Details = ({ route, navigation }: RouterProps) => {
 export default Details
 
 const styles = StyleSheet.create({
-    container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    backgroundColor: '#ff0000',
-    paddingHorizontal: 20
 
-  },
   tableContainer:{
     marginHorizontal:10
   },

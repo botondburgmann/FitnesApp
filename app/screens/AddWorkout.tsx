@@ -6,6 +6,7 @@ import UserContext from '../contexts/UserContext'
 import {ExerciseSelectOption, ExerciseSet } from '../types and interfaces/types'
 import { addXP, handleAddButton } from '../functions/otherFunctions'
 import { NavigationProp } from '@react-navigation/native'
+import { globalStyles } from '../assets/styles'
 
 interface RouterProps {
   route: any,
@@ -112,7 +113,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
 
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={globalStyles.container}>
       <Text style={styles.label}>Add new execise</Text>
       <View style={styles.selectMenuContainer} >
         <SelectMenu
@@ -137,7 +138,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
           <Text style={styles.text}>weight (kg)</Text>
           <TextInput
             keyboardType='numeric'
-            style={styles.input}
+            style={globalStyles.input}
             value={weight}
             placeholder="Weight"
             autoCapitalize='none'
@@ -148,7 +149,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
               <Text style={styles.text}>reps</Text>
               <TextInput
                 keyboardType='numeric'
-                style={styles.input}
+                style={globalStyles.input}
                 value={reps}
                 placeholder="Reps"
                 autoCapitalize='none'
@@ -160,7 +161,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
           <Text style={styles.text}>time (seconds)</Text>
           <TextInput
             keyboardType='numeric'
-            style={styles.input}
+            style={globalStyles.input}
             value={time}
             placeholder="Time (in seconds)"
             autoCapitalize='none'
@@ -169,20 +170,20 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
           <Text style={styles.text}>Rest time (seconds)</Text>
           <TextInput
             keyboardType='numeric'
-            style={styles.input}
+            style={globalStyles.input}
             value={restTime}
             placeholder="Rest time (in seconds)"
             autoCapitalize='none'
             onChangeText={(text) => setRestTime(text)}
           />
           <View style={styles.gridContainer}>
-            <Pressable style={styles.button} onPress={() => handleAddButton(parseInt(time), setTime, parseFloat(reps), setReps, 
+            <Pressable style={[globalStyles.button, { width: 100}]} onPress={() => handleAddButton(parseInt(time), setTime, parseFloat(reps), setReps, 
                                                                             parseInt(restTime), setRestTime, side, setSide,parseFloat(weight), setWeight, 
                                                                             currentExercise, setCurrentExercise, sets, setIsEnabled, selectedExercises)}>
-                <Text style={styles.text}>Add set</Text>
+                <Text style={globalStyles.buttonText}>Add set</Text>
             </Pressable> 
-            <Pressable style={styles.button} onPress={() => handleFinishButton(selectedExercises, sets)}>
-                <Text style={styles.text}>Finish</Text>
+            <Pressable style={[globalStyles.button, { width: 100}]} onPress={() => handleFinishButton(selectedExercises, sets)}>
+                <Text style={globalStyles.buttonText}>Finish</Text>
             </Pressable>
           </View>
             <Text style={styles.text}>Total sets: {sets.exercise.length}</Text>
@@ -195,19 +196,6 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
 export default AddWorkout
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    backgroundColor: '#ff0000'
-  },
-  input: {
-    marginHorizontal: 10,
-    marginVertical: 4,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 10,
-    backgroundColor: '#fff'
-  },
   text:{
     alignSelf: 'center',
     fontSize: 18,
@@ -222,13 +210,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 20,
     justifyContent: 'center'
-  },
-  button:{
-    width: 100,
-    paddingHorizontal: 5,
-    marginHorizontal: 20,
-    alignSelf: "center",
-    backgroundColor: "#000",
   },
   label: {
     alignSelf: 'center',

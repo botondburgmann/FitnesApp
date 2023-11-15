@@ -4,6 +4,7 @@ import UserContext from '../contexts/UserContext';
 import { getAllExercises, toggleExerciseVisibilty } from '../functions/databaseQueries';
 import { Exercise } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
+import { globalStyles } from '../assets/styles';
 
 const Exercises = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
@@ -55,7 +56,7 @@ const Exercises = ({navigation}: RouterProps) => {
   
 
   return (
-    <View style={styles.container}>
+    <View style={[globalStyles.container, {flex: 1}]}>
       <Text style={styles.label}>My exercises</Text>
       {loading 
       ? <ActivityIndicator/> 
@@ -73,11 +74,6 @@ const Exercises = ({navigation}: RouterProps) => {
 export default Exercises
 
 const styles = StyleSheet.create({
-  container: {
-  flex: 1,
-  justifyContent: 'flex-start',
-  backgroundColor: '#ff0000'
-},
 tableContainer:{
   marginHorizontal:10
 },

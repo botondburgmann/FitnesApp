@@ -6,6 +6,7 @@ import UserContext from '../contexts/UserContext';
 import { NavigationProp } from '@react-navigation/native';
 import { MyUser, BestExercise } from '../types and interfaces/types';
 import { onSnapshot, query, collection, where } from 'firebase/firestore';
+import { globalStyles } from '../assets/styles';
 
 interface RouterProps {
   route: any,
@@ -90,7 +91,7 @@ useEffect(() => {
   
   }, [user])
   return (
-    <View style={styles.container} >
+    <View style={[globalStyles.container, {flex: 1}]} >
    <View>
             <Text style={styles.text}>{user.name}</Text>
             <Text style={styles.text}>Level: {user.level}</Text>
@@ -123,11 +124,11 @@ useEffect(() => {
 
       {userID === loggedInUserID &&
       <View>
-        <Pressable style={styles.button}>
+        <Pressable style={globalStyles.button}>
             <Text style={styles.text} onPress={() => navigation.navigate("Edit profile", {user: user})}>Edit profile</Text>
         </Pressable>
-        <Pressable style={styles.button}>
-            <Text style={styles.text} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>
+        <Pressable style={globalStyles.button}>
+            <Text style={globalStyles.buttonText} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>
         </Pressable>
       </View>
       }
@@ -139,11 +140,6 @@ useEffect(() => {
 export default Account
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ff0000'
-  },
   text:{
     alignSelf: 'center',
     fontSize: 18,
@@ -151,13 +147,5 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight: "600",
     paddingVertical: 10,
-  },
-  button:{
-    width: 250,
-    paddingHorizontal: 5,
-    marginHorizontal: 20,
-    marginVertical: 10,
-    alignSelf: "center",
-    backgroundColor: "#000",
-  },
+  }
 });

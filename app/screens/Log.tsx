@@ -7,6 +7,7 @@ import DisplaySets from '../components/DisplaySets';
 import { ExerciseSet } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
 import NavigationContext from '../contexts/NavigationContext';
+import { globalStyles } from '../assets/styles';
 
 
 
@@ -15,7 +16,7 @@ const Log = ({navigation}: RouterProps) => {
 
 
   return (
-    <View style={styles.container}>
+    <View style={[globalStyles.container, {flex: 1}]}>
       <Datepicker date={date} setDate={setDate} />
       <Text style={[styles.text, {marginTop: 20}]}>{date.toDateString()}</Text>
 
@@ -26,12 +27,12 @@ const Log = ({navigation}: RouterProps) => {
       </ScrollView>
     
       <View style={styles.buttonGroup}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Add',{ date: date.toDateString()})}>
-          <Text style={styles.text}>Add new Exercise</Text>
+        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Add',{ date: date.toDateString()})}>
+          <Text style={globalStyles.buttonText}>Add new Exercise</Text>
         </Pressable>
         
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Routines')}>
-          <Text style={styles.text}>Ask for routine</Text>
+        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Routines')}>
+          <Text style={globalStyles.buttonText}>Ask for routine</Text>
         </Pressable>
       </View>     
     </View>
@@ -41,11 +42,6 @@ const Log = ({navigation}: RouterProps) => {
 export default Log
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ff0000'
-  },
   text:{
     alignSelf: 'center',
     fontSize: 18,
@@ -53,13 +49,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight: "600",
     paddingVertical: 10,
-  },
-  button:{
-    width: 100,
-    paddingHorizontal: 5,
-    marginHorizontal: 20,
-    alignSelf: "center",
-    backgroundColor: "#000",
   },
 
   buttonGroup: {

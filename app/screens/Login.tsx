@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { RouterProps } from '../types and interfaces/interfaces';
+import { globalStyles } from '../assets/styles';
 
 
 
@@ -27,11 +28,11 @@ const Login = ({navigation}: RouterProps) => {
 
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.container}>
       <Text  style={[styles.logo]}>App Name</Text>
       <TextInput 
         value={email}
-        style={styles.input} 
+        style={globalStyles.input} 
         placeholder='Email' 
         autoCapitalize='none' 
         onChangeText={(text) => setEmail(text)}
@@ -39,7 +40,7 @@ const Login = ({navigation}: RouterProps) => {
       <TextInput 
         value={password}
         secureTextEntry={true}
-        style={styles.input} 
+        style={globalStyles.input} 
         placeholder='Password' 
         autoCapitalize='none' 
         onChangeText={(text) => setPassword(text)}
@@ -49,12 +50,12 @@ const Login = ({navigation}: RouterProps) => {
         <ActivityIndicator size="large" color="#0000ff"/>
       : 
         <>
-          <Pressable style={styles.button} onPress={signIn}>
-            <Text  style={styles.text}>Login</Text>
+          <Pressable style={globalStyles.button} onPress={signIn}>
+            <Text  style={globalStyles.buttonText}>Login</Text>
           </Pressable>
           <Text style={[styles.text, {marginTop: 30}]}>Not registered yet</Text>
-          <Pressable style={styles.button} onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.text}>Create new account here</Text>
+          <Pressable style={globalStyles.button} onPress={() => navigation.navigate('Register')}>
+            <Text style={globalStyles.buttonText}>Create new account here</Text>
           </Pressable>
           <Text style={styles.copyright}>Copyright 2023 Botond Burgmann</Text>
         </> 
@@ -66,31 +67,12 @@ const Login = ({navigation}: RouterProps) => {
 export default Login
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ff0000'
-  },
-  input: {
-    marginHorizontal: 10,
-    marginVertical: 4,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 10,
-    backgroundColor: '#fff'
-  },
   text:{
     alignSelf: 'center',
     fontSize: 18,
     color: "#fff",
     textTransform: 'uppercase',
     paddingVertical: 10,
-  },
-  button:{
-    marginHorizontal: 10,
-    marginVertical: 20,
-    backgroundColor: "#000",
   },
   logo: {
     alignSelf: 'center',
