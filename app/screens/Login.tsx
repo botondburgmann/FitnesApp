@@ -28,7 +28,7 @@ const Login = ({navigation}: RouterProps) => {
 
 
   return (
-    <View style={globalStyles.container}>
+    <View style={[globalStyles.container, {flex: 1}]}>
       <Text  style={[styles.logo]}>App Name</Text>
       <TextInput 
         value={email}

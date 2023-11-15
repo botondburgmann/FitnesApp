@@ -56,18 +56,18 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
                         if (maxField.value > bestExercise[field]) {
                             bestExercise[field] = maxField.value;
                             bestExercise.name = exercise.exercise[maxField.index];
-                            bestExercise[secondaryField] = exercise.reps[maxField.index];
+                            bestExercise[secondaryField] = exercise[secondaryField][maxField.index];
                         } else if (maxField.value === bestExercise[field] && maxSecondaryField.value > bestExercise[secondaryField]) {
                             bestExercise[secondaryField] = maxSecondaryField.value;
                             bestExercise.name = exercise.exercise[maxSecondaryField.index];
-                            bestExercise[field] = exercise.weights[maxSecondaryField.index];
+                            bestExercise[field] = exercise[field][maxSecondaryField.index];
                         }
                     }
                 });
             }
         });
-        callback(bestExercise)
-      });
+    });
+    callback(bestExercise)
       
 
     return unsubscribeFromWorkouts;

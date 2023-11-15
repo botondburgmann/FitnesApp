@@ -47,7 +47,7 @@ useEffect(() => {
    const unsubscribeFromMostWeight = getBestExercise(userID, "weights", "reps", (exerciseData) => {
     setmostWeightExercise(exerciseData);
   });
-  const unsubscribeFromMostReps = getBestExercise(userID, "reps", "weight", (exerciseData) => {
+  const unsubscribeFromMostReps = getBestExercise(userID, "reps", "weights", (exerciseData) => {    
     setmostRepsExercise(exerciseData);
   });
 
