@@ -21,7 +21,7 @@ const Datepicker = (props) => {
   return (
     <View style={{marginTop: 50, alignSelf: 'center' }}>
       <Pressable onPress={() => setShowDate(true)}>
-      <FontAwesome5 name="calendar-alt" size={50} color={"#fff"} />      
+        <FontAwesome5 name="calendar-alt" size={50} color={"#fff"} />      
       </Pressable>
       
       {showDate && (

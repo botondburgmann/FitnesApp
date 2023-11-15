@@ -5,6 +5,7 @@ import { getAllUsers, resetWeeklyExperience } from '../functions/databaseQueries
 import UserContext from '../contexts/UserContext';
 import { MyUser  } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
+import { selectLoggedInUser, selectSimilarUsers, sortUsers } from '../functions/otherFunctions';
 
 interface WeekRange{
   start: Date;
@@ -12,11 +13,14 @@ interface WeekRange{
 }
 
 const Toplist = ({navigation}: RouterProps) => {
+  const userID = useContext(UserContext);
   const [users, setUsers] = useState<MyUser[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const unsubscribe = getAllUsers((users) => {
-      const sortedUsers = sortUsers(users);
+      const loggedInUser = selectLoggedInUser(users, userID );
+      const similarUsers = selectSimilarUsers(users, loggedInUser);
+      const sortedUsers = sortUsers(similarUsers);
       setUsers(sortedUsers);
       setLoading(false);
     });
@@ -44,20 +48,7 @@ const Toplist = ({navigation}: RouterProps) => {
       </View>)
   })
 
-  function sortUsers(users: MyUser[]): MyUser[] {
-    const sortedUsers = [...users];
-    const n = sortedUsers.length;
 
-    for (let i = 0; i < n - 1; i++) {
-        for (let j = 0; j < n - i - 1; j++) {
-            if (sortedUsers[j].weeklyExperience < sortedUsers[j + 1].weeklyExperience) {
-                [sortedUsers[j], sortedUsers[j + 1]] = [sortedUsers[j + 1], sortedUsers[j]];
-            }
-        }
-    }
-
-    return sortedUsers;
-}
 
   const [week, setWeek] = useState({
     start: undefined,

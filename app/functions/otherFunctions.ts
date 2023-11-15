@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import { deleteSet } from "./databaseQueries";
-import { Exercise, ExerciseSelectOption, ExerciseSet } from "../types and interfaces/types";
+import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser } from "../types and interfaces/types";
 
 export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     let currentExperience = 0;
@@ -190,3 +190,39 @@ export const chooseExercises = (exercises:Exercise[], activityLevel: string ): E
 };
 
   
+export const sortUsers = (users: MyUser[]): MyUser[] => {
+  const sortedUsers = [...users];
+  const n = sortedUsers.length;
+
+  for (let i = 0; i < n - 1; i++) {
+      for (let j = 0; j < n - i - 1; j++) {
+          if (sortedUsers[j].weeklyExperience < sortedUsers[j + 1].weeklyExperience) {
+              [sortedUsers[j], sortedUsers[j + 1]] = [sortedUsers[j + 1], sortedUsers[j]];
+          }
+      }
+  }
+
+  return sortedUsers;
+}
+
+export const selectLoggedInUser = (users:MyUser[], userID: string) : MyUser => {
+  let loggedInUser:MyUser;
+  for (const user of users) {
+    if (user.userID === userID) {
+      loggedInUser = user;
+    }
+  }
+  return loggedInUser;
+}
+
+export const selectSimilarUsers = (users: MyUser[], loggedInUser: MyUser): MyUser[] => {
+  const similarUsers = [];
+  const loggedInUserBMI = loggedInUser.weight / loggedInUser.height**2;
+  for (const user of users) {
+    let userBMI = user.weight / user.height**2;
+    if (user.gender === loggedInUser.gender && userBMI >= loggedInUserBMI-5 && userBMI <= loggedInUserBMI+ 5) {
+      similarUsers.push(user);
+    }
+  }
+  return similarUsers;
+}
