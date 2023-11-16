@@ -421,7 +421,7 @@ export const getConsistencyStreakAchievement = (userID: string, callback: Functi
         
         const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
             if (!workoutsSnapshot.empty) {
-                 switch (workoutsSnapshot.docs.length) {
+                switch (workoutsSnapshot.docs.length) {
                     case 10:
                         achievement.color = "#B0A2A2";
                         achievement.name = "Consistency Streak";
@@ -457,6 +457,74 @@ export const getConsistencyStreakAchievement = (userID: string, callback: Functi
                         break;
                 }
                 callback(achievement);
+            }
+        })
+        return unsubscribeFromWorkouts;
+        
+    } catch (error) {
+        alert(`Error: couldn't fetch exercises: ${error.message}`);
+}};
+export const getDedicatedAthleteAchievement = (userID: string, callback: Function): Unsubscribe => {
+    try {
+        const achievement: Achievment = {
+            color: "",
+            name: "",
+            status: "",
+            visibility: 0
+        };
+        const dateStrings: string[]  = [];
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+        
+        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
+            if (!workoutsSnapshot.empty) {
+                workoutsSnapshot.docs.forEach(workoutDoc => {
+                    dateStrings.push(workoutDoc.data().date);
+                }) 
+                const dates: Date[] = dateStrings.map(dateString => new Date(dateString));
+                dates.sort((a, b) => a.getTime() - b.getTime());
+                
+                const firstDate = dates[0];
+                const lastDate = dates[dates.length - 1];
+
+                const timeDifference = lastDate.getTime() - firstDate.getTime();
+                const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                switch (daysDifference) {
+                    case 30:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Dedicated Athlete";
+                        achievement.status = "Workout Apprentice";
+                        achievement.visibility = 1;
+                        break;
+                    case 91:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Dedicated Athlete";
+                        achievement.status = "Gym Devotee";
+                        achievement.visibility = 1;
+                        break;
+                    case 182:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Dedicated Athlete";
+                        achievement.status = "Fitness Enthusiast";
+                        achievement.visibility = 1;
+                        break;
+                    case 273:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Dedicated Athlete";
+                        achievement.status = "Workout Maestro";
+                        achievement.visibility = 1;
+                        break;
+                    case 365:
+                        achievement.color = "#D4AF37";
+                        achievement.name = "Dedicated Athlete";
+                        achievement.status = "Gym God";
+                        achievement.visibility = 1;
+                        break;
+                
+                    default:
+                        break;
+                }
+               callback(achievement);
             }
         })
         return unsubscribeFromWorkouts;
