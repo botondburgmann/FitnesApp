@@ -311,13 +311,13 @@ export const getStrengthBuilderAchievement = (userID: string, callback: Function
                     case 60:
                         achievement.color = "#B0A2A2";
                         achievement.name = "Strength builder";
-                        achievement.color = "Gym Novice";
+                        achievement.status = "Gym Novice";
                         achievement.visibility = 1;
                         break;
                     case 80:
                         achievement.color = "#B0A2A2";
                         achievement.name = "Strength builder";
-                        achievement.color = "Intermediate Lifter";
+                        achievement.status = "Intermediate Lifter";
                         achievement.visibility = 1;
                         break;
                     case 100:
@@ -337,9 +337,133 @@ export const getStrengthBuilderAchievement = (userID: string, callback: Function
         
     } catch (error) {
         alert(`Error: couldn't fetch exercises: ${error.message}`);
-    }}
+}};
   
-
+export const getEnduranceMasterAchievement = (userID: string, callback: Function): Unsubscribe => {
+    try {
+        const achievement: Achievment = {
+            color: "",
+            name: "",
+            status: "",
+            visibility: 0
+        };
+        let maxreps = 0;
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+        
+        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
+            if (!workoutsSnapshot.empty) {
+                workoutsSnapshot.docs.forEach(workoutDoc => {
+                    for (const exercise of workoutDoc.data().Workout) {
+                        if (exercise.reps.includes(100) && maxreps < 100) {
+                            maxreps = 100;
+                        }
+                        else if (exercise.reps.includes(75) && maxreps < 80) {
+                            maxreps = 75;
+                        }
+                        else if (exercise.reps.includes(50) && maxreps < 50) {
+                            maxreps = 50;
+                        }
+                        else if (exercise.reps.includes(20) && maxreps < 20) {
+                            maxreps = 20;
+                        }
+                        
+                    }
+                })
+                
+                switch (maxreps) {
+                    case 20:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Endurance Master";
+                        achievement.status = "Repetition Rookie";
+                        achievement.visibility = 1;
+                        break;
+                    case 50:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Endurance Master";
+                        achievement.status = "Endurance Enthusiast";
+                        achievement.visibility = 1;
+                        break;
+                    case 75:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Endurance Master";
+                        achievement.status = "Repetition Pro";
+                        achievement.visibility = 1;
+                        break;
+                    case 100:
+                        achievement.color = "#D4AF37";
+                        achievement.name = "Endurance Master";
+                        achievement.status = "Endurance Champion";
+                        achievement.visibility = 1;
+                        break;
+                
+                    default:
+                        break;
+                }
+                callback(achievement);
+            }
+        })
+        return unsubscribeFromWorkouts;
+        
+    } catch (error) {
+        alert(`Error: couldn't fetch exercises: ${error.message}`);
+}};
+export const getConsistencyStreakAchievement = (userID: string, callback: Function): Unsubscribe => {
+    try {
+        const achievement: Achievment = {
+            color: "",
+            name: "",
+            status: "",
+            visibility: 0
+        };
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+        
+        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
+            if (!workoutsSnapshot.empty) {
+                 switch (workoutsSnapshot.docs.length) {
+                    case 10:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Consistency Streak";
+                        achievement.status = "Workout Explorer";
+                        achievement.visibility = 1;
+                        break;
+                    case 30:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Consistency Streak";
+                        achievement.status = "Fitness Journeyman";
+                        achievement.visibility = 1;
+                        break;
+                    case 60:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Consistency Streak";
+                        achievement.status = "Consistency Warrior";
+                        achievement.visibility = 1;
+                        break;
+                    case 90:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Consistency Streak";
+                        achievement.status = "Workout Veteran";
+                        achievement.visibility = 1;
+                        break;
+                    case 100:
+                        achievement.color = "#D4AF37";
+                        achievement.name = "Consistency Streak";
+                        achievement.status = "Fitness Legend";
+                        achievement.visibility = 1;
+                        break;
+                
+                    default:
+                        break;
+                }
+                callback(achievement);
+            }
+        })
+        return unsubscribeFromWorkouts;
+        
+    } catch (error) {
+        alert(`Error: couldn't fetch exercises: ${error.message}`);
+}};
 // setters
 export const signUp = async (name:string, setLoading:Function, auth:Auth, email:string, password:string): Promise<void> => {
     setLoading(true);
