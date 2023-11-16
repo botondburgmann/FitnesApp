@@ -1,31 +1,32 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Login from './app/screens/Login';
-import { useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
-import { FIREBASE_AUTH} from './FirebaseConfig';
-import Registration from './app/screens/Registration';
-import Age from './app/screens/Age';
-import Weight from './app/screens/Weight';
-import Gender from './app/screens/Gender';
-import Height from './app/screens/Height';
-import ActivityLevel from './app/screens/ActivityLevel';
-import Log from './app/screens/Log';
-import AddWorkout from './app/screens/AddWorkout';
-import Account from './app/screens/Account';
-import Routines from './app/screens/Routines';
-import { getSetUpValue } from './app/functions/databaseQueries';
-import Toplist from './app/screens/Toplist';
-import Exercises from './app/screens/Exercises';
-import Focus from './app/screens/Focus';
-import UserContext from './app/contexts/UserContext';
-import CurrentExercise from './app/screens/CurrentExercise';
-import CreateExercise from './app/screens/CreateExercise';
-import EditSet from './app/screens/EditSet';
-import EditProfile from './app/screens/EditProfile';
-import Details from './app/screens/Details';
-import { FontAwesome5 } from '@expo/vector-icons';
+import Login from "./app/screens/Login";
+import { useContext, useEffect, useState } from "react";
+import { User, onAuthStateChanged } from "firebase/auth";
+import { FIREBASE_AUTH} from "./FirebaseConfig";
+import Registration from "./app/screens/Registration";
+import Age from "./app/screens/Age";
+import Weight from "./app/screens/Weight";
+import Gender from "./app/screens/Gender";
+import Height from "./app/screens/Height";
+import ActivityLevel from "./app/screens/ActivityLevel";
+import Log from "./app/screens/Log";
+import AddWorkout from "./app/screens/AddWorkout";
+import Account from "./app/screens/Account";
+import Routines from "./app/screens/Routines";
+import { getSetUpValue } from "./app/functions/databaseQueries";
+import Toplist from "./app/screens/Toplist";
+import Exercises from "./app/screens/Exercises";
+import Focus from "./app/screens/Focus";
+import UserContext from "./app/contexts/UserContext";
+import CurrentExercise from "./app/screens/CurrentExercise";
+import CreateExercise from "./app/screens/CreateExercise";
+import EditSet from "./app/screens/EditSet";
+import EditProfile from "./app/screens/EditProfile";
+import Details from "./app/screens/Details";
+import { FontAwesome5 } from "@expo/vector-icons";
+import Achievements from "./app/screens/Achievements";
 
 
 const Stack = createNativeStackNavigator();
@@ -54,27 +55,27 @@ function InsideLayout() {
       tabBarIcon: ({ color, size }) => {
         let iconName;
 
-        if (route.name === 'Workouts') {
-          iconName = 'dumbbell';
-        } else if (route.name === 'Toplist') {
-          iconName = 'trophy';
-        } else if (route.name === 'Exercises') {
-          iconName = 'list';
-        } else if (route.name === 'Profile') {
-          iconName = 'user-alt';
+        if (route.name === "Workouts") {
+          iconName = "dumbbell";
+        } else if (route.name === "Toplist") {
+          iconName = "trophy";
+        } else if (route.name === "Exercises") {
+          iconName = "list";
+        } else if (route.name === "Profile") {
+          iconName = "user-alt";
         }
 
         return <FontAwesome5 name={iconName} size={size} color={color} />;
       },
-      tabBarStyle: { backgroundColor: '#ff0000' },
-      tabBarInactiveTintColor: '#fff',
-      tabBarActiveTintColor: '#b0a2a2'
+      tabBarStyle: { backgroundColor: "#FF0000" },
+      tabBarInactiveTintColor: "#FFF",
+      tabBarActiveTintColor: "#B0A2A2"
     })}
   >
-    <Tab.Screen name='Workouts' component={WorkoutsLayout} options={{ headerShown: false }} />
-    <Tab.Screen name='Toplist' component={ToplistLayout} options={{ headerShown: false }} />
-    <Tab.Screen name='Exercises' component={ExercisesLayout} options={{ headerShown: false }} />
-    <Tab.Screen name='Profile' component={ProfileLayout} options={{ headerShown: false }} />
+    <Tab.Screen name="Workouts" component={WorkoutsLayout} options={{ headerShown: false }} />
+    <Tab.Screen name="Toplist" component={ToplistLayout} options={{ headerShown: false }} />
+    <Tab.Screen name="Exercises" component={ExercisesLayout} options={{ headerShown: false }} />
+    <Tab.Screen name="Profile" component={ProfileLayout} options={{ headerShown: false }} />
   </Tab.Navigator>
   );
 }
@@ -82,8 +83,10 @@ function InsideLayout() {
 function ToplistLayout() {
   return( 
     <SetupStack.Navigator>
-        <Tab.Screen name='Leaderboard' component={Toplist} options={{ headerShown: false }}/>
-        <Tab.Screen name='User' component={Account}/>
+        <Tab.Screen name="Leaderboard" component={Toplist} options={{ headerShown: false }}/>
+        <Tab.Screen name="User" component={Account}/>
+        <Tab.Screen name="Achievements" component={Achievements}/>
+
     </SetupStack.Navigator>
   )
 }
@@ -92,8 +95,10 @@ function ProfileLayout() {
   const userID   = useContext(UserContext);
   return( 
     <SetupStack.Navigator>
-        <Tab.Screen name='Account' component={Account} options={{ headerShown: false }} initialParams={{userID: userID  }}/>
-        <Tab.Screen name='Edit profile' component={EditProfile}/>
+        <Tab.Screen name="Account" component={Account} options={{ headerShown: false }} initialParams={{userID: userID  }}/>
+        <Tab.Screen name="Edit profile" component={EditProfile}/>
+        <Tab.Screen name="Achievements" component={Achievements}/>
+
 
     </SetupStack.Navigator>
   )
@@ -144,15 +149,15 @@ export default function App() {
   return (
     <UserContext.Provider value={userID}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName='Login'>
+        <Stack.Navigator initialRouteName="Login">
           {user && alreadySetUp === true ? 
-            (<Stack.Screen name='Inside' component={ InsideLayout} options={{ headerShown: false }}/>)
+            (<Stack.Screen name="Inside" component={ InsideLayout} options={{ headerShown: false }}/>)
           : user && alreadySetUp === false ?
-            (<Stack.Screen name='SetUp' component={ SetUpLayout} options={{ headerShown: false } }/>) 
+            (<Stack.Screen name="SetUp" component={ SetUpLayout} options={{ headerShown: false } }/>) 
           : (
             <>
-              <Stack.Screen name='Login' component={ Login} options={{ headerShown: false }}/>
-              <Stack.Screen name='Register' component={ Registration} options={{ headerShown: false }}/>
+              <Stack.Screen name="Login" component={ Login} options={{ headerShown: false }}/>
+              <Stack.Screen name="Register" component={ Registration} options={{ headerShown: false }}/>
             </>
             )
           }

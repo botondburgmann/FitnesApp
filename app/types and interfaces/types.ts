@@ -69,3 +69,10 @@ export type WeekRange = {
     start: Date;
     end: Date;
   }
+
+export type Achievment = {
+    name: string;
+    status: string;
+    color: string;
+    visibility: number;
+}

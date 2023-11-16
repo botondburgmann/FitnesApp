@@ -3,7 +3,7 @@ import { Unsubscribe, addDoc, collection, doc, getDocs, onSnapshot, query, updat
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 import { validateActivityLevel, validateAge, validateExerciseSet, validateExperience, validateGender, validateHeight, validateWeight } from "./validations";
-import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser } from "../types and interfaces/types";
+import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser, Achievment } from "../types and interfaces/types";
 
 
 // getters
@@ -41,8 +41,8 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
         weights: 0,
         reps: 0
     };
-    const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
-    const workoutQuery = query(workoutCollectionRef, where("userID", "==", userID));
+    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+    const workoutQuery = query(workoutsCollectionRef, where("userID", "==", userID));
     const unsubscribeFromWorkouts = onSnapshot(workoutQuery, (snapshot) => {
         snapshot.docs.forEach((doc) => {
             const workoutData = doc.data().Workout;
@@ -72,8 +72,6 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
 
     return unsubscribeFromWorkouts;
 };
-  
-
 
 export const getAllExercises = (userID: string, callback: Function): Unsubscribe => {
     try {
@@ -140,8 +138,6 @@ export const getAvailableExercises = (userID: string, callback: Function): Unsub
         alert(`Error: Couldn't fetch exercises: ${error}`)
     }
 };
-
-
 
 export const getExercise = (userID: string, exerciseName: string, callback): Unsubscribe => {
 
@@ -223,6 +219,7 @@ export const getUser = (userID:string, callback: Function): Unsubscribe => {
                 height:  userDoc.data().height,
                 level:  userDoc.data().level,
                 name:  userDoc.data().name,
+                userID: userDoc.data().userID,
                 weeklyExperience: userDoc.data().weeklyExperience,
                 weight:  userDoc.data().weight
             };
@@ -282,6 +279,65 @@ export const getWorkout = (userID: string, date: string, callback: Function): Un
     }
 }
 
+export const getStrengthBuilderAchievement = (userID: string, callback: Function): Unsubscribe => {
+    try {
+        const achievement: Achievment = {
+            color: "",
+            name: "",
+            status: "",
+            visibility: 0
+        };
+        let maxWeight = 0;
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+        
+        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
+            if (!workoutsSnapshot.empty) {
+                workoutsSnapshot.docs.forEach(workoutDoc => {
+                    for (const exercise of workoutDoc.data().Workout) {
+                        if (exercise.weights.includes(100) && maxWeight < 100) {
+                            maxWeight = 100;
+                        }
+                        else if (exercise.weights.includes(80) && maxWeight < 80) {
+                            maxWeight = 80;
+                        }
+                        else if (exercise.weights.includes(60) && maxWeight < 60) {
+                            maxWeight = 60;
+                        }
+                        
+                    }
+                })
+                switch (maxWeight) {
+                    case 60:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Strength builder";
+                        achievement.color = "Gym Novice";
+                        achievement.visibility = 1;
+                        break;
+                    case 80:
+                        achievement.color = "#B0A2A2";
+                        achievement.name = "Strength builder";
+                        achievement.color = "Intermediate Lifter";
+                        achievement.visibility = 1;
+                        break;
+                    case 100:
+                        achievement.color = "#D4AF37";
+                        achievement.name = "Strength builder";
+                        achievement.status = "Gym Warrior";
+                        achievement.visibility = 1;
+                        break;
+                
+                    default:
+                        break;
+                }
+                callback(achievement);
+            }
+        })
+        return unsubscribeFromWorkouts;
+        
+    } catch (error) {
+        alert(`Error: couldn't fetch exercises: ${error.message}`);
+    }}
   
 
 // setters
@@ -598,8 +654,8 @@ export const editProfile = async (userID:string, changes: MyUser): Promise<void>
 };
 
 export const addWorkout =async (userID:string, date: string, workout: ExerciseSet[], xpToAdd: number): Promise<void> => {
-    const workoutCollectionRef = collection(FIRESTORE_DB, "Workouts");
-    await addDoc(workoutCollectionRef, {
+    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+    await addDoc(workoutsCollectionRef, {
         date: date,
         userID: userID,
         Workout: workout

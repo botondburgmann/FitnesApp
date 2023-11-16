@@ -1,12 +1,12 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
-import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig'
-import { getUser, getBestExercise } from '../functions/databaseQueries'
-import UserContext from '../contexts/UserContext';
-import { NavigationProp } from '@react-navigation/native';
-import { MyUser, BestExercise } from '../types and interfaces/types';
-import { onSnapshot, query, collection, where } from 'firebase/firestore';
-import { globalStyles } from '../assets/styles';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native"
+import React, { useContext, useEffect, useState } from "react"
+import { FIREBASE_AUTH, FIRESTORE_DB } from "../../FirebaseConfig"
+import { getUser, getBestExercise } from "../functions/databaseQueries"
+import UserContext from "../contexts/UserContext";
+import { NavigationProp } from "@react-navigation/native";
+import { MyUser, BestExercise } from "../types and interfaces/types";
+import { onSnapshot, query, collection, where } from "firebase/firestore";
+import { globalStyles } from "../assets/styles";
 
 interface RouterProps {
   route: any,
@@ -121,7 +121,9 @@ useEffect(() => {
           </View>
 
       
-
+        <Pressable style={globalStyles.button}>
+            <Text style={globalStyles.buttonText} onPress={() => navigation.navigate("Achievements", {userID: userID})}>Achievements</Text>
+        </Pressable>
       {userID === loggedInUserID &&
       <View>
         <Pressable style={globalStyles.button}>
@@ -141,10 +143,10 @@ export default Account
 
 const styles = StyleSheet.create({
   text:{
-    alignSelf: 'center',
+    alignSelf: "center",
     fontSize: 18,
     color: "#fff",
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     fontWeight: "600",
     paddingVertical: 10,
   }
