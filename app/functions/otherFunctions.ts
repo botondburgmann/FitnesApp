@@ -226,3 +226,9 @@ export const selectSimilarUsers = (users: MyUser[], loggedInUser: MyUser): MyUse
   }
   return similarUsers;
 }
+
+export const dateStep = (currentDate: Date, step: number): Date => {
+  const newDate = new Date(currentDate);
+  newDate.setDate(newDate.getDate() + step); // You can adjust the increment as needed
+  return newDate
+}
