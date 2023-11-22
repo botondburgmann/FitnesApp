@@ -4,34 +4,45 @@ import { globalStyles } from '../assets/styles'
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
-import { Achievment } from '../types and interfaces/types';
-import { getConsistencyStreakAchievement, getDedicatedAthleteAchievement, getEnduranceMasterAchievement, getStrengthBuilderAchievement } from '../functions/databaseQueries';
+import { AntDesign } from '@expo/vector-icons';
+import { Achievement, MyUser } from '../types and interfaces/types';
+import { getAllUsers, getConsistencyStreakAchievement, getDedicatedAthleteAchievement, getEnduranceMasterAchievement, getStrengthBuilderAchievement } from '../functions/databaseQueries';
+import { getClimbingTheRanksAchievement, selectLoggedInUser, selectSimilarUsers, sortUsers } from '../functions/otherFunctions';
 
 const Achievements = ({route}) => {
     const {userID} = route?.params;
-    const [strengthBuilder, setStrengthBuilder] = useState<Achievment>({
-        color: "",
-        name: "",
-        status: "",
-        visibility: 0
+    const [loggedInUser, setLoggedInUser] = useState<MyUser>();
+    const [users, setUsers] = useState<MyUser[]>([]);
+
+    const [strengthBuilder, setStrengthBuilder] = useState<Achievement>({
+        color: "#808080",
+        name: "Strength Builder",
+        status: "locked",
+        visibility: 0.5
     });
-    const [enduranceMaster, setEnduranceMaster] = useState<Achievment>({
-        color: "",
-        name: "",
-        status: "",
-        visibility: 0
+    const [enduranceMaster, setEnduranceMaster] = useState<Achievement>({
+        color: "#808080",
+        name: "Endurance Master",
+        status: "locked",
+        visibility: 0.5
     });
-    const [consistencyStreak, setConsistencyStreak] = useState<Achievment>({
-        color: "",
-        name: "",
-        status: "",
-        visibility: 0
+    const [consistencyStreak, setConsistencyStreak] = useState<Achievement>({
+        color: "#808080",
+        name: "Consistency Streak",
+        status: "locked",
+        visibility: 0.5
     });
-    const [dedicatedAthlete, setDedicatedAthlete] = useState<Achievment>({
-        color: "",
-        name: "",
-        status: "",
-        visibility: 0
+    const [dedicatedAthlete, setDedicatedAthlete] = useState<Achievement>({
+        color: "#808080",
+        name: "Dedicated Athlete",
+        status: "locked",
+        visibility: 0.5
+    });
+    const [climbingTheRanks, setClimbingTheRanks] = useState<Achievement>({
+        color: "#808080",
+        name: "Climbing The Ranks",
+        status: "locked",
+        visibility: 0.5
     });
 
     useEffect(() => {
@@ -71,17 +82,33 @@ const Achievements = ({route}) => {
         }
         setDedicatedAthlete(newAchievement);
       })
-      
-    
+      const unsubscribeFromUsers = getAllUsers((users) => {
+        const loggedInUser = selectLoggedInUser(users, userID );
+        const similarUsers = selectSimilarUsers(users, loggedInUser);
+        const sortedUsers = sortUsers(similarUsers);
+        setLoggedInUser(loggedInUser)
+        setUsers(sortedUsers);
+      })
+
       return () => {
         unsubscribeFromStrengthBuilder();
         unsubscribeFromEnduranceMaster();
         unsubscribeFromConsistencyStreak();
         unsubscribeFromDedicatedAthlete();
+        unsubscribeFromUsers();
       }
     }, [userID])
     
-
+    useEffect(() => {
+        if (users.length > 0 && climbingTheRanks.status === "locked") {    
+            console.log(climbingTheRanks);
+                    
+            setClimbingTheRanks(getClimbingTheRanksAchievement(loggedInUser, users))
+        }
+      
+    
+    }, [users, loggedInUser])
+    
     return (
         <View style={[globalStyles.container, {flex: 1}]}>
         <Pressable onPress={() => alert("show")}>
@@ -117,6 +144,15 @@ const Achievements = ({route}) => {
             <View>
                 <Text style={globalStyles.text}>{dedicatedAthlete.name}</Text>
                 <Text style={globalStyles.text}>{dedicatedAthlete.status}</Text>
+            </View>
+            </View>
+        </Pressable>
+        <Pressable onPress={() => alert("show")}>
+            <View style={[globalStyles.gridContainer,{backgroundColor: climbingTheRanks.color, margin: 10, opacity: climbingTheRanks.visibility}]}>
+            <AntDesign name="star" size={50} color="#FFF" />
+            <View>
+                <Text style={globalStyles.text}>{climbingTheRanks.name}</Text>
+                <Text style={globalStyles.text}>{climbingTheRanks.status}</Text>
             </View>
             </View>
         </Pressable>

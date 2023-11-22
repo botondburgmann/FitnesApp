@@ -70,7 +70,7 @@ export type WeekRange = {
     end: Date;
   }
 
-export type Achievment = {
+export type Achievement = {
     name: string;
     status: string;
     color: string;

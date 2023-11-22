@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import { deleteSet } from "./databaseQueries";
-import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser } from "../types and interfaces/types";
+import { Achievement, Exercise, ExerciseSelectOption, ExerciseSet, MyUser } from "../types and interfaces/types";
 
 export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     let currentExperience = 0;
@@ -231,4 +231,34 @@ export const dateStep = (currentDate: Date, step: number): Date => {
   const newDate = new Date(currentDate);
   newDate.setDate(newDate.getDate() + step); // You can adjust the increment as needed
   return newDate
+}
+
+export const getClimbingTheRanksAchievement = (loggedInUser: MyUser, topTen: MyUser[]) => {
+  const achievement: Achievement = {
+    color: "",
+    name: "",
+    status: "",
+    visibility: 0
+  };
+  if (topTen[0].userID === loggedInUser.userID) {
+    achievement.color = "#D4AF37";
+    achievement.name = " Climbing the Ranks";
+    achievement.status = "Leaderboard Dominator";
+    achievement.visibility = 1;
+    return achievement;
+  }
+  if (topTen[1].userID === loggedInUser.userID || topTen[2].userID === loggedInUser.userID) {
+    achievement.color = "#B0A2A2";
+    achievement.name = " Climbing the Ranks";
+    achievement.status = "Top 3 Contender";
+    achievement.visibility = 1;
+    return achievement;
+  }
+  if (topTen.includes(loggedInUser)) {
+    achievement.color = "#B0A2A2";
+    achievement.name = " Climbing the Ranks";
+    achievement.status = "Top 10 Challenger";
+    achievement.visibility = 1;
+    return achievement;
+  }
 }

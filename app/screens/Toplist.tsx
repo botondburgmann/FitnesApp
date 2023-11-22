@@ -1,6 +1,5 @@
-import { ActivityIndicator, Button, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import {Table, Row, Rows} from 'react-native-table-component'
 import { getAllUsers, resetWeeklyExperience } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { MyUser  } from '../types and interfaces/types';
@@ -48,7 +47,6 @@ const Toplist = ({navigation}: RouterProps) => {
 
       </View>)
   })
-
 
 
   const [week, setWeek] = useState({

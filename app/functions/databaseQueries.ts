@@ -3,7 +3,7 @@ import { Unsubscribe, addDoc, collection, doc, getDocs, onSnapshot, query, updat
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 import { validateActivityLevel, validateAge, validateExerciseSet, validateExperience, validateGender, validateHeight, validateWeight } from "./validations";
-import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser, Achievment } from "../types and interfaces/types";
+import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser, Achievement } from "../types and interfaces/types";
 
 
 // getters
@@ -281,7 +281,7 @@ export const getWorkout = (userID: string, date: string, callback: Function): Un
 
 export const getStrengthBuilderAchievement = (userID: string, callback: Function): Unsubscribe => {
     try {
-        const achievement: Achievment = {
+        const achievement: Achievement = {
             color: "",
             name: "",
             status: "",
@@ -341,7 +341,7 @@ export const getStrengthBuilderAchievement = (userID: string, callback: Function
   
 export const getEnduranceMasterAchievement = (userID: string, callback: Function): Unsubscribe => {
     try {
-        const achievement: Achievment = {
+        const achievement: Achievement = {
             color: "",
             name: "",
             status: "",
@@ -410,7 +410,7 @@ export const getEnduranceMasterAchievement = (userID: string, callback: Function
 }};
 export const getConsistencyStreakAchievement = (userID: string, callback: Function): Unsubscribe => {
     try {
-        const achievement: Achievment = {
+        const achievement: Achievement = {
             color: "",
             name: "",
             status: "",
@@ -466,7 +466,7 @@ export const getConsistencyStreakAchievement = (userID: string, callback: Functi
 }};
 export const getDedicatedAthleteAchievement = (userID: string, callback: Function): Unsubscribe => {
     try {
-        const achievement: Achievment = {
+        const achievement: Achievement = {
             color: "",
             name: "",
             status: "",
