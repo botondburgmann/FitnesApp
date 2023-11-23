@@ -229,7 +229,7 @@ export const getUser = (userID:string, callback: Function): Unsubscribe => {
     })
 
     return unsubscribeFromUsers;
-}
+};
 export const getAllUsers = (callback): Unsubscribe => { 
     
     const usersCollectionRef = collection(FIRESTORE_DB, "Users");
@@ -241,7 +241,7 @@ export const getAllUsers = (callback): Unsubscribe => {
         callback(users);    
     })
     return unsubscribeFromUsers;
-}
+};
 
 export const getWorkout = (userID: string, date: string, callback: Function): Unsubscribe => {
     try {
@@ -277,261 +277,46 @@ export const getWorkout = (userID: string, date: string, callback: Function): Un
     } catch (error) {
         alert(`Error: couldn't fetch workout for ${date}`);
     }
-}
+};
 
-export const getStrengthBuilderAchievement = (userID: string, callback: Function): Unsubscribe => {
+export const getAchievementsForUser = (userID: string, callback: Function): Unsubscribe => {
     try {
-        const achievement: Achievement = {
-            color: "",
-            name: "",
-            status: "",
-            visibility: 0
-        };
-        let maxWeight = 0;
-        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
-        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-        
-        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
-            if (!workoutsSnapshot.empty) {
-                workoutsSnapshot.docs.forEach(workoutDoc => {
-                    for (const exercise of workoutDoc.data().Workout) {
-                        if (exercise.weights.includes(100) && maxWeight < 100) {
-                            maxWeight = 100;
-                        }
-                        else if (exercise.weights.includes(80) && maxWeight < 80) {
-                            maxWeight = 80;
-                        }
-                        else if (exercise.weights.includes(60) && maxWeight < 60) {
-                            maxWeight = 60;
+        const achievements: Achievement[] = [];
+
+        const achievementCollectionRef = collection(FIRESTORE_DB, "Achievements");
+        const unsubscribeFromAchievements = onSnapshot(achievementCollectionRef, achievementsSnapshot => {
+            if (!achievementsSnapshot.empty) {
+                achievementsSnapshot.docs.forEach(achievementDoc => {
+                    let achievement = {
+                        icon: achievementDoc.data().icon,
+                        name: achievementDoc.data().name,
+                        status: "locked",
+                        color: "#808080",
+                        visibility: 0.5
+                    }
+                    for (const owner of achievementDoc.data().owners) {
+                        if (owner.userID === userID) {
+                            achievement = {
+                                icon: achievementDoc.data().icon,
+                                name: achievementDoc.data().name,
+                                status: owner.status,
+                                color: owner.color,
+                                visibility: 1
+                            };
                         }
                         
                     }
-                })
-                switch (maxWeight) {
-                    case 60:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Strength builder";
-                        achievement.status = "Gym Novice";
-                        achievement.visibility = 1;
-                        break;
-                    case 80:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Strength builder";
-                        achievement.status = "Intermediate Lifter";
-                        achievement.visibility = 1;
-                        break;
-                    case 100:
-                        achievement.color = "#D4AF37";
-                        achievement.name = "Strength builder";
-                        achievement.status = "Gym Warrior";
-                        achievement.visibility = 1;
-                        break;
-                
-                    default:
-                        break;
-                }
-                callback(achievement);
-            }
-        })
-        return unsubscribeFromWorkouts;
-        
-    } catch (error) {
-        alert(`Error: couldn't fetch exercises: ${error.message}`);
-}};
-  
-export const getEnduranceMasterAchievement = (userID: string, callback: Function): Unsubscribe => {
-    try {
-        const achievement: Achievement = {
-            color: "",
-            name: "",
-            status: "",
-            visibility: 0
-        };
-        let maxreps = 0;
-        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
-        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-        
-        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
-            if (!workoutsSnapshot.empty) {
-                workoutsSnapshot.docs.forEach(workoutDoc => {
-                    for (const exercise of workoutDoc.data().Workout) {
-                        if (exercise.reps.includes(100) && maxreps < 100) {
-                            maxreps = 100;
-                        }
-                        else if (exercise.reps.includes(75) && maxreps < 80) {
-                            maxreps = 75;
-                        }
-                        else if (exercise.reps.includes(50) && maxreps < 50) {
-                            maxreps = 50;
-                        }
-                        else if (exercise.reps.includes(20) && maxreps < 20) {
-                            maxreps = 20;
-                        }
-                        
-                    }
-                })
-                
-                switch (maxreps) {
-                    case 20:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Endurance Master";
-                        achievement.status = "Repetition Rookie";
-                        achievement.visibility = 1;
-                        break;
-                    case 50:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Endurance Master";
-                        achievement.status = "Endurance Enthusiast";
-                        achievement.visibility = 1;
-                        break;
-                    case 75:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Endurance Master";
-                        achievement.status = "Repetition Pro";
-                        achievement.visibility = 1;
-                        break;
-                    case 100:
-                        achievement.color = "#D4AF37";
-                        achievement.name = "Endurance Master";
-                        achievement.status = "Endurance Champion";
-                        achievement.visibility = 1;
-                        break;
-                
-                    default:
-                        break;
-                }
-                callback(achievement);
-            }
-        })
-        return unsubscribeFromWorkouts;
-        
-    } catch (error) {
-        alert(`Error: couldn't fetch exercises: ${error.message}`);
-}};
-export const getConsistencyStreakAchievement = (userID: string, callback: Function): Unsubscribe => {
-    try {
-        const achievement: Achievement = {
-            color: "",
-            name: "",
-            status: "",
-            visibility: 0
-        };
-        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
-        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-        
-        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
-            if (!workoutsSnapshot.empty) {
-                switch (workoutsSnapshot.docs.length) {
-                    case 10:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Consistency Streak";
-                        achievement.status = "Workout Explorer";
-                        achievement.visibility = 1;
-                        break;
-                    case 30:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Consistency Streak";
-                        achievement.status = "Fitness Journeyman";
-                        achievement.visibility = 1;
-                        break;
-                    case 60:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Consistency Streak";
-                        achievement.status = "Consistency Warrior";
-                        achievement.visibility = 1;
-                        break;
-                    case 90:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Consistency Streak";
-                        achievement.status = "Workout Veteran";
-                        achievement.visibility = 1;
-                        break;
-                    case 100:
-                        achievement.color = "#D4AF37";
-                        achievement.name = "Consistency Streak";
-                        achievement.status = "Fitness Legend";
-                        achievement.visibility = 1;
-                        break;
-                
-                    default:
-                        break;
-                }
-                callback(achievement);
-            }
-        })
-        return unsubscribeFromWorkouts;
-        
-    } catch (error) {
-        alert(`Error: couldn't fetch exercises: ${error.message}`);
-}};
-export const getDedicatedAthleteAchievement = (userID: string, callback: Function): Unsubscribe => {
-    try {
-        const achievement: Achievement = {
-            color: "",
-            name: "",
-            status: "",
-            visibility: 0
-        };
-        const dateStrings: string[]  = [];
-        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
-        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-        
-        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
-            if (!workoutsSnapshot.empty) {
-                workoutsSnapshot.docs.forEach(workoutDoc => {
-                    dateStrings.push(workoutDoc.data().date);
+                    achievements.push(achievement);
                 }) 
-                const dates: Date[] = dateStrings.map(dateString => new Date(dateString));
-                dates.sort((a, b) => a.getTime() - b.getTime());
-                
-                const firstDate = dates[0];
-                const lastDate = dates[dates.length - 1];
-
-                const timeDifference = lastDate.getTime() - firstDate.getTime();
-                const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-                switch (daysDifference) {
-                    case 30:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Dedicated Athlete";
-                        achievement.status = "Workout Apprentice";
-                        achievement.visibility = 1;
-                        break;
-                    case 91:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Dedicated Athlete";
-                        achievement.status = "Gym Devotee";
-                        achievement.visibility = 1;
-                        break;
-                    case 182:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Dedicated Athlete";
-                        achievement.status = "Fitness Enthusiast";
-                        achievement.visibility = 1;
-                        break;
-                    case 273:
-                        achievement.color = "#B0A2A2";
-                        achievement.name = "Dedicated Athlete";
-                        achievement.status = "Workout Maestro";
-                        achievement.visibility = 1;
-                        break;
-                    case 365:
-                        achievement.color = "#D4AF37";
-                        achievement.name = "Dedicated Athlete";
-                        achievement.status = "Gym God";
-                        achievement.visibility = 1;
-                        break;
-                
-                    default:
-                        break;
-                }
-               callback(achievement);
+                callback(achievements)
             }
         })
-        return unsubscribeFromWorkouts;
-        
+        return unsubscribeFromAchievements;
     } catch (error) {
-        alert(`Error: couldn't fetch exercises: ${error.message}`);
-}};
+        alert(`Error: couldn't fetch achievements for ${userID}: ${error}`);
+    }
+};
+
 // setters
 export const signUp = async (name:string, setLoading:Function, auth:Auth, email:string, password:string): Promise<void> => {
     setLoading(true);
