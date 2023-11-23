@@ -85,7 +85,7 @@ const NormalExercise = (props) => {
                     time: exercise.times[index],
                     weight: exercise.weights[index],
                     }, exerciseID: exerciseID, setID: index, isIsometric: false})} 
-                onLongPress={() => showDeleteConfirmation(userID, exercise.exercise[index], exerciseID, index, removeXP(exercise.times[index],exercise.weights[index]))}                                
+                onLongPress={() => showDeleteConfirmation(userID, exercise.exercise[index], exerciseID, index, removeXP(exercise.reps[index],exercise.weights[index]))}                                
             >
                 <Text style={styles.text}>{rep}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]} {outputs.seconds[index]}</Text>                            
                 { exercise.restTimes[index] > 0

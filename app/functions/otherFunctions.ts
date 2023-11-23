@@ -48,7 +48,7 @@ export const  removeXP = (repOrTime: number, weight: number): number => {
 };
 
 export const showDeleteConfirmation = (userID: string, exerciseName: string, exerciseID: number, setID: number, xpDelete: number): void => {
-    Alert.alert(
+  Alert.alert(
       'Delete Item',
       'Are you sure you want to delete this item?',
       [{
