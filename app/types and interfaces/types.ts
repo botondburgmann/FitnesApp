@@ -72,6 +72,7 @@ export type WeekRange = {
 
 export type Achievement = {
     color: string;
+    description: string;
     icon: string;
     name: string;
     status: string;

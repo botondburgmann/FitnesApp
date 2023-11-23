@@ -287,26 +287,20 @@ export const getAchievementsForUser = (userID: string, callback: Function): Unsu
         const unsubscribeFromAchievements = onSnapshot(achievementCollectionRef, achievementsSnapshot => {
             if (!achievementsSnapshot.empty) {
                 achievementsSnapshot.docs.forEach(achievementDoc => {
-                    let achievement = {
-                        icon: achievementDoc.data().icon,
-                        name: achievementDoc.data().name,
-                        status: "locked",
-                        color: "#808080",
-                        visibility: 0.5
-                    }
                     for (const owner of achievementDoc.data().owners) {
                         if (owner.userID === userID) {
-                            achievement = {
+                            const achievement = {
+                                color: owner.color,
+                                description: owner.description,
                                 icon: achievementDoc.data().icon,
                                 name: achievementDoc.data().name,
                                 status: owner.status,
-                                color: owner.color,
-                                visibility: 1
+                                visibility: owner.visibility
                             };
+                            achievements.push(achievement);
                         }
                         
                     }
-                    achievements.push(achievement);
                 }) 
                 callback(achievements)
             }

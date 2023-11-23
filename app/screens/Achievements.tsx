@@ -4,13 +4,29 @@ import { globalStyles } from '../assets/styles'
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Achievement } from '../types and interfaces/types';
 import { getAchievementsForUser } from '../functions/databaseQueries';
+import Info from '../components/Info';
 
 
 const Achievements = ({route}) => {
     const {userID} = route?.params;
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [loadingAchievements, setLoadingAchievements] = useState(true);
-
+    const [name, setName] = useState<string>()
+    const [isUnilateral, setIsUnilateral] = useState(false)
+    const [isIsometric, setIsIsometric] = useState(false)
+    const [unilaterality, setUnilaterality] = useState("bilateral")
+    const [isometricity, setIsometricity] = useState("not isometric")
+    const [isCustomAlertVisible, setCustomAlertVisible] = useState(false);
+    const [title, setTitle] = useState<string>();
+    const [information, setInformation] = useState<string>();
+    const hideCustomAlert = () => {
+        setCustomAlertVisible(false);
+    };
+    const showCustomAlert = (title, information) => {
+        setCustomAlertVisible(true);
+        setTitle(title);
+        setInformation(information);
+    };
     useEffect(() => {
         const unsubscribeFromAchievements = getAchievementsForUser(userID, achievements => {
             setAchievements(achievements);
@@ -27,15 +43,24 @@ const Achievements = ({route}) => {
     if (!loadingAchievements) {        
         for (let i = 0; i < achievements.length; i++) {
             achievementComponents.push(
-                <Pressable key={i} onPress={() => alert("show")}>
-                <View style={[globalStyles.gridContainer,{backgroundColor: achievements[i].color, margin: 10, opacity: achievements[i].visibility}]}>
-                    <FontAwesome5 name={achievements[i].icon} size={50} color="#FFF" />
-                    <View>
-                    <Text style={globalStyles.text}>{achievements[i].name}</Text>
-                    <Text style={globalStyles.text}>{achievements[i].status}</Text>
+                <View key={i}>
+                    <Pressable  onPress={() => showCustomAlert(achievements[i].name,achievements[i].description )}>
+                        <View style={[globalStyles.gridContainer,{backgroundColor: achievements[i].color, margin: 10, opacity: achievements[i].visibility}]}>
+                            <FontAwesome5 name={achievements[i].icon} size={50} color="#FFF" />
+                            <View>
+                            <Text style={globalStyles.text}>{achievements[i].name}</Text>
+                            <Text style={globalStyles.text}>{achievements[i].status}</Text>
+                        </View>
+                        </View> 
+                    </Pressable>
+                    <Info
+                isVisible={isCustomAlertVisible}
+                onClose={hideCustomAlert}
+                title={title}
+                information={information}
+            />
                 </View>
-                </View> 
-            </Pressable>
+            
             );
           }
       }
