@@ -1,11 +1,10 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native"
+import { Pressable, StyleSheet, Text, View } from "react-native"
 import React, { useContext, useEffect, useState } from "react"
-import { FIREBASE_AUTH, FIRESTORE_DB } from "../../FirebaseConfig"
+import { FIREBASE_AUTH } from "../../FirebaseConfig"
 import { getUser, getBestExercise } from "../functions/databaseQueries"
 import UserContext from "../contexts/UserContext";
 import { NavigationProp } from "@react-navigation/native";
 import { MyUser, BestExercise } from "../types and interfaces/types";
-import { onSnapshot, query, collection, where } from "firebase/firestore";
 import { globalStyles } from "../assets/styles";
 
 interface RouterProps {

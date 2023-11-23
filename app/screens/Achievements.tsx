@@ -11,11 +11,6 @@ const Achievements = ({route}) => {
     const {userID} = route?.params;
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [loadingAchievements, setLoadingAchievements] = useState(true);
-    const [name, setName] = useState<string>()
-    const [isUnilateral, setIsUnilateral] = useState(false)
-    const [isIsometric, setIsIsometric] = useState(false)
-    const [unilaterality, setUnilaterality] = useState("bilateral")
-    const [isometricity, setIsometricity] = useState("not isometric")
     const [isCustomAlertVisible, setCustomAlertVisible] = useState(false);
     const [title, setTitle] = useState<string>();
     const [information, setInformation] = useState<string>();

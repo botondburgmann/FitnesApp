@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { getAllUsers, resetWeeklyExperience } from '../functions/databaseQueries';
+import { getAllUsers } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { MyUser  } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
