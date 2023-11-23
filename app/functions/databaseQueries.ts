@@ -73,38 +73,46 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
     return unsubscribeFromWorkouts;
 };
 
-export const getAllExercises = (userID: string, callback: Function): Unsubscribe => {
+export const getAllExercises = (userID: string, callback: Function): Unsubscribe[] => {
     try {
         const exercises: Exercise[] = [];
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
         const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        
+        const unsubscribeFunctions = [];
         const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
             if (!usersSnapshot.empty) {
                 const userDocRef = usersSnapshot.docs[0].ref;
                 const exercisesCollectionRef = collection(userDocRef, "exercises");
+
                 const unsubscribeFromExercises = onSnapshot(exercisesCollectionRef, exercisesSnapshot => {
-                    exercisesSnapshot.docs.forEach(exerciseDoc => {
-                        exercises.push({
-                            hidden: exerciseDoc.data().hidden,
-                            isometric: exerciseDoc.data().isometric,
-                            name: exerciseDoc.data().name,
-                            musclesWorked: exerciseDoc.data().musclesWorked,
-                            unilateral: exerciseDoc.data().unilateral
-                        })
-                    }) 
-                    callback(exercises);                   
-                })
-                unsubscribeFromExercises;
+                    const updatedExercises = exercisesSnapshot.docs.map(exerciseDoc => ({
+                        hidden: exerciseDoc.data().hidden,
+                        isometric: exerciseDoc.data().isometric,
+                        name: exerciseDoc.data().name,
+                        musclesWorked: exerciseDoc.data().musclesWorked,
+                        unilateral: exerciseDoc.data().unilateral
+                    }));
+                
+                    callback(updatedExercises);
+                });
+                
+
+                
+                unsubscribeFunctions.push(unsubscribeFromExercises);
+                
+            } else {
+                throw new Error("User doesn't exist");
             }
-            else 
-                throw new Error("user doesn't exist");
-        })
-        return unsubscribeFromUsers;
+        });
+
+        unsubscribeFunctions.push(unsubscribeFromUsers);
+        return unsubscribeFunctions;
+
     } catch (error) {
-        alert(`Error: Couldn't fetch exercises: ${error}`)
+        alert(`Error: Couldn't fetch exercises: ${error}`);
     }
 };
+
 export const getAvailableExercises = (userID: string, callback: Function): Unsubscribe => {
     try {
         const exercises: Exercise[] = [];
@@ -673,6 +681,8 @@ export const toggleExerciseVisibilty =async (userID: string, exerciseName: strin
             const updateData = {
                 hidden: !exercisesDoc.data().hidden
             };
+            console.log(`updating doc ${updateData.hidden}`);
+            
             updateDoc(exercisesDoc.ref, updateData);
         })
 

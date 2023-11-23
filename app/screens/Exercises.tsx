@@ -12,18 +12,18 @@ const Exercises = ({navigation}: RouterProps) => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const unsubscribe = getAllExercises(userID, (exercises) => {
-      setExercises(exercises);
-      setLoading(false);
+    const unsubscribeFunctions = getAllExercises(userID, (receivedExercises) => {                    
+        setExercises(receivedExercises);
+        setLoading(false);
     });
 
-  
-  
     return () => {
-      unsubscribe();
-      setExercises([])
-    }
-  }, [userID]);
+        unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
+        
+        setExercises([]);
+    };
+}, [userID]);
+
 
 
 
