@@ -478,7 +478,7 @@ export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToA
     } 
 }
 
-export const addExperience = async (userID: string, experience: number): Promise<void> => {
+const addExperience = async (userID: string, experience: number): Promise<void> => {
     try {        
         const usersCollectionRef = collection(FIRESTORE_DB,"Users");
         const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
@@ -942,6 +942,45 @@ const updateDedicatedAthleteAchievement = async (userID: string): Promise<Achiev
     }
 
 };
+
+export const updateClimbingTheRanksAchievement = (loggedInUser: MyUser, users: MyUser[]): void => {
+    if (users.slice(3,10).includes(loggedInUser)){
+        const updatedAchievement: Achievement = {
+            color: "#BBC2CC",
+            description: "Reach in the top 3 place in the leaderboard to unlock next stage",
+            icon: "arrow-up",
+            level: 1,
+            name: "Dedicated Athlete",
+            status: "Top 10 Challenger",
+            visibility: 1
+        }
+        updateAchievementStatus(loggedInUser.userID, updatedAchievement);
+    }
+    else if (users.slice(1,3).includes(loggedInUser)){
+        const updatedAchievement: Achievement = {
+            color: "#BBC2CC",
+            description: "Reach in the top 1 place in the leaderboard to unlock next stage",
+            icon: "arrow-up",
+            level: 2,
+            name: "Dedicated Athlete",
+            status: "Top 3 Contender",
+            visibility: 1
+        }
+        updateAchievementStatus(loggedInUser.userID, updatedAchievement);
+    }
+    if (users[0] === loggedInUser){
+        const updatedAchievement: Achievement = {
+            color: "#FFDD43",
+            description: "Max level achieved: Reach top 1 place in the leaderboard",
+            icon: "arrow-up",
+            level: 3,
+            name: "Dedicated Athlete",
+            status: "Leaderboard Dominator",
+            visibility: 1
+        }
+        updateAchievementStatus(loggedInUser.userID, updatedAchievement);
+    }
+}
 
 const sortDates = (dates: string[]): string[] => {
     const dateObjects = dates.map(dateString => new Date(dateString));

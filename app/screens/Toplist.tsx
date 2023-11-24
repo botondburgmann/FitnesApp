@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { getAllUsers } from '../functions/databaseQueries';
+import { getAllUsers, updateClimbingTheRanksAchievement } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { MyUser  } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
@@ -21,6 +21,10 @@ const Toplist = ({navigation}: RouterProps) => {
       const loggedInUser = selectLoggedInUser(users, userID );
       const similarUsers = selectSimilarUsers(users, loggedInUser);
       const sortedUsers = sortUsers(similarUsers);
+      if (sortedUsers.length > 10){
+        sortedUsers.splice(10,sortedUsers.length-10)
+        updateClimbingTheRanksAchievement(loggedInUser, sortedUsers);
+      }
       setUsers(sortedUsers);
       setLoading(false);
     });
