@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
-import { deleteSet } from "./databaseQueries";
-import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser } from "../types and interfaces/types";
+import { deleteSet, updateAchievementStatus } from "./databaseQueries";
+import { Achievement, Exercise, ExerciseSelectOption, ExerciseSet, MyUser } from "../types and interfaces/types";
 
 export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     let currentExperience = 0;
@@ -232,3 +232,5 @@ export const dateStep = (currentDate: Date, step: number): Date => {
   newDate.setDate(newDate.getDate() + step); // You can adjust the increment as needed
   return newDate
 };
+
+

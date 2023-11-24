@@ -42,8 +42,8 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
         reps: 0
     };
     const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
-    const workoutQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-    const unsubscribeFromWorkouts = onSnapshot(workoutQuery, (snapshot) => {
+    const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+    const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, (snapshot) => {
         snapshot.docs.forEach((doc) => {
             const workoutData = doc.data().Workout;
       
@@ -410,8 +410,8 @@ export const setUpProfile =async (field:string, value:number | string | Date | S
 
 export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToAdd: number): Promise<void> => {
     try {
-        const workoutsCollection = collection(FIRESTORE_DB, "Workouts");
-        const workoutsQuery = query(workoutsCollection, where("date", "==", date), where("userID", "==", userID) );
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        const workoutsQuery = query(workoutsCollectionRef, where("date", "==", date), where("userID", "==", userID) );
 
         const workoutsSnapshot = await getDocs(workoutsQuery);
         if(!workoutsSnapshot.empty){
@@ -425,96 +425,12 @@ export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToA
             };
             validateExerciseSet(data);
 
-            for (const weight of set.weights) {
-                if (weight >= 60 && weight < 80) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Lift 80 kg on an exercise to unlock next stage",
-                        icon: "dumbbell",
-                        level: 1,
-                        name: "Strength Builder",
-                        status: "Gym Novice",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-                else if (weight >= 80 && weight < 100) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Lift 100 kg on an exercise to unlock next stage",
-                        icon: "dumbbell",
-                        level: 2,
-                        name: "Strength Builder",
-                        status: "Intermediate Lifter",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-                else if (weight >= 100) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Max level achieved: Lift 100 kg on an exercise",
-                        icon: "dumbbell",
-                        level: 3,
-                        name: "Strength Builder",
-                        status: "Gym Warrior",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                } 
-            }
+            const updatedStrengthBuilderAchievement = updateStrengthBuilderAchievement(set);
+            updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
 
+            const updatedEnduranceMasterAchievement = updateEnduranceMasterAchievement(set);
+            updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
 
-            for (const rep of set.reps) {
-                if (rep >= 20 && rep < 50) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Do 50 repetitions for an exercise to unlock next stage",
-                        icon: "running",
-                        level: 1,
-                        name: "Endurance Master",
-                        status: "Repetition Rookie",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-                else if (rep >= 50 && rep < 75) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Do 75 repetitions for an exercise to unlock next stage",
-                        icon: "running",
-                        level: 2,
-                        name: "Endurance Master",
-                        status: "Endurance Enthusiast",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-                else if (rep >= 75 && rep < 100) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Do 100 repetitions for an exercise to unlock next stage",
-                        icon: "running",
-                        level: 3,
-                        name: "Strength Builder",
-                        status: "Repetition Pro",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-                else if (rep >= 100) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Max level achieved: Do 100 repetitions for an exercise to unlock next stage",
-                        icon: "running",
-                        level: 4,
-                        name: "Endurance Master",
-                        status: "Endurance Champion",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-            }
 
             const newWorkout = [...workoutsSnapshot.docs[0].data().Workout, data]
 
@@ -535,100 +451,25 @@ export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToA
             workout.push(data);
             validateExerciseSet(data);
 
-            for (const weight of set.weights) {
-                if (weight >= 60 && weight < 80) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Lift 80 kg on an exercise to unlock next stage",
-                        icon: "dumbbell",
-                        level: 1,
-                        name: "Strength Builder",
-                        status: "Gym Novice",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-                else if (weight >= 80 && weight < 100) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Lift 100 kg on an exercise to unlock next stage",
-                        icon: "dumbbell",
-                        level: 2,
-                        name: "Strength Builder",
-                        status: "Intermediate Lifter",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-                else if (weight >= 100) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Max level achieved: Lift 100 kg on an exercise",
-                        icon: "dumbbell",
-                        level: 3,
-                        name: "Strength Builder",
-                        status: "Gym Warrior",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                } 
-            }
+            const updatedStrengthBuilderAchievement = updateStrengthBuilderAchievement(set);
+            updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
 
-            for (const rep of set.reps) {
-                if (rep >= 20 && rep < 50) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Do 50 repetitions for an exercise to unlock next stage",
-                        icon: "running",
-                        level: 1,
-                        name: "Endurance Master",
-                        status: "Repetition Rookie",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-                else if (rep >= 50 && rep < 75) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Do 75 repetitions for an exercise to unlock next stage",
-                        icon: "running",
-                        level: 2,
-                        name: "Endurance Master",
-                        status: "Endurance Enthusiast",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-                else if (rep >= 75 && rep < 100) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Do 100 repetitions for an exercise to unlock next stage",
-                        icon: "running",
-                        level: 3,
-                        name: "Strength Builder",
-                        status: "Repetition Pro",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-                else if (rep >= 100) {
-                    const updatedAchievement = {
-                        color: "#BBC2CC",
-                        description: "Max level achieved: Do 100 repetitions for an exercise to unlock next stage",
-                        icon: "running",
-                        level: 4,
-                        name: "Endurance Master",
-                        status: "Endurance Champion",
-                        visibility: 1
-                    }
-                    updateAchievementStatus(userID, updatedAchievement);
-                }
-            }
-            await addDoc(workoutsCollection, {
+            const updatedEnduranceMasterAchievement = updateEnduranceMasterAchievement(set);
+            updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
+
+
+            await addDoc(workoutsCollectionRef, {
                 date: date,
                 userID: userID,
                 Workout: workout
             });
+            const updatedConsistencyStreakAchievement = await updateConsistencyStreakAchievement(userID);
+            updateAchievementStatus(userID, updatedConsistencyStreakAchievement);
+
+            const updatedDedicatedAthleteAchievement = await updateDedicatedAthleteAchievement(userID);
+            updateAchievementStatus(userID, updatedDedicatedAthleteAchievement);
+
+
         }         
         addExperience(userID, xpToAdd);
     } 
@@ -694,8 +535,8 @@ export const toggleExerciseVisibilty =async (userID: string, exerciseName: strin
 export const deleteSet = async (userID:string, exerciseName: string, exerciseID: number, setID: number, xpToDelete: number ): Promise<void> => {
     try {  
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
-        const workoutQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-        const workoutSnapshot = await getDocs(workoutQuery);
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+        const workoutSnapshot = await getDocs(workoutsQuery);
               
         for (const docSnapshot of workoutSnapshot.docs) {
             const updatedData = { ...docSnapshot.data() };
@@ -818,11 +659,23 @@ export const editProfile = async (userID:string, changes: MyUser): Promise<void>
 
 export const addWorkout =async (userID:string, date: string, workout: ExerciseSet[], xpToAdd: number): Promise<void> => {
     const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+    for (const set of workout) {
+        const updatedStrengthBuilderAchievement = updateStrengthBuilderAchievement(set);
+        updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
+
+        const updatedEnduranceMasterAchievement = updateEnduranceMasterAchievement(set);
+        updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
+    }
     await addDoc(workoutsCollectionRef, {
         date: date,
         userID: userID,
         Workout: workout
-    });     
+    });    
+    const updatedConsistencyStreakAchievement = await updateConsistencyStreakAchievement(userID);
+    updateAchievementStatus(userID, updatedConsistencyStreakAchievement);
+
+    const updatedDedicatedAthleteAchievement = await updateDedicatedAthleteAchievement(userID);
+    updateAchievementStatus(userID, updatedDedicatedAthleteAchievement); 
     addExperience(userID, xpToAdd);
     
 }
@@ -854,9 +707,266 @@ export const updateAchievementStatus =async (userID:string, updatedAchievement: 
 }
 
 
+const updateStrengthBuilderAchievement = (set: ExerciseSet): Achievement => {
+    for (const weight of set.weights) {
+      if (weight >= 60 && weight < 80) {
+          const updatedAchievement: Achievement = {
+              color: "#BBC2CC",
+              description: "Lift 80 kg on an exercise to unlock next stage",
+              icon: "dumbbell",
+              level: 1,
+              name: "Strength Builder",
+              status: "Gym Novice",
+              visibility: 1
+          }
+          return updatedAchievement;
+      }
+      else if (weight >= 80 && weight < 100) {
+          const updatedAchievement: Achievement = {
+              color: "#BBC2CC",
+              description: "Lift 100 kg on an exercise to unlock next stage",
+              icon: "dumbbell",
+              level: 2,
+              name: "Strength Builder",
+              status: "Intermediate Lifter",
+              visibility: 1
+          }
+          return updatedAchievement;
+      }
+      else if (weight >= 100) {
+          const updatedAchievement: Achievement = {
+              color: "#FFDD43",
+              description: "Max level achieved: Lift 100 kg on an exercise",
+              icon: "dumbbell",
+              level: 3,
+              name: "Strength Builder",
+              status: "Gym Warrior",
+              visibility: 1
+          }
+          return updatedAchievement;
+      } 
+  }
+};
+const updateEnduranceMasterAchievement = (set: ExerciseSet): Achievement => {
+    for (const rep of set.reps) {
+      if (rep >= 20 && rep < 50) {
+          const updatedAchievement: Achievement = {
+              color: "#BBC2CC",
+              description: "Do 50 repetitions for an exercise to unlock next stage",
+              icon: "running",
+              level: 1,
+              name: "Endurance Master",
+              status: "Repetition Rookie",
+              visibility: 1
+          }
+          return updatedAchievement;
+      }
+      else if (rep >= 50 && rep < 75) {
+          const updatedAchievement: Achievement = {
+              color: "#BBC2CC",
+              description: "Do 75 repetitions for an exercise to unlock next stage",
+              icon: "running",
+              level: 2,
+              name: "Endurance Master",
+              status: "Endurance Enthusiast",
+              visibility: 1
+          }
+          return updatedAchievement;
+      }
+      else if (rep >= 75 && rep < 100) {
+          const updatedAchievement: Achievement = {
+              color: "#BBC2CC",
+              description: "Do 100 repetitions for an exercise to unlock next stage",
+              icon: "running",
+              level: 3,
+              name: "Strength Builder",
+              status: "Repetition Pro",
+              visibility: 1
+          }
+          return updatedAchievement;
+      }
+      else if (rep >= 100) {
+          const updatedAchievement: Achievement = {
+              color: "#FFDD43",
+              description: "Max level achieved: Do 100 repetitions for an exercise to unlock next stage",
+              icon: "running",
+              level: 4,
+              name: "Endurance Master",
+              status: "Endurance Champion",
+              visibility: 1
+          }
+          return updatedAchievement;
+      }
+  }
+};
 
+const updateConsistencyStreakAchievement = async (userID: string): Promise<Achievement> => {
+    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+    const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+    const workoutsSnapshot = await getDocs(workoutsQuery);
+    const dates: string[] = []
+    for (const workoutDoc of workoutsSnapshot.docs) {
+        dates.push(workoutDoc.data().date);
+    }
+    if (dates.length === 10) {
+        const updatedAchievement: Achievement = {
+            color: "#BBC2CC",
+            description: "Work out for 30 days, unlock next stage",
+            icon: "calendar",
+            level: 1,
+            name: "Consistency Streak",
+            status: "Workout Explorer",
+            visibility: 1
+        }
+        return updatedAchievement;
+    }
+    else if (dates.length === 30) {
+        const updatedAchievement: Achievement = {
+            color: "#BBC2CC",
+            description: "Work out for 60 days, unlock next stage",
+            icon: "calendar",
+            level: 2,
+            name: "Consistency Streak",
+            status: "Fitness Journeyman",
+            visibility: 1
+        }
+        return updatedAchievement;
+    }
+    else if (dates.length === 60) {
+        const updatedAchievement: Achievement = {
+            color: "#BBC2CC",
+            description: "Work out for 90 days, unlock next stage",
+            icon: "calendar",
+            level: 3,
+            name: "Consistency Streak",
+            status: "Consistency Warrior",
+            visibility: 1
+        }
+        return updatedAchievement;
+    }
+    else if (dates.length === 90) {
+        const updatedAchievement: Achievement = {
+            color: "#BBC2CC",
+            description: "Work out for 120 days, unlock next stage",
+            icon: "calendar",
+            level: 4,
+            name: "Consistency Streak",
+            status: "Workout Explorer",
+            visibility: 1
+        }
+        return updatedAchievement;
+    }
+    else if (dates.length === 120) {
+        const updatedAchievement: Achievement = {
+            color: "#FFDD43",
+            description: "Max level unlocked: Work out for 120 days",
+            icon: "calendar",
+            level: 5,
+            name: "Consistency Streak",
+            status: "Fitness Legend",
+            visibility: 1
+        }
+        return updatedAchievement;
+    }
 
+};
+const updateDedicatedAthleteAchievement = async (userID: string): Promise<Achievement> => {
+    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+    const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+    const workoutsSnapshot = await getDocs(workoutsQuery);
+    const dates: string[] = []
+    for (const workoutDoc of workoutsSnapshot.docs) {
+        dates.push(workoutDoc.data().date);
+    }
+    const sortedDates = sortDates(dates);
+    const daysBetweenFirstAndlastDates = calculateDaysBetweenDates(sortedDates);
+    if (daysBetweenFirstAndlastDates >= 30 && daysBetweenFirstAndlastDates < 90 && sortedDates.length >= 4 && sortedDates.length <= 30) {
+        const updatedAchievement: Achievement = {
+            color: "#BBC2CC",
+            description: "Work out for 3 months, consistently to unlock next stage",
+            icon: "throphy",
+            level: 1,
+            name: "Dedicated Athlete",
+            status: "Workout Apprentice",
+            visibility: 1
+        }
+        return updatedAchievement;
+    }
+    else if (daysBetweenFirstAndlastDates >= 90 && daysBetweenFirstAndlastDates < 182 && sortedDates.length >= 13 && sortedDates.length <= 90) {
+        const updatedAchievement: Achievement = {
+            color: "#BBC2CC",
+            description: "Work out for 6 months, consistently to unlock next stage",
+            icon: "throphy",
+            level: 2,
+            name: "Dedicated Athlete",
+            status: "Gym Devotee",
+            visibility: 1
+        }
+        return updatedAchievement;
+    }
+    else if (daysBetweenFirstAndlastDates >= 182 && daysBetweenFirstAndlastDates < 273 && sortedDates.length >= 26 && sortedDates.length <= 182) {
+        const updatedAchievement: Achievement = {
+            color: "#BBC2CC",
+            description: "Work out for 9 months, consistently to unlock next stage",
+            icon: "throphy",
+            level: 3,
+            name: "Dedicated Athlete",
+            status: "Fitness Enthusiast",
+            visibility: 1
+        }
+        return updatedAchievement;
+    }
+    else if (daysBetweenFirstAndlastDates >= 273 && daysBetweenFirstAndlastDates < 365 && sortedDates.length >= 39 && sortedDates.length <= 273) {
+        const updatedAchievement: Achievement = {
+            color: "#BBC2CC",
+            description: "Work out for a year, consistently to unlock next stage",
+            icon: "throphy",
+            level: 4,
+            name: "Dedicated Athlete",
+            status: "Workout Maestro",
+            visibility: 1
+        }
+        return updatedAchievement;
+    }
+    else if (daysBetweenFirstAndlastDates >= 365 && sortedDates.length >= 52 && sortedDates.length <= 365) {
+        const updatedAchievement: Achievement = {
+            color: "#FFDD43",
+            description: "Max level unlocked: Work out for a year, consistently",
+            icon: "throphy",
+            level: 5,
+            name: "Dedicated Athlete",
+            status: "Gym God",
+            visibility: 1
+        }
+        return updatedAchievement;
+    }
 
+};
+
+const sortDates = (dates: string[]): string[] => {
+    const dateObjects = dates.map(dateString => new Date(dateString));
+    dateObjects.sort((a, b) => a.getTime() - b.getTime());
+    const sortedDates = dateObjects.map(dateObject => dateObject.toString());
+    return sortedDates;
+};
+
+const calculateDaysBetweenDates = (dates:string[]): number => {
+    if (dates.length >= 2) {
+        const firstDate = dates[0];
+        const lastDate = dates[dates.length - 1];
+      
+        const firstDateObject = new Date(firstDate);
+        const lastDateObject = new Date(lastDate);
+      
+        const timeDifferenceInMilliseconds = lastDateObject.getTime() - firstDateObject.getTime();
+      
+        const timeDifferenceInDays = timeDifferenceInMilliseconds / (1000 * 60 * 60 * 24);
+      
+        return timeDifferenceInDays;
+      } else {
+        throw new Error("Not enough dates to calculate the difference.");
+      }
+}
 
 
 
