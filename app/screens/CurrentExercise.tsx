@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import UserContext from '../contexts/UserContext';
 import {  addWorkout, getExercisesByFocus, getUser } from '../functions/databaseQueries';
@@ -7,7 +7,7 @@ import Set from '../components/Set';
 import Rest from '../components/Rest';
 import { addXP, calculateNumberOfSet, chooseExercises } from '../functions/otherFunctions';
 import { NavigationProp } from '@react-navigation/native';
-import { globalStyles } from '../assets/styles';
+import { backgroundImage, globalStyles } from '../assets/styles';
 
 
 interface RouterProps {
@@ -169,23 +169,25 @@ useEffect(() => {
   }
 
   return (
-    <View style={[globalStyles.container, {flex: 1}]}>
-      {
-        loadingExercises || loadingUser 
-          ? <ActivityIndicator />
-          : !endOfWorkout 
-            ?
-              <ScrollView>
-                {workoutComponents[currentIndex]}
-              </ScrollView>
-            : <View>
-                <Text style={styles.text}>Congrats</Text>
-                <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleFinishWorkoutButton(workout.current, userID, new Date().toDateString(), totalXP.current, navigation)}>
-                    <Text style={globalStyles.buttonText}>Next</Text>                   
-                </Pressable>
-              </View>
-      }
-    </View>
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
+      <View style={[globalStyles.container, {flex: 1}]}>
+        {
+          loadingExercises || loadingUser
+            ? <ActivityIndicator />
+            : !endOfWorkout
+              ?
+                <ScrollView>
+                  {workoutComponents[currentIndex]}
+                </ScrollView>
+              : <View>
+                  <Text style={styles.text}>Congrats</Text>
+                  <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleFinishWorkoutButton(workout.current, userID, new Date().toDateString(), totalXP.current, navigation)}>
+                      <Text style={globalStyles.buttonText}>Next</Text>
+                  </Pressable>
+                </View>
+        }
+      </View>
+    </ImageBackground>
   )
 }
 

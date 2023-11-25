@@ -6,7 +6,7 @@ interface MyModalProps {
   onClose: () => void;
   title: string;
   information: string;
-  children: any
+  children?: any
 }
 
 const Info = ({ isVisible, onClose, title, information, children }: MyModalProps) => {

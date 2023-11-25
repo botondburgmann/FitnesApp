@@ -1,6 +1,6 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { globalStyles } from '../assets/styles'
+import { backgroundImage, globalStyles } from '../assets/styles'
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Achievement } from '../types and interfaces/types';
 import { getAchievementsForUser } from '../functions/databaseQueries';
@@ -61,9 +61,11 @@ const Achievements = ({route}) => {
       }
     
     return (
-        <View style={[globalStyles.container, {flex: 1}]}>
-            {achievementComponents.length === 0 ? <ActivityIndicator/> : achievementComponents}
-        </View>
+        <ImageBackground source={backgroundImage} style={globalStyles.image}>
+        <View style={[globalStyles.container, {flex: 1,  backgroundColor: 'rgba(128,128,128,0.5)' }]}>
+                {achievementComponents.length === 0 ? <ActivityIndicator/> : achievementComponents}
+            </View>
+        </ImageBackground>
     )
 }
 

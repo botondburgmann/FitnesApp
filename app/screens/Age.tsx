@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Pressable, ImageBackground } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { setUpProfile } from '../functions/databaseQueries';
 import Datepicker from '../components/Datepicker';
 import UserContext from '../contexts/UserContext';
 import { RouterProps } from '../types and interfaces/interfaces';
-import { globalStyles } from '../assets/styles';
+import { backgroundImage, globalStyles } from '../assets/styles';
 
 
 
@@ -14,21 +14,23 @@ const Age = ({navigation}: RouterProps) => {
 
 
   return (
-    <View style={globalStyles.container}>
-      <Text style={styles.label}>Please, select your date of birth</Text>
-      <View style={styles.icon}>
-        <Datepicker date={birthDate} setDate={setBirthDate} />
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
+      <View style={globalStyles.container}>
+        <Text style={styles.label}>Please, select your date of birth</Text>
+        <View style={styles.icon}>
+          <Datepicker date={birthDate} setDate={setBirthDate} />
+        </View>
+        <Text style={styles.text}>{birthDate.toDateString()}</Text>
+        <View style={styles.buttonGroup}>
+          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Gender')}>
+            <Text style={globalStyles.buttonText}>Go back</Text>
+          </Pressable>
+          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => setUpProfile('age', birthDate, userID, navigation, 'Weight')}>
+            <Text style={globalStyles.buttonText}>Next</Text>
+          </Pressable>
+        </View>
       </View>
-      <Text style={styles.text}>{birthDate.toDateString()}</Text>
-      <View style={styles.buttonGroup}>
-        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Gender')}>
-          <Text style={globalStyles.buttonText}>Go back</Text>
-        </Pressable>
-        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => setUpProfile('age', birthDate, userID, navigation, 'Weight')}>
-          <Text style={globalStyles.buttonText}>Next</Text>
-        </Pressable>
-      </View>
-    </View>
+    </ImageBackground>
   );
 };
 

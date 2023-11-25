@@ -1,10 +1,10 @@
-import {  ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {  ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../contexts/UserContext';
 import { getAllExercises, toggleExerciseVisibilty } from '../functions/databaseQueries';
 import { Exercise } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
-import { globalStyles } from '../assets/styles';
+import { backgroundImage, globalStyles } from '../assets/styles';
 
 const Exercises = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
@@ -56,18 +56,20 @@ const Exercises = ({navigation}: RouterProps) => {
   
 
   return (
-    <View style={[globalStyles.container, {flex: 1}]}>
-      <Text style={styles.label}>My exercises</Text>
-      {loading 
-      ? <ActivityIndicator/> 
-      :  <ScrollView>
-          { exerciseComponentsList}
-        </ScrollView>
-      }
-    <Pressable style={styles.createExerciseButton} onPress={() => navigation.navigate("Create Exercise")}>
-        <Text style={styles.createExerciseButtonText}>+</Text>
-      </Pressable>
-    </View>
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
+      <View style={[globalStyles.container, {flex: 1}]}>
+        <Text style={styles.label}>My exercises</Text>
+        {loading
+        ? <ActivityIndicator/>
+        :  <ScrollView>
+            { exerciseComponentsList}
+          </ScrollView>
+        }
+      <Pressable style={styles.createExerciseButton} onPress={() => navigation.navigate("Create Exercise")}>
+          <Text style={styles.createExerciseButtonText}>+</Text>
+        </Pressable>
+      </View>
+    </ImageBackground>
   )
 }
 

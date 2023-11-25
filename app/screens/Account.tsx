@@ -1,11 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from "react-native"
+import { ImageBackground, Pressable, StyleSheet, Text, View } from "react-native"
 import React, { useContext, useEffect, useState } from "react"
 import { FIREBASE_AUTH } from "../../FirebaseConfig"
 import { getUser, getBestExercise } from "../functions/databaseQueries"
 import UserContext from "../contexts/UserContext";
 import { NavigationProp } from "@react-navigation/native";
 import { MyUser, BestExercise } from "../types and interfaces/types";
-import { globalStyles } from "../assets/styles";
+import { backgroundImage, globalStyles } from "../assets/styles";
 
 interface RouterProps {
   route: any,
@@ -90,51 +90,48 @@ useEffect(() => {
   
   }, [user])
   return (
-    <View style={[globalStyles.container, {flex: 1}]} >
-   <View>
-            <Text style={styles.text}>{user.name}</Text>
-            <Text style={styles.text}>Level: {user.level}</Text>
-            <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>
-
-            <Text style={styles.text}>Best records</Text>
-            {
-              mostWeightExercise.name === "" 
-              ? <Text style={styles.text}>
-                 Max weight: No data
-                </Text>
-              : <Text style={styles.text}>
-                  Max weight: {( mostWeightExercise).name} {( mostWeightExercise).weights} kg ({(mostWeightExercise).reps} repetitions)
-                </Text>
-            }
-            {
-              mostRepsExercise.name === "" 
-              ? <Text style={styles.text}>
-                 Most repetitions: No data
-                </Text>
-              : <Text style={styles.text}>
-                  Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
-                </Text>
-            }
-
-
-          </View>
-
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
+    <View style={[globalStyles.container, {flex: 1}]}>
+         <View>
+              <Text style={styles.text}>{user.name}</Text>
+              <Text style={styles.text}>Level: {user.level}</Text>
+              <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>
+              <Text style={styles.text}>Best records</Text>
+              {
+                mostWeightExercise.name === ""
+                ? <Text style={styles.text}>
+                   Max weight: No data
+                  </Text>
+                : <Text style={styles.text}>
+                    Max weight: {( mostWeightExercise).name} {( mostWeightExercise).weights} kg ({(mostWeightExercise).reps} repetitions)
+                  </Text>
+              }
+              {
+                mostRepsExercise.name === ""
+                ? <Text style={styles.text}>
+                   Most repetitions: No data
+                  </Text>
+                : <Text style={styles.text}>
+                    Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
+                  </Text>
+              }
+            </View>
       
-        <Pressable style={globalStyles.button}>
-            <Text style={globalStyles.buttonText} onPress={() => navigation.navigate("Achievements", {userID: userID})}>Achievements</Text>
-        </Pressable>
-      {userID === loggedInUserID &&
-      <View>
-        <Pressable style={globalStyles.button}>
-            <Text style={styles.text} onPress={() => navigation.navigate("Edit profile", {user: user})}>Edit profile</Text>
-        </Pressable>
-        <Pressable style={globalStyles.button}>
-            <Text style={globalStyles.buttonText} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>
-        </Pressable>
+          <Pressable style={globalStyles.button}>
+              <Text style={globalStyles.buttonText} onPress={() => navigation.navigate("Achievements", {userID: userID})}>Achievements</Text>
+          </Pressable>
+        {userID === loggedInUserID &&
+        <View>
+          <Pressable style={globalStyles.button}>
+              <Text style={styles.text} onPress={() => navigation.navigate("Edit profile", {user: user})}>Edit profile</Text>
+          </Pressable>
+          <Pressable style={globalStyles.button}>
+              <Text style={globalStyles.buttonText} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>
+          </Pressable>
+        </View>
+        }
       </View>
-      }
- 
-    </View>
+    </ImageBackground>
   )
 }
 

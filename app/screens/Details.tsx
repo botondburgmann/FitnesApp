@@ -1,11 +1,11 @@
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import {BestExercise, ExerciseRecords, TableRow, TableState } from '../types and interfaces/types';
 import { getExercise } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import {Table, Row, Rows} from 'react-native-table-component'
-import { globalStyles } from '../assets/styles';
+import { backgroundImage, globalStyles } from '../assets/styles';
 
 
 interface RouterProps {
@@ -25,18 +25,6 @@ const Details = ({ route, navigation }: RouterProps) => {
     tableHead: ["Date", "Weight (kg)", "Repetitons", "Time (seconds)"],
     tableData: []
   });
-
-/*   let mostWeight ={
-    name: exercise,
-    weights: 0,
-    reps: 0
-  }
-  let mostReps = {
-    name: exercise,
-    weights: 0,
-    reps: 0
-  }
- */
   const [mostWeight, setMostWeight] = useState<BestExercise>({
     name: exercise,
     weights: 0,
@@ -184,21 +172,23 @@ const Details = ({ route, navigation }: RouterProps) => {
 
 
   return (
-    <View style={globalStyles.container}>
-      <Text style={styles.label}>{exercise}</Text>
-      {loading 
-      ? <ActivityIndicator/> 
-      : <ScrollView>
-        <Text style={styles.text}>Maximum weight: {mostWeight.weights} kg for {mostWeight.reps} repetitons</Text>
-        <Text style={styles.text}>Most repetitions: {mostReps.reps} with {mostReps.weights} kg</Text>
-        <Table borderStyle={{borderWidth: 2, borderColor: '#b0a2a2'}}>
-          <Row data={table.tableHead} style={styles.head} textStyle={styles.headText}/>
-          <Rows data={table.tableData} textStyle={styles.cellText}/>
-        </Table>
-      </ScrollView> 
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
+      <View style={[globalStyles.container, {flex: 1}]}>
+        <Text style={styles.label}>{exercise}</Text>
+        {loading
+        ? <ActivityIndicator/>
+        : <ScrollView>
+          <Text style={styles.text}>Maximum weight: {mostWeight.weights} kg for {mostWeight.reps} repetitons</Text>
+          <Text style={styles.text}>Most repetitions: {mostReps.reps} with {mostReps.weights} kg</Text>
+          <Table borderStyle={{borderWidth: 2, borderColor: '#b0a2a2'}}>
+            <Row data={table.tableHead} style={styles.head} textStyle={styles.headText}/>
+            <Rows data={table.tableData} textStyle={styles.cellText}/>
+          </Table>
+        </ScrollView>
       
-      }
-    </View>
+        }
+      </View>
+    </ImageBackground>
   )
 }
 

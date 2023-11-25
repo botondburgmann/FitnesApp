@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
+import { ImageBackground, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import { editProfile, editSet } from '../functions/databaseQueries';
@@ -6,7 +6,7 @@ import UserContext from '../contexts/UserContext';
 import Datepicker from '../components/Datepicker';
 import Radiobutton from '../components/Radiobutton';
 import SelectMenu from '../components/SelectMenu';
-import { globalStyles } from '../assets/styles';
+import { backgroundImage, globalStyles } from '../assets/styles';
 
 interface RouterProps {
     route: any,
@@ -102,61 +102,63 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
     }
 
     return (
+        <ImageBackground source={backgroundImage} style={globalStyles.image}>
         <ScrollView contentContainerStyle={[globalStyles.container, {flex: 1}]}>
-            <View style={styles.gridContainer}>
-                <Text style={styles.text}>Name</Text>
-                <TextInput
-                    style={[globalStyles.input,{flex: 1}]}
-                    value={name}
-                    placeholder="name"
-                    autoCapitalize='none'
-                    onChangeText={(text) => setName(text)}
-                />
-            </View>
-            <View style={styles.dateGridContainer}>
-                <Text style={styles.text}>Birthday:</Text>
-                <Text style={styles.text}>{birthDate.toDateString()}</Text>
-                <Datepicker date={birthDate} setDate={setBirthDate} />
-            </View>
-            <View style={styles.gridContainer}>
-                <Text style={styles.text}>Gender</Text>
-                <Radiobutton selectedValue={gender} setselectedValue={setGender} options={options} />
-            </View>
-            <View style={styles.gridContainer}>
-                <Text style={styles.text}>Weight</Text>
-                <TextInput
-                    keyboardType='numeric'
-                    value={weight.toString()}
-                    style={globalStyles.input}
-                    placeholder={systemValueWeight === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
-                    autoCapitalize='none'
-                    onChangeText={(text) => setWeight(parseFloat(text))}
-                />
-                <View style={styles.systemSelectMenuContainer}>
-                    <SelectMenu data={systemItemsWeight} setSelectedValue={setSystemValueWeight} title={"System"} />
+                <View style={styles.gridContainer}>
+                    <Text style={styles.text}>Name</Text>
+                    <TextInput
+                        style={[globalStyles.input,{flex: 1}]}
+                        value={name}
+                        placeholder="name"
+                        autoCapitalize='none'
+                        onChangeText={(text) => setName(text)}
+                    />
                 </View>
-            </View>
-            <View style={styles.gridContainer}>
-                <Text style={styles.text}>Height</Text>
-                <TextInput
-                    keyboardType='numeric'
-                    value={height.toString()}
-                    style={globalStyles.input}
-                    placeholder={systemValueHeight === "ft" ? "height (ft)" : "height (cm)" }
-                    autoCapitalize='none'
-                    onChangeText={(text) => setHeight(parseFloat(text))}
-                />
-                <View style={styles.systemSelectMenuContainer}>
-                    <SelectMenu data={systemItemsHeight} setSelectedValue={setSystemValueHeight} title={"System"} />
+                <View style={styles.dateGridContainer}>
+                    <Text style={styles.text}>Birthday:</Text>
+                    <Text style={styles.text}>{birthDate.toDateString()}</Text>
+                    <Datepicker date={birthDate} setDate={setBirthDate} />
                 </View>
-            </View>
-            <View style={styles.activitySelectMenuContainer}>
-                <SelectMenu data={activityItems} setSelectedValue={setActivityValue} title={"Activity level"} />
-            </View> 
-            <Pressable style={[globalStyles.button, {marginTop: 20,width: 150, height: 50,}]} onPress={() => handleModifyButton()}>
-                <Text style={globalStyles.buttonText}>Modify</Text>                   
-            </Pressable>
-        </ScrollView>
+                <View style={styles.gridContainer}>
+                    <Text style={styles.text}>Gender</Text>
+                    <Radiobutton selectedValue={gender} setselectedValue={setGender} options={options} />
+                </View>
+                <View style={styles.gridContainer}>
+                    <Text style={styles.text}>Weight</Text>
+                    <TextInput
+                        keyboardType='numeric'
+                        value={weight.toString()}
+                        style={globalStyles.input}
+                        placeholder={systemValueWeight === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
+                        autoCapitalize='none'
+                        onChangeText={(text) => setWeight(parseFloat(text))}
+                    />
+                    <View style={styles.systemSelectMenuContainer}>
+                        <SelectMenu data={systemItemsWeight} setSelectedValue={setSystemValueWeight} title={"System"} />
+                    </View>
+                </View>
+                <View style={styles.gridContainer}>
+                    <Text style={styles.text}>Height</Text>
+                    <TextInput
+                        keyboardType='numeric'
+                        value={height.toString()}
+                        style={globalStyles.input}
+                        placeholder={systemValueHeight === "ft" ? "height (ft)" : "height (cm)" }
+                        autoCapitalize='none'
+                        onChangeText={(text) => setHeight(parseFloat(text))}
+                    />
+                    <View style={styles.systemSelectMenuContainer}>
+                        <SelectMenu data={systemItemsHeight} setSelectedValue={setSystemValueHeight} title={"System"} />
+                    </View>
+                </View>
+                <View style={styles.activitySelectMenuContainer}>
+                    <SelectMenu data={activityItems} setSelectedValue={setActivityValue} title={"Activity level"} />
+                </View>
+                <Pressable style={[globalStyles.button, {marginTop: 20,width: 150, height: 50,}]} onPress={() => handleModifyButton()}>
+                    <Text style={globalStyles.buttonText}>Modify</Text>
+                </Pressable>
+            </ScrollView>
+        </ImageBackground>
     )
 }
 

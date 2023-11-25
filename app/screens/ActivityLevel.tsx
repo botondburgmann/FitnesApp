@@ -1,4 +1,4 @@
-import { View, StyleSheet, Pressable, Text } from 'react-native'
+import { View, StyleSheet, Pressable, Text, ImageBackground } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { setUpProfile } from '../functions/databaseQueries';
 import SelectMenu from '../components/SelectMenu';
@@ -6,7 +6,7 @@ import UserContext from '../contexts/UserContext';
 import { SelectItem } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { globalStyles } from '../assets/styles';
+import { backgroundImage, globalStyles } from '../assets/styles';
 
 
 
@@ -23,24 +23,25 @@ const ActivityLevel = ({navigation}: RouterProps) => {
 
 
   return (
-    <View style={[globalStyles.container, {flex: 1}]}>
-      <Text style={styles.label}>Please, select your activity level</Text>
-      <View style={styles.icon}>
-        <MaterialCommunityIcons name="weight-lifter" size={60} color="#fff" />
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
+        <View style={[globalStyles.container, {flex: 1}]}>
+        <Text style={styles.label}>Please, select your activity level</Text>
+        <View style={styles.icon}>
+          <MaterialCommunityIcons name="weight-lifter" size={60} color="#fff" />
+        </View>
+        <View style={styles.selectMenuContainer}>
+          <SelectMenu data={items} setSelectedValue={setValue} title={"Activity level"} />
+        </View>
+        <View style={styles.buttonGroup}>
+          <Pressable style={globalStyles.button} onPress={() => navigation.navigate('Height')}>
+            <Text style={globalStyles.buttonText}>Go back</Text>
+          </Pressable>
+          <Pressable style={globalStyles.button} onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'InsideLayout')}>
+            <Text style={globalStyles.buttonText}>Finish</Text>
+          </Pressable>
+        </View>
       </View>
-
-      <View style={styles.selectMenuContainer}>
-        <SelectMenu data={items} setSelectedValue={setValue} title={"Activity level"} />
-      </View>      
-      <View style={styles.buttonGroup}>
-        <Pressable style={globalStyles.button} onPress={() => navigation.navigate('Height')}>
-          <Text style={globalStyles.buttonText}>Go back</Text>
-        </Pressable>
-        <Pressable style={globalStyles.button} onPress={() => setUpProfile('activityLevel', value, userID, navigation, 'InsideLayout')}>
-          <Text style={globalStyles.buttonText}>Finish</Text>
-        </Pressable>
-      </View>  
-    </View>
+    </ImageBackground>
   )
 }
 

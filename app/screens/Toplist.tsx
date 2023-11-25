@@ -1,11 +1,11 @@
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { getAllUsers, updateClimbingTheRanksAchievement } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { MyUser  } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
 import { selectLoggedInUser, selectSimilarUsers, sortUsers } from '../functions/otherFunctions';
-import { globalStyles } from '../assets/styles';
+import { backgroundImage, globalStyles } from '../assets/styles';
 
 interface WeekRange{
   start: Date;
@@ -111,15 +111,17 @@ const Toplist = ({navigation}: RouterProps) => {
   
 
   return (
-    <View style={[globalStyles.container, {flex: 1}]}>
-      <Text style={styles.label}>{week.start} - {week.end}</Text>
-      {loading 
-      ? <ActivityIndicator/> 
-      :  <ScrollView>
-          { components}
-        </ScrollView>
-      }
-    </View>
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
+      <View style={[globalStyles.container, {flex: 1}]}>
+        <Text style={styles.label}>{week.start} - {week.end}</Text>
+        {loading
+        ? <ActivityIndicator/>
+        :  <ScrollView>
+            { components}
+          </ScrollView>
+        }
+      </View>
+    </ImageBackground>
   )
 }
 

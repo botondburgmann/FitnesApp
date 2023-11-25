@@ -1,10 +1,10 @@
-import { Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
+import { ImageBackground, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import { editSet } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { addXPForOneSet, removeXP } from '../functions/otherFunctions';
-import { globalStyles } from '../assets/styles';
+import { backgroundImage, globalStyles } from '../assets/styles';
 
 
 interface RouterProps {
@@ -66,66 +66,68 @@ const EditSet = ({ route, navigation }: RouterProps) => {
     }
 
     return (
+        <ImageBackground source={backgroundImage} style={globalStyles.image}>
         <View style={[globalStyles.container, {flex: 1}]}>
-            <Text style={styles.label}>Edit {set.exercise}</Text>
-            { side !== "both"
-                ?<View style={styles.gridContainer}>
-                    <Text style={styles.text}>{side} side</Text>
-                    <Switch
-                        trackColor={{ false: "#808080", true: "#fff" }}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={toggleSwitch}
-                        value={isEnabled}
-                    />
-                </View>
-                :<></>
-            }
-            <Text style={styles.text}>weight (kg)</Text>
-            <TextInput
-                keyboardType='numeric'
-                style={globalStyles.input}
-                value={weight}
-                placeholder="Weight"
-                autoCapitalize='none'
-                onChangeText={(text) => setWeight(text)}
-            />
-            {!isIsometric 
-            ? <>
-                <Text style={styles.text}>reps</Text>
+                <Text style={styles.label}>Edit {set.exercise}</Text>
+                { side !== "both"
+                    ?<View style={styles.gridContainer}>
+                        <Text style={styles.text}>{side} side</Text>
+                        <Switch
+                            trackColor={{ false: "#808080", true: "#fff" }}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={toggleSwitch}
+                            value={isEnabled}
+                        />
+                    </View>
+                    :<></>
+                }
+                <Text style={styles.text}>weight (kg)</Text>
                 <TextInput
                     keyboardType='numeric'
                     style={globalStyles.input}
-                    value={reps}
-                    placeholder="Reps"
+                    value={weight}
+                    placeholder="Weight"
                     autoCapitalize='none'
-                    onChangeText={(text) => setReps(text)}
+                    onChangeText={(text) => setWeight(text)}
                 />
-            </>
-            :  <></>
-            }
-           
-            <Text style={styles.text}>time (seconds)</Text>
-            <TextInput
-                keyboardType='numeric'
-                style={globalStyles.input}
-                value={time}
-                placeholder="Time (in seconds)"
-                autoCapitalize='none'
-                onChangeText={(text) => setTime(text)}
-            />
-            <Text style={styles.text}>Rest time (seconds)</Text>
-            <TextInput
-                keyboardType='numeric'
-                style={globalStyles.input}
-                value={restTime}
-                placeholder="Rest time (in seconds)"
-                autoCapitalize='none'
-                onChangeText={(text) => setRestTime(text)}
-            />
-            <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleModifyButton(isIsometric, changeIsometric, changeNormal, set)}>
-                <Text style={globalStyles.buttonText}>Modify</Text>                   
-            </Pressable>
-        </View>
+                {!isIsometric
+                ? <>
+                    <Text style={styles.text}>reps</Text>
+                    <TextInput
+                        keyboardType='numeric'
+                        style={globalStyles.input}
+                        value={reps}
+                        placeholder="Reps"
+                        autoCapitalize='none'
+                        onChangeText={(text) => setReps(text)}
+                    />
+                </>
+                :  <></>
+                }
+            
+                <Text style={styles.text}>time (seconds)</Text>
+                <TextInput
+                    keyboardType='numeric'
+                    style={globalStyles.input}
+                    value={time}
+                    placeholder="Time (in seconds)"
+                    autoCapitalize='none'
+                    onChangeText={(text) => setTime(text)}
+                />
+                <Text style={styles.text}>Rest time (seconds)</Text>
+                <TextInput
+                    keyboardType='numeric'
+                    style={globalStyles.input}
+                    value={restTime}
+                    placeholder="Rest time (in seconds)"
+                    autoCapitalize='none'
+                    onChangeText={(text) => setRestTime(text)}
+                />
+                <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleModifyButton(isIsometric, changeIsometric, changeNormal, set)}>
+                    <Text style={globalStyles.buttonText}>Modify</Text>
+                </Pressable>
+            </View>
+        </ImageBackground>
     )
 }
 

@@ -1,10 +1,10 @@
 import React, { useContext, useState } from "react";
-import {  View, Pressable, Text, StyleSheet } from "react-native";
+import {  View, Pressable, Text, StyleSheet, ImageBackground } from "react-native";
 import { setUpProfile } from "../functions/databaseQueries";
 import Radiobutton from "../components/Radiobutton";
 import UserContext from "../contexts/UserContext";
 import { RouterProps } from "../types and interfaces/interfaces";
-import { globalStyles } from "../assets/styles";
+import { backgroundImage, globalStyles } from "../assets/styles";
 
 
 const Gender = ( {navigation}: RouterProps) => {
@@ -13,14 +13,15 @@ const Gender = ( {navigation}: RouterProps) => {
   const options = ["Male", "Female"];
 
   return (
-    <View style={globalStyles.container}>
-      <Text style={styles.label}>Please, select your gender</Text>
-      <Radiobutton selectedValue={gender} setselectedValue={setGender} options={options} />
-
-      <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => setUpProfile('gender', gender, userID, navigation, 'Age')}>
-          <Text style={globalStyles.buttonText}>Next</Text>
-      </Pressable>
-    </View>
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
+      <View style={globalStyles.container}>
+        <Text style={styles.label}>Please, select your gender</Text>
+        <Radiobutton selectedValue={gender} setselectedValue={setGender} options={options} />
+        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => setUpProfile('gender', gender, userID, navigation, 'Age')}>
+            <Text style={globalStyles.buttonText}>Next</Text>
+        </Pressable>
+      </View>
+    </ImageBackground>
   )
 }
 

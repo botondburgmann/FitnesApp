@@ -1,4 +1,4 @@
-import { View, TextInput, StyleSheet, Pressable, Text } from 'react-native'
+import { View, TextInput, StyleSheet, Pressable, Text, ImageBackground } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { setUpProfile } from '../functions/databaseQueries';
 import SelectMenu from '../components/SelectMenu';
@@ -6,7 +6,7 @@ import UserContext from '../contexts/UserContext';
 import { SelectItem } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { globalStyles } from '../assets/styles';
+import { backgroundImage, globalStyles } from '../assets/styles';
 
 
 const Height = ({navigation}: RouterProps) => {
@@ -20,33 +20,35 @@ const Height = ({navigation}: RouterProps) => {
   ]);
 
   return (
-    <View style={globalStyles.container}>
-      <Text style={styles.label}>Please, select your height</Text>
-      <View style={styles.icon}>
-        <MaterialCommunityIcons name="human-male-height" size={60} color="#fff" />
-      </View>
-      <View style={styles.inputGroup}>
-        <TextInput
-          keyboardType='numeric'
-          value={height}
-          style={globalStyles.input}
-          placeholder={value === "ft" ? "Height (ft)" : "Height (cm)" }
-          autoCapitalize='none'
-          onChangeText={(text) => setHeight(text)}
-        />
-        <View style={styles.selectMenuContainer}>
-          <SelectMenu data={items} setSelectedValue={setValue} title={"System"} />
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
+      <View style={globalStyles.container}>
+        <Text style={styles.label}>Please, select your height</Text>
+        <View style={styles.icon}>
+          <MaterialCommunityIcons name="human-male-height" size={60} color="#fff" />
         </View>
-      </View>  
-      <View style={styles.buttonGroup}>
-        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Weight')}>
-          <Text style={styles.text}>Go back</Text>
-        </Pressable>
-        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => setUpProfile('height', parseFloat(height), userID, navigation, 'ActivityLevel', value)}>
-          <Text style={globalStyles.buttonText}>Next</Text>
-        </Pressable>
-      </View>            
-    </View>
+        <View style={styles.inputGroup}>
+          <TextInput
+            keyboardType='numeric'
+            value={height}
+            style={globalStyles.input}
+            placeholder={value === "ft" ? "Height (ft)" : "Height (cm)" }
+            autoCapitalize='none'
+            onChangeText={(text) => setHeight(text)}
+          />
+          <View style={styles.selectMenuContainer}>
+            <SelectMenu data={items} setSelectedValue={setValue} title={"System"} />
+          </View>
+        </View>
+        <View style={styles.buttonGroup}>
+          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Weight')}>
+            <Text style={styles.text}>Go back</Text>
+          </Pressable>
+          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => setUpProfile('height', parseFloat(height), userID, navigation, 'ActivityLevel', value)}>
+            <Text style={globalStyles.buttonText}>Next</Text>
+          </Pressable>
+        </View>
+      </View>
+    </ImageBackground>
   )
 }
 

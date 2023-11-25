@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
+import { ImageBackground, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../components/SelectMenu'
 import { addSet, getAvailableExercises } from '../functions/databaseQueries'
@@ -6,7 +6,7 @@ import UserContext from '../contexts/UserContext'
 import {ExerciseSelectOption, ExerciseSet } from '../types and interfaces/types'
 import { addXP, handleAddButton } from '../functions/otherFunctions'
 import { NavigationProp } from '@react-navigation/native'
-import { globalStyles } from '../assets/styles'
+import { backgroundImage, globalStyles } from '../assets/styles'
 
 interface RouterProps {
   route: any,
@@ -113,83 +113,85 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
 
 
   return (
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
     <ScrollView contentContainerStyle={globalStyles.container}>
-      <Text style={styles.label}>Add new execise</Text>
-      <View style={styles.selectMenuContainer} >
-        <SelectMenu
-          data={allExercises || []}
-          setSelectedValue={ setCurrentExercise }
-        />
-      </View>
-      {allExercises 
-      && <View>
-          { currentExercise.unilateral
-            ? <View style={styles.gridContainer}>
-                <Text style={styles.text}>{side} side</Text>
-                <Switch
-                  trackColor={{ false: "#808080", true: "#fff" }}
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={toggleSwitch}
-                  value={isEnabled}
-                />
-              </View>
-            :<></>
-          }
-          <Text style={styles.text}>weight (kg)</Text>
-          <TextInput
-            keyboardType='numeric'
-            style={globalStyles.input}
-            value={weight}
-            placeholder="Weight"
-            autoCapitalize='none'
-            onChangeText={(text) => setWeight(text)}
+        <Text style={styles.label}>Add new execise</Text>
+        <View style={styles.selectMenuContainer} >
+          <SelectMenu
+            data={allExercises || []}
+            setSelectedValue={ setCurrentExercise }
           />
-          {!currentExercise.isometric 
-            ? <>
-              <Text style={styles.text}>reps</Text>
-              <TextInput
-                keyboardType='numeric'
-                style={globalStyles.input}
-                value={reps}
-                placeholder="Reps"
-                autoCapitalize='none'
-                onChangeText={(text) => setReps(text)}
-              />
-            </>
-            : <></>
-          }
-          <Text style={styles.text}>time (seconds)</Text>
-          <TextInput
-            keyboardType='numeric'
-            style={globalStyles.input}
-            value={time}
-            placeholder="Time (in seconds)"
-            autoCapitalize='none'
-            onChangeText={(text) => setTime(text)}
-          />
-          <Text style={styles.text}>Rest time (seconds)</Text>
-          <TextInput
-            keyboardType='numeric'
-            style={globalStyles.input}
-            value={restTime}
-            placeholder="Rest time (in seconds)"
-            autoCapitalize='none'
-            onChangeText={(text) => setRestTime(text)}
-          />
-          <View style={styles.gridContainer}>
-            <Pressable style={[globalStyles.button, { width: 100}]} onPress={() => handleAddButton(parseInt(time), setTime, parseFloat(reps), setReps, 
-                                                                            parseInt(restTime), setRestTime, side, setSide,parseFloat(weight), setWeight, 
-                                                                            currentExercise, setCurrentExercise, sets, setIsEnabled, selectedExercises)}>
-                <Text style={globalStyles.buttonText}>Add set</Text>
-            </Pressable> 
-            <Pressable style={[globalStyles.button, { width: 100}]} onPress={() => handleFinishButton(selectedExercises, sets)}>
-                <Text style={globalStyles.buttonText}>Finish</Text>
-            </Pressable>
-          </View>
-            <Text style={styles.text}>Total sets: {sets.exercise.length}</Text>
         </View>
-      }
-    </ScrollView>
+        {allExercises
+        && <View>
+            { currentExercise.unilateral
+              ? <View style={styles.gridContainer}>
+                  <Text style={styles.text}>{side} side</Text>
+                  <Switch
+                    trackColor={{ false: "#808080", true: "#fff" }}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={toggleSwitch}
+                    value={isEnabled}
+                  />
+                </View>
+              :<></>
+            }
+            <Text style={styles.text}>weight (kg)</Text>
+            <TextInput
+              keyboardType='numeric'
+              style={globalStyles.input}
+              value={weight}
+              placeholder="Weight"
+              autoCapitalize='none'
+              onChangeText={(text) => setWeight(text)}
+            />
+            {!currentExercise.isometric
+              ? <>
+                <Text style={styles.text}>reps</Text>
+                <TextInput
+                  keyboardType='numeric'
+                  style={globalStyles.input}
+                  value={reps}
+                  placeholder="Reps"
+                  autoCapitalize='none'
+                  onChangeText={(text) => setReps(text)}
+                />
+              </>
+              : <></>
+            }
+            <Text style={styles.text}>time (seconds)</Text>
+            <TextInput
+              keyboardType='numeric'
+              style={globalStyles.input}
+              value={time}
+              placeholder="Time (in seconds)"
+              autoCapitalize='none'
+              onChangeText={(text) => setTime(text)}
+            />
+            <Text style={styles.text}>Rest time (seconds)</Text>
+            <TextInput
+              keyboardType='numeric'
+              style={globalStyles.input}
+              value={restTime}
+              placeholder="Rest time (in seconds)"
+              autoCapitalize='none'
+              onChangeText={(text) => setRestTime(text)}
+            />
+            <View style={styles.gridContainer}>
+              <Pressable style={[globalStyles.button, { width: 100}]} onPress={() => handleAddButton(parseInt(time), setTime, parseFloat(reps), setReps,
+                                                                              parseInt(restTime), setRestTime, side, setSide,parseFloat(weight), setWeight,
+                                                                              currentExercise, setCurrentExercise, sets, setIsEnabled, selectedExercises)}>
+                  <Text style={globalStyles.buttonText}>Add set</Text>
+              </Pressable>
+              <Pressable style={[globalStyles.button, { width: 100}]} onPress={() => handleFinishButton(selectedExercises, sets)}>
+                  <Text style={globalStyles.buttonText}>Finish</Text>
+              </Pressable>
+            </View>
+              <Text style={styles.text}>Total sets: {sets.exercise.length}</Text>
+          </View>
+        }
+      </ScrollView>
+    </ImageBackground>
   )
 }
 

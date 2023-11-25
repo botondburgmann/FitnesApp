@@ -1,9 +1,9 @@
-import {ScrollView, StyleSheet, Text} from 'react-native'
+import {ImageBackground, ScrollView, StyleSheet, Text} from 'react-native'
 import React from 'react'
 import Routine from '../components/Routine';
 import NavigationContext from '../contexts/NavigationContext';
 import { RouterProps } from '../types and interfaces/interfaces';
-import { globalStyles } from '../assets/styles';
+import { backgroundImage, globalStyles } from '../assets/styles';
 
 
 
@@ -23,12 +23,14 @@ const Routines = ({navigation}: RouterProps) => {
     }
         
   return (
-    <ScrollView contentContainerStyle={globalStyles.container}>
-      <NavigationContext.Provider value={navigation}>
-        <Text style={styles.label}>Choose workout type</Text>
-        {routineComponents}
-      </NavigationContext.Provider>
-     </ScrollView>
+    <ImageBackground source={backgroundImage} style={globalStyles.image}>
+      <ScrollView contentContainerStyle={globalStyles.container}>
+        <NavigationContext.Provider value={navigation}>
+          <Text style={styles.label}>Choose workout type</Text>
+          {routineComponents}
+        </NavigationContext.Provider>
+       </ScrollView>
+    </ImageBackground>
   )
 }
 

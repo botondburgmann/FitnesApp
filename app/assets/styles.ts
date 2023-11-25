@@ -1,9 +1,10 @@
 import { StyleSheet} from "react-native"
+export const backgroundImage = require("../assets/background.jpg");
 
 export const globalStyles = StyleSheet.create({
     container: {
         justifyContent: "center",
-        backgroundColor: "#ff0000"
+        backgroundColor: 'rgba(128,128,128,0.5)' 
     },
     input: {
         marginHorizontal: 10,
@@ -14,6 +15,10 @@ export const globalStyles = StyleSheet.create({
         padding: 10,
         backgroundColor: "#fff"
     },
+    image: {
+        flex: 1,
+        justifyContent: 'center',
+      },
     button: {
         width: 250,
         paddingHorizontal: 5,
