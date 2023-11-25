@@ -22,7 +22,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
     {label: 'Advanced', value: 'advanced'}
   ]);
 
-  function handleFinishButtonPress(field:string, value: SelectItem, userID: string, navigation:NavigationProp<any, any>, nextPage: string ) {
+  function handleFinishButtonPress(field:string, value: SelectItem | undefined, userID: string, navigation:NavigationProp<any, any>, nextPage: string ) {
     if (value === undefined)
       alert("Error: Please select one of the options");
     else

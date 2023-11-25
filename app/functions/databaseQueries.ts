@@ -1,13 +1,13 @@
 import { Auth, createUserWithEmailAndPassword } from "firebase/auth";
-import { Unsubscribe, addDoc, collection, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
+import { DocumentData, Unsubscribe, addDoc, collection, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 import { validateActivityLevel, validateAge, validateExerciseSet, validateExperience, validateGender, validateHeight, validateWeight } from "./validations";
-import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser, Achievement } from "../types and interfaces/types";
+import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser, Achievement, SetChange } from "../types and interfaces/types";
 
 
 // getters
-export const getSetUpValue = async (userID: string): Promise<boolean> => {
+export const getSetUpValue = async (userID: string): Promise<boolean | undefined> => {
     try {
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
         const q = query(usersCollectionRef, where("userID", "==", userID));
@@ -15,24 +15,24 @@ export const getSetUpValue = async (userID: string): Promise<boolean> => {
         const doc = snapshot.docs[0];
         return doc.data().set;
     } 
-    catch (error) {
+    catch (error: any) {
         alert(`Error: Couldn't find set field: ${error.message}`);
     }
 };
 
 function getMax(array:number[]): MaxValueAndIndex{
+    const max = {
+        value : 0,
+        index: 0
+    };
     if (array !== undefined) {
-        const max = {
-            value : 0,
-            index: 0
-        };
         for (let i = 0; i < array.length; i++)
             if (array[i] > max.value) {
                 max.value = array[i];
                 max.index = i;
             }
+        }
         return max;
-    }
 }
 
 export const getBestExercise = (userID: string, field:string, secondaryField:string, callback: Function ): Unsubscribe => {
@@ -48,7 +48,7 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
             const workoutData = doc.data().Workout;
       
             if (workoutData) {
-                workoutData.forEach((exercise) => {
+                workoutData.forEach((exercise:Exercise) => {
                     const maxField = getMax(exercise[field]);
                     const maxSecondaryField = getMax(exercise[secondaryField]);
       
@@ -59,7 +59,7 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
                             bestExercise[secondaryField] = exercise[secondaryField][maxField.index];
                         } else if (maxField.value === bestExercise[field] && maxSecondaryField.value > bestExercise[secondaryField]) {
                             bestExercise[secondaryField] = maxSecondaryField.value;
-                            bestExercise.name = exercise.exercise[maxSecondaryField.index];
+                            bestExercise.name = exercise.name[maxSecondaryField.index];
                             bestExercise[field] = exercise[field][maxSecondaryField.index];
                         }
                     }
@@ -73,7 +73,7 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
     return unsubscribeFromWorkouts;
 };
 
-export const getAllExercises = (userID: string, callback: Function): Unsubscribe[] => {
+export const getAllExercises = (userID: string, callback: Function): Unsubscribe[] | undefined => {
     try {
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
         const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
@@ -112,7 +112,7 @@ export const getAllExercises = (userID: string, callback: Function): Unsubscribe
     }
 };
 
-export const getAvailableExercises = (userID: string, callback: Function): Unsubscribe => {
+export const getAvailableExercises = (userID: string, callback: Function): Unsubscribe | undefined => {
     try {
         const exercises: Exercise[] = [];
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
@@ -146,7 +146,7 @@ export const getAvailableExercises = (userID: string, callback: Function): Unsub
     }
 };
 
-export const getExercise = (userID: string, exerciseName: string, callback): Unsubscribe => {
+export const getExercise = (userID: string, exerciseName: string, callback: Function): Unsubscribe => {
 
     const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
     const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
@@ -177,7 +177,7 @@ export const getExercise = (userID: string, exerciseName: string, callback): Uns
     return unsubscribeFromWorkouts;
 };
 
-export const getExercisesByFocus = (userID: string, musclesWorked: string[], callback: Function): Unsubscribe => {
+export const getExercisesByFocus = (userID: string, musclesWorked: string[], callback: Function): Unsubscribe | undefined => {
     try {
         const exercises: Exercise[] = [];
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
@@ -207,7 +207,7 @@ export const getExercisesByFocus = (userID: string, musclesWorked: string[], cal
         })
         return unsubscribeFromUsers;
         
-    } catch (error) {
+    } catch (error: any) {
         alert(`Error: couldn't fetch exercises for ${[...musclesWorked]}: ${error.message}`);
     }
 };
@@ -237,11 +237,11 @@ export const getUser = (userID:string, callback: Function): Unsubscribe => {
 
     return unsubscribeFromUsers;
 };
-export const getAllUsers = (callback): Unsubscribe => { 
+export const getAllUsers = (callback: Function): Unsubscribe => { 
     
     const usersCollectionRef = collection(FIRESTORE_DB, "Users");
     const unsubscribeFromUsers = onSnapshot(usersCollectionRef, usersSnapshot => {
-        const users = [];
+        const users: DocumentData[] = [];
         usersSnapshot.docs.forEach(usersDoc => {
             users.push(usersDoc.data())
         })        
@@ -250,7 +250,7 @@ export const getAllUsers = (callback): Unsubscribe => {
     return unsubscribeFromUsers;
 };
 
-export const getWorkout = (userID: string, date: string, callback: Function): Unsubscribe => {
+export const getWorkout = (userID: string, date: string, callback: Function): Unsubscribe | undefined => {
     try {
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
         const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID), where("date", "==", date));
@@ -286,7 +286,7 @@ export const getWorkout = (userID: string, date: string, callback: Function): Un
     }
 };
 
-export const getAchievementsForUser = (userID: string, callback: Function): Unsubscribe => {
+export const getAchievementsForUser = (userID: string, callback: Function): Unsubscribe  | undefined => {
     try {
         const achievements: Achievement[] = [];
 
@@ -426,10 +426,16 @@ export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToA
             validateExerciseSet(data);
 
             const updatedStrengthBuilderAchievement = updateStrengthBuilderAchievement(set);
-            updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
+            if (typeof updatedStrengthBuilderAchievement === 'object' && updatedStrengthBuilderAchievement !== null){
+                if (updatedStrengthBuilderAchievement as Achievement)
+                    updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
+            }
 
             const updatedEnduranceMasterAchievement = updateEnduranceMasterAchievement(set);
-            updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
+            if (typeof updatedEnduranceMasterAchievement === 'object' && updatedEnduranceMasterAchievement !== null){
+                (updatedEnduranceMasterAchievement as Achievement)
+                   updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
+            }
 
 
             const newWorkout = [...workoutsSnapshot.docs[0].data().Workout, data]
@@ -452,10 +458,16 @@ export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToA
             validateExerciseSet(data);
 
             const updatedStrengthBuilderAchievement = updateStrengthBuilderAchievement(set);
-            updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
+            if (typeof updatedStrengthBuilderAchievement === 'object' && updatedStrengthBuilderAchievement !== null){
+                if (updatedStrengthBuilderAchievement as Achievement)
+                    updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
+            }
 
             const updatedEnduranceMasterAchievement = updateEnduranceMasterAchievement(set);
-            updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
+            if (typeof updatedEnduranceMasterAchievement === 'object' && updatedEnduranceMasterAchievement !== null){
+                if (updatedEnduranceMasterAchievement as Achievement)
+                    updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
+            }
 
 
             await addDoc(workoutsCollectionRef, {
@@ -464,16 +476,22 @@ export const addSet =async (userID:string, date: string, set: ExerciseSet, xpToA
                 Workout: workout
             });
             const updatedConsistencyStreakAchievement = await updateConsistencyStreakAchievement(userID);
-            updateAchievementStatus(userID, updatedConsistencyStreakAchievement);
+            if (typeof updatedConsistencyStreakAchievement === 'object' && updatedConsistencyStreakAchievement !== null){
+                if (updatedConsistencyStreakAchievement as Achievement)
+                    updateAchievementStatus(userID, updatedConsistencyStreakAchievement);
+            }
 
             const updatedDedicatedAthleteAchievement = await updateDedicatedAthleteAchievement(userID);
-            updateAchievementStatus(userID, updatedDedicatedAthleteAchievement);
+            if (typeof updatedDedicatedAthleteAchievement === 'object' && updatedDedicatedAthleteAchievement !== null){
+                if (updatedDedicatedAthleteAchievement as Achievement)
+                    updateAchievementStatus(userID, updatedDedicatedAthleteAchievement);
+            }
 
 
         }         
         addExperience(userID, xpToAdd);
     } 
-    catch (error) {
+    catch (error: any) {
         alert(`Error: Couldn't add set: ${error.message}`)
     } 
 }
@@ -527,7 +545,7 @@ export const toggleExerciseVisibilty =async (userID: string, exerciseName: strin
             updateDoc(exercisesDoc.ref, updateData);
         })
 
-    } catch (error) {
+    } catch (error: any) {
         alert(`Error: Couldn't change visibility for ${exerciseName}: ${error.message}`)
     }
 };
@@ -566,7 +584,7 @@ export const deleteSet = async (userID:string, exerciseName: string, exerciseID:
     addExperience(userID, xpToDelete);
 
     } 
-    catch (error) {
+    catch (error: any) {
         alert(`Error: Couldn't delete fields: ${error.message}`);
    }
 };
@@ -585,12 +603,12 @@ export const createNewExercise = async (userID: string, name: string, isUnilater
             unilateral: isUnilateral
         });   
     } 
-    catch (error) {
+    catch (error: any) {
         alert(`Error: Couldn't create exercise: ${error.message}`);
     }
 };
 
-export const editSet = async (userID:string, exerciseName: string, exerciseID: number, setID: number, changes: object, xpToChange: number): Promise<void> => {
+export const editSet = async (userID:string, exerciseName: string, exerciseID: number, setID: number, changes: SetChange, xpToChange: number): Promise<void> => {
     try {  
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
         const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
@@ -614,7 +632,7 @@ export const editSet = async (userID:string, exerciseName: string, exerciseID: n
         
         addExperience(userID, xpToChange);
 
-    } catch (error) {
+    } catch (error: any) {
         alert(`Error: couldn't update set fields: ${error.message}`);
    }
 };
@@ -652,7 +670,7 @@ export const editProfile = async (userID:string, changes: MyUser): Promise<void>
         updateDoc(usersDoc.ref, updateData);
 
     } 
-    catch (error) {
+    catch (error: any) {
         alert(`Error: couldn't find fields: ${error.message}`);
     }
 };
@@ -661,10 +679,15 @@ export const addWorkout =async (userID:string, date: string, workout: ExerciseSe
     const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
     for (const set of workout) {
         const updatedStrengthBuilderAchievement = updateStrengthBuilderAchievement(set);
-        updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
-
+        if (typeof updatedStrengthBuilderAchievement === 'object' && updatedStrengthBuilderAchievement !== null){
+            if (updatedStrengthBuilderAchievement as Achievement)
+                updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
+        }
         const updatedEnduranceMasterAchievement = updateEnduranceMasterAchievement(set);
-        updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
+        if (typeof updatedEnduranceMasterAchievement === 'object' && updatedEnduranceMasterAchievement !== null){
+            if (updatedEnduranceMasterAchievement as Achievement)
+                updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
+        }    
     }
     await addDoc(workoutsCollectionRef, {
         date: date,
@@ -672,11 +695,15 @@ export const addWorkout =async (userID:string, date: string, workout: ExerciseSe
         Workout: workout
     });    
     const updatedConsistencyStreakAchievement = await updateConsistencyStreakAchievement(userID);
-    updateAchievementStatus(userID, updatedConsistencyStreakAchievement);
-
+    if (typeof updatedConsistencyStreakAchievement === 'object' && updatedConsistencyStreakAchievement !== null){
+        if (updatedConsistencyStreakAchievement as Achievement)
+            updateAchievementStatus(userID, updatedConsistencyStreakAchievement);
+    }    
     const updatedDedicatedAthleteAchievement = await updateDedicatedAthleteAchievement(userID);
-    updateAchievementStatus(userID, updatedDedicatedAthleteAchievement); 
-    addExperience(userID, xpToAdd);
+    if (typeof updatedDedicatedAthleteAchievement === 'object' && updatedDedicatedAthleteAchievement !== null){
+        if (updatedDedicatedAthleteAchievement as Achievement)
+            updateAchievementStatus(userID, updatedDedicatedAthleteAchievement);
+    }      addExperience(userID, xpToAdd);
     
 }
 
@@ -707,7 +734,7 @@ export const updateAchievementStatus =async (userID:string, updatedAchievement: 
 }
 
 
-const updateStrengthBuilderAchievement = (set: ExerciseSet): Achievement => {
+const updateStrengthBuilderAchievement = (set: ExerciseSet): Achievement | undefined => {
     for (const weight of set.weights) {
       if (weight >= 60 && weight < 80) {
           const updatedAchievement: Achievement = {
@@ -747,7 +774,7 @@ const updateStrengthBuilderAchievement = (set: ExerciseSet): Achievement => {
       } 
   }
 };
-const updateEnduranceMasterAchievement = (set: ExerciseSet): Achievement => {
+const updateEnduranceMasterAchievement = (set: ExerciseSet): Achievement | undefined => {
     for (const rep of set.reps) {
       if (rep >= 20 && rep < 50) {
           const updatedAchievement: Achievement = {
@@ -800,7 +827,7 @@ const updateEnduranceMasterAchievement = (set: ExerciseSet): Achievement => {
   }
 };
 
-const updateConsistencyStreakAchievement = async (userID: string): Promise<Achievement> => {
+const updateConsistencyStreakAchievement = async (userID: string): Promise<Achievement | undefined> => {
     const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
     const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
     const workoutsSnapshot = await getDocs(workoutsQuery);
@@ -870,7 +897,7 @@ const updateConsistencyStreakAchievement = async (userID: string): Promise<Achie
     }
 
 };
-const updateDedicatedAthleteAchievement = async (userID: string): Promise<Achievement> => {
+const updateDedicatedAthleteAchievement = async (userID: string): Promise<Achievement | undefined> => {
     const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
     const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
     const workoutsSnapshot = await getDocs(workoutsQuery);

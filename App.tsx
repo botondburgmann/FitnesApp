@@ -52,7 +52,7 @@ function SetUpLayout() {
 function InsideLayout() {
   return( 
     <Tab.Navigator
-    screenOptions={({ route }) => ({
+    screenOptions={({ route } ) => ({
       tabBarIcon: ({ color, size }) => {
         let iconName;
 
@@ -136,13 +136,14 @@ export default function App() {
     onAuthStateChanged(FIREBASE_AUTH, async (user)=>{
       setUser(user);
       if(user){
-        const setUpValue = getSetUpValue(user.uid);
-        setAlreadySetUp(await setUpValue)
+        const setUpValue = await getSetUpValue(user.uid);
+        if (typeof setUpValue === "boolean")
+          setAlreadySetUp(setUpValue)
       }
     });
   }, [])
   
-    let userID;
+    let userID: string = "";
     if (user !== null) {
       userID = user.uid;
     }

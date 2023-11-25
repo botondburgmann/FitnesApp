@@ -5,6 +5,7 @@ import { editSet } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { addXPForOneSet, removeXP } from '../functions/otherFunctions';
 import { backgroundImage, globalStyles } from '../assets/styles';
+import { SetChange } from '../types and interfaces/types';
 
 
 interface RouterProps {
@@ -24,17 +25,17 @@ const EditSet = ({ route, navigation }: RouterProps) => {
     const [side, setSide] = useState<string>(set.side);
 
     const changeNormal = {
-        sides : side,
-        weights : parseFloat(weight) ,
-        reps :  parseFloat(reps),
-        times :  parseFloat(time) ,
-        restTimes : parseFloat(restTime)
+        side: side,
+        weight : parseFloat(weight) ,
+        rep :  parseFloat(reps),
+        time :  parseFloat(time) ,
+        restTime : parseFloat(restTime)
     };
     const changeIsometric = {
         side: side,
-        weights : parseFloat(weight) ,
-        times :  parseFloat(time) ,
-        restTimes : parseFloat(restTime)
+        weight : parseFloat(weight) ,
+        time :  parseFloat(time) ,
+        restTime : parseFloat(restTime)
     };
 
     function toggleSwitch(): void {
@@ -47,7 +48,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
 
 
 
-    function handleModifyButton(isIsometric, changeIsometric, changeNormal, set): void {
+    function handleModifyButton(isIsometric: boolean, changeIsometric: SetChange, changeNormal: SetChange, set: { exercise: string; time: number; weight: number; reps: number; }): void {
         if (isIsometric) {
             if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) 
                 alert("Time field cannot be empty");

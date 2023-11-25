@@ -1,10 +1,10 @@
-import { View, TextInput, ActivityIndicator, Pressable, Text, ImageBackground } from 'react-native'
-import React, { useState } from 'react'
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
-import { signUp } from '../functions/databaseQueries';
-import { RouterProps } from '../types and interfaces/interfaces';
-import { backgroundImage, globalStyles } from '../assets/styles';
-import { Auth } from 'firebase/auth';
+import { View, TextInput, ActivityIndicator, Pressable, Text, ImageBackground } from "react-native"
+import React, { useState } from "react"
+import { FIREBASE_AUTH } from "../../FirebaseConfig";
+import { signUp } from "../functions/databaseQueries";
+import { RouterProps } from "../types and interfaces/interfaces";
+import { backgroundImage, globalStyles } from "../assets/styles";
+import { Auth } from "firebase/auth";
 
 
 
@@ -15,7 +15,7 @@ const Registration = ({navigation}: RouterProps) => {
     const [loading, setLoading] = useState(false);
     const auth = FIREBASE_AUTH;
     
-    function handleRegisterButtonPress(name:string, setLoading: Function, auth: Auth, email: string, password: string) {
+    function handleRegisterButtonPress(name:string | undefined, setLoading: Function, auth: Auth, email: string | undefined, password: string | undefined) {
         if (name === undefined || email === undefined || password === undefined)
             alert("Error: Please fill out all the fields")
         else{
@@ -32,23 +32,23 @@ const Registration = ({navigation}: RouterProps) => {
         <TextInput
                     value={name}
                     style={globalStyles.input}
-                    placeholder='Name'
-                    autoCapitalize='none'
+                    placeholder="Name"
+                    autoCapitalize="none"
                     onChangeText={(text) => setName(text)}
                 />
                 <TextInput
                     value={email}
                     style={globalStyles.input}
-                    placeholder='Email'
-                    autoCapitalize='none'
+                    placeholder="Email"
+                    autoCapitalize="none"
                     onChangeText={(text) => setEmail(text)}
                 />
                 <TextInput
                     value={password}
                     secureTextEntry={true}
                     style={globalStyles.input}
-                    placeholder='Password'
-                    autoCapitalize='none'
+                    placeholder="Password"
+                    autoCapitalize="none"
                     onChangeText={(text) => setPassword(text)}
                 />
                 { loading ?
@@ -59,7 +59,7 @@ const Registration = ({navigation}: RouterProps) => {
                             <Text style={globalStyles.buttonText}>Create new account</Text>
                         </Pressable>
                         <Text style={[globalStyles.text, {marginTop: 30, fontSize: 18, textTransform: "uppercase"}]}>Not registered yet</Text>
-                        <Pressable style={globalStyles.button} onPress={() => navigation.navigate('Login')}>
+                        <Pressable style={globalStyles.button} onPress={() => navigation.navigate("Login")}>
                             <Text style={globalStyles.buttonText}>Login here</Text>
                         </Pressable>
                     </>

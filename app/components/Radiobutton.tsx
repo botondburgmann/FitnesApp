@@ -2,14 +2,15 @@ import React from "react";
 import {  View, StyleSheet } from "react-native";
 import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
 
-const Radiobutton = (props) => {
-    const selectedValue: string = props.selectedValue;
-    const setselectedValue: Function = props.setselectedValue;
-    const options: string = props.options;
+const Radiobutton = (props: { selectedValue: string | undefined; setselectedValue: Function | undefined; options: string[] | undefined; }) => {
+    const selectedValue: string | undefined = props.selectedValue;
+    const setselectedValue: Function | undefined = props.setselectedValue;
+    const options: string[] | undefined= props.options;
 
     const radioButtonItems: RadioButtonItem = [];
-    for (let i = 0; i < options.length; i++)
-        radioButtonItems.push(<RadioButtonItem  key={i} value={options[i]} label={options[i]} />);
+    if (options !== undefined)
+        for (let i = 0; i < options.length; i++)
+            radioButtonItems.push(<RadioButtonItem  key={i} value={options[i]} label={options[i]} />);
 
     return (
         <View>
@@ -18,7 +19,7 @@ const Radiobutton = (props) => {
                 containerStyle={styles.radioContainer}
                 labelStyle={styles.radioLabel}
                 selected={selectedValue}
-                onSelected={(value) => setselectedValue(value)}
+                onSelected={(value: any) => {setselectedValue !== undefined && setselectedValue(value)}}
                 radioBackground="white"
             >
                 {radioButtonItems}

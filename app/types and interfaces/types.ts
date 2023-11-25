@@ -12,6 +12,18 @@ export type BestExercise = {
     name: string;
     weights: number;
     reps: number;
+    [key: string]: any;
+
+}
+
+export type SetChange = {
+    side : string;
+    weight : number;
+    rep? :  number;
+    time :  number;
+    restTime : number;
+    [key: string]: any;
+
 }
 
 export type Exercise = {
@@ -20,6 +32,7 @@ export type Exercise = {
     name: string;
     musclesWorked: string[];
     unilateral: boolean;
+    [key: string]: any;
 }
 
 
@@ -29,7 +42,8 @@ export type ExerciseSet = {
     reps: number[],
     times: number[],
     restTimes: number[],
-    sides: string[]
+    sides: string[];
+    [key: string]: any;
 }
 
 export type MyUser = {

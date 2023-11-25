@@ -15,13 +15,13 @@ const Weight = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
 
   const [weight, setWeight] = useState<string>();
-  const [value, setValue] = useState<string>();
+  const [value, setValue] = useState<SelectItem>();
   const [items] = useState<SelectItem[]>([
     {label: 'Metric (kg)', value: 'kg'},
     {label: 'Imperial (lbs)', value: 'lbs'}
   ]);
 
-  function handleNextButtonPress(field:string, value: number, userID: string, navigation:NavigationProp<any, any>, nextPage: string, system: string | undefined ) {    
+  function handleNextButtonPress(field:string, value: number, userID: string, navigation:NavigationProp<any, any>, nextPage: string, system: SelectItem | undefined ) {    
     if (system === undefined)
       alert("Error: Please select one of the options");
     else
@@ -41,7 +41,7 @@ const Weight = ({navigation}: RouterProps) => {
             keyboardType='numeric'
             value={weight}
             style={globalStyles.input}
-            placeholder={value["value"] === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
+            placeholder={ value && value["value"] === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
             autoCapitalize='none'
             onChangeText={(text) => setWeight(text)}
           />
@@ -53,7 +53,7 @@ const Weight = ({navigation}: RouterProps) => {
           <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Age')}>
             <Text style={globalStyles.buttonText}>Go back</Text>
           </Pressable>
-          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleNextButtonPress('weight', parseFloat(weight),  userID, navigation, 'Height', value)}>
+          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleNextButtonPress('weight', parseFloat(weight ?? "0"),  userID, navigation, 'Height', value)}>
             <Text style={globalStyles.buttonText}>Next</Text>
           </Pressable>
         </View>

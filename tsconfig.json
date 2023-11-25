@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "lib": ["es6", "dom"],
     "jsx": "react",
+    "strict": true,
     "esModuleInterop": true,
+    "types": ["react-native", "react", "@react-navigation/native", "@react-navigation/bottom-tabs"]
 
   },
   "extends": "expo/tsconfig.base"
