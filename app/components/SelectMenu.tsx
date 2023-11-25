@@ -2,7 +2,7 @@ import { View, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 import { Dropdown } from 'react-native-element-dropdown';
 
-const SelectMenu = (props) => {
+const SelectMenu = (props: { setSelectedValue: Function; data: any; title: string; }) => {
 
   const setSelectedValue = props.setSelectedValue;    
   const data = props.data

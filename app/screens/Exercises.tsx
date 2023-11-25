@@ -12,13 +12,15 @@ const Exercises = ({navigation}: RouterProps) => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const unsubscribeFunctions = getAllExercises(userID, (receivedExercises) => {                    
+    const unsubscribeFunctions = getAllExercises(userID, (receivedExercises: React.SetStateAction<Exercise[]>) => {                    
         setExercises(receivedExercises);
         setLoading(false);
     });
 
     return () => {
+      if (unsubscribeFunctions !== undefined) {
         unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
+      }
         
         setExercises([]);
     };
@@ -27,7 +29,7 @@ const Exercises = ({navigation}: RouterProps) => {
 
 
 
-  const exerciseComponentsList = [];
+  const exerciseComponentsList: React.JSX.Element[] = [];
   exercises.forEach((exercise, index) => {
     exerciseComponentsList.push(
       <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, flexWrap: 'wrap',}}>

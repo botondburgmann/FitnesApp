@@ -2,7 +2,7 @@ import { ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, 
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import UserContext from '../contexts/UserContext';
 import {  addWorkout, getExercisesByFocus, getUser } from '../functions/databaseQueries';
-import { Exercise, ExerciseSet } from '../types and interfaces/types';
+import { Exercise, ExerciseSet, MuscleGroups } from '../types and interfaces/types';
 import Set from '../components/Set';
 import Rest from '../components/Rest';
 import { addXP, calculateNumberOfSet, chooseExercises } from '../functions/otherFunctions';
@@ -18,7 +18,7 @@ interface RouterProps {
 const CurrentExercise = ({ route, navigation }: RouterProps) => {
   const userID = useContext(UserContext)
   const { workoutType, focus } = route?.params;
-  const muscles ={
+  const muscles: MuscleGroups  ={
     'Full body': ['Calves', 'Quadriceps', 'Glutes', 'Hamstrings', 'Abs', 'Obliques', 'Chest', 'Lower back', 'Upper back', 'Traps', 'Lats', 'Front delts', 'Middle delts', 
                   'Rear delts', 'Biceps', 'Triceps', 'Forearms', 'Adductors'],
     'Push': ['Chest', 'Front delts', 'Triceps', 'Middle delts'],
@@ -59,18 +59,19 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
 
   
   useEffect(() => {
-    const unsubscribe = getExercisesByFocus(userID, muscles[workoutType], (exercises) => {
+    const unsubscribeFromGetExerciseByFocus = getExercisesByFocus(userID, muscles[workoutType], (exercises: React.SetStateAction<Exercise[]>) => {
       setExercises(exercises);
       setLoadingExercises(false);
     })
   
     return () => {
-      unsubscribe();
+      if (unsubscribeFromGetExerciseByFocus !== undefined)
+        unsubscribeFromGetExerciseByFocus();
     }
   }, [userID, workoutType]);
   
   useEffect(() => {
-    const unsubscribe = getUser(userID, (user) => {
+    const unsubscribe = getUser(userID, (user: { activityLevel: React.SetStateAction<string>; }) => {
         setActivityLevel(user.activityLevel);
         setLoadingUser(false);
 
@@ -85,7 +86,7 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
     if (!loadingUser && !loadingExercises) {
       const selectedExercises: Exercise[] = chooseExercises(exercises, activityLevel);
       const numberOfSets = calculateNumberOfSet(focus, activityLevel);
-      const workoutComponents = [];    
+      const [workoutComponents, setWorkoutComponents] = useState<JSX.Element[]>([]);
     
       for (let i = 0; i < selectedExercises.length; i++) {
         for (let j = 0; j < numberOfSets; j++) {
@@ -106,8 +107,11 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
         } 
       }
       workoutComponents.splice(workoutComponents.length-1,1);
-      setWorkoutComponents(workoutComponents);
-    }
+      setWorkoutComponents((prevWorkoutComponents) => [
+        ...prevWorkoutComponents,
+        ...workoutComponents,
+      ]);
+          }
 
   }, [loadingExercises, loadingUser])
 
@@ -126,17 +130,28 @@ useEffect(() => {
       else
         currentExercise.current.restTimes.push(0);
       
-      const resultArray = currentExercise.current.exercise.reduce((acc, _, index) => {
+      const resultArray = currentExercise.current.exercise.reduce((acc: ExerciseSet[], _, index) => {
         const exerciseName = currentExercise.current.exercise[index];
       
-        const existingExercise = acc.find((item) => item.exercise[0] === exerciseName);
+        const existingExercise = acc.find((item) => (item as { exercise: string[] }).exercise[0] === exerciseName);
       
         if (existingExercise) {
           Object.keys(currentExercise.current).forEach((key) => {
-            existingExercise[key].push(currentExercise.current[key][index]);
-          });
+            const existingExercise = acc.find((item) => (item as { [key: string]: any })[key] === exerciseName);
+            if (existingExercise) {
+              const existingExerciseKey = existingExercise[key] as any[];
+              existingExerciseKey.push(currentExercise.current[key][index]);
+            }
+                      });
         } else {
-          const newExercise = {};
+          const newExercise: ExerciseSet = {
+            exercise: [],
+            weights: [],
+            reps: [],
+            times: [],
+            restTimes: [],
+            sides: []
+          };
           Object.keys(currentExercise.current).forEach((key) => {
             newExercise[key] = [currentExercise.current[key][index]];
           });
@@ -163,7 +178,7 @@ useEffect(() => {
   }
 }, [goToNextPage])
 
-  function handleFinishWorkoutButton(workout: ExerciseSet[], userID: string, date: string, totalXP: number, navigation: NavigationProp<any, any> ): void {    
+  function handleFinishWorkoutButton(workout: ExerciseSet[], userID: string | null, date: string, totalXP: number, navigation: NavigationProp<any, any> ): void {    
     addWorkout(userID, date, workout, totalXP );
     navigation.navigate("Log");
   }

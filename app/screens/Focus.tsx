@@ -15,11 +15,9 @@ const [focus, setFocus] = useState<string>();
 const options = ["Strength", "Hypertrophy"];
 
 function handleStartButtonPress(navigation:NavigationProp<any, any>, workoutType: string, focus: string) {
-  if (focus !== undefined) {
     navigation.navigate('CurrentExercise',{workoutType: workoutType, focus:focus})
-  }
-  else
-    alert("Please choose an option");
+  
+  
 }
 
   return (
@@ -29,7 +27,8 @@ function handleStartButtonPress(navigation:NavigationProp<any, any>, workoutType
           <View style={styles.radioButtonContainer}>
             <Radiobutton selectedValue={focus} setselectedValue={setFocus} options={options} />
           </View>
-          <Pressable style={globalStyles.button} onPress={() => handleStartButtonPress(navigation,workoutType,focus) }>
+          <Pressable style={globalStyles.button} onPress={() =>{focus !== undefined ? handleStartButtonPress(navigation,workoutType,focus) :     alert("Please choose an option");
+} }>
             <Text style={globalStyles.buttonText}>Start Workout</Text>
         </Pressable>
       </View>

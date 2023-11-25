@@ -40,13 +40,13 @@ const Account = ({ route, navigation }: RouterProps) => {
 })
 
 useEffect(() => {
-  const unsubscribeFromUser = getUser(userID, (userData) => {
+  const unsubscribeFromUser = getUser(userID, (userData: React.SetStateAction<MyUser>) => {
     setUser(userData);
   });
-   const unsubscribeFromMostWeight = getBestExercise(userID, "weights", "reps", (exerciseData) => {
+   const unsubscribeFromMostWeight = getBestExercise(userID, "weights", "reps", (exerciseData: BestExercise) => {
     setmostWeightExercise(exerciseData);
   });
-  const unsubscribeFromMostReps = getBestExercise(userID, "reps", "weights", (exerciseData) => {    
+  const unsubscribeFromMostReps = getBestExercise(userID, "reps", "weights", (exerciseData: BestExercise) => {    
     setmostRepsExercise(exerciseData);
   });
 

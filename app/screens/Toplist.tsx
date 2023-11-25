@@ -1,23 +1,20 @@
-import { ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { getAllUsers, updateClimbingTheRanksAchievement } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
-import { MyUser  } from '../types and interfaces/types';
+import { MyUser, WeekRange  } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
 import { selectLoggedInUser, selectSimilarUsers, sortUsers } from '../functions/otherFunctions';
 import { backgroundImage, globalStyles } from '../assets/styles';
 
-interface WeekRange{
-  start: Date;
-  end: Date;
-}
+
 
 const Toplist = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
   const [users, setUsers] = useState<MyUser[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const unsubscribe = getAllUsers((users) => {
+    const unsubscribe = getAllUsers((users: MyUser[]) => {
       const loggedInUser = selectLoggedInUser(users, userID );
       const similarUsers = selectSimilarUsers(users, loggedInUser);
       const sortedUsers = sortUsers(similarUsers);
@@ -38,7 +35,7 @@ const Toplist = ({navigation}: RouterProps) => {
   }, []);
 
 
-  const components = [];
+  const components: React.JSX.Element[] = [];
   users.forEach((user, index) => {
     components.push(
       <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, flexWrap:'wrap'}}>
@@ -53,9 +50,9 @@ const Toplist = ({navigation}: RouterProps) => {
   })
 
 
-  const [week, setWeek] = useState({
-    start: undefined,
-    end: undefined
+  const [week, setWeek] = useState<WeekRange>({
+    start: "",
+    end: ""
   })
 
   const [today, setToday] = useState(new Date());
@@ -84,8 +81,8 @@ const Toplist = ({navigation}: RouterProps) => {
 
   function calculateWeekRange(today:Date): WeekRange {
     const week = {
-      start: undefined,
-      end: undefined  
+      start: "",
+      end: ""  
     };
     let moveBack = 0;
     let moveForward = 6;

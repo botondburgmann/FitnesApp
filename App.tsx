@@ -52,8 +52,8 @@ function SetUpLayout() {
 function InsideLayout() {
   return( 
     <Tab.Navigator
-    screenOptions={({ route } ) => ({
-      tabBarIcon: ({ color, size }) => {
+    screenOptions={({ route }:any ) => ({
+      tabBarIcon: ({ color, size }: any) => {
         let iconName;
 
         if (route.name === "Workouts") {

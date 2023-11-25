@@ -1,18 +1,18 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext } from 'react'
-import { ExerciseSet } from '../types and interfaces/types';
+import { Exercise, ExerciseSet, Outputs } from '../types and interfaces/types';
 import { calculateNumberOfSets, isDropsSet, isSuperSet, removeXP, showDeleteConfirmation } from '../functions/otherFunctions';
 import UserContext from '../contexts/UserContext';
 import NavigationContext from '../contexts/NavigationContext';
 import { globalStyles } from '../assets/styles';
 
 
-const NormalExercise = (props) => {    
+const NormalExercise = (props: { exercise: Exercise; exerciseID: number; }) => {    
     const userID = useContext(UserContext);
     const navigation = useContext(NavigationContext);
 
-    const exercise: ExerciseSet = props.exercise;
-    const exerciseID = props.exerciseID;
+    const exercise: Exercise = props.exercise;
+    const exerciseID: number = props.exerciseID;
 
     const uniqueValues = {
         sides: Array.from(new Set<string>(exercise.sides)),
@@ -22,7 +22,7 @@ const NormalExercise = (props) => {
     const numberOfSets = calculateNumberOfSets(exercise.sides, uniqueValues.exercise.length, exercise.restTimes);
     const unilateral : string = uniqueValues.sides.length === 2 ? "(per side)" : "";
 
-    const outputs = {
+    const outputs: Outputs = {
         setNumbers: [],
         reps : [],
         seconds: [],
@@ -68,7 +68,7 @@ const NormalExercise = (props) => {
             outputs.weights.push(`with ${exercise.weights[i]} kg`);
             
     }
-    const sets = [];
+    const sets: React.JSX.Element[] = [];
 
     outputs.reps.map((rep,index) => 
         sets.push(
@@ -79,13 +79,13 @@ const NormalExercise = (props) => {
                     : <></>
             }
             <Pressable
-                onPress={() => navigation.navigate("Edit set",{set: {exercise : exercise.exercise[index],
+                onPress={() => {navigation !== null && navigation.navigate("Edit set",{set: {exercise : exercise.exercise[index],
                     reps: exercise.reps[index],
                     restTime: exercise.restTimes[index],
                     side: exercise.sides[index],
                     time: exercise.times[index],
                     weight: exercise.weights[index],
-                    }, exerciseID: exerciseID, setID: index, isIsometric: false})} 
+                    }, exerciseID: exerciseID, setID: index, isIsometric: false})}} 
                 onLongPress={() => showDeleteConfirmation(userID, exercise.exercise[index], exerciseID, index, removeXP(exercise.reps[index],exercise.weights[index]))}                                
             >
                 <Text style={[globalStyles.text, {lineHeight: 35}]}>{rep}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]} {outputs.seconds[index]}</Text>                            

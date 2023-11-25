@@ -21,7 +21,7 @@ export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     return currentExperience;
 }
 
-export const addXPForOneSet = (isIsometric: boolean, set): number => {
+export const addXPForOneSet = (isIsometric: boolean, set: { [x: string]: any; side?: string; weight?: number; rep?: number | undefined; time?: number; restTime?: number; weights?: any; reps?: any; times?: any; }): number => {
     let currentExperience = 0
     if (!isIsometric) {
         if (set.weights === 0 && Number.isNaN(set.weights))
@@ -47,7 +47,7 @@ export const  removeXP = (repOrTime: number, weight: number): number => {
         return currentExperience;
 };
 
-export const showDeleteConfirmation = (userID: string, exerciseName: string, exerciseID: number, setID: number, xpDelete: number): void => {
+export const showDeleteConfirmation = (userID: string | null, exerciseName: string, exerciseID: number, setID: number, xpDelete: number): void => {
   Alert.alert(
       'Delete Item',
       'Are you sure you want to delete this item?',
@@ -205,8 +205,8 @@ export const sortUsers = (users: MyUser[]): MyUser[] => {
   return sortedUsers;
 };
 
-export const selectLoggedInUser = (users:MyUser[], userID: string) : MyUser => {
-  let loggedInUser:MyUser;
+export const selectLoggedInUser = (users:MyUser[], userID: string | null) : MyUser => {
+  let loggedInUser:MyUser = users[0];
   for (const user of users) {
     if (user.userID === userID) {
       loggedInUser = user;

@@ -20,7 +20,7 @@ const Height = ({navigation}: RouterProps) => {
     {label: 'Imperial (ft)', value: 'ft'}
   ]);
 
-  function handleNextButtonPress(field:string, value: number, userID: string, navigation:NavigationProp<any, any>, nextPage: string, system: SelectItem | undefined ) {    
+  function handleNextButtonPress(field:string, value: number, userID: string | null, navigation:NavigationProp<any, any>, nextPage: string, system: SelectItem | undefined ) {    
     if (system === undefined)
       alert("Error: Please select one of the options");
     else
@@ -42,7 +42,7 @@ const Height = ({navigation}: RouterProps) => {
             style={globalStyles.input}
             placeholder={value && value["value"] === "ft" ? "Height (ft)" : "Height (cm)" }
             autoCapitalize='none'
-            onChangeText={(text) => setHeight(text)}
+            onChangeText={(text: string) => setHeight(text)}
           />
           <View style={styles.selectMenuContainer}>
             <SelectMenu data={items} setSelectedValue={setValue} title={"System"} />

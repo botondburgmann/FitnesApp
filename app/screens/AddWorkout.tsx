@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../components/SelectMenu'
 import { addSet, getAvailableExercises } from '../functions/databaseQueries'
 import UserContext from '../contexts/UserContext'
-import {ExerciseSelectOption, ExerciseSet } from '../types and interfaces/types'
+import {Exercise, ExerciseSelectOption, ExerciseSet } from '../types and interfaces/types'
 import { addXP, handleAddButton } from '../functions/otherFunctions'
 import { NavigationProp } from '@react-navigation/native'
 import { backgroundImage, globalStyles } from '../assets/styles'
@@ -23,8 +23,8 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
   const [currentExercise, setCurrentExercise] = useState<ExerciseSelectOption>({
     label: "",
     value: "",
-    unilateral: undefined,
-    isometric: undefined
+    unilateral: true,
+    isometric: false
   });
   const [selectedExercises, setSelectedExercises] = useState<ExerciseSelectOption[]>([]);
   const [weight, setWeight] = useState("");
@@ -44,8 +44,8 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
 
 
   useEffect(() => {
-    const unsubscribe = getAvailableExercises(userID, (exercises) => {
-      const exerciseData = [];
+    const unsubscribeFromAvailableExercises = getAvailableExercises(userID, (exercises: Exercise[]) => {
+      const exerciseData: ExerciseSelectOption[] = [];
         exercises.forEach((exercise) => {
           exerciseData.push({
             label: exercise.name,
@@ -59,7 +59,8 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
     });
   
     return () => {
-      unsubscribe();
+      if (unsubscribeFromAvailableExercises !== undefined)
+        unsubscribeFromAvailableExercises();
       setAllExercises([]);
     };
   }, []);
@@ -83,7 +84,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
     setIsEnabled(previousState => !previousState);
   }
 
-  function handleFinishButton(selectedExercises, sets: ExerciseSet): void {
+  function handleFinishButton(selectedExercises: ExerciseSelectOption[], sets: ExerciseSet): void {
     if (sets.exercise.length === 0)
       throw new Error("Not enough data");
     else{
@@ -120,6 +121,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
           <SelectMenu
             data={allExercises || []}
             setSelectedValue={ setCurrentExercise }
+            title="Exercise"
           />
         </View>
         {allExercises

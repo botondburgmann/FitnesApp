@@ -42,7 +42,7 @@ const Details = ({ route, navigation }: RouterProps) => {
     dates: [],
 })
   useEffect(() => {
-    const unsubscribe = getExercise(userID, exercise, (response) => {
+    const unsubscribe = getExercise(userID, exercise, (response: React.SetStateAction<ExerciseRecords>) => {
       setRecords(response)      
       setLoading(false);
     });

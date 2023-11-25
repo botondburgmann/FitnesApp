@@ -21,7 +21,7 @@ const Weight = ({navigation}: RouterProps) => {
     {label: 'Imperial (lbs)', value: 'lbs'}
   ]);
 
-  function handleNextButtonPress(field:string, value: number, userID: string, navigation:NavigationProp<any, any>, nextPage: string, system: SelectItem | undefined ) {    
+  function handleNextButtonPress(field:string, value: number, userID: string | null, navigation:NavigationProp<any, any>, nextPage: string, system: SelectItem | undefined ) {    
     if (system === undefined)
       alert("Error: Please select one of the options");
     else
@@ -43,7 +43,7 @@ const Weight = ({navigation}: RouterProps) => {
             style={globalStyles.input}
             placeholder={ value && value["value"] === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
             autoCapitalize='none'
-            onChangeText={(text) => setWeight(text)}
+            onChangeText={(text: string) => setWeight(text)}
           />
           <View style={styles.selectMenuContainer}>
             <SelectMenu data={items} setSelectedValue={setValue} title={"System"} />

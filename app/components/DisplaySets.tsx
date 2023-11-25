@@ -4,15 +4,16 @@ import NormalExercise from './NormalExercise';
 import IsometricExercise from './IsometricExercise';
 import { getWorkout } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
+import { Exercise } from '../types and interfaces/types';
 
 
-const DisplaySets = (props) => {
+const DisplaySets = (props: { date: string; }) => {
     const userID = useContext(UserContext);
     const date = props.date
-    const [allExercises, setAllExercises] = useState([]);
+    const [allExercises, setAllExercises] = useState<React.JSX.Element[]>([]);
 
     useEffect(() => {
-      const unsubscribe = getWorkout(userID, date, (exercises) => {
+      const unsubscribeFromWorkouts = getWorkout(userID, date, (exercises: Exercise[]) => {
         const exerciseComponents: React.JSX.Element[] = [];
         
         exercises.forEach((exercise, index) => {
@@ -24,12 +25,13 @@ const DisplaySets = (props) => {
             alert("Error: Invalid rep number. Reps can't be negative");
           }          
         });
-  
-        setAllExercises(exerciseComponents);
+          setAllExercises(exerciseComponents);
       });
   
-      return () => {        
-        unsubscribe();
+      return () => {       
+        if (unsubscribeFromWorkouts !== undefined) {
+          unsubscribeFromWorkouts();
+        } 
         setAllExercises([]);
       };
     }, [userID, date]);

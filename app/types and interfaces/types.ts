@@ -80,8 +80,8 @@ export type TableState = {
 }
 
 export type WeekRange = {
-    start: Date;
-    end: Date;
+    start: string;
+    end: string;
   }
 
 export type Achievement = {
@@ -92,4 +92,32 @@ export type Achievement = {
     name: string;
     status: string;
     visibility: number;
+}
+
+export type Outputs = {
+    setNumbers: string[];
+    reps : string[];
+    seconds: string[];
+    weights:string[];
+    names: string[];
+    sides: string[];
+}
+
+export type MuscleGroups = {
+'Full body': string[],
+'Push': string[],
+'Pull': string[],
+'Leg': string[],
+'Back' : string[],
+'Chest' : string[],
+'Bicep' : string[],
+'Tricep' : string[],
+'Shoulder': string[],
+'Ab' : string[],
+'Arm' : string[],
+'Forearm': string[],
+'Upper body': string[],
+'Full body pull' : string[],
+'Full body push' : string[],
+[key: string]: any
 }

@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { ExerciseSet, Exercise } from '../types and interfaces/types';
 import { globalStyles } from '../assets/styles';
 
-const Set = (props) => {
+const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Function; currentExercise: ExerciseSet; }) => {
     const exercise = props.exercise;
     const focus = props.focus;
     const setGoToNextPage = props.setGoToNextPage

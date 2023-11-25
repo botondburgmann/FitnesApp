@@ -21,7 +21,7 @@ const CreateExercise = ({navigation}: RouterProps) => {
     const [title, setTitle] = useState<string>();
     const [information, setInformation] = useState<string>();
 
-    const showCustomAlert = (title, information) => {
+    const showCustomAlert = (title: React.SetStateAction<string | undefined>, information: React.SetStateAction<string | undefined>) => {
         setCustomAlertVisible(true);
         setTitle(title);
         setInformation(information);
@@ -52,12 +52,14 @@ const CreateExercise = ({navigation}: RouterProps) => {
     }
 
     function handleButtonClick() {
-        createNewExercise(userID, name, isUnilateral, isIsometric)
-        setName("");
-        setIsIsometric(false);
-        setIsUnilateral(false);
-        setUnilaterality("");
-        setIsometricity("");
+        if (userID !== null && name !== undefined) {
+            createNewExercise(userID, name, isUnilateral, isIsometric)
+            setName("");
+            setIsIsometric(false);
+            setIsUnilateral(false);
+            setUnilaterality("");
+            setIsometricity("");
+        }
     }
 
   return (

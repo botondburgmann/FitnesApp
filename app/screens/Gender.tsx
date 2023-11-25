@@ -14,7 +14,7 @@ const Gender = ( {navigation}: RouterProps) => {
   const [gender, setGender] = useState<string>();
   const options = ["Male", "Female"];
 
-  function handleNextButtonPress(field:string, value: string | undefined, userID: string, navigation:NavigationProp<any, any>, nextPage: string) {    
+  function handleNextButtonPress(field:string, value: string | undefined, userID: string | null, navigation:NavigationProp<any, any>, nextPage: string) {    
     if (value === undefined)
       alert("Error: Please select one of the options");
     else

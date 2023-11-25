@@ -43,7 +43,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
             setSide('left');
         else
             setSide('right');
-        setIsEnabled(previousState => !previousState);
+        setIsEnabled((previousState: boolean) => !previousState);
     }
 
 
@@ -89,7 +89,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                     value={weight}
                     placeholder="Weight"
                     autoCapitalize='none'
-                    onChangeText={(text) => setWeight(text)}
+                    onChangeText={(text: string) => setWeight(text)}
                 />
                 {!isIsometric
                 ? <>
@@ -100,7 +100,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                         value={reps}
                         placeholder="Reps"
                         autoCapitalize='none'
-                        onChangeText={(text) => setReps(text)}
+                        onChangeText={(text: string) => setReps(text)}
                     />
                 </>
                 :  <></>
@@ -113,7 +113,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                     value={time}
                     placeholder="Time (in seconds)"
                     autoCapitalize='none'
-                    onChangeText={(text) => setTime(text)}
+                    onChangeText={(text: string) => setTime(text)}
                 />
                 <Text style={[globalStyles.text, {textTransform: "uppercase", paddingVertical: 10, fontWeight: "800"}]}>Rest time (seconds)</Text>
                 <TextInput
@@ -122,7 +122,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                     value={restTime}
                     placeholder="Rest time (in seconds)"
                     autoCapitalize='none'
-                    onChangeText={(text) => setRestTime(text)}
+                    onChangeText={(text: string) => setRestTime(text)}
                 />
                 <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleModifyButton(isIsometric, changeIsometric, changeNormal, set)}>
                     <Text style={globalStyles.buttonText}>Modify</Text>

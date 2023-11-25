@@ -1,13 +1,13 @@
 import React from "react";
-import {  View, StyleSheet } from "react-native";
-import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
+import {  View, StyleSheet, ViewStyle, TextStyle } from "react-native";
+import { RadioButtonGroup, RadioButtonItem } from 'expo-radio-button';
 
-const Radiobutton = (props: { selectedValue: string | undefined; setselectedValue: Function | undefined; options: string[] | undefined; }) => {
+const Radiobutton = (props: { selectedValue: string | undefined; setselectedValue: Function | undefined; options: string[]; }) => {
     const selectedValue: string | undefined = props.selectedValue;
     const setselectedValue: Function | undefined = props.setselectedValue;
     const options: string[] | undefined= props.options;
 
-    const radioButtonItems: RadioButtonItem = [];
+    const radioButtonItems: React.JSX.Element[] = [];
     if (options !== undefined)
         for (let i = 0; i < options.length; i++)
             radioButtonItems.push(<RadioButtonItem  key={i} value={options[i]} label={options[i]} />);
@@ -19,7 +19,7 @@ const Radiobutton = (props: { selectedValue: string | undefined; setselectedValu
                 containerStyle={styles.radioContainer}
                 labelStyle={styles.radioLabel}
                 selected={selectedValue}
-                onSelected={(value: any) => {setselectedValue !== undefined && setselectedValue(value)}}
+                onSelected={(value: string) => {setselectedValue !== undefined && setselectedValue(value)}}
                 radioBackground="white"
             >
                 {radioButtonItems}
@@ -35,10 +35,10 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         marginRight: 5,
 
-    },
+    } as ViewStyle,
     radioContainer:{
         marginBottom: 50
-    },
+    } as ViewStyle,
     radioLabel: {
         color: '#fff', 
         fontSize: 16, 
@@ -49,5 +49,5 @@ const styles = StyleSheet.create({
         },
         textShadowColor: "#000",
         textShadowRadius: 10
-    }
+    } as TextStyle
  });

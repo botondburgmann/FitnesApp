@@ -7,7 +7,7 @@ import { getAchievementsForUser } from '../functions/databaseQueries';
 import Info from '../components/Info';
 
 
-const Achievements = ({route}) => {
+const Achievements = ({route}: any) => {
     const {userID} = route?.params;
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [loadingAchievements, setLoadingAchievements] = useState(true);
@@ -17,19 +17,20 @@ const Achievements = ({route}) => {
     const hideCustomAlert = () => {
         setCustomAlertVisible(false);
     };
-    const showCustomAlert = (title, information) => {
+    const showCustomAlert = (title: React.SetStateAction<string | undefined>, information: React.SetStateAction<string | undefined>) => {
         setCustomAlertVisible(true);
         setTitle(title);
         setInformation(information);
     };
     useEffect(() => {
-        const unsubscribeFromAchievements = getAchievementsForUser(userID, achievements => {
+        const unsubscribeFromAchievements = getAchievementsForUser(userID, (achievements: React.SetStateAction<Achievement[]>) => {
             setAchievements(achievements);
             setLoadingAchievements(false);
         })
     
       return () => {
-        unsubscribeFromAchievements();
+        if (unsubscribeFromAchievements !== undefined)
+            unsubscribeFromAchievements();
       }
     }, [userID]);
     
