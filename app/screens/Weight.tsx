@@ -21,7 +21,7 @@ const Weight = ({navigation}: RouterProps) => {
     {label: 'Imperial (lbs)', value: 'lbs'}
   ]);
 
-  function handleNextButtonPress(field:string, value: number, userID: string, navigation:NavigationProp<any, any>, nextPage: string, system: SelectItem | undefined ) {    
+  function handleNextButtonPress(field:string, value: number, userID: string, navigation:NavigationProp<any, any>, nextPage: string, system: string | undefined ) {    
     if (system === undefined)
       alert("Error: Please select one of the options");
     else
@@ -41,7 +41,7 @@ const Weight = ({navigation}: RouterProps) => {
             keyboardType='numeric'
             value={weight}
             style={globalStyles.input}
-            placeholder={value === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
+            placeholder={value["value"] === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
             autoCapitalize='none'
             onChangeText={(text) => setWeight(text)}
           />
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({  buttonGroup: {
     alignItems: 'center',
   },
   selectMenuContainer: {
-    flex: 0.5, //
+    flex: 0.7, //
     backgroundColor: "#fff",
     padding: 5
   },

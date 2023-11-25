@@ -20,7 +20,7 @@ const Height = ({navigation}: RouterProps) => {
     {label: 'Imperial (ft)', value: 'ft'}
   ]);
 
-  function handleNextButtonPress(field:string, value: number, userID: string, navigation:NavigationProp<any, any>, nextPage: string, system: SelectItem | undefined ) {    
+  function handleNextButtonPress(field:string, value: number, userID: string, navigation:NavigationProp<any, any>, nextPage: string, system: string | undefined ) {    
     if (system === undefined)
       alert("Error: Please select one of the options");
     else
@@ -40,7 +40,7 @@ const Height = ({navigation}: RouterProps) => {
             keyboardType='numeric'
             value={height}
             style={globalStyles.input}
-            placeholder={value === "ft" ? "Height (ft)" : "Height (cm)" }
+            placeholder={value["value"] === "ft" ? "Height (ft)" : "Height (cm)" }
             autoCapitalize='none'
             onChangeText={(text) => setHeight(text)}
           />
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
    alignItems: 'center',
   },
   selectMenuContainer: {
-   flex: 0.5,
+   flex: 0.7,
    backgroundColor: "#fff",
    padding: 5
   },

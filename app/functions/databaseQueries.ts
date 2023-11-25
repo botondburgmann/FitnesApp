@@ -334,7 +334,8 @@ export const signUp = async (name:string, setLoading:Function, auth:Auth, email:
             activityLevel: "", 
             set: false, 
             level: 1, 
-            experience: 0
+            experience: 0,
+            weeklyExperience: 0
         };
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
         const userDocRef = await addDoc(usersCollectionRef, userData);
@@ -394,6 +395,7 @@ export const setUpProfile =async (field:string, value:number | string | Date | S
             if (field === "activityLevel" && typeof value === "object" && "label" in value && "value" in value) {
                 const newData = { [field]: value.value,set: true }; 
                 await updateDoc(userDocRef, newData);
+                initializeAchievements(userID);
             } else {
                 const newData = { [field]: value}; 
                 await updateDoc(userDocRef, newData);
@@ -1005,6 +1007,74 @@ const calculateDaysBetweenDates = (dates:string[]): number => {
       }
 }
 
+const initializeAchievements = async (userID: string): Promise<void> => {
+    const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+    const achievementsSnapshot = await getDocs(achievementsCollectionRef);
+    let newOwner;
+    for (const achievementDoc of achievementsSnapshot.docs) {
+        switch (achievementDoc.data().name) {
+            case "Consistency Streak":
+                newOwner = {
+                    color: "#808080",
+                    description: "Workout for 10 days to unlock this achievement",
+                    level: 0,
+                    status: "locked",
+                    userID: userID,
+                    visibility: 0.5
+                }
+                break;
+            case "Endurance Master":
+                newOwner = {
+                    color: "#808080",
+                    description: "Do 20 repetitions for an exercise to unlock this achievement",
+                    level: 0,
+                    status: "locked",
+                    userID: userID,
+                    visibility: 0.5
+                }
+                break;
+            case "Dedicated Athlete":
+                newOwner = {
+                    color: "#808080",
+                    description: "Workout for a month consistently to unlock this achievement",
+                    level: 0,
+                    status: "locked",
+                    userID: userID,
+                    visibility: 0.5
+                }
+                break;
+            case "Climbing The Ranks":
+                newOwner = {
+                    color: "#808080",
+                    description: "Get in the top 10 users to unlock this achievement",
+                    level: 0,
+                    status: "locked",
+                    userID: userID,
+                    visibility: 0.5
+                }
+                break;
+            case "Strength Builder":
+                newOwner = {
+                    color: "#808080",
+                    description: "Lift 60 kg on an exercise to unlock this achievement",
+                    level: 0,
+                    status: "locked",
+                    userID: userID,
+                    visibility: 0.5
+                }
+                break
+            default:
+                break;
+            }
+            const updatedOwners = [...achievementDoc.data().owners, newOwner];
+            console.log(updatedOwners);
+            
+            const updatedData = {
+                owners: updatedOwners
+            }
+            await updateDoc(achievementDoc.ref, updatedData);
+        }
+}
 
 
 
