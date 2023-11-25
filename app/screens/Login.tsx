@@ -30,7 +30,9 @@ const Login = ({navigation}: RouterProps) => {
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={[globalStyles.container, {flex: 1}]}>
-        <Text  style={[styles.logo]}>App Name</Text>
+        <View style={{ backgroundColor: "rgba(255,0,0,0.7)", marginBottom: 20, paddingVertical: 20 }}>
+          <Text  style={[globalStyles.logo]}>Gym Gamer</Text>
+        </View>
         <TextInput
           value={email}
           style={globalStyles.input}
@@ -53,7 +55,7 @@ const Login = ({navigation}: RouterProps) => {
             <Pressable style={globalStyles.button} onPress={signIn}>
               <Text  style={globalStyles.buttonText}>Login</Text>
             </Pressable>
-            <Text style={[styles.text, {marginTop: 30}]}>Not registered yet</Text>
+            <Text style={[globalStyles.text, {marginTop: 30, fontSize: 18, textTransform: "uppercase"}]}>Not registered yet</Text>
             <Pressable style={globalStyles.button} onPress={() => navigation.navigate('Register')}>
               <Text style={globalStyles.buttonText}>Create new account here</Text>
             </Pressable>
@@ -75,13 +77,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     paddingVertical: 10,
   },
-  logo: {
-    alignSelf: 'center',
-    fontSize: 50,
-    color: "#fff",
-    textTransform: 'uppercase',
-    marginBottom: 50
-  },
+ 
   copyright: {
     alignSelf: 'center',
     color: "#fff",

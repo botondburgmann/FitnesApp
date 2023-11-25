@@ -42,12 +42,12 @@ const Toplist = ({navigation}: RouterProps) => {
   users.forEach((user, index) => {
     components.push(
       <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, flexWrap:'wrap'}}>
-        <Text style={styles.text}>{index + 1}</Text>
+        <Text style={[globalStyles.text, {textTransform: "uppercase", fontSize: 14, fontWeight: "600", paddingVertical: 10, paddingHorizontal: 5}]}>{index + 1}</Text>
         <Pressable onPress={()=>navigation.navigate('User', {userID: user.userID})}>
-          <Text style={styles.text}>{user.name}</Text>
+          <Text style={[globalStyles.text, {textTransform: "uppercase", fontSize: 14, fontWeight: "600", paddingVertical: 10, paddingHorizontal: 5}]}>{user.name}</Text>
         </Pressable>
-        <Text style={styles.text}>level {user.level}</Text>
-        <Text style={styles.text}>{user.weeklyExperience} XP</Text>
+        <Text style={[globalStyles.text, {textTransform: "uppercase", fontSize: 14, fontWeight: "600", paddingVertical: 10, paddingHorizontal: 5}]}>level {user.level}</Text>
+        <Text style={[globalStyles.text, {textTransform: "uppercase", fontSize: 14, fontWeight: "600", paddingVertical: 10, paddingHorizontal: 5}]}>{user.weeklyExperience} XP</Text>
 
       </View>)
   })
@@ -113,10 +113,10 @@ const Toplist = ({navigation}: RouterProps) => {
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={[globalStyles.container, {flex: 1}]}>
-        <Text style={styles.label}>{week.start} - {week.end}</Text>
+        <Text style={[globalStyles.label, {marginTop: 100, marginBottom: 20, fontSize: 17}]}>{week.start} - {week.end}</Text>
         {loading
         ? <ActivityIndicator/>
-        :  <ScrollView>
+        :  <ScrollView contentContainerStyle={{ backgroundColor: "rgba(255,0,0,0.7)" }}>
             { components}
           </ScrollView>
         }
@@ -126,23 +126,3 @@ const Toplist = ({navigation}: RouterProps) => {
 }
 
 export default Toplist
-
-const styles = StyleSheet.create({
-  label: {
-    alignSelf: 'center',
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#fff",
-    textTransform: 'uppercase',
-    marginTop: 100,
-    marginBottom: 20
-  },
-  text:{
-    fontSize: 14,
-    color: "#fff",
-    textTransform: 'uppercase',
-    fontWeight: "600",
-    paddingVertical: 10,
-    paddingHorizontal: 5
-  },
-});

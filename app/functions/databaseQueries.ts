@@ -75,7 +75,6 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
 
 export const getAllExercises = (userID: string, callback: Function): Unsubscribe[] => {
     try {
-        const exercises: Exercise[] = [];
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
         const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
         const unsubscribeFunctions = [];
@@ -324,8 +323,6 @@ export const getAchievementsForUser = (userID: string, callback: Function): Unsu
 export const signUp = async (name:string, setLoading:Function, auth:Auth, email:string, password:string): Promise<void> => {
     setLoading(true);
     try {
-        if (name === "")
-            throw new Error("name must be set"); 
         const response = await createUserWithEmailAndPassword(auth, email,password);
         const userData = {
             userID: response.user.uid, 
@@ -374,6 +371,7 @@ export const setUpProfile =async (field:string, value:number | string | Date | S
         
         else if (field === "weight" && typeof(value) === "number") {
             validateWeight(value);
+            
             if (system === "lbs")
                 value = Math.round((value*0.453592)*100)/100;
         }

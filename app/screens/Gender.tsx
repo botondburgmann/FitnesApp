@@ -14,8 +14,8 @@ const Gender = ( {navigation}: RouterProps) => {
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
-      <View style={globalStyles.container}>
-        <Text style={styles.label}>Please, select your gender</Text>
+      <View style={[globalStyles.container, {backgroundColor: "rgba(255,0,0,0.7)", paddingVertical: 20, paddingHorizontal: 20}]}>
+        <Text style={[globalStyles.label, {marginBottom: 50}]}>Please, select your gender</Text>
         <Radiobutton selectedValue={gender} setselectedValue={setGender} options={options} />
         <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => setUpProfile('gender', gender, userID, navigation, 'Age')}>
             <Text style={globalStyles.buttonText}>Next</Text>

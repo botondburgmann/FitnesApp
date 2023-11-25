@@ -68,10 +68,10 @@ const EditSet = ({ route, navigation }: RouterProps) => {
     return (
         <ImageBackground source={backgroundImage} style={globalStyles.image}>
         <View style={[globalStyles.container, {flex: 1}]}>
-                <Text style={styles.label}>Edit {set.exercise}</Text>
+                <Text style={globalStyles.label}>Edit {set.exercise}</Text>
                 { side !== "both"
                     ?<View style={styles.gridContainer}>
-                        <Text style={styles.text}>{side} side</Text>
+                        <Text style={[globalStyles.text, {textTransform: "uppercase", paddingVertical: 10, fontWeight: "800"}]}>{side} side</Text>
                         <Switch
                             trackColor={{ false: "#808080", true: "#fff" }}
                             ios_backgroundColor="#3e3e3e"
@@ -81,7 +81,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                     </View>
                     :<></>
                 }
-                <Text style={styles.text}>weight (kg)</Text>
+                <Text style={[globalStyles.text, {textTransform: "uppercase", paddingVertical: 10, fontWeight: "800"}]}>weight (kg)</Text>
                 <TextInput
                     keyboardType='numeric'
                     style={globalStyles.input}
@@ -92,7 +92,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                 />
                 {!isIsometric
                 ? <>
-                    <Text style={styles.text}>reps</Text>
+                    <Text style={[globalStyles.text, {textTransform: "uppercase", paddingVertical: 10, fontWeight: "800"}]}>reps</Text>
                     <TextInput
                         keyboardType='numeric'
                         style={globalStyles.input}
@@ -105,7 +105,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                 :  <></>
                 }
             
-                <Text style={styles.text}>time (seconds)</Text>
+                <Text style={[globalStyles.text, {textTransform: "uppercase", paddingVertical: 10, fontWeight: "800"}]}>time (seconds)</Text>
                 <TextInput
                     keyboardType='numeric'
                     style={globalStyles.input}
@@ -114,7 +114,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                     autoCapitalize='none'
                     onChangeText={(text) => setTime(text)}
                 />
-                <Text style={styles.text}>Rest time (seconds)</Text>
+                <Text style={[globalStyles.text, {textTransform: "uppercase", paddingVertical: 10, fontWeight: "800"}]}>Rest time (seconds)</Text>
                 <TextInput
                     keyboardType='numeric'
                     style={globalStyles.input}

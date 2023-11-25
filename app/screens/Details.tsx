@@ -1,11 +1,11 @@
-import { ActivityIndicator, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
-import {BestExercise, ExerciseRecords, TableRow, TableState } from '../types and interfaces/types';
-import { getExercise } from '../functions/databaseQueries';
-import UserContext from '../contexts/UserContext';
-import {Table, Row, Rows} from 'react-native-table-component'
-import { backgroundImage, globalStyles } from '../assets/styles';
+import { ActivityIndicator, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native"
+import React, { useContext, useEffect, useState } from "react"
+import { NavigationProp } from "@react-navigation/native";
+import {BestExercise, ExerciseRecords, TableRow, TableState } from "../types and interfaces/types";
+import { getExercise } from "../functions/databaseQueries";
+import UserContext from "../contexts/UserContext";
+import {Table, Row, Rows} from "react-native-table-component"
+import { backgroundImage, globalStyles } from "../assets/styles";
 
 
 interface RouterProps {
@@ -174,16 +174,21 @@ const Details = ({ route, navigation }: RouterProps) => {
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={[globalStyles.container, {flex: 1}]}>
-        <Text style={styles.label}>{exercise}</Text>
+        <Text style={[globalStyles.label, {marginTop: 50, marginBottom: 20}]}>{exercise}</Text>
         {loading
         ? <ActivityIndicator/>
+        : table.tableData.length === 0 ?
+        <Text style={[globalStyles.label, {marginTop: 50, marginBottom: 20}]}>No data</Text>
+
         : <ScrollView>
-          <Text style={styles.text}>Maximum weight: {mostWeight.weights} kg for {mostWeight.reps} repetitons</Text>
-          <Text style={styles.text}>Most repetitions: {mostReps.reps} with {mostReps.weights} kg</Text>
-          <Table borderStyle={{borderWidth: 2, borderColor: '#b0a2a2'}}>
-            <Row data={table.tableHead} style={styles.head} textStyle={styles.headText}/>
-            <Rows data={table.tableData} textStyle={styles.cellText}/>
-          </Table>
+          <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10, paddingLeft: 10, fontSize: 14, alignSelf: "flex-start"}]}>Maximum weight: {mostWeight.weights} kg for {mostWeight.reps} repetitons</Text>
+          <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10, paddingLeft: 10, fontSize: 14, alignSelf: "flex-start"}]}>Most repetitions: {mostReps.reps} with {mostReps.weights} kg</Text>
+          <View style={{ backgroundColor: "rgba(255,0,0,0.7)" }}>
+            <Table borderStyle={{borderWidth: 1, borderColor: "#fff"}}>
+              <Row data={table.tableHead} style={styles.head} textStyle={styles.headText}/>
+              <Rows data={table.tableData} textStyle={styles.cellText}/>
+            </Table>
+          </View>
         </ScrollView>
       
         }
@@ -200,12 +205,13 @@ const styles = StyleSheet.create({
     marginHorizontal:10
   },
   text:{
-    textAlign: 'left',
+    textAlign: "left",
     fontSize: 12,
     color: "#fff",
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     fontWeight: "600",
     paddingVertical: 10,
+    opacity: 1
   },
   head:{
     height: 50,
@@ -214,47 +220,47 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12  ,
     fontWeight: "800",
-    textTransform: 'uppercase',
-    textAlign: 'center'
+    textTransform: "uppercase",
+    textAlign: "center"
   },  
   cellText:{
     color: "#fff",
     fontSize: 12,
     fontWeight: "600",
     paddingVertical: 5,
-    textAlign: 'center'
+    textAlign: "center"
   },
-  selectedExercise:{    alignSelf: 'center',
+  selectedExercise:{    alignSelf: "center",
   fontSize: 20,
   fontWeight: "800",
   color: "#fff",
-  textTransform: 'uppercase',
+  textTransform: "uppercase",
   marginVertical: 20,
   },
   label: {
-      alignSelf: 'center',
+      alignSelf: "center",
       fontSize: 20,
       fontWeight: "800",
       color: "#fff",
-      textTransform: 'uppercase',
+      textTransform: "uppercase",
       marginTop: 50,
       marginBottom: 20
     },
     createExerciseButton:{
       marginVertical: 20,
-      alignSelf: 'flex-end',
+      alignSelf: "flex-end",
       marginRight: 20,
       width: 50,
       height: 50,
       borderRadius: 50,
-      backgroundColor: '#808080',
-      justifyContent: 'center',
-      alignItems: 'center',
+      backgroundColor: "#808080",
+      justifyContent: "center",
+      alignItems: "center",
     },
     createExerciseButtonText:{
       fontSize: 25,
       color: "#fff",
       fontWeight: "600",
-      alignSelf: 'center'
+      alignSelf: "center"
     }
   });

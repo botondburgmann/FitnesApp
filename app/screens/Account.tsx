@@ -93,25 +93,25 @@ useEffect(() => {
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
     <View style={[globalStyles.container, {flex: 1}]}>
          <View>
-              <Text style={styles.text}>{user.name}</Text>
-              <Text style={styles.text}>Level: {user.level}</Text>
-              <Text style={styles.text}>XP until next level: {experienceNeeded}</Text>
-              <Text style={styles.text}>Best records</Text>
+              <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>{user.name}</Text>
+              <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Level: {user.level}</Text>
+              <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>XP until next level: {experienceNeeded}</Text>
+              <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Best records</Text>
               {
                 mostWeightExercise.name === ""
-                ? <Text style={styles.text}>
+                ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
                    Max weight: No data
                   </Text>
-                : <Text style={styles.text}>
+                : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
                     Max weight: {( mostWeightExercise).name} {( mostWeightExercise).weights} kg ({(mostWeightExercise).reps} repetitions)
                   </Text>
               }
               {
                 mostRepsExercise.name === ""
-                ? <Text style={styles.text}>
+                ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
                    Most repetitions: No data
                   </Text>
-                : <Text style={styles.text}>
+                : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
                     Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
                   </Text>
               }

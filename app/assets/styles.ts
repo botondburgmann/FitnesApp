@@ -46,8 +46,56 @@ export const globalStyles = StyleSheet.create({
         alignSelf: "center",
         fontSize: 18,
         color: "#fff",
-        textTransform: "uppercase",
-        fontWeight: "600",
-        paddingVertical: 10,
-      }
+        textShadowOffset:{
+            height: 2,
+            width: 2
+        },
+        textShadowColor: "#000",
+        textShadowRadius: 10
+      },
+     
+      exerciseName: {
+        fontSize: 24,
+        lineHeight: 50,
+        fontWeight: 'bold',
+        letterSpacing: 0.25,
+        color: 'white',
+        textAlign: 'center',
+        flexWrap: 'wrap',
+        textShadowOffset:{
+            height: 2,
+            width: 2
+        },
+        textShadowColor: "#000",
+        textShadowRadius: 10
+    },
+    
+  label: {
+    alignSelf: 'center',
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#fff",
+    textTransform: 'uppercase',
+    marginVertical: 10,
+    textAlign: 'center',
+    lineHeight: 40,
+    textShadowOffset:{
+        height: 2,
+        width: 2
+    },
+    textShadowColor: "#000",
+    textShadowRadius: 10
+  },
+  logo: {
+    alignSelf: 'center',
+    fontSize: 50,
+    color: "#fff",
+    textTransform: 'uppercase',
+    textShadowOffset:{
+      height: 2,
+      width: 2
+  },
+  textShadowColor: "#000",
+  textShadowRadius: 10,
+  },
 })

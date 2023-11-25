@@ -115,7 +115,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
     <ScrollView contentContainerStyle={globalStyles.container}>
-        <Text style={styles.label}>Add new execise</Text>
+        <Text style={globalStyles.label}>Add new execise</Text>
         <View style={styles.selectMenuContainer} >
           <SelectMenu
             data={allExercises || []}
@@ -126,7 +126,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
         && <View>
             { currentExercise.unilateral
               ? <View style={styles.gridContainer}>
-                  <Text style={styles.text}>{side} side</Text>
+                  <Text style={[globalStyles.text, {textTransform: 'uppercase', fontWeight: "800", paddingVertical: 10}]}>{side} side</Text>
                   <Switch
                     trackColor={{ false: "#808080", true: "#fff" }}
                     ios_backgroundColor="#3e3e3e"
@@ -136,7 +136,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
                 </View>
               :<></>
             }
-            <Text style={styles.text}>weight (kg)</Text>
+            <Text style={[globalStyles.text, {textTransform: 'uppercase', fontWeight: "800", paddingVertical: 10}]}>weight (kg)</Text>
             <TextInput
               keyboardType='numeric'
               style={globalStyles.input}
@@ -147,7 +147,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
             />
             {!currentExercise.isometric
               ? <>
-                <Text style={styles.text}>reps</Text>
+                <Text style={[globalStyles.text, {textTransform: 'uppercase', fontWeight: "800", paddingVertical: 10}]}>reps</Text>
                 <TextInput
                   keyboardType='numeric'
                   style={globalStyles.input}
@@ -159,7 +159,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
               </>
               : <></>
             }
-            <Text style={styles.text}>time (seconds)</Text>
+            <Text style={[globalStyles.text, {textTransform: 'uppercase', fontWeight: "800", paddingVertical: 10}]}>time (seconds)</Text>
             <TextInput
               keyboardType='numeric'
               style={globalStyles.input}
@@ -168,7 +168,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
               autoCapitalize='none'
               onChangeText={(text) => setTime(text)}
             />
-            <Text style={styles.text}>Rest time (seconds)</Text>
+            <Text style={[globalStyles.text, {textTransform: 'uppercase', fontWeight: "800", paddingVertical: 10}]}>Rest time (seconds)</Text>
             <TextInput
               keyboardType='numeric'
               style={globalStyles.input}
@@ -187,7 +187,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
                   <Text style={globalStyles.buttonText}>Finish</Text>
               </Pressable>
             </View>
-              <Text style={styles.text}>Total sets: {sets.exercise.length}</Text>
+              <Text style={[globalStyles.text, {textTransform: 'uppercase', fontWeight: "800", paddingVertical: 10}]}>Total sets: {sets.exercise.length}</Text>
           </View>
         }
       </ScrollView>
@@ -198,30 +198,12 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
 export default AddWorkout
 
 const styles = StyleSheet.create({
-  text:{
-    alignSelf: 'center',
-    fontSize: 18,
-    color: "#fff",
-    textTransform: 'uppercase',
-    fontWeight: "600",
-    paddingVertical: 10,
-  },
   gridContainer:{
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginHorizontal: 10,
     marginVertical: 20,
     justifyContent: 'center'
-  },
-  label: {
-    alignSelf: 'center',
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#fff",
-    textTransform: 'uppercase',
-    marginVertical: 10,
-    textAlign: 'center',
-    lineHeight: 40
   },
   selectMenuContainer: {
     backgroundColor: "#fff",

@@ -15,12 +15,12 @@ const Age = ({navigation}: RouterProps) => {
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
-      <View style={globalStyles.container}>
-        <Text style={styles.label}>Please, select your date of birth</Text>
+      <View style={[globalStyles.container, {backgroundColor: "rgba(255,0,0,0.7)", paddingVertical: 20, paddingHorizontal: 20}]}>
+        <Text style={[globalStyles.label, {marginHorizontal: 40}]}>Please, select your date of birth</Text>
         <View style={styles.icon}>
           <Datepicker date={birthDate} setDate={setBirthDate} />
         </View>
-        <Text style={styles.text}>{birthDate.toDateString()}</Text>
+        <Text style={[globalStyles.text, {fontSize: 18, textTransform: "uppercase", fontWeight: "600"}]}>{birthDate.toDateString()}</Text>
         <View style={styles.buttonGroup}>
           <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Gender')}>
             <Text style={globalStyles.buttonText}>Go back</Text>
@@ -58,7 +58,8 @@ const styles = StyleSheet.create({
    },
    buttonGroup: {
     marginTop: 100,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    justifyContent: 'center'
    },
    icon: {
     alignSelf: 'center',

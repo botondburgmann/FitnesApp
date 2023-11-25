@@ -4,6 +4,7 @@ import { ExerciseSet } from '../types and interfaces/types';
 import { calculateNumberOfSets, isDropsSet, isSuperSet, removeXP, showDeleteConfirmation } from '../functions/otherFunctions';
 import UserContext from '../contexts/UserContext';
 import NavigationContext from '../contexts/NavigationContext';
+import { globalStyles } from '../assets/styles';
 
 
 const NormalExercise = (props) => {    
@@ -74,7 +75,7 @@ const NormalExercise = (props) => {
         <View key={index} style={styles.container} >
             {
                 outputs.setNumbers[index] !== ""
-                    ? <Text style={styles.text}>{outputs.setNumbers[index]}</Text>
+                    ? <Text style={[globalStyles.text, {lineHeight: 35}]}>{outputs.setNumbers[index]}</Text>
                     : <></>
             }
             <Pressable
@@ -87,9 +88,9 @@ const NormalExercise = (props) => {
                     }, exerciseID: exerciseID, setID: index, isIsometric: false})} 
                 onLongPress={() => showDeleteConfirmation(userID, exercise.exercise[index], exerciseID, index, removeXP(exercise.reps[index],exercise.weights[index]))}                                
             >
-                <Text style={styles.text}>{rep}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]} {outputs.seconds[index]}</Text>                            
+                <Text style={[globalStyles.text, {lineHeight: 35}]}>{rep}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]} {outputs.seconds[index]}</Text>                            
                 { exercise.restTimes[index] > 0
-                    ? <Text style={styles.text}>{exercise.restTimes[index]/60} minute rest</Text>
+                    ? <Text style={[globalStyles.text, {lineHeight: 35}]}>{exercise.restTimes[index]/60} minute rest</Text>
                     : <></>
                 }    
             </Pressable>
@@ -102,14 +103,14 @@ const NormalExercise = (props) => {
            { isSuperSet(exercise.restTimes,uniqueValues.exercise.length) 
            ? <View>
                 { numberOfSets === 1
-                    ? <Text style={styles.exercise}>1 superset of</Text>
-                    : <Text style={styles.exercise}>{numberOfSets} supersets</Text>
+                    ? <Text style={globalStyles.exerciseName}>1 superset of</Text>
+                    : <Text style={globalStyles.exerciseName}>{numberOfSets} supersets</Text>
                 }     
                 <View>
                     {uniqueValues.exercise.map((exercise,index) =>  
                     index !== uniqueValues.exercise.length-1
-                        ? <Text style={styles.exercise} key={index}>{exercise} and </Text>
-                        : <Text style={styles.exercise} key={index}>{exercise}</Text>
+                        ? <Text style={globalStyles.exerciseName} key={index}>{exercise} and </Text>
+                        : <Text style={globalStyles.exerciseName} key={index}>{exercise}</Text>
                     )}
                 </View>
                 {sets}
@@ -117,16 +118,16 @@ const NormalExercise = (props) => {
             : isDropsSet(exercise.restTimes, exercise.reps, exercise.weights, uniqueValues.exercise.length) 
             ?
                 <View>
-                    <Text style={styles.exercise}>1 dropset of {uniqueValues.exercise} {unilateral}</Text>
+                    <Text style={globalStyles.exerciseName}>1 dropset of {uniqueValues.exercise} {unilateral}</Text>
                     {sets}       
                 </View>
             :
             <View>
                 { numberOfSets === 1
-                    ? <Text style={styles.exercise}>1 set of {uniqueValues.exercise[0]}</Text>
+                    ? <Text style={globalStyles.exerciseName}>1 set of {uniqueValues.exercise[0]}</Text>
                     : uniqueValues.exercise[0][uniqueValues.exercise[0].length-1] === "s" 
-                    ? <Text style={styles.exercise}>{numberOfSets} sets of {uniqueValues.exercise[0]}es {unilateral}</Text>
-                    : <Text style={styles.exercise}>{numberOfSets} sets of {uniqueValues.exercise[0]}s {unilateral}</Text>
+                    ? <Text style={globalStyles.exerciseName}>{numberOfSets} sets of {uniqueValues.exercise[0]}es {unilateral}</Text>
+                    : <Text style={globalStyles.exerciseName}>{numberOfSets} sets of {uniqueValues.exercise[0]}s {unilateral}</Text>
                 }
                 {sets}                
             </View>}
@@ -142,21 +143,6 @@ const styles = StyleSheet.create({
         marginVertical: 5
       },
       
-    text: {
-        fontSize: 16,
-        lineHeight: 25,
-        letterSpacing: 0.25,
-        color: 'white',
-        textAlign: 'center'
-    },
-    exercise: {
-        fontSize: 20,
-        lineHeight: 50,
-        fontWeight: 'bold',
-        letterSpacing: 0.25,
-        color: 'white',
-        textAlign: 'center',
-        flexWrap: 'wrap'
-    },
+   
 
 })

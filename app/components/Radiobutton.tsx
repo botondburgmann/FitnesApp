@@ -41,6 +41,12 @@ const styles = StyleSheet.create({
     radioLabel: {
         color: '#fff', 
         fontSize: 16, 
-        fontWeight: '600' 
+        fontWeight: '600', 
+        textShadowOffset:{
+            height: 2,
+            width: 2
+        },
+        textShadowColor: "#000",
+        textShadowRadius: 10
     }
  });

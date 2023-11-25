@@ -103,9 +103,9 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
 
     return (
         <ImageBackground source={backgroundImage} style={globalStyles.image}>
-        <ScrollView contentContainerStyle={[globalStyles.container, {flex: 1}]}>
+        <ScrollView contentContainerStyle={[globalStyles.container, {flex: 1, backgroundColor: "rgba(255,0,0,0.7)"}]}>
                 <View style={styles.gridContainer}>
-                    <Text style={styles.text}>Name</Text>
+                    <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>Name</Text>
                     <TextInput
                         style={[globalStyles.input,{flex: 1}]}
                         value={name}
@@ -115,16 +115,16 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                     />
                 </View>
                 <View style={styles.dateGridContainer}>
-                    <Text style={styles.text}>Birthday:</Text>
-                    <Text style={styles.text}>{birthDate.toDateString()}</Text>
+                    <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>Birthday:</Text>
+                    <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>{birthDate.toDateString()}</Text>
                     <Datepicker date={birthDate} setDate={setBirthDate} />
                 </View>
                 <View style={styles.gridContainer}>
-                    <Text style={styles.text}>Gender</Text>
+                    <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>Gender</Text>
                     <Radiobutton selectedValue={gender} setselectedValue={setGender} options={options} />
                 </View>
                 <View style={styles.gridContainer}>
-                    <Text style={styles.text}>Weight</Text>
+                    <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>Weight</Text>
                     <TextInput
                         keyboardType='numeric'
                         value={weight.toString()}
@@ -138,7 +138,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                     </View>
                 </View>
                 <View style={styles.gridContainer}>
-                    <Text style={styles.text}>Height</Text>
+                    <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>Height</Text>
                     <TextInput
                         keyboardType='numeric'
                         value={height.toString()}

@@ -26,7 +26,7 @@ const Routines = ({navigation}: RouterProps) => {
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <ScrollView contentContainerStyle={globalStyles.container}>
         <NavigationContext.Provider value={navigation}>
-          <Text style={styles.label}>Choose workout type</Text>
+          <Text style={[globalStyles.label, {marginBottom: -10}]}>Choose workout type</Text>
           {routineComponents}
         </NavigationContext.Provider>
        </ScrollView>
@@ -35,23 +35,3 @@ const Routines = ({navigation}: RouterProps) => {
 }
 
 export default Routines
-
-const styles = StyleSheet.create({
-  text:{
-    alignSelf: 'center',
-    fontSize: 18,
-    color: "#fff",
-    textTransform: 'uppercase',
-    fontWeight: "600",
-    paddingVertical: 10,
-  },
-  label: {
-    alignSelf: 'center',
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#fff",
-    textTransform: 'uppercase',
-    marginTop: 30,
-    textAlign: 'center',
-  },
-});

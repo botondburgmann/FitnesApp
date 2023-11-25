@@ -44,9 +44,9 @@ const Exercises = ({navigation}: RouterProps) => {
         </Pressable>
         <Pressable>
           {exercise.hidden 
-            ? <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
+            ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
             }>Unhide exercise</Text>
-            : <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
+            : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
             }>Hide exercise</Text>}
         </Pressable>
       </View>)
@@ -58,7 +58,7 @@ const Exercises = ({navigation}: RouterProps) => {
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={[globalStyles.container, {flex: 1}]}>
-        <Text style={styles.label}>My exercises</Text>
+        <Text style={[globalStyles.label, {marginTop: 50, marginBottom: 20}]}>My exercises</Text>
         {loading
         ? <ActivityIndicator/>
         :  <ScrollView>

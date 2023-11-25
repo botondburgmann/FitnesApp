@@ -4,6 +4,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { getUser } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import NavigationContext from '../contexts/NavigationContext';
+import { globalStyles } from '../assets/styles';
 
 
 const Routine = (props) => {
@@ -27,7 +28,7 @@ const Routine = (props) => {
     const workoutType = props.workoutType;
   return (
     <Pressable style={styles.container} onPress={() => navigation.navigate('Focus',{workoutType: workoutType})}>
-        <Text style={styles.text}>{workoutType} workout</Text>
+        <Text style={[globalStyles.text, {textTransform: "uppercase", paddingVertical: 30, fontWeight: "800"}]}>{workoutType} workout</Text>
     </Pressable>
   )
 }
@@ -39,21 +40,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     flexDirection:'row',
     justifyContent: 'space-evenly',
-    backgroundColor:'#808080',    
+    backgroundColor:'rgba(255,0,0,0.7)',    
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#000',
-  },
-  image: {
-    width: 50,
-    height: 100,
-  },
-  text:{
-    alignSelf: 'flex-start',
-    fontSize: 18,
-    color: "#fff",
-    textTransform: 'uppercase',
-    fontWeight: "800",
-    paddingVertical: 30,
   },
 });

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import { ExerciseSet, Exercise } from '../types and interfaces/types';
+import { globalStyles } from '../assets/styles';
 
 const Set = (props) => {
     const exercise = props.exercise;
@@ -42,27 +43,27 @@ const Set = (props) => {
       }
   return (
     <View>
-        <Text style={styles.label}>{exercise.name}</Text>
+        <Text style={[globalStyles.label, {marginVertical: 50}]}>{exercise.name}</Text>
         {exercise.isometric
             ? exercise.musclesWorked.length === 1 && focus === "strength"
                 ? exercise.unilateral 
-                    ? <Text style={styles.text}>Do 20-30 seconds each side</Text>
-                    :  <Text style={styles.text}>Do 20-30 seconds</Text>
+                    ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Do 20-30 seconds each side</Text>
+                    :  <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Do 20-30 seconds</Text>
                 : exercise.unilateral 
-                    ? <Text style={styles.text}>Do 30-60 seconds each side</Text>
-                    :  <Text style={styles.text}>Do 30-60 seconds</Text>
+                    ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Do 30-60 seconds each side</Text>
+                    :  <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Do 30-60 seconds</Text>
             :
             exercise.musclesWorked.length === 1 && focus === "strength" 
                 ? exercise.unilateral 
-                    ? <Text style={styles.text}>Do 2-3 repetitons each side</Text>
-                    :  <Text style={styles.text}>Do 2-3 repetitons</Text>
+                    ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Do 2-3 repetitons each side</Text>
+                    :  <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Do 2-3 repetitons</Text>
                 : exercise.unilateral 
-                    ? <Text style={styles.text}>Do 6-8 repetitons each side</Text>
-                    :  <Text style={styles.text}>Do 6-8 repetitons</Text>
+                    ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Do 6-8 repetitons each side</Text>
+                    :  <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Do 6-8 repetitons</Text>
 
         }
         
-        <Text style={styles.text}>weight (kg)</Text>
+        <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>weight (kg)</Text>
         <TextInput
             keyboardType='numeric'
             style={styles.input}
@@ -74,7 +75,7 @@ const Set = (props) => {
         {
         exercise.isometric
         ? <>
-            <Text style={styles.text}>time (seconds)</Text>
+            <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>time (seconds)</Text>
             <TextInput
                 keyboardType='numeric'
                 style={styles.input}
@@ -85,7 +86,7 @@ const Set = (props) => {
             />
         </>
         : <>
-            <Text style={styles.text}>repetitons</Text>
+            <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>repetitons</Text>
             <TextInput
                 keyboardType='numeric'
                 style={styles.input}
@@ -96,10 +97,10 @@ const Set = (props) => {
             />
         </>
         }
-        <Pressable style={styles.button} onPress={() => handleCompleteSetButton(exercise, parseFloat(weight), 
+        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleCompleteSetButton(exercise, parseFloat(weight), 
                                                                                 parseFloat(time),
                                                                                 parseFloat(reps))}>
-            <Text style={styles.text}>Next</Text>                   
+            <Text style={globalStyles.buttonText}>Next</Text>                   
         </Pressable>
   </View>
   )
@@ -120,32 +121,9 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff'
     },
-    text:{
-        alignSelf: 'center',
-        fontSize: 18,
-        color: "#fff",
-        textTransform: 'uppercase',
-        fontWeight: "600",
-        paddingVertical: 10,
-    },
     gridContainer:{
         flexDirection: 'row',
         marginHorizontal: 10,
         justifyContent: 'center'
-    },
-    button:{
-        width: 100,
-        paddingHorizontal: 5,
-        marginHorizontal: 20,
-        alignSelf: "center",
-        backgroundColor: "#000",
-    },
-    label: {
-        fontSize: 20,
-        fontWeight: "800",
-        color: "#fff",
-        textTransform: 'uppercase',
-        textAlign: 'center',
-        marginVertical: 50
-    },
+    }
   });

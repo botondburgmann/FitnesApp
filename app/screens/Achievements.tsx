@@ -43,8 +43,8 @@ const Achievements = ({route}) => {
                         <View style={[globalStyles.gridContainer,{backgroundColor: achievements[i].color, margin: 10, opacity: achievements[i].visibility}]}>
                             <FontAwesome5 name={achievements[i].icon} size={50} color="#FFF" />
                             <View>
-                            <Text style={globalStyles.text}>{achievements[i].name}</Text>
-                            <Text style={globalStyles.text}>{achievements[i].status}</Text>
+                            <Text style={[globalStyles.text, {fontSize: 20, fontWeight: "600"}]}>{achievements[i].name}</Text>
+                            <Text style={[globalStyles.text, {fontSize: 20, fontWeight: "600"}]}>{achievements[i].status}</Text>
                         </View>
                         </View> 
                     </Pressable>
@@ -70,5 +70,3 @@ const Achievements = ({route}) => {
 }
 
 export default Achievements
-
-const styles = StyleSheet.create({})

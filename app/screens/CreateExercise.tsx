@@ -71,7 +71,7 @@ const CreateExercise = ({navigation}: RouterProps) => {
                 onChangeText={(text) => setName(text)}
             />
             <View style={styles.gridContainer}>
-                <Text style={[styles.text,styles.gridItem]}>This exercise is {unilaterality}</Text>
+                <Text style={[globalStyles.text, {fontWeight: "600"}]}>This exercise is {unilaterality}</Text>
                 <Pressable style={styles.infoButton} onPress={() => showCustomAlert("What is unilaterality?","A unilateral exercise is a weight bearing movement mainly or completely involving one limb (e.g. single leg squat, Bulgarian split squat and single leg jump), whereas, a bilateral exercise is a weight bearing movement executed evenly and simultaneously by both limbs (e.g. back squat, deadlift and countermovement jump)." )}>
                     <Text style={styles.infoButtonText}>i</Text>
                 </Pressable>
@@ -84,7 +84,7 @@ const CreateExercise = ({navigation}: RouterProps) => {
             </View>
                 <View style={styles.switch}>
                     <Switch
-                        trackColor={{ false: "#808080", true: "#fff" }}
+                        trackColor={{ false: "#000", true: "#fff" }}
                         ios_backgroundColor="#3e3e3e"
                         onValueChange={toggleUnilateralitySwitch}
                         value={isUnilateral}
@@ -92,7 +92,7 @@ const CreateExercise = ({navigation}: RouterProps) => {
                 </View>
         
             <View style={styles.gridContainer}>
-                <Text style={styles.text}>This exercise is {isometricity}</Text>
+                <Text style={[globalStyles.text, {fontWeight: "600"}]}>This exercise is {isometricity}</Text>
                 <Pressable style={styles.infoButton} onPress={() => showCustomAlert("What is isometricity?","Isometric exercises are tightening (contractions) of a specific muscle or group of muscles. During isometric exercises, the muscle doesn't noticeably change length. The affected joint also doesn't move. Isometric exercises help maintain strength. They can also build strength, but not effectively. And they can be performed anywhere. Examples include wall sit or plank." )} >
                     <Text style={styles.infoButtonText}>i</Text>
                 </Pressable>
@@ -105,10 +105,11 @@ const CreateExercise = ({navigation}: RouterProps) => {
             </View>
                 <View style={styles.switch}>
                     <Switch
-                        trackColor={{ false: "#808080", true: "#fff" }}
+                        trackColor={{ false: "#000", true: "#fff" }}
                         ios_backgroundColor="#3e3e3e"
                         onValueChange={toggleIsometricitySwitch}
                         value={isIsometric}
+
                     />
                 </View>
         
@@ -159,7 +160,7 @@ switch:{
       width: 20,
       height: 20,
       borderRadius: 50,
-      backgroundColor: '#808080',
+      backgroundColor: '#000',
       justifyContent: 'center',
       alignItems: 'center',
     },

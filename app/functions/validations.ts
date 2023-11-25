@@ -23,13 +23,13 @@ export const validateAge = (age: number) => {
 }
 
 export const validateWeight = (weight: number) => {
-    if (weight === undefined)
+    if (Number.isNaN(weight))
         throw new Error("weight must be set");
     else if (typeof(weight) !== "number" || weight < 0)
         throw new Error("weight must be a positive number");
 }
 export const validateHeight = (height: number) => {
-    if (height === undefined)
+    if (Number.isNaN(height))
         throw new Error("height must be set");
     else if (typeof(height) !== "number" || height < 0)
         throw new Error("height must be a positive number");

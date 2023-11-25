@@ -13,14 +13,23 @@ const Focus = ({ route, navigation }: RouterProps) => {
 const { workoutType } = route?.params;
 const [focus, setFocus] = useState<string>();
 const options = ["Strength", "Hypertrophy"];
+
+function handleStartButtonPress(navigation:NavigationProp<any, any>, workoutType: string, focus: string) {
+  if (focus !== undefined) {
+    navigation.navigate('CurrentExercise',{workoutType: workoutType, focus:focus})
+  }
+  else
+    alert("Please choose an option");
+}
+
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={[globalStyles.container, {flex: 1}]}>
-          <Text style={styles.label}>What would you like to focus on?</Text>
+          <Text style={[globalStyles.label, {fontSize: 18}]}>What would you like to focus on?</Text>
           <View style={styles.radioButtonContainer}>
             <Radiobutton selectedValue={focus} setselectedValue={setFocus} options={options} />
           </View>
-          <Pressable style={globalStyles.button} onPress={() => navigation.navigate('CurrentExercise',{workoutType: workoutType, focus:focus})}>
+          <Pressable style={globalStyles.button} onPress={() => handleStartButtonPress(navigation,workoutType,focus) }>
             <Text style={globalStyles.buttonText}>Start Workout</Text>
         </Pressable>
       </View>
@@ -33,23 +42,5 @@ export default Focus
 const styles = StyleSheet.create({
   radioButtonContainer: {
     alignItems: 'center'
-  },
-  text:{
-    alignSelf: 'center',
-    fontSize: 18,
-    color: "#fff",
-    textTransform: 'uppercase',
-    fontWeight: "600",
-    paddingVertical: 10,
-  },
-  label: {
-    alignSelf: 'center',
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#fff",
-    textTransform: 'uppercase',
-    marginVertical: 10,
-    textAlign: 'center',
-    lineHeight: 40
   },
 });

@@ -70,7 +70,7 @@ function InsideLayout() {
       },
       tabBarStyle: { backgroundColor: "#FF0000" },
       tabBarInactiveTintColor: "#FFF",
-      tabBarActiveTintColor: "#B0A2A2"
+      tabBarActiveTintColor: "lightgrey",
     })}
   >
     <Tab.Screen name="Workouts" component={WorkoutsLayout} options={{ headerShown: false }} />
