@@ -13,7 +13,7 @@ const DisplaySets = (props) => {
 
     useEffect(() => {
       const unsubscribe = getWorkout(userID, date, (exercises) => {
-        const exerciseComponents = [];
+        const exerciseComponents: React.JSX.Element[] = [];
         
         exercises.forEach((exercise, index) => {
           if (exercise.reps[0] > 0) {

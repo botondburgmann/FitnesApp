@@ -1,27 +1,33 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import Modal from 'react-native-modal';
+import { Modal, View, Text, Pressable } from 'react-native';
 
-function Info({ isVisible, onClose, title, information }) {
+interface MyModalProps {
+  isVisible: boolean;
+  onClose: () => void;
+  title: string;
+  information: string;
+  children: any
+}
+
+const Info = ({ isVisible, onClose, title, information, children }: MyModalProps) => {
   return (
-    <Modal isVisible={isVisible}>
+    <Modal visible={isVisible}>
       <View style={{ backgroundColor: 'white', padding: 20 }}>
-        {/* Custom alert icon */}
         <Text style={{ fontSize: 30, textAlign: 'center', marginVertical: 10 }}>
           {title}
         </Text>
 
-        {/* Alert content */}
         <Text style={{ fontSize: 18, textAlign: 'center', marginVertical: 10  }}>
-        {information}
+          {information}
         </Text>
 
-        {/* Close button */}
-        <TouchableOpacity onPress={onClose}>
+        <Pressable onPress={onClose}>
           <Text style={{ fontSize: 18, textAlign: 'center', marginVertical: 10  }}>
             Close
           </Text>
-        </TouchableOpacity>
+        </Pressable>
+
+        {children}
       </View>
     </Modal>
   );
