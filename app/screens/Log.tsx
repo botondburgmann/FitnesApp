@@ -15,35 +15,41 @@ const Log = ({navigation}: RouterProps) => {
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
-    <View style={[globalStyles.container, {flex: 1 }]}>
-          <View style={{ backgroundColor: 'rgba(255,0,0,0.7)'  }}>
-            <View style={[globalStyles.gridContainer, {alignItems:'flex-end'}]}>
-              <Pressable onPress={() => setDate(dateStep(date, -1))}>
-                <AntDesign name="caretleft" size={24} color="#FFF" />
-              </Pressable>
-                    <Datepicker date={date} setDate={setDate} />
-                    <Pressable onPress={() => setDate(dateStep(date, +1))}>
-                <AntDesign name="caretright" size={24} color="#FFF" />
-              </Pressable>
-            </View>
-                  <Text style={[styles.text, {marginTop: 20}]}>{date.toDateString()}</Text>
+      <View style={[globalStyles.container, {flex: 1 }]}>
+        <View style={{ backgroundColor: 'rgba(255,0,0,0.7)'  }}>
+          <View style={[globalStyles.gridContainer, {alignItems:'flex-end'}]}>
+            <Pressable onPress={() => setDate(dateStep(date, -1))}>
+              <AntDesign name="caretleft" size={24} color="#FFF" />
+            </Pressable>
+            <Datepicker date={date} setDate={setDate} />
+            <Pressable onPress={() => setDate(dateStep(date, +1))}>
+              <AntDesign name="caretright" size={24} color="#FFF" />
+            </Pressable>
           </View>
           
-                <ScrollView contentContainerStyle={styles.log}>
+          <Text style={[styles.text, {marginTop: 20}]}>{date.toDateString()}</Text>
+        </View>
+          
+        <ScrollView contentContainerStyle={styles.log}>
           <NavigationContext.Provider value={navigation}>
             <DisplaySets date={date.toDateString()}/>
           </NavigationContext.Provider>
-                </ScrollView>
-              
-                <View style={styles.buttonGroup}>
-          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Add',{ date: date.toDateString()})}>
-            <Text style={globalStyles.buttonText}>Add new Exercise</Text>
-          </Pressable>
-          
-          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Routines')}>
-            <Text style={globalStyles.buttonText}>Ask for routine</Text>
-          </Pressable>
-                </View>
+        </ScrollView>
+            
+        <View style={styles.buttonGroup}>
+          { date <= new Date() 
+            ? <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Add',{ date: date.toDateString()})}>
+                <Text style={globalStyles.buttonText}>Add new Exercise</Text>
+              </Pressable>
+            : <></>
+          }
+          { date.toDateString() === new Date().toDateString()
+            ? <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Routines')}>
+                <Text style={globalStyles.buttonText}>Ask for routine</Text>
+              </Pressable>
+            : <></>
+          }
+        </View>
     </View>
   </ImageBackground> 
   )

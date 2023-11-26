@@ -5,6 +5,7 @@ import IsometricExercise from './IsometricExercise';
 import { getWorkout } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import { Exercise } from '../types and interfaces/types';
+import { globalStyles } from '../assets/styles';
 
 
 const DisplaySets = (props: { date: string; }) => {
@@ -38,7 +39,7 @@ const DisplaySets = (props: { date: string; }) => {
 
     return (
         <View style={styles.container}>
-            {allExercises}
+          {allExercises.length === 0 ? <Text style={[globalStyles.label, {marginHorizontal: 40}]}>You have no workout logged for this day yet</Text> : allExercises}
         </View>    
     )
 
