@@ -35,7 +35,7 @@ function getMax(array:number[]): MaxValueAndIndex{
         return max;
 }
 
-export const getBestExercise = (userID: string, field:string, secondaryField:string, callback: Function ): Unsubscribe => {
+export const getBestExercise = (userID: string | null, field:string, secondaryField:string, callback: Function ): Unsubscribe => {
     const bestExercise: BestExercise = {
         name: "",
         weights: 0,
@@ -44,30 +44,31 @@ export const getBestExercise = (userID: string, field:string, secondaryField:str
     const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
     const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
     const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, (snapshot) => {
-        snapshot.docs.forEach((doc) => {
-            const workoutData = doc.data().Workout;
-      
-            if (workoutData) {
-                workoutData.forEach((exercise:Exercise) => {
-                    const maxField = getMax(exercise[field]);
-                    const maxSecondaryField = getMax(exercise[secondaryField]);
-      
-                    if (maxField && maxSecondaryField) {
-                        if (maxField.value > bestExercise[field]) {
-                            bestExercise[field] = maxField.value;
-                            bestExercise.name = exercise.exercise[maxField.index];
-                            bestExercise[secondaryField] = exercise[secondaryField][maxField.index];
-                        } else if (maxField.value === bestExercise[field] && maxSecondaryField.value > bestExercise[secondaryField]) {
-                            bestExercise[secondaryField] = maxSecondaryField.value;
-                            bestExercise.name = exercise.name[maxSecondaryField.index];
-                            bestExercise[field] = exercise[field][maxSecondaryField.index];
-                        }
-                    }
-                });
-            }
-        });
+        if (!snapshot.empty) {
+            snapshot.docs.forEach((doc) => {
+                const workoutData = doc.data().Workout;
+    
+                if (workoutData) {
+                    workoutData.forEach((exercise: Exercise) => {
+                        const maxField = getMax(exercise[field]);
+                        const maxSecondaryField = getMax(exercise[secondaryField]);
+                            if (maxField.value > bestExercise[field]) {
+                                bestExercise[field] = maxField.value;
+                                bestExercise.name = exercise.exercise[maxField.index];
+                                bestExercise[secondaryField] = exercise[secondaryField][maxField.index];
+                            } else if (maxField.value === bestExercise[field] && maxSecondaryField.value > bestExercise[secondaryField]) {
+                                bestExercise[secondaryField] = maxSecondaryField.value;
+                                bestExercise.name = exercise.exercise[maxSecondaryField.index];
+                                bestExercise[field] = exercise[field][maxSecondaryField.index];
+                            }
+                        
+                    });
+                }
+            });
+            callback(bestExercise)
+        }
     });
-    callback(bestExercise)
+    
       
 
     return unsubscribeFromWorkouts;

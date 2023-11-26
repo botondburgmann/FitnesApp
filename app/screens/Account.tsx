@@ -43,7 +43,7 @@ useEffect(() => {
   const unsubscribeFromUser = getUser(userID, (userData: React.SetStateAction<MyUser>) => {
     setUser(userData);
   });
-   const unsubscribeFromMostWeight = getBestExercise(userID, "weights", "reps", (exerciseData: BestExercise) => {
+   const unsubscribeFromMostWeight = getBestExercise(userID, "weights", "reps", (exerciseData: BestExercise) => {    
     setmostWeightExercise(exerciseData);
   });
   const unsubscribeFromMostReps = getBestExercise(userID, "reps", "weights", (exerciseData: BestExercise) => {    
