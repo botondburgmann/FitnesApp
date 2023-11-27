@@ -1,13 +1,12 @@
 import { View, TextInput, StyleSheet, Pressable, Text, ImageBackground } from 'react-native'
 import React, { useContext, useState } from 'react'
-import { setUpProfile } from '../functions/databaseQueries';
 import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
 import { RouterProps } from '../types and interfaces/interfaces';
 import { SelectItem } from '../types and interfaces/types';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { backgroundImage, globalStyles } from '../assets/styles';
-import { NavigationProp } from '@react-navigation/native';
+import { handleNextButtonPress } from '../functions/otherFunctions';
 
 
 
@@ -21,13 +20,6 @@ const Weight = ({navigation}: RouterProps) => {
     {label: 'Imperial (lbs)', value: 'lbs'}
   ]);
 
-  function handleNextButtonPress(field:string, value: number, userID: string | null, navigation:NavigationProp<any, any>, nextPage: string, system: SelectItem | undefined ) {    
-    if (system === undefined)
-      alert("Error: Please select one of the options");
-    else
-      setUpProfile(field, value, userID, navigation, nextPage, system["value"])
-    
-  }
   
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
@@ -53,7 +45,7 @@ const Weight = ({navigation}: RouterProps) => {
           <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Age')}>
             <Text style={globalStyles.buttonText}>Go back</Text>
           </Pressable>
-          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleNextButtonPress('weight', parseFloat(weight ?? "0"),  userID, navigation, 'Height', value)}>
+          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => {value !== undefined && handleNextButtonPress('weight', parseFloat(weight ?? "0"),  userID, navigation, 'Height', value["value"])}}>
             <Text style={globalStyles.buttonText}>Next</Text>
           </Pressable>
         </View>

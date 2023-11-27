@@ -1,6 +1,41 @@
 import { Alert } from "react-native";
-import { deleteSet } from "./databaseQueries";
-import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser, WeekRange } from "../types and interfaces/types";
+import { deleteSet, setUpProfile } from "./databaseQueries";
+import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser, SelectItem, WeekRange } from "../types and interfaces/types";
+import { NavigationProp } from "@react-navigation/native";
+
+export const  handleNextButtonPress = (field:string, value: string | number | undefined | SelectItem, userID: string | null, navigation:NavigationProp<any, any>, nextPage: string, system?:string | undefined) => {    
+  if (field === "gender") {
+    if (value === undefined)
+      alert("Error: Please select one of the options");
+    else
+      setUpProfile(field, value, userID, navigation, nextPage);
+  }
+  else if (field === "age" && value !== undefined){
+    setUpProfile(field, value, userID, navigation, nextPage);
+  }
+  else if (field === "weight" && value !== undefined){
+    if (system === undefined)
+      alert("Error: Please select one of the options");
+    else
+      setUpProfile(field, value, userID, navigation, nextPage, system);
+  }
+  else if (field === "height" && value !== undefined){
+    if (system === undefined)
+      alert("Error: Please select one of the options");
+    else
+      setUpProfile(field, value, userID, navigation, nextPage, system);
+  }
+  else if (field === "activityLevel"){
+    if (value === undefined)
+      alert("Error: Please select one of the options");
+    else
+      setUpProfile(field, value, userID, navigation, nextPage);
+  }
+  
+
+
+  
+}
 
 export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     let currentExperience = 0;

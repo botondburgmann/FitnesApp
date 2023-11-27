@@ -8,6 +8,7 @@ import { RouterProps } from '../types and interfaces/interfaces';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { backgroundImage, globalStyles } from '../assets/styles';
 import { NavigationProp } from '@react-navigation/native';
+import { handleNextButtonPress } from '../functions/otherFunctions';
 
 
 
@@ -22,13 +23,6 @@ const ActivityLevel = ({navigation}: RouterProps) => {
     {label: 'Advanced', value: 'advanced'}
   ]);
 
-  function handleFinishButtonPress(field:string, value: SelectItem | undefined, userID: string | null, navigation:NavigationProp<any, any>, nextPage: string ) {
-    if (value === undefined)
-      alert("Error: Please select one of the options");
-    else
-      setUpProfile(field, value, userID, navigation, nextPage)
-    
-  }
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
@@ -44,7 +38,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
           <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Height')}>
             <Text style={globalStyles.buttonText}>Go back</Text>
           </Pressable>
-          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleFinishButtonPress('activityLevel', value, userID, navigation, 'InsideLayout')}>
+          <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleNextButtonPress('activityLevel', value, userID, navigation, 'InsideLayout')}>
             <Text style={globalStyles.buttonText}>Finish</Text>
           </Pressable>
         </View>

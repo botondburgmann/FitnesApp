@@ -8,6 +8,7 @@ import Rest from '../components/Rest';
 import { addXP, calculateNumberOfSet, chooseExercises } from '../functions/otherFunctions';
 import { NavigationProp } from '@react-navigation/native';
 import { backgroundImage, globalStyles } from '../assets/styles';
+import WeekContext from '../contexts/WeekContext';
 
 
 interface RouterProps {
@@ -17,6 +18,7 @@ interface RouterProps {
 
 const CurrentExercise = ({ route, navigation }: RouterProps) => {
   const userID = useContext(UserContext)
+  const week = useContext(WeekContext)
   const { workoutType, focus } = route?.params;
   const muscles: MuscleGroups  ={
     'Full body': ['Calves', 'Quadriceps', 'Glutes', 'Hamstrings', 'Abs', 'Obliques', 'Chest', 'Lower back', 'Upper back', 'Traps', 'Lats', 'Front delts', 'Middle delts', 
@@ -106,7 +108,6 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
       
         } 
       }
-     // workoutComponents.splice(workoutComponents.length-1,1);
       setWorkoutComponents(workoutComponents)
       
           }
@@ -177,8 +178,10 @@ useEffect(() => {
 }, [goToNextPage]) 
 
   function handleFinishWorkoutButton(workout: ExerciseSet[], userID: string | null, date: string, totalXP: number, navigation: NavigationProp<any, any> ): void {    
-    addWorkout(userID, date, workout, totalXP );
-    navigation.navigate("Log");
+    if (week !== null) {
+      addWorkout(userID, date, workout, totalXP, week );
+      navigation.navigate("Log");
+    }
   }
 
   return (

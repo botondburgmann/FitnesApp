@@ -32,7 +32,7 @@ const DisplaySets = (props: { date: string; }) => {
   
       return () => {       
         if (unsubscribeFromWorkouts !== undefined) {
-          unsubscribeFromWorkouts();
+          unsubscribeFromWorkouts();          
         } 
         setAllExercises([]);
       };

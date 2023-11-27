@@ -1,11 +1,10 @@
 import React, { useContext, useState } from "react";
 import {  View, Pressable, Text, StyleSheet, ImageBackground } from "react-native";
-import { setUpProfile } from "../functions/databaseQueries";
 import Radiobutton from "../components/Radiobutton";
 import UserContext from "../contexts/UserContext";
 import { RouterProps } from "../types and interfaces/interfaces";
 import { backgroundImage, globalStyles } from "../assets/styles";
-import { NavigationProp } from "@react-navigation/native";
+import { handleNextButtonPress } from "../functions/otherFunctions";
 
 
 const Gender = ( {navigation}: RouterProps) => {
@@ -13,13 +12,6 @@ const Gender = ( {navigation}: RouterProps) => {
   const [gender, setGender] = useState<string>();
   const options = ["Male", "Female"];
 
-  function handleNextButtonPress(field:string, value: string | undefined, userID: string | null, navigation:NavigationProp<any, any>, nextPage: string) {    
-    if (value === undefined)
-      alert("Error: Please select one of the options");
-    else
-      setUpProfile(field, value, userID, navigation, nextPage)
-    
-  }
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
