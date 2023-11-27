@@ -1,6 +1,5 @@
-import { StyleSheet, Text, Pressable, Image } from 'react-native'
+import { StyleSheet, Text, Pressable } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { NavigationProp } from "@react-navigation/native";
 import { getUser } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import NavigationContext from '../contexts/NavigationContext';

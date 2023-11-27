@@ -40,7 +40,7 @@ const Height = ({navigation}: RouterProps) => {
             keyboardType='numeric'
             value={height}
             style={globalStyles.input}
-            placeholder={value && value["value"] === "ft" ? "Height (ft)" : "Height (cm)" }
+            placeholder="Height"
             autoCapitalize='none'
             onChangeText={(text: string) => setHeight(text)}
           />

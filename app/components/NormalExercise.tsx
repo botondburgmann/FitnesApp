@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext } from 'react'
-import { Exercise, ExerciseSet, Outputs } from '../types and interfaces/types';
+import { Exercise, Outputs } from '../types and interfaces/types';
 import { calculateNumberOfSets, isDropsSet, isSuperSet, removeXP, showDeleteConfirmation } from '../functions/otherFunctions';
 import UserContext from '../contexts/UserContext';
 import NavigationContext from '../contexts/NavigationContext';

@@ -1,4 +1,4 @@
-import { ActivityIndicator, ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ImageBackground, Pressable, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { backgroundImage, globalStyles } from '../assets/styles'
 import { FontAwesome5 } from '@expo/vector-icons';

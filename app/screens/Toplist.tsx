@@ -20,8 +20,8 @@ const Toplist = ({navigation}: RouterProps) => {
       const sortedUsers = sortUsers(similarUsers);
       if (sortedUsers.length > 10){
         sortedUsers.splice(10,sortedUsers.length-10)
-        updateClimbingTheRanksAchievement(loggedInUser, sortedUsers);
       }
+      updateClimbingTheRanksAchievement(loggedInUser, sortedUsers);
       setUsers(sortedUsers);
       setLoading(false);
     });
@@ -56,24 +56,6 @@ const Toplist = ({navigation}: RouterProps) => {
   })
 
   const [today, setToday] = useState(new Date());
-/*   function update(callback) {
-    const timeUntilMonday = ((1 - today.getDay() + 7) % 7) * 24 * 60 * 60 * 1000;
-    const timeUntilMidnight = (24 - today.getHours()) * 60 * 60 * 1000 - today.getMinutes() * 60 * 1000 - today.getSeconds() * 1000;
-    const initialDelay = timeUntilMonday + timeUntilMidnight;
-    callback();
-    setInterval(() => {
-      callback();
-    }, 7 * 24 * 60 * 60 * 1000);
-
-    setTimeout(() => {
-      setInterval(() => {
-        callback();
-      }, 7 * 24 * 60 * 60 * 1000);
-    }, initialDelay);
-
-  }
-
-  update(() => resetWeeklyExperience(userID)) */
   useEffect(() => {
     setWeek(calculateWeekRange(today))
   }, [today])
@@ -86,10 +68,10 @@ const Toplist = ({navigation}: RouterProps) => {
     };
     let moveBack = 0;
     let moveForward = 6;
-    for (let i = 1; i <= 7; i++) {      
+    for (let i = 0; i <= 6; i++) {      
       if (today.getDay() === i) {
-        week.start = addDaysToDate(today,-moveBack).toDateString()
-        week.end = addDaysToDate(today,moveForward).toDateString()
+        week.start = addDaysToDate(today,-moveBack-6).toDateString()
+        week.end = addDaysToDate(today,moveForward-6).toDateString()
         break;
       }
       moveBack++;

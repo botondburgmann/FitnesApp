@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+import React from 'react'
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 import { Exercise, ExerciseSet } from '../types and interfaces/types'
 import { globalStyles } from '../assets/styles'

@@ -1,4 +1,4 @@
-import { ImageBackground, Pressable, StyleSheet, Text, View } from "react-native"
+import { ImageBackground, Pressable, Text, View } from "react-native"
 import React, { useContext, useEffect, useState } from "react"
 import { FIREBASE_AUTH } from "../../FirebaseConfig"
 import { getUser, getBestExercise } from "../functions/databaseQueries"
@@ -123,7 +123,7 @@ useEffect(() => {
         {userID === loggedInUserID &&
         <View>
           <Pressable style={globalStyles.button}>
-              <Text style={styles.text} onPress={() => navigation.navigate("Edit profile", {user: user})}>Edit profile</Text>
+              <Text style={globalStyles.buttonText} onPress={() => navigation.navigate("Edit profile", {user: user})}>Edit profile</Text>
           </Pressable>
           <Pressable style={globalStyles.button}>
               <Text style={globalStyles.buttonText} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>
@@ -136,14 +136,3 @@ useEffect(() => {
 }
 
 export default Account
-
-const styles = StyleSheet.create({
-  text:{
-    alignSelf: "center",
-    fontSize: 18,
-    color: "#fff",
-    textTransform: "uppercase",
-    fontWeight: "600",
-    paddingVertical: 10,
-  }
-});

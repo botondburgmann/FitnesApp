@@ -41,7 +41,7 @@ const Weight = ({navigation}: RouterProps) => {
             keyboardType='numeric'
             value={weight}
             style={globalStyles.input}
-            placeholder={ value && value["value"] === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
+            placeholder="Weight"
             autoCapitalize='none'
             onChangeText={(text: string) => setWeight(text)}
           />

@@ -1,7 +1,7 @@
-import { ImageBackground, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
-import { editProfile, editSet } from '../functions/databaseQueries';
+import { editProfile } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
 import Datepicker from '../components/Datepicker';
 import Radiobutton from '../components/Radiobutton';

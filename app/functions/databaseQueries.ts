@@ -972,37 +972,37 @@ const updateDedicatedAthleteAchievement = async (userID: string | null): Promise
 };
 
 export const updateClimbingTheRanksAchievement = (loggedInUser: MyUser, users: MyUser[]): void => {
-    if (users.slice(3,10).includes(loggedInUser)){
+    if (users.slice(3,10).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
         const updatedAchievement: Achievement = {
             color: "#BBC2CC",
-            description: "Reach in the top 3 place in the leaderboard to unlock next stage",
+            description: "Reach the top 3 place in the leaderboard to unlock next stage",
             icon: "arrow-up",
             level: 1,
-            name: "Dedicated Athlete",
+            name: "Climbing the Ranks",
             status: "Top 10 Challenger",
             visibility: 1
         }
         updateAchievementStatus(loggedInUser.userID, updatedAchievement);
     }
-    else if (users.slice(1,3).includes(loggedInUser)){
+    else if (users.slice(1,3).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
         const updatedAchievement: Achievement = {
             color: "#BBC2CC",
-            description: "Reach in the top 1 place in the leaderboard to unlock next stage",
+            description: "Reach the top 1 place in the leaderboard to unlock next stage",
             icon: "arrow-up",
             level: 2,
-            name: "Dedicated Athlete",
+            name: "Climbing the Ranks",
             status: "Top 3 Contender",
             visibility: 1
         }
         updateAchievementStatus(loggedInUser.userID, updatedAchievement);
     }
-    if (users[0] === loggedInUser){
+    if (users[0] === loggedInUser && loggedInUser.weeklyExperience > 0){
         const updatedAchievement: Achievement = {
             color: "#FFDD43",
             description: "Max level achieved: Reach top 1 place in the leaderboard",
             icon: "arrow-up",
             level: 3,
-            name: "Dedicated Athlete",
+            name: "Climbing the Ranks",
             status: "Leaderboard Dominator",
             visibility: 1
         }
@@ -1018,6 +1018,7 @@ const sortDates = (dates: string[]): string[] => {
 };
 
 const calculateDaysBetweenDates = (dates:string[]): number => {
+    let timeDifferenceInDays = 0;
     if (dates.length >= 2) {
         const firstDate = dates[0];
         const lastDate = dates[dates.length - 1];
@@ -1027,12 +1028,10 @@ const calculateDaysBetweenDates = (dates:string[]): number => {
       
         const timeDifferenceInMilliseconds = lastDateObject.getTime() - firstDateObject.getTime();
       
-        const timeDifferenceInDays = timeDifferenceInMilliseconds / (1000 * 60 * 60 * 24);
+        timeDifferenceInDays = timeDifferenceInMilliseconds / (1000 * 60 * 60 * 24);
       
-        return timeDifferenceInDays;
-      } else {
-        throw new Error("Not enough dates to calculate the difference.");
-      }
+    } 
+    return timeDifferenceInDays;
 }
 
 const initializeAchievements = async (userID: string | null): Promise<void> => {

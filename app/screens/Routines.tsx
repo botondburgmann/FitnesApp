@@ -1,4 +1,4 @@
-import {ImageBackground, ScrollView, StyleSheet, Text} from 'react-native'
+import {ImageBackground, ScrollView, Text} from 'react-native'
 import React from 'react'
 import Routine from '../components/Routine';
 import NavigationContext from '../contexts/NavigationContext';

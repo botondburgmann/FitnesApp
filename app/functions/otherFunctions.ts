@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
-import { deleteSet, updateAchievementStatus } from "./databaseQueries";
-import { Achievement, Exercise, ExerciseSelectOption, ExerciseSet, MyUser } from "../types and interfaces/types";
+import { deleteSet } from "./databaseQueries";
+import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser } from "../types and interfaces/types";
 
 export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     let currentExperience = 0;

@@ -1,4 +1,4 @@
-import { ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import UserContext from '../contexts/UserContext';
 import {  addWorkout, getExercisesByFocus, getUser } from '../functions/databaseQueries';
@@ -41,7 +41,7 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
   const [loadingExercises, setLoadingExercises] = useState(true);
   const [activityLevel, setActivityLevel] = useState("");
   const [loadingUser, setLoadingUser] = useState(true);
-  const [workoutComponents, setWorkoutComponents] = useState([]);
+  const [workoutComponents, setWorkoutComponents] = useState<React.JSX.Element[]>([]);
   const workout = useRef<ExerciseSet[]>([]);
   const [endOfWorkout, setEndofWorkout] = useState(false);
   const totalXP = useRef(0);
@@ -58,7 +58,7 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
   })
 
   
-  useEffect(() => {
+   useEffect(() => {
     const unsubscribeFromGetExerciseByFocus = getExercisesByFocus(userID, muscles[workoutType], (exercises: React.SetStateAction<Exercise[]>) => {
       setExercises(exercises);
       setLoadingExercises(false);
@@ -69,7 +69,7 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
         unsubscribeFromGetExerciseByFocus();
     }
   }, [userID, workoutType]);
-  
+ 
   useEffect(() => {
     const unsubscribe = getUser(userID, (user: { activityLevel: React.SetStateAction<string>; }) => {
         setActivityLevel(user.activityLevel);
@@ -80,13 +80,13 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
         unsubscribe();
       }
     }, [userID]);
-  
+   
 
   useEffect(() => {
     if (!loadingUser && !loadingExercises) {
       const selectedExercises: Exercise[] = chooseExercises(exercises, activityLevel);
       const numberOfSets = calculateNumberOfSet(focus, activityLevel);
-      const [workoutComponents, setWorkoutComponents] = useState<JSX.Element[]>([]);
+      const workoutComponents: React.JSX.Element[] = []
     
       for (let i = 0; i < selectedExercises.length; i++) {
         for (let j = 0; j < numberOfSets; j++) {
@@ -106,11 +106,9 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
       
         } 
       }
-      workoutComponents.splice(workoutComponents.length-1,1);
-      setWorkoutComponents((prevWorkoutComponents) => [
-        ...prevWorkoutComponents,
-        ...workoutComponents,
-      ]);
+     // workoutComponents.splice(workoutComponents.length-1,1);
+      setWorkoutComponents(workoutComponents)
+      
           }
 
   }, [loadingExercises, loadingUser])
@@ -176,7 +174,7 @@ useEffect(() => {
     
     setGoToNextPage(false)
   }
-}, [goToNextPage])
+}, [goToNextPage]) 
 
   function handleFinishWorkoutButton(workout: ExerciseSet[], userID: string | null, date: string, totalXP: number, navigation: NavigationProp<any, any> ): void {    
     addWorkout(userID, date, workout, totalXP );

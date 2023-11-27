@@ -5,7 +5,6 @@ import Radiobutton from "../components/Radiobutton";
 import UserContext from "../contexts/UserContext";
 import { RouterProps } from "../types and interfaces/interfaces";
 import { backgroundImage, globalStyles } from "../assets/styles";
-import { SelectItem } from "../types and interfaces/types";
 import { NavigationProp } from "@react-navigation/native";
 
 

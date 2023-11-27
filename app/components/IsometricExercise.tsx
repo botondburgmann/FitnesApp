@@ -1,10 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext } from 'react'
 import { removeXP, isDropsSet, isSuperSet, calculateNumberOfSets, showDeleteConfirmation } from '../functions/otherFunctions';
-import { NavigationContext } from '@react-navigation/native';
 import UserContext from '../contexts/UserContext';
-import { Exercise, ExerciseSet, Outputs } from '../types and interfaces/types';
+import { Exercise, Outputs } from '../types and interfaces/types';
 import { globalStyles } from '../assets/styles';
+import NavigationContext from '../contexts/NavigationContext';
 
 const IsometricExercise = (props: { exercise: Exercise; exerciseID: number; }) => {
 
