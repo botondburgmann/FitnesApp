@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import { deleteSet, setUpProfile } from "./databaseQueries";
-import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser, SelectItem, WeekRange } from "../types and interfaces/types";
+import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser, SelectItem, SetChange, WeekRange } from "../types and interfaces/types";
 import { NavigationProp } from "@react-navigation/native";
 
 export const  handleNextButtonPress = (field:string, value: string | number | undefined | SelectItem, userID: string | null, navigation:NavigationProp<any, any>, nextPage: string, system?:string | undefined) => {    
@@ -56,22 +56,25 @@ export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     return currentExperience;
 }
 
-export const addXPForOneSet = (isIsometric: boolean, set: { [x: string]: any; side?: string; weight?: number; rep?: number | undefined; time?: number; restTime?: number; weights?: any; reps?: any; times?: any; }): number => {
+export const addXPForOneSet = (isIsometric: boolean, set: SetChange): number => {
     let currentExperience = 0
-    if (!isIsometric) {
-        if (set.weights === 0 && Number.isNaN(set.weights))
-            currentExperience += set.reps;
+    console.log(set);
+    if (!isIsometric && set.rep !== undefined) {
+        if (set.weight === 0 && Number.isNaN(set.weight))
+            currentExperience += set.rep;
         else
-            currentExperience += set.reps * set.weights;
+            currentExperience += set.rep * set.weight;
     }
     else {
-        if (set.weights === 0 && Number.isNaN(set.weights))
-            currentExperience += set.times;
+        if (set.weights === 0 && Number.isNaN(set.weight))
+            currentExperience += set.time;
         else
-            currentExperience += set.times * set.weights;
-    }             
+            currentExperience += set.time * set.weight;
+    }       
+          
     return currentExperience;
 }
+
 
 export const  removeXP = (repOrTime: number, weight: number): number => {
     let currentExperience = 0;

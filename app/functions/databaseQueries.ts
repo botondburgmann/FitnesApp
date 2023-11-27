@@ -616,29 +616,33 @@ export const createNewExercise = async (userID: string, name: string, isUnilater
 };
 
 export const editSet = async (userID:string | null, exerciseName: string, exerciseID: number, setID: number, changes: SetChange, xpToChange: number, date: string, week: WeekRange): Promise<void> => {
-    try {  
+    try {       
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
         const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
         const workoutSnapshot = await getDocs(workoutsQuery);
               
         for (const workoutDoc of workoutSnapshot.docs) {
+            
             const updatedData = { ...workoutDoc.data() };
-
+            
             for (let i = 0; i < workoutDoc.data().Workout.length; i++) {   
                 if(workoutDoc.data().Workout[i].exercise[setID] === exerciseName && i === exerciseID){
-                
-                    for (const change in changes) 
-                        updatedData.Workout[i][change][setID] = changes[change];
+                    updatedData.Workout[i].weights[setID] = changes.weight;
+                    updatedData.Workout[i].reps[setID] = changes.rep;
+                    updatedData.Workout[i].times[setID] = changes.time;
+                    updatedData.Workout[i].restTimes[setID] = changes.restTime;
+                    updatedData.Workout[i].sides[setID] = changes.side;
+            
                     
-                    await updateDoc(doc(FIRESTORE_DB, "Workouts", workoutDoc.id), {
-                        Workout: updatedData.Workout
-                    });
-                }
-            }  
-        }
-        
-        addExperience(userID, xpToChange, date, week);
-
+                
+                await updateDoc(doc(FIRESTORE_DB, "Workouts", workoutDoc.id), {
+                    Workout: updatedData.Workout
+                });
+            }
+        }  
+    }    
+    addExperience(userID, xpToChange, date, week);
+    
     } catch (error: any) {
         alert(`Error: couldn't update set fields: ${error.message}`);
    }

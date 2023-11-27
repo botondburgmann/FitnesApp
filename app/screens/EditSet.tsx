@@ -18,13 +18,11 @@ interface RouterProps {
 const EditSet = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
     const week = useContext(WeekContext);
-    const date = useContext(DateContext);
-
-    const { set, exerciseID, setID, isIsometric} = route?.params; 
+    const { set, exerciseID, setID, isIsometric, date} = route?.params; 
     const [weight, setWeight] = useState<string>(set.weight.toString());
     const [time, setTime] = useState<string>(set.time.toString());
     const [reps, setReps] = isIsometric ? useState<string>("") : useState<string>(set.reps.toString());
-    const [restTime, setRestTime] = useState<string>(set.restTime.toString());
+    const [restTime, setRestTime] = useState<string>((set.restTime/60).toString());
     const [isEnabled, setIsEnabled] = set.side === "left" ? useState(false) : useState(true);
     const [side, setSide] = useState<string>(set.side);
 
@@ -33,13 +31,13 @@ const EditSet = ({ route, navigation }: RouterProps) => {
         weight : parseFloat(weight) ,
         rep :  parseFloat(reps),
         time :  parseFloat(time) ,
-        restTime : parseFloat(restTime)
+        restTime : parseFloat(restTime)*60
     };
     const changeIsometric = {
         side: side,
         weight : parseFloat(weight) ,
         time :  parseFloat(time) ,
-        restTime : parseFloat(restTime)
+        restTime : parseFloat(restTime)*60
     };
 
     function toggleSwitch(): void {
@@ -63,7 +61,9 @@ const EditSet = ({ route, navigation }: RouterProps) => {
         } else {
             if (changeNormal.reps === 0 || Number.isNaN(changeNormal.reps))
                 alert("Reps field cannot be empty"); 
-            else if(date !== null && week !== null){
+            else if(date !== null && week !== null){            
+                console.log(changeNormal);
+                   
                 editSet(userID,set.exercise, exerciseID, setID,changeNormal, (addXPForOneSet(isIsometric, changeNormal)+removeXP(set.reps, set.weight)), date, week)
                 navigation.navigate("Log")
             }
@@ -124,7 +124,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                     keyboardType='numeric'
                     style={globalStyles.input}
                     value={restTime}
-                    placeholder="Rest time (in seconds)"
+                    placeholder="Rest time (in minutes)"
                     autoCapitalize='none'
                     onChangeText={(text: string) => setRestTime(text)}
                 />
