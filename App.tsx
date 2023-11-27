@@ -28,6 +28,8 @@ import EditProfile from "./app/screens/EditProfile";
 import Details from "./app/screens/Details";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Achievements from "./app/screens/Achievements";
+import WeekContext from "./app/contexts/WeekContext";
+import { WeekRange } from "./app/types and interfaces/types";
 
 
 const Stack = createNativeStackNavigator();
@@ -147,24 +149,61 @@ export default function App() {
     if (user !== null) {
       userID = user.uid;
     }
-
+    const [week, setWeek] = useState<WeekRange>({
+      start: "",
+      end: ""
+    })
+  
+    const [today, setToday] = useState(new Date());
+    useEffect(() => {
+      setWeek(calculateWeekRange(today))
+    }, [today])
+    
+  
+    function calculateWeekRange(today:Date): WeekRange {
+      const week = {
+        start: "",
+        end: ""  
+      };
+      let moveBack = 0;
+      let moveForward = 6;
+      for (let i = 0; i <= 6; i++) {      
+        if (today.getDay() === i) {
+          week.start = addDaysToDate(today,-moveBack-6).toDateString()
+          week.end = addDaysToDate(today,moveForward-6).toDateString()
+          break;
+        }
+        moveBack++;
+        moveForward--;
+      }
+      
+      return week;
+    }
+  
+    function addDaysToDate(date:Date, daysToAdd:number) {
+      const newDate = new Date(date);
+      newDate.setDate(date.getDate() + daysToAdd);
+      return newDate;
+    }
   return (
     <UserContext.Provider value={userID}>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
-          {user && alreadySetUp === true ? 
-            (<Stack.Screen name="Inside" component={ InsideLayout} options={{ headerShown: false }}/>)
-          : user && alreadySetUp === false ?
-            (<Stack.Screen name="SetUp" component={ SetUpLayout} options={{ headerShown: false } }/>) 
-          : (
-            <>
-              <Stack.Screen name="Login" component={ Login} options={{ headerShown: false }}/>
-              <Stack.Screen name="Register" component={ Registration} options={{ headerShown: false }}/>
-            </>
-            )
-          }
-        </Stack.Navigator>
-      </NavigationContainer>
+      <WeekContext.Provider value={week}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Login">
+            {user && alreadySetUp === true ?
+              (<Stack.Screen name="Inside" component={ InsideLayout} options={{ headerShown: false }}/>)
+            : user && alreadySetUp === false ?
+              (<Stack.Screen name="SetUp" component={ SetUpLayout} options={{ headerShown: false } }/>)
+            : (
+              <>
+                <Stack.Screen name="Login" component={ Login} options={{ headerShown: false }}/>
+                <Stack.Screen name="Register" component={ Registration} options={{ headerShown: false }}/>
+              </>
+              )
+            }
+          </Stack.Navigator>
+        </NavigationContainer>
+      </WeekContext.Provider>
     </UserContext.Provider>
 
   );

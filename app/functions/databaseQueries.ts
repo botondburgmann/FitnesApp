@@ -3,7 +3,7 @@ import { DocumentData, Unsubscribe, addDoc, collection, doc, getDocs, onSnapshot
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 import { validateActivityLevel, validateAge, validateExerciseSet, validateExperience, validateGender, validateHeight, validateWeight } from "./validations";
-import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser, Achievement, SetChange } from "../types and interfaces/types";
+import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser, Achievement, SetChange, WeekRange } from "../types and interfaces/types";
 
 
 // getters
@@ -409,7 +409,7 @@ export const setUpProfile =async (field:string, value:number | string | Date | S
     }
 }
 
-export const addSet =async (userID:string | null, date: string, set: ExerciseSet, xpToAdd: number): Promise<void> => {
+export const addSet =async (userID:string | null, date: string, set: ExerciseSet, xpToAdd: number, week: WeekRange): Promise<void> => {
     try {
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
         const workoutsQuery = query(workoutsCollectionRef, where("date", "==", date), where("userID", "==", userID) );
@@ -490,14 +490,14 @@ export const addSet =async (userID:string | null, date: string, set: ExerciseSet
 
 
         }         
-        addExperience(userID, xpToAdd);
+        addExperience(userID, xpToAdd, date, week);
     } 
     catch (error: any) {
         alert(`Error: Couldn't add set: ${error.message}`)
     } 
 }
 
-const addExperience = async (userID: string | null, experience: number): Promise<void> => {
+const addExperience = async (userID: string | null, experience: number, date: string,  week: WeekRange): Promise<void> => {
     try {        
         const usersCollectionRef = collection(FIRESTORE_DB,"Users");
         const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
@@ -505,13 +505,19 @@ const addExperience = async (userID: string | null, experience: number): Promise
         const firstUserDoc = firstUsersSnapshot.docs[0];
         
         validateExperience(experience);
-        
-        const firstUpdatedData = {
-            experience: firstUserDoc.data().experience+experience,
-            weeklyExperience: firstUserDoc.data().weeklyExperience+experience,
+        if (week.start <= date && date <= week.end) {            
+            const firstUpdatedData = {
+                experience: firstUserDoc.data().experience+experience,
+                weeklyExperience: firstUserDoc.data().weeklyExperience+experience,
+            }
+            await updateDoc(firstUserDoc.ref, firstUpdatedData);
         }
-
-        await updateDoc(firstUserDoc.ref, firstUpdatedData);
+        else{
+            const firstUpdatedData = {
+                experience: firstUserDoc.data().experience+experience,
+            }
+            await updateDoc(firstUserDoc.ref, firstUpdatedData);
+        }
         
         const secondUsersSnapshot = await getDocs(usersQuery);
         const secondUserDoc = secondUsersSnapshot.docs[0];
@@ -551,7 +557,7 @@ export const toggleExerciseVisibilty =async (userID: string | null, exerciseName
     }
 };
 
-export const deleteSet = async (userID:string | null, exerciseName: string, exerciseID: number, setID: number, xpToDelete: number ): Promise<void> => {
+export const deleteSet = async (userID:string | null, exerciseName: string, exerciseID: number, setID: number, xpToDelete: number, date: string, week:WeekRange ): Promise<void> => {
     try {  
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
         const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
@@ -582,7 +588,7 @@ export const deleteSet = async (userID:string | null, exerciseName: string, exer
         } 
       
     validateExperience(xpToDelete);
-    addExperience(userID, xpToDelete);
+    addExperience(userID, xpToDelete, date, week);
 
     } 
     catch (error: any) {
@@ -609,7 +615,7 @@ export const createNewExercise = async (userID: string, name: string, isUnilater
     }
 };
 
-export const editSet = async (userID:string | null, exerciseName: string, exerciseID: number, setID: number, changes: SetChange, xpToChange: number): Promise<void> => {
+export const editSet = async (userID:string | null, exerciseName: string, exerciseID: number, setID: number, changes: SetChange, xpToChange: number, date: string, week: WeekRange): Promise<void> => {
     try {  
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
         const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
@@ -631,7 +637,7 @@ export const editSet = async (userID:string | null, exerciseName: string, exerci
             }  
         }
         
-        addExperience(userID, xpToChange);
+        addExperience(userID, xpToChange, date, week);
 
     } catch (error: any) {
         alert(`Error: couldn't update set fields: ${error.message}`);
@@ -676,7 +682,7 @@ export const editProfile = async (userID:string | null, changes: MyUser): Promis
     }
 };
 
-export const addWorkout =async (userID:string | null, date: string, workout: ExerciseSet[], xpToAdd: number): Promise<void> => {
+export const addWorkout =async (userID:string | null, date: string, workout: ExerciseSet[], xpToAdd: number, week: WeekRange): Promise<void> => {
     const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
     for (const set of workout) {
         const updatedStrengthBuilderAchievement = updateStrengthBuilderAchievement(set);
@@ -704,7 +710,7 @@ export const addWorkout =async (userID:string | null, date: string, workout: Exe
     if (typeof updatedDedicatedAthleteAchievement === 'object' && updatedDedicatedAthleteAchievement !== null){
         if (updatedDedicatedAthleteAchievement as Achievement)
             updateAchievementStatus(userID, updatedDedicatedAthleteAchievement);
-    }      addExperience(userID, xpToAdd);
+    }      addExperience(userID, xpToAdd, date, week);
     
 }
 

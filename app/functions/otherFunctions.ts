@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import { deleteSet } from "./databaseQueries";
-import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser } from "../types and interfaces/types";
+import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser, WeekRange } from "../types and interfaces/types";
 
 export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     let currentExperience = 0;
@@ -47,7 +47,7 @@ export const  removeXP = (repOrTime: number, weight: number): number => {
         return currentExperience;
 };
 
-export const showDeleteConfirmation = (userID: string | null, exerciseName: string, exerciseID: number, setID: number, xpDelete: number): void => {
+export const showDeleteConfirmation = (userID: string | null, exerciseName: string, exerciseID: number, setID: number, xpDelete: number, date: string, week: WeekRange): void => {
   Alert.alert(
       'Delete Item',
       'Are you sure you want to delete this item?',
@@ -57,7 +57,7 @@ export const showDeleteConfirmation = (userID: string | null, exerciseName: stri
       },
       {
         text: 'Delete',
-        onPress: () => { deleteSet(userID, exerciseName, exerciseID,  setID, xpDelete)},
+        onPress: () => { deleteSet(userID, exerciseName, exerciseID,  setID, xpDelete, date, week)},
       }],
       { cancelable: false }
     );
@@ -101,7 +101,7 @@ export const isDecreasing = (array: number[]): boolean => {
 export const handleAddButton = (time: number, setTime: Function, reps: number, setReps: Function,
                                  restTime: number, setRestTime: Function, side: string, setSide: Function, 
                                  weight: number, setWeight: Function, currentExercise: ExerciseSelectOption,
-                                setCurrentExercise: Function, sets: ExerciseSet, setIsEnabled: Function,
+                                 sets: ExerciseSet, setIsEnabled: Function,
                                 selectedExercises:ExerciseSelectOption[]): void => {
     if (currentExercise.isometric && (time === 0 || Number.isNaN(time)))
       throw new Error("time field cannot be empty for isometric exercises");
@@ -110,7 +110,7 @@ export const handleAddButton = (time: number, setTime: Function, reps: number, s
     else {
         sets.exercise.push(currentExercise.value);
         Number.isNaN(reps) ? sets.reps.push(0) : sets.reps.push(reps) ;
-        Number.isNaN(restTime) ? sets.restTimes.push(0) : sets.restTimes.push(restTime) ;
+        Number.isNaN(restTime) ? sets.restTimes.push(0) : sets.restTimes.push(restTime * 60) ;
         sets.sides.push(side);
         Number.isNaN(time) ? sets.times.push(0) : sets.times.push(time) ;
         Number.isNaN(weight) ? sets.weights.push(0) : sets.weights.push(weight) ;

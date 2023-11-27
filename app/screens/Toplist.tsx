@@ -2,15 +2,17 @@ import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View }
 import React, { useContext, useEffect, useState } from 'react'
 import { getAllUsers, updateClimbingTheRanksAchievement } from '../functions/databaseQueries';
 import UserContext from '../contexts/UserContext';
-import { MyUser, WeekRange  } from '../types and interfaces/types';
+import { MyUser  } from '../types and interfaces/types';
 import { RouterProps } from '../types and interfaces/interfaces';
 import { selectLoggedInUser, selectSimilarUsers, sortUsers } from '../functions/otherFunctions';
 import { backgroundImage, globalStyles } from '../assets/styles';
+import WeekContext from '../contexts/WeekContext';
 
 
 
 const Toplist = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
+  const week = useContext(WeekContext);
   const [users, setUsers] = useState<MyUser[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -50,49 +52,14 @@ const Toplist = ({navigation}: RouterProps) => {
   })
 
 
-  const [week, setWeek] = useState<WeekRange>({
-    start: "",
-    end: ""
-  })
-
-  const [today, setToday] = useState(new Date());
-  useEffect(() => {
-    setWeek(calculateWeekRange(today))
-  }, [today])
   
-
-  function calculateWeekRange(today:Date): WeekRange {
-    const week = {
-      start: "",
-      end: ""  
-    };
-    let moveBack = 0;
-    let moveForward = 6;
-    for (let i = 0; i <= 6; i++) {      
-      if (today.getDay() === i) {
-        week.start = addDaysToDate(today,-moveBack-6).toDateString()
-        week.end = addDaysToDate(today,moveForward-6).toDateString()
-        break;
-      }
-      moveBack++;
-      moveForward--;
-    }
-    
-    return week;
-  }
-
-  function addDaysToDate(date:Date, daysToAdd:number) {
-    const newDate = new Date(date);
-    newDate.setDate(date.getDate() + daysToAdd);
-    return newDate;
-  }
   
   
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={[globalStyles.container, {flex: 1}]}>
-        <Text style={[globalStyles.label, {marginTop: 100, marginBottom: 20, fontSize: 17}]}>{week.start} - {week.end}</Text>
+        {week !== null && <Text style={[globalStyles.label, {marginTop: 100, marginBottom: 20, fontSize: 17}]}>{week.start} - {week.end}</Text>}
         {loading
         ? <ActivityIndicator/>
         :  <ScrollView contentContainerStyle={{ backgroundColor: "rgba(255,0,0,0.7)" }}>

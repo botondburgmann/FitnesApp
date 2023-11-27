@@ -7,6 +7,7 @@ import {Exercise, ExerciseSelectOption, ExerciseSet } from '../types and interfa
 import { addXP, handleAddButton } from '../functions/otherFunctions'
 import { NavigationProp } from '@react-navigation/native'
 import { backgroundImage, globalStyles } from '../assets/styles'
+import WeekContext from '../contexts/WeekContext'
 
 interface RouterProps {
   route: any,
@@ -15,6 +16,7 @@ interface RouterProps {
 
 const AddWorkout = ({ route, navigation }: RouterProps) => {
   const userID = useContext(UserContext);
+  const week = useContext(WeekContext);
 
 
   const { date } = route?.params;
@@ -23,7 +25,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
   const [currentExercise, setCurrentExercise] = useState<ExerciseSelectOption>({
     label: "",
     value: "",
-    unilateral: true,
+    unilateral: false,
     isometric: false
   });
   const [selectedExercises, setSelectedExercises] = useState<ExerciseSelectOption[]>([]);
@@ -71,6 +73,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
   useEffect(() => {
     if (currentExercise.unilateral)
       setSide("left");
+  
     else if (!currentExercise.unilateral)
       setSide("both");
   }, [currentExercise])
@@ -95,8 +98,8 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
           else
             experience = addXP(false, sets);
         }
-        
-        addSet(userID, date, sets, experience);
+        if (week !== null) 
+          addSet(userID, date, sets, experience, week);
       setSets({
         exercise : [],
         weights: [],
@@ -175,14 +178,14 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
               keyboardType='numeric'
               style={globalStyles.input}
               value={restTime}
-              placeholder="Rest time (in seconds)"
+              placeholder="Rest time (in minutes)"
               autoCapitalize='none'
               onChangeText={(text) => setRestTime(text)}
             />
             <View style={styles.gridContainer}>
               <Pressable style={[globalStyles.button, { width: 100}]} onPress={() => handleAddButton(parseInt(time), setTime, parseFloat(reps), setReps,
                                                                               parseInt(restTime), setRestTime, side, setSide,parseFloat(weight), setWeight,
-                                                                              currentExercise, setCurrentExercise, sets, setIsEnabled, selectedExercises)}>
+                                                                              currentExercise, sets, setIsEnabled, selectedExercises)}>
                   <Text style={globalStyles.buttonText}>Add set</Text>
               </Pressable>
               <Pressable style={[globalStyles.button, { width: 100}]} onPress={() => handleFinishButton(selectedExercises, sets)}>

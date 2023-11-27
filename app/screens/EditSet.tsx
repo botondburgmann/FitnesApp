@@ -6,6 +6,8 @@ import UserContext from '../contexts/UserContext';
 import { addXPForOneSet, removeXP } from '../functions/otherFunctions';
 import { backgroundImage, globalStyles } from '../assets/styles';
 import { SetChange } from '../types and interfaces/types';
+import WeekContext from '../contexts/WeekContext';
+import DateContext from '../contexts/DateContext';
 
 
 interface RouterProps {
@@ -15,6 +17,8 @@ interface RouterProps {
 
 const EditSet = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
+    const week = useContext(WeekContext);
+    const date = useContext(DateContext);
 
     const { set, exerciseID, setID, isIsometric} = route?.params; 
     const [weight, setWeight] = useState<string>(set.weight.toString());
@@ -52,15 +56,15 @@ const EditSet = ({ route, navigation }: RouterProps) => {
         if (isIsometric) {
             if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) 
                 alert("Time field cannot be empty");
-            else{
-                editSet(userID,set.exercise,exerciseID,setID,changeIsometric, (addXPForOneSet(isIsometric, changeIsometric)+removeXP(set.time, set.weight)))
+            else if (date !== null && week !== null){
+                editSet(userID,set.exercise,exerciseID,setID,changeIsometric, (addXPForOneSet(isIsometric, changeIsometric)+removeXP(set.time, set.weight)), date, week)
                 navigation.navigate("Log")
             }
         } else {
             if (changeNormal.reps === 0 || Number.isNaN(changeNormal.reps))
                 alert("Reps field cannot be empty"); 
-            else{
-                editSet(userID,set.exercise, exerciseID, setID,changeNormal, (addXPForOneSet(isIsometric, changeNormal)+removeXP(set.reps, set.weight)))
+            else if(date !== null && week !== null){
+                editSet(userID,set.exercise, exerciseID, setID,changeNormal, (addXPForOneSet(isIsometric, changeNormal)+removeXP(set.reps, set.weight)), date, week)
                 navigation.navigate("Log")
             }
         }

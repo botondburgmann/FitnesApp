@@ -5,11 +5,15 @@ import UserContext from '../contexts/UserContext';
 import { Exercise, Outputs } from '../types and interfaces/types';
 import { globalStyles } from '../assets/styles';
 import NavigationContext from '../contexts/NavigationContext';
+import WeekContext from '../contexts/WeekContext';
+import DateContext from '../contexts/DateContext';
 
 const IsometricExercise = (props: { exercise: Exercise; exerciseID: number; }) => {
 
     const userID = useContext(UserContext);
     const navigation = useContext(NavigationContext);
+    const week = useContext(WeekContext);
+    const date = useContext(DateContext);
 
     const exercise: Exercise = props.exercise;
     const exerciseID: number = props.exerciseID;
@@ -80,7 +84,7 @@ const IsometricExercise = (props: { exercise: Exercise; exerciseID: number; }) =
                     time: exercise.times[index],
                     weight: exercise.weights[index],
                     }, exerciseID: exerciseID, setID: index, isIsometric: false})}} 
-                onLongPress={() => showDeleteConfirmation(userID, exercise.exercise[index], exerciseID, index, removeXP(exercise.times[index],exercise.weights[index]))}                                
+                onLongPress={() => {date !== null && week !== null && showDeleteConfirmation(userID, exercise.exercise[index], exerciseID, index, removeXP(exercise.times[index],exercise.weights[index]), date, week)}}                                
             >
                 <Text style={[globalStyles.text, {lineHeight: 35}]}>{second}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]}</Text>
                 { exercise.restTimes[index] > 0
