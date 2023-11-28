@@ -9,7 +9,7 @@ const Rest = (props: { setGoToNextPage: Function; currentExercise: ExerciseSet; 
   const setGoToNextPage = props.setGoToNextPage
   const currentExercise: ExerciseSet = props.currentExercise;
   const exercise = props.exercise;
-  const duration = exercise.musclesWorked.length > 1 ? 180 : 120;
+  const duration = exercise.musclesWorked.length > 1 ? 1 : 2;
 
   return (
     <View style={styles.container}>
@@ -17,13 +17,13 @@ const Rest = (props: { setGoToNextPage: Function; currentExercise: ExerciseSet; 
       <CountdownCircleTimer
         isPlaying
         duration={duration}
-        colors={['#FFf0000', '#FF0000', '#FF0000', '#FF0000']}
+        colors={['#FF0000', '#FF0000', '#FF0000', '#FF0000']}
         colorsTime={[30, 25, 10, 0]}
         onComplete={() => {
           if (exercise.unilateral)
-            currentExercise.restTimes.push(...[0, duration]);
+            currentExercise.restTimes.push(...[0, duration*60]);
           else                
-            currentExercise.restTimes.push(duration);
+            currentExercise.restTimes.push(duration*60);
           setGoToNextPage(true)
         }}
       >

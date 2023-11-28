@@ -97,6 +97,7 @@ const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Functi
             />
         </>
         }
+        <Text style={[globalStyles.text, { fontWeight: "600", marginHorizontal: 10}]}>For maximum efficency choose a weight that makes you fail in these repetiton ranges</Text>
         <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleCompleteSetButton(exercise, parseFloat(weight), 
                                                                                 parseFloat(time),
                                                                                 parseFloat(reps))}>

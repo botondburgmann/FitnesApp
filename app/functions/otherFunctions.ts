@@ -1,5 +1,5 @@
 import { Alert } from "react-native";
-import { deleteSet, setUpProfile } from "./firebaseFunctions";
+import { addWorkout, deleteSet, setUpProfile } from "./firebaseFunctions";
 import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser, SelectItem, SetChange, WeekRange } from "../types and interfaces/types";
 import { NavigationProp } from "@react-navigation/native";
 
@@ -270,4 +270,11 @@ export const dateStep = (currentDate: Date, step: number): Date => {
   return newDate
 };
 
-
+export const handleFinishWorkoutButton = (workout: ExerciseSet[], userID: string | null, date: string, totalXP: number, navigation: NavigationProp<any, any>, week: WeekRange ): void => {    
+  if (week !== null) {
+    console.log(workout);
+    
+    addWorkout(userID, date, workout, totalXP, week );
+    navigation.navigate("Log");
+  }
+}

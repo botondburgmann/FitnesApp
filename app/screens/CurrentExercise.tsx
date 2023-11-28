@@ -1,17 +1,17 @@
-import { ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import UserContext from '../contexts/UserContext';
-import {  addWorkout, getExercisesByFocus, getUser } from '../functions/firebaseFunctions';
+import { getExercisesByFocus, getUser } from '../functions/firebaseFunctions';
 import { Exercise, ExerciseSet, MuscleGroups } from '../types and interfaces/types';
 import Set from '../components/Set';
 import Rest from '../components/Rest';
-import { addXP, calculateNumberOfSet, chooseExercises } from '../functions/otherFunctions';
+import { addXP, calculateNumberOfSet, chooseExercises, handleFinishWorkoutButton } from '../functions/otherFunctions';
 import { NavigationProp } from '@react-navigation/native';
 import { backgroundImage, globalStyles } from '../assets/styles';
 import WeekContext from '../contexts/WeekContext';
 
 
-interface RouterProps {
+type RouterProps = {
   route: any,
   navigation: NavigationProp<any, any>;
 }
@@ -115,53 +115,48 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
   }, [loadingExercises, loadingUser])
 
 
+  useEffect(() => {
+    if (goToNextPage) {
+      if (currentIndex < workoutComponents.length-1)
+        setCurrentIndex(currentIndex+1);
+      else if (currentIndex === workoutComponents.length-1){
+        setEndofWorkout(true)
+        if (currentExercise.current.sides[currentExercise.current.sides.length-1] === "right")
+          currentExercise.current.restTimes.push(...[0,0]);
+        else
+          currentExercise.current.restTimes.push(0);
+      }    
 
-
-useEffect(() => {
-  if (goToNextPage) {
-    if (currentIndex < workoutComponents.length-1)
-      setCurrentIndex(currentIndex+1);
-    else if (currentIndex === workoutComponents.length-1) {
-      
-      setEndofWorkout(true)
-      if (currentExercise.current.sides[currentExercise.current.sides.length-1] === "right")
-        currentExercise.current.restTimes.push(...[0,0]);
-      else
-        currentExercise.current.restTimes.push(0);
-      
-      const resultArray = currentExercise.current.exercise.reduce((acc: ExerciseSet[], _, index) => {
-        const exerciseName = currentExercise.current.exercise[index];
-      
-        const existingExercise = acc.find((item) => (item as { exercise: string[] }).exercise[0] === exerciseName);
-      
-        if (existingExercise) {
-          Object.keys(currentExercise.current).forEach((key) => {
-            const existingExercise = acc.find((item) => (item as { [key: string]: any })[key] === exerciseName);
-            if (existingExercise) {
-              const existingExerciseKey = existingExercise[key] as any[];
-              existingExerciseKey.push(currentExercise.current[key][index]);
-            }
-                      });
-        } else {
-          const newExercise: ExerciseSet = {
-            exercise: [],
-            weights: [],
-            reps: [],
-            times: [],
-            restTimes: [],
-            sides: []
-          };
-          Object.keys(currentExercise.current).forEach((key) => {
-            newExercise[key] = [currentExercise.current[key][index]];
-          });
-          acc.push(newExercise);
+      const newExercise: ExerciseSet = {
+        exercise: [],
+        reps: [],
+        restTimes: [],
+        sides: [],
+        times: [],
+        weights: []
+      };
+      for (let i = 0; i < currentExercise.current.exercise.length; i++) {
+        if (currentExercise.current.exercise[i] !== currentExercise.current.exercise[i-1] && i > 0) {
+          workout.current.push(newExercise)          
+          currentExercise.current.exercise.splice(0, currentExercise.current.exercise.length-1)
+          currentExercise.current.reps.splice(0, currentExercise.current.reps.length-1)
+          currentExercise.current.restTimes.splice(0, currentExercise.current.restTimes.length-1)
+          currentExercise.current.sides.splice(0, currentExercise.current.sides.length-1)
+          currentExercise.current.times.splice(0, currentExercise.current.times.length-1)
+          currentExercise.current.weights.splice(0, currentExercise.current.weights.length-1)
+        }
+        else{
+          
+          newExercise.exercise.push(currentExercise.current.exercise[i])
+          newExercise.reps.push(currentExercise.current.reps[i])
+          newExercise.restTimes.push(currentExercise.current.restTimes[i])
+          newExercise.sides.push(currentExercise.current.sides[i])
+          newExercise.times.push(currentExercise.current.times[i])
+          newExercise.weights.push(currentExercise.current.weights[i])
         }
       
-        return acc;
-      }, []);
-      
-      workout.current = resultArray
-      
+      }
+             
       for (const exercise of workout.current) {
         if (exercise.reps[0] === 0) 
           totalXP.current += addXP(true, exercise);
@@ -169,20 +164,15 @@ useEffect(() => {
           totalXP.current += addXP(false, exercise);
       }
 
-    } 
-    
-    
-    
-    setGoToNextPage(false)
-  }
-}, [goToNextPage]) 
-
-  function handleFinishWorkoutButton(workout: ExerciseSet[], userID: string | null, date: string, totalXP: number, navigation: NavigationProp<any, any> ): void {    
-    if (week !== null) {
-      addWorkout(userID, date, workout, totalXP, week );
-      navigation.navigate("Log");
+ 
+      
+      
+      
+      setGoToNextPage(false)
     }
-  }
+  }, [goToNextPage]) 
+
+
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
@@ -196,9 +186,10 @@ useEffect(() => {
                   {workoutComponents[currentIndex]}
                 </ScrollView>
               : <View>
-                  <Text style={styles.text}>Congrats</Text>
-                  <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleFinishWorkoutButton(workout.current, userID, new Date().toDateString(), totalXP.current, navigation)}>
-                      <Text style={globalStyles.buttonText}>Next</Text>
+                  <Text style={globalStyles.label}>Congratulations!</Text>
+                  <Text style={globalStyles.label}>You completed the workout.</Text>
+                  <Pressable style={[globalStyles.button, {width: 200}]} onPress={() =>{week !== null && handleFinishWorkoutButton(workout.current, userID, new Date().toDateString(), totalXP.current, navigation, week)}}>
+                      <Text style={globalStyles.buttonText}>Go to homepage</Text>
                   </Pressable>
                 </View>
         }
@@ -208,14 +199,3 @@ useEffect(() => {
 }
 
 export default CurrentExercise
-
-const styles = StyleSheet.create({
-  text:{
-      alignSelf: 'center',
-      fontSize: 18,
-      color: "#fff",
-      textTransform: 'uppercase',
-      fontWeight: "600",
-      paddingVertical: 10,
-  },
-});
