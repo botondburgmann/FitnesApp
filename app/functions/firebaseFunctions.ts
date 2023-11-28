@@ -147,19 +147,19 @@ export const getAvailableExercises = (userID: string | null, callback: Function)
     }
 };
 
-export const getExercise = (userID: string | null, exerciseName: string, callback: Function): Unsubscribe => {
+export const getExercise = (userID: string | null, exerciseName: string, callback: Function): Unsubscribe | undefined=> {
 
     const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
     const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
 
     const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutSnapshot => {
+        const exerciseRecords: ExerciseRecords = {
+            weights: [],
+            reps: [],
+            times: [],
+            dates: [],
+        }
         if (!workoutSnapshot.empty) {
-            const exerciseRecords: ExerciseRecords = {
-                weights: [],
-                reps: [],
-                times: [],
-                dates: [],
-            }
             workoutSnapshot.docs.forEach(workoutDoc => {
                 for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
                     let set = workoutDoc.data().Workout[i];                    
@@ -171,9 +171,10 @@ export const getExercise = (userID: string | null, exerciseName: string, callbac
                             exerciseRecords.dates.push(workoutDoc.data().date)
                         }
                 }
-            })            
-            callback(exerciseRecords);    
+            })
+                        
         }
+        callback(exerciseRecords);    
     })
     return unsubscribeFromWorkouts;
 };

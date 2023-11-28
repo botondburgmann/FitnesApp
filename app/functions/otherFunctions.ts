@@ -1,5 +1,5 @@
 import { Alert } from "react-native";
-import { addWorkout, deleteSet, setUpProfile } from "./firebaseFunctions";
+import { addSet, addWorkout, deleteSet, setUpProfile } from "./firebaseFunctions";
 import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser, SelectItem, SetChange, WeekRange } from "../types and interfaces/types";
 import { NavigationProp } from "@react-navigation/native";
 
@@ -141,9 +141,9 @@ export const handleAddButton = (time: number, setTime: Function, reps: number, s
                                  sets: ExerciseSet, setIsEnabled: Function,
                                 selectedExercises:ExerciseSelectOption[]): void => {
     if (currentExercise.isometric && (time === 0 || Number.isNaN(time)))
-      throw new Error("time field cannot be empty for isometric exercises");
+      alert("Error: time field cannot be empty for isometric exercises");
     if (!currentExercise.isometric && (reps === 0 || Number.isNaN(reps)))
-      throw new Error("reps field cannot be empty for non-isometric exercises");
+      alert("Error: Reps field cannot be empty for non-isometric exercises");
     else {
         sets.exercise.push(currentExercise.value);
         Number.isNaN(reps) ? sets.reps.push(0) : sets.reps.push(reps) ;
@@ -271,10 +271,38 @@ export const dateStep = (currentDate: Date, step: number): Date => {
 };
 
 export const handleFinishWorkoutButton = (workout: ExerciseSet[], userID: string | null, date: string, totalXP: number, navigation: NavigationProp<any, any>, week: WeekRange ): void => {    
-  if (week !== null) {
-    console.log(workout);
-    
-    addWorkout(userID, date, workout, totalXP, week );
-    navigation.navigate("Log");
+  try {
+    if (week !== null) {      
+      addWorkout(userID, date, workout, totalXP, week );
+      navigation.navigate("Log");
+    }
+  } catch (error) {
+    alert(`Error: Couldn't finish workout: ${error}`)
+  }
+}
+
+export const handleFinishButton = (userID: string | null, date: string, week: WeekRange, selectedExercises: ExerciseSelectOption[], setSelectedExercises: Function, sets: ExerciseSet, setSets: Function, navigation: NavigationProp<any, any>): void => {
+  if (sets.exercise.length === 0)
+   alert("Error: Not enough data");
+  else{
+      let experience = 0;
+      for (const exercise of selectedExercises) {
+        if (exercise.isometric)
+          experience = addXP(true, sets);
+        else
+          experience = addXP(false, sets);
+      }
+      if (week !== null) 
+        addSet(userID, date, sets, experience, week);
+    setSets({
+      exercise : [],
+      weights: [],
+      reps: [],
+      times: [],
+      restTimes: [],
+      sides: []
+    });
+    setSelectedExercises([]);
+    navigation.navigate("Log")
   }
 }

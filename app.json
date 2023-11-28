@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "FitnessApp",
-    "slug": "FitnessApp",
+    "name": "Gym Gamer",
+    "slug": "gym-gamer",
+    "description": "This app is not an ordinary fitness app. Apart from logging their workouts, users can ask for workouts and have a fun, gamified experience.",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,6 +26,17 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "969065b5-59ba-43a5-aa7d-57ef8d815c97"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/969065b5-59ba-43a5-aa7d-57ef8d815c97"
     }
   }
 }

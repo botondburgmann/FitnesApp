@@ -1,15 +1,15 @@
 import { ImageBackground, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../components/SelectMenu'
-import { addSet, getAvailableExercises } from '../functions/firebaseFunctions'
+import {getAvailableExercises } from '../functions/firebaseFunctions'
 import UserContext from '../contexts/UserContext'
 import {Exercise, ExerciseSelectOption, ExerciseSet } from '../types and interfaces/types'
-import { addXP, handleAddButton } from '../functions/otherFunctions'
+import { handleAddButton, handleFinishButton } from '../functions/otherFunctions'
 import { NavigationProp } from '@react-navigation/native'
 import { backgroundImage, globalStyles } from '../assets/styles'
 import WeekContext from '../contexts/WeekContext'
 
-interface RouterProps {
+type RouterProps = {
   route: any,
   navigation: NavigationProp<any, any>;
 };
@@ -87,31 +87,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
     setIsEnabled(previousState => !previousState);
   }
 
-  function handleFinishButton(selectedExercises: ExerciseSelectOption[], sets: ExerciseSet): void {
-    if (sets.exercise.length === 0)
-      throw new Error("Not enough data");
-    else{
-        let experience = 0;
-        for (const exercise of selectedExercises) {
-          if (exercise.isometric)
-            experience = addXP(true, sets);
-          else
-            experience = addXP(false, sets);
-        }
-        if (week !== null) 
-          addSet(userID, date, sets, experience, week);
-      setSets({
-        exercise : [],
-        weights: [],
-        reps: [],
-        times: [],
-        restTimes: [],
-        sides: []
-      });
-      setSelectedExercises([]);
-      navigation.navigate("Log")
-    }
-  }
+  
 
   
 
@@ -188,7 +164,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
                                                                               currentExercise, sets, setIsEnabled, selectedExercises)}>
                   <Text style={globalStyles.buttonText}>Add set</Text>
               </Pressable>
-              <Pressable style={[globalStyles.button, { width: 100}]} onPress={() => handleFinishButton(selectedExercises, sets)}>
+              <Pressable style={[globalStyles.button, { width: 100}]} onPress={() => {week !== null && handleFinishButton(userID,date, week, selectedExercises, setSelectedExercises, sets, setSets, navigation)}}>
                   <Text style={globalStyles.buttonText}>Finish</Text>
               </Pressable>
             </View>
