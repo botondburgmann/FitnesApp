@@ -21,9 +21,9 @@ const Rest = (props: { setGoToNextPage: Function; currentExercise: ExerciseSet; 
         colorsTime={[30, 25, 10, 0]}
         onComplete={() => {
           if (exercise.unilateral)
-            currentExercise.restTimes.push(...[0, duration*60]);
+            currentExercise.restTimes.push(...[0, duration]);
           else                
-            currentExercise.restTimes.push(duration*60);
+            currentExercise.restTimes.push(duration);
           setGoToNextPage(true)
         }}
       >

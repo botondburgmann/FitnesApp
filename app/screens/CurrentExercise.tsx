@@ -121,10 +121,9 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
         setCurrentIndex(currentIndex+1);
       else if (currentIndex === workoutComponents.length-1){
         setEndofWorkout(true)
-        if (currentExercise.current.sides[currentExercise.current.sides.length-1] === "right")
-          currentExercise.current.restTimes.push(...[0,0]);
-        else
-          currentExercise.current.restTimes.push(0);
+        workout.current.push(currentExercise.current)       
+
+        
       }    
 
       const newExercise: ExerciseSet = {
@@ -136,14 +135,20 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
         weights: []
       };
       for (let i = 0; i < currentExercise.current.exercise.length; i++) {
-        if (currentExercise.current.exercise[i] !== currentExercise.current.exercise[i-1] && i > 0) {
-          workout.current.push(newExercise)          
+        if (currentExercise.current.exercise[i] !== currentExercise.current.exercise[i-1] && i > 0) {          
+          console.log(newExercise);
+          workout.current.push(newExercise)             
+          console.log(workout.current);
+     
           currentExercise.current.exercise.splice(0, currentExercise.current.exercise.length-1)
           currentExercise.current.reps.splice(0, currentExercise.current.reps.length-1)
           currentExercise.current.restTimes.splice(0, currentExercise.current.restTimes.length-1)
           currentExercise.current.sides.splice(0, currentExercise.current.sides.length-1)
           currentExercise.current.times.splice(0, currentExercise.current.times.length-1)
-          currentExercise.current.weights.splice(0, currentExercise.current.weights.length-1)
+          currentExercise.current.weights.splice(0, currentExercise.current.weights.length-1)        
+        
+          console.log(currentExercise.current);
+          
         }
         else{
           
