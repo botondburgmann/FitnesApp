@@ -1,13 +1,11 @@
 import { View, StyleSheet, Pressable, Text, ImageBackground } from 'react-native'
 import React, { useContext, useState } from 'react'
-import { setUpProfile } from '../functions/databaseQueries';
 import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
 import { SelectItem } from '../types and interfaces/types';
-import { RouterProps } from '../types and interfaces/interfaces';
+import { RouterProps } from '../types and interfaces/types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { backgroundImage, globalStyles } from '../assets/styles';
-import { NavigationProp } from '@react-navigation/native';
 import { handleNextButtonPress } from '../functions/otherFunctions';
 
 

@@ -1,9 +1,8 @@
 import { View, StyleSheet, TextInput, ActivityIndicator, Pressable, Text, ImageBackground } from 'react-native'
 import React, { useState } from 'react'
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
-import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
-import { RouterProps } from '../types and interfaces/interfaces';
 import { backgroundImage, globalStyles } from '../assets/styles';
+import { signIn } from '../functions/firebaseFunctions';
+import { RouterProps } from '../types and interfaces/types';
 
 
 
@@ -11,26 +10,8 @@ const Login = ({navigation}: RouterProps) => {
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const [loading, setLoading] = useState(false);
-  const auth: Auth = FIREBASE_AUTH;
 
-  async function signIn(setLoading: Function, email: string | undefined, password: string | undefined, auth: Auth): Promise<void> {
-    setLoading(true);
-    try {
-      if (typeof email === "string" && typeof password === "string") {
-        await signInWithEmailAndPassword(auth, email, password);
-      }
-      else if (email === undefined && password === undefined)
-        alert("Error: Sign in failed: Please fill all the fields")
-      else if (email === undefined)
-        alert("Error: Sign in failed: Email raddress is required")
-    } 
-    catch (error:any) {
-      alert(`Error: Sign in failed: ${error.message}`);
-    }
-    finally {
-      setLoading(false);
-    } 
-  }
+
 
 
   return (
@@ -58,7 +39,7 @@ const Login = ({navigation}: RouterProps) => {
           <ActivityIndicator size="large" color="#0000ff"/>
         :
           <>
-            <Pressable style={globalStyles.button} onPress={() => signIn(setLoading, email, password, auth)}>
+            <Pressable style={globalStyles.button} onPress={() => signIn(setLoading, email, password)}>
               <Text  style={globalStyles.buttonText}>Login</Text>
             </Pressable>
             <Text style={[globalStyles.text, {marginTop: 30, fontSize: 18, textTransform: "uppercase"}]}>Not registered yet</Text>

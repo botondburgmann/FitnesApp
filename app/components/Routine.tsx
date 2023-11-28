@@ -1,6 +1,6 @@
 import { StyleSheet, Text, Pressable } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { getUser } from '../functions/databaseQueries';
+import { getUser } from '../functions/firebaseFunctions';
 import UserContext from '../contexts/UserContext';
 import NavigationContext from '../contexts/NavigationContext';
 import { globalStyles } from '../assets/styles';

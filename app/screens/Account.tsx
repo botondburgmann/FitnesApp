@@ -1,7 +1,7 @@
 import { ImageBackground, Pressable, Text, View } from "react-native"
 import React, { useContext, useEffect, useState } from "react"
 import { FIREBASE_AUTH } from "../../FirebaseConfig"
-import { getUser, getBestExercise } from "../functions/databaseQueries"
+import { getUser, getBestExercise } from "../functions/firebaseFunctions"
 import UserContext from "../contexts/UserContext";
 import { NavigationProp } from "@react-navigation/native";
 import { MyUser, BestExercise } from "../types and interfaces/types";

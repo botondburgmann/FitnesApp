@@ -2,7 +2,7 @@ import { View, TextInput, StyleSheet, Pressable, Text, ImageBackground } from 'r
 import React, { useContext, useState } from 'react'
 import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
-import { RouterProps } from '../types and interfaces/interfaces';
+import { RouterProps } from '../types and interfaces/types';
 import { SelectItem } from '../types and interfaces/types';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { backgroundImage, globalStyles } from '../assets/styles';

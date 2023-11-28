@@ -2,7 +2,7 @@ import { ActivityIndicator, ImageBackground, ScrollView, StyleSheet, Text, View 
 import React, { useContext, useEffect, useState } from "react"
 import { NavigationProp } from "@react-navigation/native";
 import {BestExercise, ExerciseRecords, TableRow, TableState } from "../types and interfaces/types";
-import { getExercise } from "../functions/databaseQueries";
+import { getExercise } from "../functions/firebaseFunctions";
 import UserContext from "../contexts/UserContext";
 import {Table, Row, Rows} from "react-native-table-component"
 import { backgroundImage, globalStyles } from "../assets/styles";

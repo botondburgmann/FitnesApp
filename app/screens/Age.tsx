@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, Pressable, ImageBackground } from 'react-native'
 import React, { useContext, useState } from 'react'
-import { setUpProfile } from '../functions/databaseQueries';
+import { setUpProfile } from '../functions/firebaseFunctions';
 import Datepicker from '../components/Datepicker';
 import UserContext from '../contexts/UserContext';
-import { RouterProps } from '../types and interfaces/interfaces';
+import { RouterProps } from '../types and interfaces/types';
 import { backgroundImage, globalStyles } from '../assets/styles';
 
 

@@ -1,7 +1,7 @@
 import { ImageBackground, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
-import { editSet } from '../functions/databaseQueries';
+import { editSet } from '../functions/firebaseFunctions';
 import UserContext from '../contexts/UserContext';
 import { addXPForOneSet, removeXP } from '../functions/otherFunctions';
 import { backgroundImage, globalStyles } from '../assets/styles';
@@ -119,7 +119,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                     autoCapitalize='none'
                     onChangeText={(text: string) => setTime(text)}
                 />
-                <Text style={[globalStyles.text, {textTransform: "uppercase", paddingVertical: 10, fontWeight: "800"}]}>Rest time (seconds)</Text>
+                <Text style={[globalStyles.text, {textTransform: "uppercase", paddingVertical: 10, fontWeight: "800"}]}>Rest time (minutes)</Text>
                 <TextInput
                     keyboardType='numeric'
                     style={globalStyles.input}

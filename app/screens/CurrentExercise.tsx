@@ -1,7 +1,7 @@
 import { ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import UserContext from '../contexts/UserContext';
-import {  addWorkout, getExercisesByFocus, getUser } from '../functions/databaseQueries';
+import {  addWorkout, getExercisesByFocus, getUser } from '../functions/firebaseFunctions';
 import { Exercise, ExerciseSet, MuscleGroups } from '../types and interfaces/types';
 import Set from '../components/Set';
 import Rest from '../components/Rest';

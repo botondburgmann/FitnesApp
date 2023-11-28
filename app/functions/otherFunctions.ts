@@ -1,5 +1,5 @@
 import { Alert } from "react-native";
-import { deleteSet, setUpProfile } from "./databaseQueries";
+import { deleteSet, setUpProfile } from "./firebaseFunctions";
 import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser, SelectItem, SetChange, WeekRange } from "../types and interfaces/types";
 import { NavigationProp } from "@react-navigation/native";
 
@@ -58,7 +58,6 @@ export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
 
 export const addXPForOneSet = (isIsometric: boolean, set: SetChange): number => {
     let currentExperience = 0
-    console.log(set);
     if (!isIsometric && set.rep !== undefined) {
         if (set.weight === 0 && Number.isNaN(set.weight))
             currentExperience += set.rep;
@@ -121,18 +120,18 @@ export const calculateNumberOfSets = (sides: string[], uniqueExerciseLength: num
     return isSuperSet(restTimes, uniqueExerciseLength) ? numberOfSet/uniqueExerciseLength : numberOfSet;
 };
 
-export const isDropsSet =(restTimes: number[], reps: number[], weights: number[], uniqueExerciseLength: number): boolean => {
-    for (let i = 0; i < restTimes.length-1; i++) 
-        if (restTimes[i] > 0) 
-            return false;
-    if (!(uniqueExerciseLength === 1 && reps.length > 1 && isDecreasing(weights)))
-        return false;
+export const isDropsSet =(restTimes: number[], repsOrTimes: number[], weights: number[], uniqueExerciseLength: number): boolean => {
+  if (restTimes.length === 1 )
+    return false;
+  for (let i = 0; i < restTimes.length-1; i++) 
+    if (!(uniqueExerciseLength === 1 && repsOrTimes.length > 1 && isDecreasing(weights) && restTimes[i] === 0))
+      return false;
     return true;
 };
 
-export const isDecreasing = (array: number[]): boolean => {
+export const isDecreasing = (array: number[]): boolean => {  
     for (let i = 1; i <= array.length; i++)
-        if (array[i-1] < array[i] )
+        if (array[i-1] <= array[i] )
             return false;
     return true;
 };

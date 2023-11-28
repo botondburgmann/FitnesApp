@@ -1,7 +1,13 @@
+import { NavigationProp } from "@react-navigation/native";
+
+export type RouterProps = {
+    navigation: NavigationProp<any, any>;
+}
+
 export type SelectItem = {
     label: string
     value: string
-  }
+}
 
 export type MaxValueAndIndex = {
     value: number;

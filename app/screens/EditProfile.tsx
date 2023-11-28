@@ -1,7 +1,7 @@
 import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
-import { editProfile } from '../functions/databaseQueries';
+import { editProfile } from '../functions/firebaseFunctions';
 import UserContext from '../contexts/UserContext';
 import Datepicker from '../components/Datepicker';
 import Radiobutton from '../components/Radiobutton';

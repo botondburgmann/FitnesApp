@@ -1,6 +1,6 @@
-import { Auth, createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { DocumentData, Unsubscribe, addDoc, collection, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
-import { FIRESTORE_DB } from "../../FirebaseConfig";
+import { FIREBASE_AUTH, FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 import { validateActivityLevel, validateAge, validateExerciseSet, validateExperience, validateGender, validateHeight, validateWeight } from "./validations";
 import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser, Achievement, SetChange, WeekRange } from "../types and interfaces/types";
@@ -321,9 +321,10 @@ export const getAchievementsForUser = (userID: string, callback: Function): Unsu
 };
 
 // setters
-export const signUp = async (name:string, setLoading:Function, auth:Auth, email:string, password:string): Promise<void> => {
+export const signUp = async (name:string, setLoading:Function, email:string, password:string): Promise<void> => {
     setLoading(true);
     try {
+        const auth = FIREBASE_AUTH;
         const response = await createUserWithEmailAndPassword(auth, email,password);
         const userData = {
             userID: response.user.uid, 
@@ -358,6 +359,26 @@ export const signUp = async (name:string, setLoading:Function, auth:Auth, email:
         setLoading(false);
     }
 }
+
+export const signIn = async (setLoading: Function, email: string | undefined, password: string | undefined): Promise<void> =>{
+    setLoading(true);
+    try {
+        const auth = FIREBASE_AUTH;
+      if (typeof email === "string" && typeof password === "string") {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+      else if (email === undefined && password === undefined)
+        throw new Error("Please fill all the fields")
+      else if (email === undefined)
+        throw new Error("Email raddress is required")
+    } 
+    catch (error:any) {
+      alert(`Error: Sign in failed: ${error.message}`);
+    }
+    finally {
+      setLoading(false);
+    } 
+  }
 
 export const setUpProfile =async (field:string, value:number | string | Date | SelectItem, userID:string | null, navigation:NavigationProp<any, any>, nextPage:string, system?: string): Promise<void> => {
     try {
@@ -547,7 +568,6 @@ export const toggleExerciseVisibilty =async (userID: string | null, exerciseName
             const updateData = {
                 hidden: !exercisesDoc.data().hidden
             };
-            console.log(`updating doc ${updateData.hidden}`);
             
             updateDoc(exercisesDoc.ref, updateData);
         })
@@ -988,7 +1008,7 @@ export const updateClimbingTheRanksAchievement = (loggedInUser: MyUser, users: M
             description: "Reach the top 3 place in the leaderboard to unlock next stage",
             icon: "arrow-up",
             level: 1,
-            name: "Climbing the Ranks",
+            name: "Climbing The Ranks",
             status: "Top 10 Challenger",
             visibility: 1
         }
@@ -1000,19 +1020,20 @@ export const updateClimbingTheRanksAchievement = (loggedInUser: MyUser, users: M
             description: "Reach the top 1 place in the leaderboard to unlock next stage",
             icon: "arrow-up",
             level: 2,
-            name: "Climbing the Ranks",
+            name: "Climbing The Ranks",
             status: "Top 3 Contender",
             visibility: 1
         }
         updateAchievementStatus(loggedInUser.userID, updatedAchievement);
     }
     if (users[0] === loggedInUser && loggedInUser.weeklyExperience > 0){
+        
         const updatedAchievement: Achievement = {
             color: "#FFDD43",
             description: "Max level achieved: Reach top 1 place in the leaderboard",
             icon: "arrow-up",
             level: 3,
-            name: "Climbing the Ranks",
+            name: "Climbing The Ranks",
             status: "Leaderboard Dominator",
             visibility: 1
         }
@@ -1104,7 +1125,6 @@ const initializeAchievements = async (userID: string | null): Promise<void> => {
                 break;
             }
             const updatedOwners = [...achievementDoc.data().owners, newOwner];
-            console.log(updatedOwners);
             
             const updatedData = {
                 owners: updatedOwners

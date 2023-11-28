@@ -1,9 +1,9 @@
 import {  ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../contexts/UserContext';
-import { getAllExercises, toggleExerciseVisibilty } from '../functions/databaseQueries';
+import { getAllExercises, toggleExerciseVisibilty } from '../functions/firebaseFunctions';
 import { Exercise } from '../types and interfaces/types';
-import { RouterProps } from '../types and interfaces/interfaces';
+import { RouterProps } from '../types and interfaces/types';
 import { backgroundImage, globalStyles } from '../assets/styles';
 
 const Exercises = ({navigation}: RouterProps) => {

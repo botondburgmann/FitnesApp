@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { backgroundImage, globalStyles } from '../assets/styles'
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Achievement } from '../types and interfaces/types';
-import { getAchievementsForUser } from '../functions/databaseQueries';
+import { getAchievementsForUser } from '../functions/firebaseFunctions';
 import Info from '../components/Info';
 
 

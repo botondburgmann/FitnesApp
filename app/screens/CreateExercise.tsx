@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react'
 import UserContext from '../contexts/UserContext';
 import { NavigationProp } from '@react-navigation/native';
 import Info from '../components/Info';
-import { createNewExercise } from '../functions/databaseQueries';
+import { createNewExercise } from '../functions/firebaseFunctions';
 import { backgroundImage, globalStyles } from '../assets/styles';
 
 interface RouterProps {

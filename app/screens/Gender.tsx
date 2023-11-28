@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import {  View, Pressable, Text, StyleSheet, ImageBackground } from "react-native";
 import Radiobutton from "../components/Radiobutton";
 import UserContext from "../contexts/UserContext";
-import { RouterProps } from "../types and interfaces/interfaces";
+import { RouterProps } from "../types and interfaces/types";
 import { backgroundImage, globalStyles } from "../assets/styles";
 import { handleNextButtonPress } from "../functions/otherFunctions";
 

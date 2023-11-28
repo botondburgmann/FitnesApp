@@ -1,10 +1,8 @@
 import { View, TextInput, ActivityIndicator, Pressable, Text, ImageBackground } from "react-native"
 import React, { useState } from "react"
-import { FIREBASE_AUTH } from "../../FirebaseConfig";
-import { signUp } from "../functions/databaseQueries";
-import { RouterProps } from "../types and interfaces/interfaces";
+import { signUp } from "../functions/firebaseFunctions";
+import { RouterProps } from "../types and interfaces/types";
 import { backgroundImage, globalStyles } from "../assets/styles";
-import { Auth } from "firebase/auth";
 
 
 
@@ -14,16 +12,15 @@ const Registration = ({navigation}: RouterProps) => {
     const [password, setPassword] = useState<string>();
     const [confirmPassword, setConfirmPassword] = useState<string>();
     const [loading, setLoading] = useState(false);
-    const auth = FIREBASE_AUTH;
     
-    function handleRegisterButtonPress(name:string | undefined, setLoading: Function, auth: Auth, email: string | undefined, password: string | undefined) {
+    function handleRegisterButtonPress(name:string | undefined, setLoading: Function, email: string | undefined, password: string | undefined) {
         if (name === undefined || email === undefined || password === undefined || confirmPassword === undefined)
             alert("Error: Please fill out all the fields")
         else if (password !== confirmPassword){
             alert("Error: Passwords do not match");
         }
         else{
-            signUp(name, setLoading, auth, email, password )
+            signUp(name, setLoading, email, password )
         }
     }
 
@@ -67,7 +64,7 @@ const Registration = ({navigation}: RouterProps) => {
                     <ActivityIndicator size="large" color="#0000ff"/>
                 :
                 <>
-                    <Pressable style={globalStyles.button} onPress={() => handleRegisterButtonPress(name, setLoading, auth, email, password) }>
+                    <Pressable style={globalStyles.button} onPress={() => handleRegisterButtonPress(name, setLoading, email, password) }>
                         <Text style={globalStyles.buttonText}>Create new account</Text>
                     </Pressable>
                     <Text style={[globalStyles.text, {marginTop: 30, fontSize: 18, textTransform: "uppercase"}]}>Already have an account</Text>

@@ -16,7 +16,7 @@ import Log from "./app/screens/Log";
 import AddWorkout from "./app/screens/AddWorkout";
 import Account from "./app/screens/Account";
 import Routines from "./app/screens/Routines";
-import { getSetUpValue } from "./app/functions/databaseQueries";
+import { getSetUpValue } from "./app/functions/firebaseFunctions";
 import Toplist from "./app/screens/Toplist";
 import Exercises from "./app/screens/Exercises";
 import Focus from "./app/screens/Focus";

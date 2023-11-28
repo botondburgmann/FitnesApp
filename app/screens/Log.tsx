@@ -2,7 +2,7 @@ import {ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'r
 import React, { useState } from 'react'
 import Datepicker from '../components/Datepicker'
 import DisplaySets from '../components/DisplaySets';
-import { RouterProps } from '../types and interfaces/interfaces';
+import { RouterProps } from '../types and interfaces/types';
 import NavigationContext from '../contexts/NavigationContext';
 import { backgroundImage, globalStyles } from '../assets/styles';
 import { AntDesign } from '@expo/vector-icons';

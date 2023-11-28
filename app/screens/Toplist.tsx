@@ -1,9 +1,9 @@
 import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { getAllUsers, updateClimbingTheRanksAchievement } from '../functions/databaseQueries';
+import { getAllUsers, updateClimbingTheRanksAchievement } from '../functions/firebaseFunctions';
 import UserContext from '../contexts/UserContext';
 import { MyUser  } from '../types and interfaces/types';
-import { RouterProps } from '../types and interfaces/interfaces';
+import { RouterProps } from '../types and interfaces/types';
 import { selectLoggedInUser, selectSimilarUsers, sortUsers } from '../functions/otherFunctions';
 import { backgroundImage, globalStyles } from '../assets/styles';
 import WeekContext from '../contexts/WeekContext';
@@ -22,7 +22,7 @@ const Toplist = ({navigation}: RouterProps) => {
       const sortedUsers = sortUsers(similarUsers);
       if (sortedUsers.length > 10){
         sortedUsers.splice(10,sortedUsers.length-10)
-      }
+      }      
       updateClimbingTheRanksAchievement(loggedInUser, sortedUsers);
       setUsers(sortedUsers);
       setLoading(false);

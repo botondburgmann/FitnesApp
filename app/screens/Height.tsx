@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react'
 import SelectMenu from '../components/SelectMenu';
 import UserContext from '../contexts/UserContext';
 import { SelectItem } from '../types and interfaces/types';
-import { RouterProps } from '../types and interfaces/interfaces';
+import { RouterProps } from '../types and interfaces/types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { backgroundImage, globalStyles } from '../assets/styles';
 import { handleNextButtonPress } from '../functions/otherFunctions';

@@ -17,7 +17,7 @@ const Rest = (props: { setGoToNextPage: Function; currentExercise: ExerciseSet; 
       <CountdownCircleTimer
         isPlaying
         duration={duration}
-        colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+        colors={['#FFf0000', '#FF0000', '#FF0000', '#FF0000']}
         colorsTime={[30, 25, 10, 0]}
         onComplete={() => {
           if (exercise.unilateral)

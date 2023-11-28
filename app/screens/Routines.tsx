@@ -2,7 +2,7 @@ import {ImageBackground, ScrollView, Text} from 'react-native'
 import React from 'react'
 import Routine from '../components/Routine';
 import NavigationContext from '../contexts/NavigationContext';
-import { RouterProps } from '../types and interfaces/interfaces';
+import { RouterProps } from '../types and interfaces/types';
 import { backgroundImage, globalStyles } from '../assets/styles';
 
 

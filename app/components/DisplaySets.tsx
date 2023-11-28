@@ -2,7 +2,7 @@ import { StyleSheet, View,Text } from 'react-native'
 import React, {useContext, useEffect, useState } from 'react'
 import NormalExercise from './NormalExercise';
 import IsometricExercise from './IsometricExercise';
-import { getWorkout } from '../functions/databaseQueries';
+import { getWorkout } from '../functions/firebaseFunctions';
 import UserContext from '../contexts/UserContext';
 import { Exercise } from '../types and interfaces/types';
 import { globalStyles } from '../assets/styles';

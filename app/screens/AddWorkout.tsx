@@ -1,7 +1,7 @@
 import { ImageBackground, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../components/SelectMenu'
-import { addSet, getAvailableExercises } from '../functions/databaseQueries'
+import { addSet, getAvailableExercises } from '../functions/firebaseFunctions'
 import UserContext from '../contexts/UserContext'
 import {Exercise, ExerciseSelectOption, ExerciseSet } from '../types and interfaces/types'
 import { addXP, handleAddButton } from '../functions/otherFunctions'
@@ -173,7 +173,7 @@ const AddWorkout = ({ route, navigation }: RouterProps) => {
               autoCapitalize='none'
               onChangeText={(text) => setTime(text)}
             />
-            <Text style={[globalStyles.text, {textTransform: 'uppercase', fontWeight: "800", paddingVertical: 10}]}>Rest time (seconds)</Text>
+            <Text style={[globalStyles.text, {textTransform: 'uppercase', fontWeight: "800", paddingVertical: 10}]}>Rest time (minutes)</Text>
             <TextInput
               keyboardType='numeric'
               style={globalStyles.input}

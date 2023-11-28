@@ -111,7 +111,7 @@ const IsometricExercise = (props: { exercise: Exercise; exerciseID: number; }) =
                 </View>
                 {sets}
            </View>
-            : isDropsSet(exercise.restTimes, exercise.reps, exercise.weights, uniqueValues.exercise.length) 
+            : isDropsSet(exercise.restTimes, exercise.times, exercise.weights, uniqueValues.exercise.length) 
             ?
                 <View>
                     <Text style={globalStyles.exerciseName}>1 dropset of {uniqueValues.exercise} {unilateral}</Text>
