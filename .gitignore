@@ -34,6 +34,7 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+*.config.js
 
 babel.config.js
 expo-radio-button.d.ts
