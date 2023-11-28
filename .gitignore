@@ -33,3 +33,14 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+
+babel.config.js
+expo-radio-button.d.ts
+firebase.json
+firebaseConfig.ts
+metro.config.js
+package-lock.json
+package.json
+tsconfig.base
+tsconfig.json
