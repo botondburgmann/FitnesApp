@@ -142,8 +142,14 @@ export const handleAddButton = (time: number, setTime: Function, reps: number, s
                                 selectedExercises:ExerciseSelectOption[]): void => {
     if (currentExercise.isometric && (time === 0 || Number.isNaN(time)))
       alert("Error: time field cannot be empty for isometric exercises");
-    if (!currentExercise.isometric && (reps === 0 || Number.isNaN(reps)))
+    else if (!currentExercise.isometric && (reps === 0 || Number.isNaN(reps)))
       alert("Error: Reps field cannot be empty for non-isometric exercises");
+    else if (reps < 0)
+      alert("Error: Rep number must be a positive number")
+    else if (time < 0)
+      alert("Error: Time must be a positive number")
+    else if (restTime < 0)
+      alert("Error: Rest time must be a positive number")
     else {
         sets.exercise.push(currentExercise.value);
         Number.isNaN(reps) ? sets.reps.push(0) : sets.reps.push(reps) ;

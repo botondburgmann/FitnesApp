@@ -52,18 +52,26 @@ const EditSet = ({ route, navigation }: RouterProps) => {
 
     function handleModifyButton(isIsometric: boolean, changeIsometric: SetChange, changeNormal: SetChange, set: { exercise: string; time: number; weight: number; reps: number; }): void {
         if (isIsometric) {
-            if (changeIsometric.times === 0 || Number.isNaN(changeIsometric.times)) 
+            if (changeIsometric.time === 0 || Number.isNaN(changeIsometric.time)) 
                 alert("Time field cannot be empty");
+            else if (changeIsometric.time !== undefined && changeIsometric.time < 0)
+                alert("Error: Time must be a positive number")
+            else if (changeIsometric.restTime !== undefined && changeIsometric.restTime < 0)
+                alert("Error: Rest time must be a positive number")
             else if (date !== null && week !== null){
                 editSet(userID,set.exercise,exerciseID,setID,changeIsometric, (addXPForOneSet(isIsometric, changeIsometric)+removeXP(set.time, set.weight)), date, week)
                 navigation.navigate("Log")
             }
-        } else {
-            if (changeNormal.reps === 0 || Number.isNaN(changeNormal.reps))
-                alert("Reps field cannot be empty"); 
-            else if(date !== null && week !== null){            
-                console.log(changeNormal);
-                   
+        } else {            
+            if (changeNormal.rep === 0 || Number.isNaN(changeNormal.rep))
+                alert("Error: Reps field cannot be empty"); 
+            else if (changeNormal.rep !== undefined && changeNormal.rep < 0)
+                alert("Error: Rep number must be a positive number")
+            else if (changeNormal.time !== undefined && changeNormal.time < 0)
+                alert("Error: Time must be a positive number")
+            else if (changeNormal.restTime !== undefined && changeNormal.restTime < 0)
+                alert("Error: Rest time must be a positive number")
+            else if(date !== null && week !== null){                               
                 editSet(userID,set.exercise, exerciseID, setID,changeNormal, (addXPForOneSet(isIsometric, changeNormal)+removeXP(set.reps, set.weight)), date, week)
                 navigation.navigate("Log")
             }

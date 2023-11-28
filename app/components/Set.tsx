@@ -14,9 +14,13 @@ const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Functi
 
     function handleCompleteSetButton(exercise:Exercise, weight: number, time: number, reps: number) {
          if (exercise.isometric && (time === 0 || Number.isNaN(time)))
-          alert("Error: time field cannot be empty for isometric exercises");
+          alert("Error: Time field cannot be empty for isometric exercises");
         else if (!exercise.isometric && (reps === 0 || Number.isNaN(reps))) 
-          alert("Error: reps field cannot be empty for non-isometric exercises");
+          alert("Error: Reps field cannot be empty for non-isometric exercises");
+        else if (time < 0) 
+            alert("Error: Time must be a positive number");
+        else if (reps < 0) 
+            alert("Error: Rep number must be a positive number");
         else {
             if (Number.isNaN(weight))
                 weight = 0;
