@@ -15,8 +15,8 @@ const NormalExercise = (props: { exercise: Exercise; exerciseID: number; }) => {
     const week = useContext(WeekContext);
     const date = useContext(DateContext);
 
-    const exercise: Exercise = props.exercise;
-    const exerciseID: number = props.exerciseID;
+    const exercise = props.exercise;
+    const exerciseID = props.exerciseID;
 
     const uniqueValues = {
         sides: Array.from(new Set<string>(exercise.sides)),
@@ -24,7 +24,7 @@ const NormalExercise = (props: { exercise: Exercise; exerciseID: number; }) => {
         
     };
     const numberOfSets = calculateNumberOfSets(exercise.sides, uniqueValues.exercise.length, exercise.restTimes);
-    const unilateral : string = uniqueValues.sides.length === 2 ? "(per side)" : "";
+    const unilateral = uniqueValues.sides.length === 2 ? "(per side)" : "";
 
     const outputs: Outputs = {
         setNumbers: [],

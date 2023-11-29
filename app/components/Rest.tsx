@@ -1,15 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
-import { Exercise, ExerciseSet } from '../types and interfaces/types'
+import { Exercise, ExerciseLog } from '../types and interfaces/types'
 import { globalStyles } from '../assets/styles'
 
 
-const Rest = (props: { setGoToNextPage: Function; currentExercise: ExerciseSet; exercise: Exercise }) => {
+const Rest = (props: { setGoToNextPage: Function; currentExercise: ExerciseLog; exercise: Exercise }) => {
   const setGoToNextPage = props.setGoToNextPage
-  const currentExercise: ExerciseSet = props.currentExercise;
+  const currentExercise = props.currentExercise;
   const exercise = props.exercise;
-  const duration = exercise.musclesWorked.length > 1 ? 1 : 2;
+  const duration = exercise.musclesWorked.length > 1 ? 180 : 120;
 
   return (
     <View style={styles.container}>

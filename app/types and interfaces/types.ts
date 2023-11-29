@@ -42,7 +42,7 @@ export type Exercise = {
 }
 
 
-export type ExerciseSet = {
+export type ExerciseLog = {
     exercise : string[],
     weights: number[],
     reps: number[],
@@ -50,6 +50,15 @@ export type ExerciseSet = {
     restTimes: number[],
     sides: string[];
     [key: string]: any;
+}
+
+export type ExerciseSet = {
+    exercise : string,
+    weight: number,
+    reps: number,
+    time: number,
+    restTime: number,
+    side: string;
 }
 
 export type MyUser = {
@@ -127,3 +136,10 @@ export type MuscleGroups = {
 'Full body push' : string[],
 [key: string]: any
 }
+
+export type MyModalProps = {
+    isVisible: boolean;
+    onClose: () => void;
+    title: string | undefined;
+    information: string | undefined;
+  }

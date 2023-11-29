@@ -3,75 +3,62 @@ import { DocumentData, Unsubscribe, addDoc, collection, doc, getDocs, onSnapshot
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../../FirebaseConfig";
 import { NavigationProp } from "@react-navigation/native";
 import { validateActivityLevel, validateAge, validateExerciseSet, validateExperience, validateGender, validateHeight, validateWeight } from "./validations";
-import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseSet, ExerciseRecords, MyUser, Achievement, SetChange, WeekRange } from "../types and interfaces/types";
+import { SelectItem, MaxValueAndIndex, BestExercise, Exercise, ExerciseLog, ExerciseRecords, MyUser, Achievement, SetChange, WeekRange } from "../types and interfaces/types";
 
 
 // getters
 export const getSetUpValue = async (userID: string): Promise<boolean | undefined> => {
     try {
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const q = query(usersCollectionRef, where("userID", "==", userID));
-        const snapshot = await getDocs(q);
-        const doc = snapshot.docs[0];
-        return doc.data().set;
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        const usersSnapshot = await getDocs(usersQuery);
+        const userDoc = usersSnapshot.docs[0];
+        return userDoc.data().set;
     } 
     catch (error: any) {
         alert(`Error: Couldn't find set field: ${error.message}`);
     }
 };
 
-function getMax(array:number[]): MaxValueAndIndex{
-    const max = {
-        value : 0,
-        index: 0
-    };
-    if (array !== undefined) {
-        for (let i = 0; i < array.length; i++)
-            if (array[i] > max.value) {
-                max.value = array[i];
-                max.index = i;
+export const getBestExercise = (userID: string | null, field:string, secondaryField:string, callback: Function ): Unsubscribe | undefined=> {
+    try {
+        const bestExercise: BestExercise = {
+            name: "",
+            weights: 0,
+            reps: 0
+        };
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, (snapshot) => {
+            if (!snapshot.empty) {
+                snapshot.docs.forEach((doc) => {
+                    const workoutData = doc.data().Workout;
+        
+                    if (workoutData) {
+                        workoutData.forEach((exercise: Exercise) => {
+                            const maxField = getMaxValueAndIndexOfArray(exercise[field]);
+                            const maxSecondaryField = getMaxValueAndIndexOfArray(exercise[secondaryField]);
+                                if (maxField !== undefined && maxField.value > bestExercise[field]) {
+                                    bestExercise[field] = maxField.value;
+                                    bestExercise.name = exercise.exercise[maxField.index];
+                                    bestExercise[secondaryField] = exercise[secondaryField][maxField.index];
+                                } else if (maxField !== undefined && maxSecondaryField !== undefined && maxField.value === bestExercise[field] && maxSecondaryField.value > bestExercise[secondaryField]) {
+                                    bestExercise[secondaryField] = maxSecondaryField.value;
+                                    bestExercise.name = exercise.exercise[maxSecondaryField.index];
+                                    bestExercise[field] = exercise[field][maxSecondaryField.index];
+                                }
+                            
+                        });
+                    }
+                });
+                callback(bestExercise)
             }
-        }
-        return max;
-}
-
-export const getBestExercise = (userID: string | null, field:string, secondaryField:string, callback: Function ): Unsubscribe => {
-    const bestExercise: BestExercise = {
-        name: "",
-        weights: 0,
-        reps: 0
-    };
-    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
-    const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-    const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, (snapshot) => {
-        if (!snapshot.empty) {
-            snapshot.docs.forEach((doc) => {
-                const workoutData = doc.data().Workout;
+        });
     
-                if (workoutData) {
-                    workoutData.forEach((exercise: Exercise) => {
-                        const maxField = getMax(exercise[field]);
-                        const maxSecondaryField = getMax(exercise[secondaryField]);
-                            if (maxField.value > bestExercise[field]) {
-                                bestExercise[field] = maxField.value;
-                                bestExercise.name = exercise.exercise[maxField.index];
-                                bestExercise[secondaryField] = exercise[secondaryField][maxField.index];
-                            } else if (maxField.value === bestExercise[field] && maxSecondaryField.value > bestExercise[secondaryField]) {
-                                bestExercise[secondaryField] = maxSecondaryField.value;
-                                bestExercise.name = exercise.exercise[maxSecondaryField.index];
-                                bestExercise[field] = exercise[field][maxSecondaryField.index];
-                            }
-                        
-                    });
-                }
-            });
-            callback(bestExercise)
-        }
-    });
-    
-      
-
-    return unsubscribeFromWorkouts;
+        return unsubscribeFromWorkouts;
+    } catch (error: any) {
+        alert(`Error: Couldn't fetch best exercises for ${field}: ${error}`)
+    }
 };
 
 export const getAllExercises = (userID: string | null, callback: Function): Unsubscribe[] | undefined => {
@@ -108,7 +95,7 @@ export const getAllExercises = (userID: string | null, callback: Function): Unsu
         unsubscribeFunctions.push(unsubscribeFromUsers);
         return unsubscribeFunctions;
 
-    } catch (error) {
+    } catch (error: any) {
         alert(`Error: Couldn't fetch exercises: ${error}`);
     }
 };
@@ -142,41 +129,44 @@ export const getAvailableExercises = (userID: string | null, callback: Function)
                 throw new Error("user doesn't exist");
         })
         return unsubscribeFromUsers;
-    } catch (error) {
+    } catch (error: any) {
         alert(`Error: Couldn't fetch exercises: ${error}`)
     }
 };
 
 export const getExercise = (userID: string | null, exerciseName: string, callback: Function): Unsubscribe | undefined=> {
-
-    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
-    const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-
-    const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutSnapshot => {
-        const exerciseRecords: ExerciseRecords = {
-            weights: [],
-            reps: [],
-            times: [],
-            dates: [],
-        }
-        if (!workoutSnapshot.empty) {
-            workoutSnapshot.docs.forEach(workoutDoc => {
-                for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
-                    let set = workoutDoc.data().Workout[i];                    
-                    for (let j = set.exercise.length-1; j >= 0 ; j--)
-                        if (set.exercise[j] === exerciseName) {                            
-                            exerciseRecords.weights.push(set.weights[j])
-                            exerciseRecords.reps.push(set.reps[j])
-                            exerciseRecords.times.push(set.times[j])
-                            exerciseRecords.dates.push(workoutDoc.data().date)
-                        }
-                }
-            })
-                        
-        }
-        callback(exerciseRecords);    
-    })
-    return unsubscribeFromWorkouts;
+    try {
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+    
+        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutSnapshot => {
+            const exerciseRecords: ExerciseRecords = {
+                weights: [],
+                reps: [],
+                times: [],
+                dates: [],
+            }
+            if (!workoutSnapshot.empty) {
+                workoutSnapshot.docs.forEach(workoutDoc => {
+                    for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
+                        let set = workoutDoc.data().Workout[i];                    
+                        for (let j = set.exercise.length-1; j >= 0 ; j--)
+                            if (set.exercise[j] === exerciseName) {                            
+                                exerciseRecords.weights.push(set.weights[j])
+                                exerciseRecords.reps.push(set.reps[j])
+                                exerciseRecords.times.push(set.times[j])
+                                exerciseRecords.dates.push(workoutDoc.data().date)
+                            }
+                    }
+                })
+                            
+            }
+            callback(exerciseRecords);    
+        })
+        return unsubscribeFromWorkouts;
+    } catch (error: any) {
+        alert(`Error: Couldn't fetch data for ${exerciseName}: ${error} `)
+    }
 };
 
 export const getExercisesByFocus = (userID: string | null, musclesWorked: string[], callback: Function): Unsubscribe | undefined => {
@@ -214,42 +204,49 @@ export const getExercisesByFocus = (userID: string | null, musclesWorked: string
     }
 };
 
-export const getUser = (userID:string | null, callback: Function): Unsubscribe => {
-    const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-    const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-    const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
-        if (!usersSnapshot.empty) {
-            const userDoc = usersSnapshot.docs[0];
-            const userData = {
-                activityLevel:  userDoc.data().activityLevel,
-                age:  userDoc.data().age,
-                experience:  userDoc.data().experience,
-                gender:  userDoc.data().gender,
-                height:  userDoc.data().height,
-                level:  userDoc.data().level,
-                name:  userDoc.data().name,
-                userID: userDoc.data().userID,
-                weeklyExperience: userDoc.data().weeklyExperience,
-                weight:  userDoc.data().weight
-            };
-
-            callback(userData);
-        }
-    })
-
-    return unsubscribeFromUsers;
-};
-export const getAllUsers = (callback: Function): Unsubscribe => { 
+export const getUser = (userID:string | null, callback: Function): Unsubscribe | undefined => {
+    try {
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
+            if (!usersSnapshot.empty) {
+                const userDoc = usersSnapshot.docs[0];
+                const userData = {
+                    activityLevel:  userDoc.data().activityLevel,
+                    age:  userDoc.data().age,
+                    experience:  userDoc.data().experience,
+                    gender:  userDoc.data().gender,
+                    height:  userDoc.data().height,
+                    level:  userDoc.data().level,
+                    name:  userDoc.data().name,
+                    userID: userDoc.data().userID,
+                    weeklyExperience: userDoc.data().weeklyExperience,
+                    weight:  userDoc.data().weight
+                };
     
-    const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-    const unsubscribeFromUsers = onSnapshot(usersCollectionRef, usersSnapshot => {
-        const users: DocumentData[] = [];
-        usersSnapshot.docs.forEach(usersDoc => {
-            users.push(usersDoc.data())
-        })        
-        callback(users);    
-    })
-    return unsubscribeFromUsers;
+                callback(userData);
+            }
+        })
+    
+        return unsubscribeFromUsers;
+    } catch (error: any) {
+        alert(`Error: Couldn't fetch user: ${error}`)
+    }
+};
+export const getAllUsers = (callback: Function): Unsubscribe | undefined => { 
+    try {    
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const unsubscribeFromUsers = onSnapshot(usersCollectionRef, usersSnapshot => {
+            const users: DocumentData[] = [];
+            usersSnapshot.docs.forEach(usersDoc => {
+                users.push(usersDoc.data())
+            })        
+            callback(users);    
+        })
+        return unsubscribeFromUsers;
+    } catch (error: any) {
+        alert(`Error: Couldn't fetch users: ${error}`)
+    }
 };
 
 export const getWorkout = (userID: string | null, date: string, callback: Function): Unsubscribe | undefined => {
@@ -257,12 +254,12 @@ export const getWorkout = (userID: string | null, date: string, callback: Functi
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
         const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID), where("date", "==", date));
         
-        const unsubscribe = onSnapshot(workoutsQuery, workoutsSnapshot => {
+        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
             if (!workoutsSnapshot.empty) {
-                const allExercises: ExerciseSet[] = [];
+                const allExercises: ExerciseLog[] = [];
                 workoutsSnapshot.docs.forEach(workout => {
                     for (let i = 0; i < workout.data().Workout.length; i++) {
-                        let currentExercise: ExerciseSet = {
+                        let currentExercise: ExerciseLog = {
                             exercise :  workout.data().Workout[i].exercise,
                             weights: workout.data().Workout[i].weights,
                             reps: workout.data().Workout[i].reps,
@@ -270,20 +267,15 @@ export const getWorkout = (userID: string | null, date: string, callback: Functi
                             restTimes: workout.data().Workout[i].restTimes,
                             sides: workout.data().Workout[i].sides
                         };
-                        allExercises.push(currentExercise);
-                        
-                        
+                        allExercises.push(currentExercise);   
                     }
-
-
-            
                 })
                 
                 callback(allExercises);
             }
         })
-        return unsubscribe;
-    } catch (error) {
+        return unsubscribeFromWorkouts;
+    } catch (error: any) {
         alert(`Error: couldn't fetch workout for ${date}`);
     }
 };
@@ -316,7 +308,7 @@ export const getAchievementsForUser = (userID: string, callback: Function): Unsu
             }
         })
         return unsubscribeFromAchievements;
-    } catch (error) {
+    } catch (error: any) {
         alert(`Error: couldn't fetch achievements for ${userID}: ${error}`);
     }
 };
@@ -431,7 +423,7 @@ export const setUpProfile =async (field:string, value:number | string | Date | S
     }
 }
 
-export const addSet =async (userID:string | null, date: string, set: ExerciseSet, xpToAdd: number, week: WeekRange): Promise<void> => {
+export const addSet =async (userID:string | null, date: string, set: ExerciseLog, xpToAdd: number, week: WeekRange): Promise<void> => {
     try {
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
         const workoutsQuery = query(workoutsCollectionRef, where("date", "==", date), where("userID", "==", userID) );
@@ -518,42 +510,6 @@ export const addSet =async (userID:string | null, date: string, set: ExerciseSet
         alert(`Error: Couldn't add set: ${error.message}`)
     } 
 }
-
-const addExperience = async (userID: string | null, experience: number, date: string,  week: WeekRange): Promise<void> => {
-    try {        
-        const usersCollectionRef = collection(FIRESTORE_DB,"Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        const firstUsersSnapshot = await getDocs(usersQuery);
-        const firstUserDoc = firstUsersSnapshot.docs[0];
-        
-        validateExperience(experience);
-        if (week.start <= date && date <= week.end) {            
-            const firstUpdatedData = {
-                experience: firstUserDoc.data().experience+experience,
-                weeklyExperience: firstUserDoc.data().weeklyExperience+experience,
-            }
-            await updateDoc(firstUserDoc.ref, firstUpdatedData);
-        }
-        else{
-            const firstUpdatedData = {
-                experience: firstUserDoc.data().experience+experience,
-            }
-            await updateDoc(firstUserDoc.ref, firstUpdatedData);
-        }
-        
-        const secondUsersSnapshot = await getDocs(usersQuery);
-        const secondUserDoc = secondUsersSnapshot.docs[0];
-        const secondUserData = secondUserDoc.data() as MyUser;
-        const secondUpdateData = {
-            level: secondUserData.experience < 225 ? 1 : Math.floor(Math.log(secondUserData.experience / 100) / Math.log(1.5)),
-        };
-        
-        await updateDoc(secondUserDoc.ref, secondUpdateData);
-    } 
-    catch (error) {
-        alert(`Error: Couldn't update experience and level fields: ${error}`)
-    }
-};
 
 export const toggleExerciseVisibilty =async (userID: string | null, exerciseName: string): Promise<void> => {
     try {
@@ -680,7 +636,7 @@ export const resetWeeklyExperience = async (userID:string): Promise<void> => {
         };
         updateDoc(usersDoc.ref, updateData);
     }
-    catch (error) {
+    catch (error: any) {
         alert(`Error: couldn't reset weekly experience:  ${error}`);
     }
 };
@@ -707,431 +663,530 @@ export const editProfile = async (userID:string | null, changes: MyUser): Promis
     }
 };
 
-export const addWorkout =async (userID:string | null, date: string, workout: ExerciseSet[], xpToAdd: number, week: WeekRange): Promise<void> => {
-    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
-    for (const set of workout) {
-        const updatedStrengthBuilderAchievement = updateStrengthBuilderAchievement(set);
-        if (typeof updatedStrengthBuilderAchievement === 'object' && updatedStrengthBuilderAchievement !== null){
-            if (updatedStrengthBuilderAchievement as Achievement)
-                updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
+export const addWorkout =async (userID:string | null, date: string, workout: ExerciseLog[], xpToAdd: number, week: WeekRange): Promise<void> => {
+    try {
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        for (const set of workout) {
+            const updatedStrengthBuilderAchievement = updateStrengthBuilderAchievement(set);
+            if (typeof updatedStrengthBuilderAchievement === 'object' && updatedStrengthBuilderAchievement !== null){
+                if (updatedStrengthBuilderAchievement as Achievement)
+                    updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
+            }
+            const updatedEnduranceMasterAchievement = updateEnduranceMasterAchievement(set);
+            if (typeof updatedEnduranceMasterAchievement === 'object' && updatedEnduranceMasterAchievement !== null){
+                if (updatedEnduranceMasterAchievement as Achievement)
+                    updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
+            }    
         }
-        const updatedEnduranceMasterAchievement = updateEnduranceMasterAchievement(set);
-        if (typeof updatedEnduranceMasterAchievement === 'object' && updatedEnduranceMasterAchievement !== null){
-            if (updatedEnduranceMasterAchievement as Achievement)
-                updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
+        await addDoc(workoutsCollectionRef, {
+            date: date,
+            userID: userID,
+            Workout: workout
+        });    
+        const updatedConsistencyStreakAchievement = await updateConsistencyStreakAchievement(userID);
+        if (typeof updatedConsistencyStreakAchievement === 'object' && updatedConsistencyStreakAchievement !== null){
+            if (updatedConsistencyStreakAchievement as Achievement)
+                updateAchievementStatus(userID, updatedConsistencyStreakAchievement);
         }    
+        const updatedDedicatedAthleteAchievement = await updateDedicatedAthleteAchievement(userID);
+        if (typeof updatedDedicatedAthleteAchievement === 'object' && updatedDedicatedAthleteAchievement !== null){
+            if (updatedDedicatedAthleteAchievement as Achievement)
+                updateAchievementStatus(userID, updatedDedicatedAthleteAchievement);
+        }      
+        addExperience(userID, xpToAdd, date, week);
+    } catch (error: any) {
+        alert(`Error: Couldn't add workout: ${error}`)
     }
-    await addDoc(workoutsCollectionRef, {
-        date: date,
-        userID: userID,
-        Workout: workout
-    });    
-    const updatedConsistencyStreakAchievement = await updateConsistencyStreakAchievement(userID);
-    if (typeof updatedConsistencyStreakAchievement === 'object' && updatedConsistencyStreakAchievement !== null){
-        if (updatedConsistencyStreakAchievement as Achievement)
-            updateAchievementStatus(userID, updatedConsistencyStreakAchievement);
-    }    
-    const updatedDedicatedAthleteAchievement = await updateDedicatedAthleteAchievement(userID);
-    if (typeof updatedDedicatedAthleteAchievement === 'object' && updatedDedicatedAthleteAchievement !== null){
-        if (updatedDedicatedAthleteAchievement as Achievement)
-            updateAchievementStatus(userID, updatedDedicatedAthleteAchievement);
-    }      addExperience(userID, xpToAdd, date, week);
     
 }
 
 export const updateAchievementStatus =async (userID:string | null, updatedAchievement: Achievement): Promise<void> => {
-    const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
-    const achievementsSnapshot = await getDocs(achievementsCollectionRef);
-    for (const achievementDoc of achievementsSnapshot.docs) {
-        const owners = achievementDoc.data().owners;
-        for (let i = 0; i < owners.length; i++) {
-            if (owners[i].userID === userID && owners[i].level < updatedAchievement.level && achievementDoc.data().name === updatedAchievement.name){
-                const updatedOwner = {
-                    color: updatedAchievement.color,
-                    description: updatedAchievement.description,
-                    level: updatedAchievement.level,
-                    status: updatedAchievement.status,
-                    userID: userID,
-                    visibility: updatedAchievement.visibility
-                };
-                owners[i] = updatedOwner;
-                alert(`New achievement unlocked: ${updatedAchievement.name}: ${updatedAchievement.status}`);
-                const updatedAchievementDoc = {
-                    owners: owners
-                }
-                await updateDoc(achievementDoc.ref, updatedAchievementDoc);
-            }            
+    try {
+        const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+        const achievementsSnapshot = await getDocs(achievementsCollectionRef);
+        for (const achievementDoc of achievementsSnapshot.docs) {
+            const owners = achievementDoc.data().owners;
+            for (let i = 0; i < owners.length; i++) {
+                if (owners[i].userID === userID && owners[i].level < updatedAchievement.level && achievementDoc.data().name === updatedAchievement.name){
+                    const updatedOwner = {
+                        color: updatedAchievement.color,
+                        description: updatedAchievement.description,
+                        level: updatedAchievement.level,
+                        status: updatedAchievement.status,
+                        userID: userID,
+                        visibility: updatedAchievement.visibility
+                    };
+                    owners[i] = updatedOwner;
+                    alert(`New achievement unlocked: ${updatedAchievement.name}: ${updatedAchievement.status}`);
+                    const updatedAchievementDoc = {
+                        owners: owners
+                    }
+                    await updateDoc(achievementDoc.ref, updatedAchievementDoc);
+                }            
+            }
         }
+    } catch (error: any) {
+        alert(`Errror: Couldn't update achievement status: ${error}`)
     }
 }
 
 
-const updateStrengthBuilderAchievement = (set: ExerciseSet): Achievement | undefined => {
-    for (const weight of set.weights) {
-      if (weight >= 60 && weight < 80) {
-          const updatedAchievement: Achievement = {
-              color: "#BBC2CC",
-              description: "Lift 80 kg on an exercise to unlock next stage",
-              icon: "dumbbell",
-              level: 1,
-              name: "Strength Builder",
-              status: "Gym Novice",
-              visibility: 1
-          }
-          return updatedAchievement;
-      }
-      else if (weight >= 80 && weight < 100) {
-          const updatedAchievement: Achievement = {
-              color: "#BBC2CC",
-              description: "Lift 100 kg on an exercise to unlock next stage",
-              icon: "dumbbell",
-              level: 2,
-              name: "Strength Builder",
-              status: "Intermediate Lifter",
-              visibility: 1
-          }
-          return updatedAchievement;
-      }
-      else if (weight >= 100) {
-          const updatedAchievement: Achievement = {
-              color: "#FFDD43",
-              description: "Max level achieved: Lift 100 kg on an exercise",
-              icon: "dumbbell",
-              level: 3,
-              name: "Strength Builder",
-              status: "Gym Warrior",
-              visibility: 1
-          }
-          return updatedAchievement;
-      } 
-  }
+const addExperience = async (userID: string | null, experience: number, date: string,  week: WeekRange): Promise<void> => {
+    try {        
+        const usersCollectionRef = collection(FIRESTORE_DB,"Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        const firstUsersSnapshot = await getDocs(usersQuery);
+        const firstUserDoc = firstUsersSnapshot.docs[0];
+        
+        validateExperience(experience);
+        
+        const startDate = new Date(week.start)
+        const endDate = new Date(week.  end)
+        const today = new Date(date)
+        if (startDate <= today && today <= endDate) {            
+            const firstUpdatedData = {
+                experience: firstUserDoc.data().experience+experience,
+                weeklyExperience: firstUserDoc.data().weeklyExperience+experience,
+            }
+            await updateDoc(firstUserDoc.ref, firstUpdatedData);
+        }
+        else{
+            const firstUpdatedData = {
+                experience: firstUserDoc.data().experience+experience,
+            }
+            await updateDoc(firstUserDoc.ref, firstUpdatedData);
+        }
+        
+        const secondUsersSnapshot = await getDocs(usersQuery);
+        const secondUserDoc = secondUsersSnapshot.docs[0];
+        const secondUserData = secondUserDoc.data() as MyUser;
+        const secondUpdateData = {
+            level: secondUserData.experience < 225 ? 1 : Math.floor(Math.log(secondUserData.experience / 100) / Math.log(1.5)),
+        };
+        
+        await updateDoc(secondUserDoc.ref, secondUpdateData);
+    } 
+    catch (error) {
+        alert(`Error: Couldn't update experience and level fields: ${error}`)
+    }
 };
-const updateEnduranceMasterAchievement = (set: ExerciseSet): Achievement | undefined => {
-    for (const rep of set.reps) {
-      if (rep >= 20 && rep < 50) {
-          const updatedAchievement: Achievement = {
-              color: "#BBC2CC",
-              description: "Do 50 repetitions for an exercise to unlock next stage",
-              icon: "running",
-              level: 1,
-              name: "Endurance Master",
-              status: "Repetition Rookie",
-              visibility: 1
+const getMaxValueAndIndexOfArray = (array:number[]): MaxValueAndIndex | undefined => {
+    try {
+        const max = {
+            value : 0,
+            index: 0
+        };
+        if (array !== undefined) {
+            for (let i = 0; i < array.length; i++)
+                if (array[i] > max.value) {
+                    max.value = array[i];
+                    max.index = i;
+                }
+        }
+        return max;
+    } catch (error) {
+        alert(`Error: Couldn't find max of ${array}: ${error}`)
+    }
+}
+
+const updateStrengthBuilderAchievement = (set: ExerciseLog): Achievement | undefined => {
+    try {
+        for (const weight of set.weights) {
+          if (weight >= 60 && weight < 80) {
+              const updatedAchievement: Achievement = {
+                  color: "#BBC2CC",
+                  description: "Lift 80 kg on an exercise to unlock next stage",
+                  icon: "dumbbell",
+                  level: 1,
+                  name: "Strength Builder",
+                  status: "Gym Novice",
+                  visibility: 1
+              }
+              return updatedAchievement;
           }
-          return updatedAchievement;
-      }
-      else if (rep >= 50 && rep < 75) {
-          const updatedAchievement: Achievement = {
-              color: "#BBC2CC",
-              description: "Do 75 repetitions for an exercise to unlock next stage",
-              icon: "running",
-              level: 2,
-              name: "Endurance Master",
-              status: "Endurance Enthusiast",
-              visibility: 1
+          else if (weight >= 80 && weight < 100) {
+              const updatedAchievement: Achievement = {
+                  color: "#BBC2CC",
+                  description: "Lift 100 kg on an exercise to unlock next stage",
+                  icon: "dumbbell",
+                  level: 2,
+                  name: "Strength Builder",
+                  status: "Intermediate Lifter",
+                  visibility: 1
+              }
+              return updatedAchievement;
           }
-          return updatedAchievement;
+          else if (weight >= 100) {
+              const updatedAchievement: Achievement = {
+                  color: "#FFDD43",
+                  description: "Max level achieved: Lift 100 kg on an exercise",
+                  icon: "dumbbell",
+                  level: 3,
+                  name: "Strength Builder",
+                  status: "Gym Warrior",
+                  visibility: 1
+              }
+              return updatedAchievement;
+          } 
       }
-      else if (rep >= 75 && rep < 100) {
-          const updatedAchievement: Achievement = {
-              color: "#BBC2CC",
-              description: "Do 100 repetitions for an exercise to unlock next stage",
-              icon: "running",
-              level: 3,
-              name: "Strength Builder",
-              status: "Repetition Pro",
-              visibility: 1
+    } catch (error: any) {
+        alert(`Couldn't update achievement: ${error}`)
+    }
+};
+const updateEnduranceMasterAchievement = (set: ExerciseLog): Achievement | undefined => {
+    try {
+        for (const rep of set.reps) {
+          if (rep >= 20 && rep < 50) {
+              const updatedAchievement: Achievement = {
+                  color: "#BBC2CC",
+                  description: "Do 50 repetitions for an exercise to unlock next stage",
+                  icon: "running",
+                  level: 1,
+                  name: "Endurance Master",
+                  status: "Repetition Rookie",
+                  visibility: 1
+              }
+              return updatedAchievement;
           }
-          return updatedAchievement;
-      }
-      else if (rep >= 100) {
-          const updatedAchievement: Achievement = {
-              color: "#FFDD43",
-              description: "Max level achieved: Do 100 repetitions for an exercise to unlock next stage",
-              icon: "running",
-              level: 4,
-              name: "Endurance Master",
-              status: "Endurance Champion",
-              visibility: 1
+          else if (rep >= 50 && rep < 75) {
+              const updatedAchievement: Achievement = {
+                  color: "#BBC2CC",
+                  description: "Do 75 repetitions for an exercise to unlock next stage",
+                  icon: "running",
+                  level: 2,
+                  name: "Endurance Master",
+                  status: "Endurance Enthusiast",
+                  visibility: 1
+              }
+              return updatedAchievement;
           }
-          return updatedAchievement;
+          else if (rep >= 75 && rep < 100) {
+              const updatedAchievement: Achievement = {
+                  color: "#BBC2CC",
+                  description: "Do 100 repetitions for an exercise to unlock next stage",
+                  icon: "running",
+                  level: 3,
+                  name: "Strength Builder",
+                  status: "Repetition Pro",
+                  visibility: 1
+              }
+              return updatedAchievement;
+          }
+          else if (rep >= 100) {
+              const updatedAchievement: Achievement = {
+                  color: "#FFDD43",
+                  description: "Max level achieved: Do 100 repetitions for an exercise to unlock next stage",
+                  icon: "running",
+                  level: 4,
+                  name: "Endurance Master",
+                  status: "Endurance Champion",
+                  visibility: 1
+              }
+              return updatedAchievement;
+          }
       }
-  }
+    } catch (error: any) {
+        alert(`Error: Couldn't update achievement: ${error}`)    
+    }
 };
 
 const updateConsistencyStreakAchievement = async (userID: string | null): Promise<Achievement | undefined> => {
-    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
-    const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-    const workoutsSnapshot = await getDocs(workoutsQuery);
-    const dates: string[] = []
-    for (const workoutDoc of workoutsSnapshot.docs) {
-        dates.push(workoutDoc.data().date);
-    }
-    if (dates.length === 10) {
-        const updatedAchievement: Achievement = {
-            color: "#BBC2CC",
-            description: "Work out for 30 days, unlock next stage",
-            icon: "calendar",
-            level: 1,
-            name: "Consistency Streak",
-            status: "Workout Explorer",
-            visibility: 1
+    try {
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+        const workoutsSnapshot = await getDocs(workoutsQuery);
+        const dates: string[] = []
+        for (const workoutDoc of workoutsSnapshot.docs) {
+            dates.push(workoutDoc.data().date);
         }
-        return updatedAchievement;
-    }
-    else if (dates.length === 30) {
-        const updatedAchievement: Achievement = {
-            color: "#BBC2CC",
-            description: "Work out for 60 days, unlock next stage",
-            icon: "calendar",
-            level: 2,
-            name: "Consistency Streak",
-            status: "Fitness Journeyman",
-            visibility: 1
+        if (dates.length === 10) {
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Work out for 30 days, unlock next stage",
+                icon: "calendar",
+                level: 1,
+                name: "Consistency Streak",
+                status: "Workout Explorer",
+                visibility: 1
+            }
+            return updatedAchievement;
         }
-        return updatedAchievement;
-    }
-    else if (dates.length === 60) {
-        const updatedAchievement: Achievement = {
-            color: "#BBC2CC",
-            description: "Work out for 90 days, unlock next stage",
-            icon: "calendar",
-            level: 3,
-            name: "Consistency Streak",
-            status: "Consistency Warrior",
-            visibility: 1
+        else if (dates.length === 30) {
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Work out for 60 days, unlock next stage",
+                icon: "calendar",
+                level: 2,
+                name: "Consistency Streak",
+                status: "Fitness Journeyman",
+                visibility: 1
+            }
+            return updatedAchievement;
         }
-        return updatedAchievement;
-    }
-    else if (dates.length === 90) {
-        const updatedAchievement: Achievement = {
-            color: "#BBC2CC",
-            description: "Work out for 120 days, unlock next stage",
-            icon: "calendar",
-            level: 4,
-            name: "Consistency Streak",
-            status: "Workout Explorer",
-            visibility: 1
+        else if (dates.length === 60) {
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Work out for 90 days, unlock next stage",
+                icon: "calendar",
+                level: 3,
+                name: "Consistency Streak",
+                status: "Consistency Warrior",
+                visibility: 1
+            }
+            return updatedAchievement;
         }
-        return updatedAchievement;
-    }
-    else if (dates.length === 120) {
-        const updatedAchievement: Achievement = {
-            color: "#FFDD43",
-            description: "Max level unlocked: Work out for 120 days",
-            icon: "calendar",
-            level: 5,
-            name: "Consistency Streak",
-            status: "Fitness Legend",
-            visibility: 1
+        else if (dates.length === 90) {
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Work out for 120 days, unlock next stage",
+                icon: "calendar",
+                level: 4,
+                name: "Consistency Streak",
+                status: "Workout Explorer",
+                visibility: 1
+            }
+            return updatedAchievement;
         }
-        return updatedAchievement;
+        else if (dates.length === 120) {
+            const updatedAchievement: Achievement = {
+                color: "#FFDD43",
+                description: "Max level unlocked: Work out for 120 days",
+                icon: "calendar",
+                level: 5,
+                name: "Consistency Streak",
+                status: "Fitness Legend",
+                visibility: 1
+            }
+            return updatedAchievement;
+        }
+    } catch (error: any) {
+        alert(`Error: Couldn't update achievement: ${error}`)
     }
 
 };
 const updateDedicatedAthleteAchievement = async (userID: string | null): Promise<Achievement | undefined> => {
-    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
-    const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-    const workoutsSnapshot = await getDocs(workoutsQuery);
-    const dates: string[] = []
-    for (const workoutDoc of workoutsSnapshot.docs) {
-        dates.push(workoutDoc.data().date);
-    }
-    const sortedDates = sortDates(dates);
-    const daysBetweenFirstAndlastDates = calculateDaysBetweenDates(sortedDates);
-    if (daysBetweenFirstAndlastDates >= 30 && daysBetweenFirstAndlastDates < 90 && sortedDates.length >= 4 && sortedDates.length <= 30) {
-        const updatedAchievement: Achievement = {
-            color: "#BBC2CC",
-            description: "Work out for 3 months, consistently to unlock next stage",
-            icon: "throphy",
-            level: 1,
-            name: "Dedicated Athlete",
-            status: "Workout Apprentice",
-            visibility: 1
+    try {
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+        const workoutsSnapshot = await getDocs(workoutsQuery);
+        const dates: string[] = []
+        for (const workoutDoc of workoutsSnapshot.docs) {
+            dates.push(workoutDoc.data().date);
         }
-        return updatedAchievement;
-    }
-    else if (daysBetweenFirstAndlastDates >= 90 && daysBetweenFirstAndlastDates < 182 && sortedDates.length >= 13 && sortedDates.length <= 90) {
-        const updatedAchievement: Achievement = {
-            color: "#BBC2CC",
-            description: "Work out for 6 months, consistently to unlock next stage",
-            icon: "throphy",
-            level: 2,
-            name: "Dedicated Athlete",
-            status: "Gym Devotee",
-            visibility: 1
+        const sortedDates = sortDates(dates);
+        const daysBetweenFirstAndlastDates = calculateDaysBetweenDates(sortedDates);
+        if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 30 && daysBetweenFirstAndlastDates < 90 && sortedDates.length >= 4 && sortedDates.length <= 30) {
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Work out for 3 months, consistently to unlock next stage",
+                icon: "throphy",
+                level: 1,
+                name: "Dedicated Athlete",
+                status: "Workout Apprentice",
+                visibility: 1
+            }
+            return updatedAchievement;
         }
-        return updatedAchievement;
-    }
-    else if (daysBetweenFirstAndlastDates >= 182 && daysBetweenFirstAndlastDates < 273 && sortedDates.length >= 26 && sortedDates.length <= 182) {
-        const updatedAchievement: Achievement = {
-            color: "#BBC2CC",
-            description: "Work out for 9 months, consistently to unlock next stage",
-            icon: "throphy",
-            level: 3,
-            name: "Dedicated Athlete",
-            status: "Fitness Enthusiast",
-            visibility: 1
+        else if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 90 && daysBetweenFirstAndlastDates < 182 && sortedDates.length >= 13 && sortedDates.length <= 90) {
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Work out for 6 months, consistently to unlock next stage",
+                icon: "throphy",
+                level: 2,
+                name: "Dedicated Athlete",
+                status: "Gym Devotee",
+                visibility: 1
+            }
+            return updatedAchievement;
         }
-        return updatedAchievement;
-    }
-    else if (daysBetweenFirstAndlastDates >= 273 && daysBetweenFirstAndlastDates < 365 && sortedDates.length >= 39 && sortedDates.length <= 273) {
-        const updatedAchievement: Achievement = {
-            color: "#BBC2CC",
-            description: "Work out for a year, consistently to unlock next stage",
-            icon: "throphy",
-            level: 4,
-            name: "Dedicated Athlete",
-            status: "Workout Maestro",
-            visibility: 1
+        else if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 182 && daysBetweenFirstAndlastDates < 273 && sortedDates.length >= 26 && sortedDates.length <= 182) {
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Work out for 9 months, consistently to unlock next stage",
+                icon: "throphy",
+                level: 3,
+                name: "Dedicated Athlete",
+                status: "Fitness Enthusiast",
+                visibility: 1
+            }
+            return updatedAchievement;
         }
-        return updatedAchievement;
-    }
-    else if (daysBetweenFirstAndlastDates >= 365 && sortedDates.length >= 52 && sortedDates.length <= 365) {
-        const updatedAchievement: Achievement = {
-            color: "#FFDD43",
-            description: "Max level unlocked: Work out for a year, consistently",
-            icon: "throphy",
-            level: 5,
-            name: "Dedicated Athlete",
-            status: "Gym God",
-            visibility: 1
+        else if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 273 && daysBetweenFirstAndlastDates < 365 && sortedDates.length >= 39 && sortedDates.length <= 273) {
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Work out for a year, consistently to unlock next stage",
+                icon: "throphy",
+                level: 4,
+                name: "Dedicated Athlete",
+                status: "Workout Maestro",
+                visibility: 1
+            }
+            return updatedAchievement;
         }
-        return updatedAchievement;
+        else if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 365 && sortedDates.length >= 52 && sortedDates.length <= 365) {
+            const updatedAchievement: Achievement = {
+                color: "#FFDD43",
+                description: "Max level unlocked: Work out for a year, consistently",
+                icon: "throphy",
+                level: 5,
+                name: "Dedicated Athlete",
+                status: "Gym God",
+                visibility: 1
+            }
+            return updatedAchievement;
+        }
+    
+    } catch (error: any) {
+        alert(`Error: Couldn't update achievement: ${error}`)
     }
-
 };
 
 export const updateClimbingTheRanksAchievement = (loggedInUser: MyUser, users: MyUser[]): void => {
-    if (users.slice(3,10).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
-        const updatedAchievement: Achievement = {
-            color: "#BBC2CC",
-            description: "Reach the top 3 place in the leaderboard to unlock next stage",
-            icon: "arrow-up",
-            level: 1,
-            name: "Climbing The Ranks",
-            status: "Top 10 Challenger",
-            visibility: 1
+    try {
+        if (users.slice(3,10).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Reach the top 3 place in the leaderboard to unlock next stage",
+                icon: "arrow-up",
+                level: 1,
+                name: "Climbing The Ranks",
+                status: "Top 10 Challenger",
+                visibility: 1
+            }
+            updateAchievementStatus(loggedInUser.userID, updatedAchievement);
         }
-        updateAchievementStatus(loggedInUser.userID, updatedAchievement);
-    }
-    else if (users.slice(1,3).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
-        const updatedAchievement: Achievement = {
-            color: "#BBC2CC",
-            description: "Reach the top 1 place in the leaderboard to unlock next stage",
-            icon: "arrow-up",
-            level: 2,
-            name: "Climbing The Ranks",
-            status: "Top 3 Contender",
-            visibility: 1
+        else if (users.slice(1,3).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Reach the top 1 place in the leaderboard to unlock next stage",
+                icon: "arrow-up",
+                level: 2,
+                name: "Climbing The Ranks",
+                status: "Top 3 Contender",
+                visibility: 1
+            }
+            updateAchievementStatus(loggedInUser.userID, updatedAchievement);
         }
-        updateAchievementStatus(loggedInUser.userID, updatedAchievement);
-    }
-    if (users[0] === loggedInUser && loggedInUser.weeklyExperience > 0){
-        
-        const updatedAchievement: Achievement = {
-            color: "#FFDD43",
-            description: "Max level achieved: Reach top 1 place in the leaderboard",
-            icon: "arrow-up",
-            level: 3,
-            name: "Climbing The Ranks",
-            status: "Leaderboard Dominator",
-            visibility: 1
+        if (users[0] === loggedInUser && loggedInUser.weeklyExperience > 0){
+            
+            const updatedAchievement: Achievement = {
+                color: "#FFDD43",
+                description: "Max level achieved: Reach top 1 place in the leaderboard",
+                icon: "arrow-up",
+                level: 3,
+                name: "Climbing The Ranks",
+                status: "Leaderboard Dominator",
+                visibility: 1
+            }
+            updateAchievementStatus(loggedInUser.userID, updatedAchievement);
         }
-        updateAchievementStatus(loggedInUser.userID, updatedAchievement);
+    } catch (error: any) {
+        alert(`Error: Couldn't update achievement: ${error}`)
     }
-}
-
-const sortDates = (dates: string[]): string[] => {
-    const dateObjects = dates.map(dateString => new Date(dateString));
-    dateObjects.sort((a, b) => a.getTime() - b.getTime());
-    const sortedDates = dateObjects.map(dateObject => dateObject.toString());
-    return sortedDates;
 };
 
-const calculateDaysBetweenDates = (dates:string[]): number => {
-    let timeDifferenceInDays = 0;
-    if (dates.length >= 2) {
-        const firstDate = dates[0];
-        const lastDate = dates[dates.length - 1];
-      
-        const firstDateObject = new Date(firstDate);
-        const lastDateObject = new Date(lastDate);
-      
-        const timeDifferenceInMilliseconds = lastDateObject.getTime() - firstDateObject.getTime();
-      
-        timeDifferenceInDays = timeDifferenceInMilliseconds / (1000 * 60 * 60 * 24);
-      
-    } 
-    return timeDifferenceInDays;
+const sortDates = (dates: string[]): string[] | undefined => {
+    try {
+        const dateObjects = dates.map(dateString => new Date(dateString));
+        dateObjects.sort((a, b) => a.getTime() - b.getTime());
+        const sortedDates = dateObjects.map(dateObject => dateObject.toString());
+        return sortedDates;
+    } catch (error: any) {
+        alert(`Error: Couldn't sort dates`);
+    }
+};
+
+const calculateDaysBetweenDates = (dates:string[] | undefined): number | undefined=> {
+    try {
+        let timeDifferenceInDays = 0;
+        if (dates !== undefined && dates.length >= 2) {
+            const firstDate = dates[0];
+            const lastDate = dates[dates.length - 1];
+          
+            const firstDateObject = new Date(firstDate);
+            const lastDateObject = new Date(lastDate);
+          
+            const timeDifferenceInMilliseconds = lastDateObject.getTime() - firstDateObject.getTime();
+          
+            timeDifferenceInDays = timeDifferenceInMilliseconds / (1000 * 60 * 60 * 24);
+          
+        } 
+        return timeDifferenceInDays;
+    } catch (error: any) {
+        alert(`Error: Couldn't calculate days between two dates: ${error}`)
+    }
 }
 
 const initializeAchievements = async (userID: string | null): Promise<void> => {
-    const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
-    const achievementsSnapshot = await getDocs(achievementsCollectionRef);
-    let newOwner;
-    for (const achievementDoc of achievementsSnapshot.docs) {
-        switch (achievementDoc.data().name) {
-            case "Consistency Streak":
-                newOwner = {
-                    color: "#808080",
-                    description: "Workout for 10 days to unlock this achievement",
-                    level: 0,
-                    status: "locked",
-                    userID: userID,
-                    visibility: 0.5
+    try {
+        const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+        const achievementsSnapshot = await getDocs(achievementsCollectionRef);
+        let newOwner;
+        for (const achievementDoc of achievementsSnapshot.docs) {
+            switch (achievementDoc.data().name) {
+                case "Consistency Streak":
+                    newOwner = {
+                        color: "#808080",
+                        description: "Workout for 10 days to unlock this achievement",
+                        level: 0,
+                        status: "locked",
+                        userID: userID,
+                        visibility: 0.5
+                    }
+                    break;
+                case "Endurance Master":
+                    newOwner = {
+                        color: "#808080",
+                        description: "Do 20 repetitions for an exercise to unlock this achievement",
+                        level: 0,
+                        status: "locked",
+                        userID: userID,
+                        visibility: 0.5
+                    }
+                    break;
+                case "Dedicated Athlete":
+                    newOwner = {
+                        color: "#808080",
+                        description: "Workout for a month consistently to unlock this achievement",
+                        level: 0,
+                        status: "locked",
+                        userID: userID,
+                        visibility: 0.5
+                    }
+                    break;
+                case "Climbing The Ranks":
+                    newOwner = {
+                        color: "#808080",
+                        description: "Get in the top 10 users to unlock this achievement",
+                        level: 0,
+                        status: "locked",
+                        userID: userID,
+                        visibility: 0.5
+                    }
+                    break;
+                case "Strength Builder":
+                    newOwner = {
+                        color: "#808080",
+                        description: "Lift 60 kg on an exercise to unlock this achievement",
+                        level: 0,
+                        status: "locked",
+                        userID: userID,
+                        visibility: 0.5
+                    }
+                    break
+                default:
+                    break;
                 }
-                break;
-            case "Endurance Master":
-                newOwner = {
-                    color: "#808080",
-                    description: "Do 20 repetitions for an exercise to unlock this achievement",
-                    level: 0,
-                    status: "locked",
-                    userID: userID,
-                    visibility: 0.5
+                const updatedOwners = [...achievementDoc.data().owners, newOwner];
+                
+                const updatedData = {
+                    owners: updatedOwners
                 }
-                break;
-            case "Dedicated Athlete":
-                newOwner = {
-                    color: "#808080",
-                    description: "Workout for a month consistently to unlock this achievement",
-                    level: 0,
-                    status: "locked",
-                    userID: userID,
-                    visibility: 0.5
-                }
-                break;
-            case "Climbing The Ranks":
-                newOwner = {
-                    color: "#808080",
-                    description: "Get in the top 10 users to unlock this achievement",
-                    level: 0,
-                    status: "locked",
-                    userID: userID,
-                    visibility: 0.5
-                }
-                break;
-            case "Strength Builder":
-                newOwner = {
-                    color: "#808080",
-                    description: "Lift 60 kg on an exercise to unlock this achievement",
-                    level: 0,
-                    status: "locked",
-                    userID: userID,
-                    visibility: 0.5
-                }
-                break
-            default:
-                break;
+                await updateDoc(achievementDoc.ref, updatedData);
             }
-            const updatedOwners = [...achievementDoc.data().owners, newOwner];
-            
-            const updatedData = {
-                owners: updatedOwners
-            }
-            await updateDoc(achievementDoc.ref, updatedData);
-        }
+    } catch (error: any) {
+        alert(`Couldn't initialize achievements: ${error}`)
+    }
 }
 
 

@@ -12,11 +12,15 @@ const Datepicker = (props: { date: Date; setDate: Function; }) => {
   const [showDate, setShowDate] = useState(false);
 
     
-  const onChange = (selectedDate: any) => {
-    const currentDate = selectedDate || date;
-    setDate(currentDate) 
-    setShowDate(false);  
-    };
+  const onDateChange = (selectedDate: Date, previousDate: Date, setDate: Function, setShowDate: Function): void => {
+    try {
+      const currentDate = selectedDate || previousDate;
+      setDate(currentDate) 
+      setShowDate(false); 
+    } catch (error: any) {
+      alert(`Error: Couldn't change date: ${error}`);
+    } 
+  };
   
   return (
     <View style={{marginTop: 50, alignSelf: 'center' }}>
@@ -29,7 +33,7 @@ const Datepicker = (props: { date: Date; setDate: Function; }) => {
         testID="dateTimePicker"
         value={date}
         mode='date'
-        onChange={(_event: any, selectedDate: any) => onChange(selectedDate)}
+        onChange={(_event: any, selectedDate: any) => onDateChange(selectedDate, date, setDate, setShowDate)}
       />
       )}
     </View>

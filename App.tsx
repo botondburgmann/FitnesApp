@@ -157,7 +157,7 @@ export default function App() {
     const [today, setToday] = useState(new Date());
     useEffect(() => {
       setWeek(calculateWeekRange(today))
-    }, [today])
+    }, [today, userID])
     
   
     function calculateWeekRange(today:Date): WeekRange {
@@ -167,15 +167,18 @@ export default function App() {
       };
       let moveBack = 0;
       let moveForward = 6;
-      for (let i = 0; i <= 6; i++) {      
+      for (let i = 0; i <= 6; i++) {   
         if (today.getDay() === i) {
-          week.start = addDaysToDate(today,-moveBack-6).toDateString()
-          week.end = addDaysToDate(today,moveForward-6).toDateString()
+          week.start = addDaysToDate(today,-moveBack+1).toDateString()
+          week.end = addDaysToDate(today,moveForward+1).toDateString()
           break;
         }
         moveBack++;
         moveForward--;
       }
+      
+/*       console.log(today);
+      console.log(week); */
       
       return week;
     }

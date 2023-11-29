@@ -3,11 +3,10 @@ import React, { useContext, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
 import { editSet } from '../functions/firebaseFunctions';
 import UserContext from '../contexts/UserContext';
-import { addXPForOneSet, removeXP } from '../functions/otherFunctions';
+import { changeXP, } from '../functions/otherFunctions';
 import { backgroundImage, globalStyles } from '../assets/styles';
-import { SetChange } from '../types and interfaces/types';
+import { ExerciseSet, SetChange } from '../types and interfaces/types';
 import WeekContext from '../contexts/WeekContext';
-import DateContext from '../contexts/DateContext';
 
 
 interface RouterProps {
@@ -18,7 +17,9 @@ interface RouterProps {
 const EditSet = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
     const week = useContext(WeekContext);
+
     const { set, exerciseID, setID, isIsometric, date} = route?.params; 
+
     const [weight, setWeight] = useState<string>(set.weight.toString());
     const [time, setTime] = useState<string>(set.time.toString());
     const [reps, setReps] = isIsometric ? useState<string>("") : useState<string>(set.reps.toString());
@@ -40,7 +41,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
         restTime : parseFloat(restTime)*60
     };
 
-    function toggleSwitch(): void {
+    const switchSides = (isEnabled: boolean, setSide: Function, setIsEnabled: Function): void => {
         if (isEnabled)
             setSide('left');
         else
@@ -50,7 +51,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
 
 
 
-    function handleModifyButton(isIsometric: boolean, changeIsometric: SetChange, changeNormal: SetChange, set: { exercise: string; time: number; weight: number; reps: number; }): void {
+    const modifySet = (isIsometric: boolean, changeIsometric: SetChange, changeNormal: SetChange, set: ExerciseSet): void => {
         if (isIsometric) {
             if (changeIsometric.time === 0 || Number.isNaN(changeIsometric.time)) 
                 alert("Time field cannot be empty");
@@ -59,7 +60,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
             else if (changeIsometric.restTime !== undefined && changeIsometric.restTime < 0)
                 alert("Error: Rest time must be a positive number")
             else if (date !== null && week !== null){
-                editSet(userID,set.exercise,exerciseID,setID,changeIsometric, (addXPForOneSet(isIsometric, changeIsometric)+removeXP(set.time, set.weight)), date, week)
+                editSet(userID,set.exercise,exerciseID,setID,changeIsometric, changeXP(isIsometric, changeIsometric), date, week)
                 navigation.navigate("Log")
             }
         } else {            
@@ -72,7 +73,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
             else if (changeNormal.restTime !== undefined && changeNormal.restTime < 0)
                 alert("Error: Rest time must be a positive number")
             else if(date !== null && week !== null){                               
-                editSet(userID,set.exercise, exerciseID, setID,changeNormal, (addXPForOneSet(isIsometric, changeNormal)+removeXP(set.reps, set.weight)), date, week)
+                editSet(userID,set.exercise, exerciseID, setID,changeNormal, changeXP(isIsometric, changeNormal), date, week)
                 navigation.navigate("Log")
             }
         }
@@ -88,7 +89,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                         <Switch
                             trackColor={{ false: "#808080", true: "#fff" }}
                             ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleSwitch}
+                            onValueChange={() => switchSides(isEnabled,setSide,setIsEnabled)}
                             value={isEnabled}
                         />
                     </View>
@@ -136,7 +137,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                     autoCapitalize='none'
                     onChangeText={(text: string) => setRestTime(text)}
                 />
-                <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => handleModifyButton(isIsometric, changeIsometric, changeNormal, set)}>
+                <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => modifySet(isIsometric, changeIsometric, changeNormal, set)}>
                     <Text style={globalStyles.buttonText}>Modify</Text>
                 </Pressable>
             </View>

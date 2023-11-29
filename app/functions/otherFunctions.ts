@@ -1,7 +1,25 @@
 import { Alert } from "react-native";
 import { addSet, addWorkout, deleteSet, setUpProfile } from "./firebaseFunctions";
-import { Exercise, ExerciseSelectOption, ExerciseSet, MyUser, SelectItem, SetChange, WeekRange } from "../types and interfaces/types";
+import { Exercise, ExerciseSelectOption, ExerciseLog, MyUser, SelectItem, SetChange, WeekRange } from "../types and interfaces/types";
 import { NavigationProp } from "@react-navigation/native";
+
+
+export const calculateNumberOfSets = (sides: string[], uniqueExerciseLength: number, restTimes: number[]): number | undefined => {
+  try {
+    let numberOfSet = 0;
+    for (const side of sides) {
+        if (side === "both")
+            numberOfSet++;
+        else 
+            numberOfSet +=0.5;
+    }
+    return isSuperSet(restTimes, uniqueExerciseLength) ? numberOfSet/uniqueExerciseLength : numberOfSet;
+  } catch (error) {
+    alert(`Error: Couldn't calculate number of sets: ${error}`)
+  }
+};
+
+
 
 export const  handleNextButtonPress = (field:string, value: string | number | undefined | SelectItem, userID: string | null, navigation:NavigationProp<any, any>, nextPage: string, system?:string | undefined) => {    
   if (field === "gender") {
@@ -37,7 +55,7 @@ export const  handleNextButtonPress = (field:string, value: string | number | un
   
 }
 
-export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
+export const addXP = (isIsometric: boolean, sets: ExerciseLog): number => {
     let currentExperience = 0;
     if (isIsometric) 
         for (let i = 0; i < sets.times.length; i++) {
@@ -56,22 +74,24 @@ export const addXP = (isIsometric: boolean, sets: ExerciseSet): number => {
     return currentExperience;
 }
 
-export const addXPForOneSet = (isIsometric: boolean, set: SetChange): number => {
-    let currentExperience = 0
-    if (!isIsometric && set.rep !== undefined) {
-        if (set.weight === 0 && Number.isNaN(set.weight))
-            currentExperience += set.rep;
-        else
-            currentExperience += set.rep * set.weight;
-    }
-    else {
-        if (set.weights === 0 && Number.isNaN(set.weight))
-            currentExperience += set.time;
-        else
-            currentExperience += set.time * set.weight;
-    }       
-          
-    return currentExperience;
+export const changeXP = (isIsometric: boolean, set: SetChange): number => {
+  let currentExperience = 0
+  if (!isIsometric && set.rep !== undefined) {
+    if (set.weight === 0 && Number.isNaN(set.weight))
+        currentExperience += set.rep;
+    else
+        currentExperience += set.rep * set.weight;
+    currentExperience += removeXP(set.rep, set.weight)
+  }
+  else {
+    if (set.weights === 0 && Number.isNaN(set.weight))
+        currentExperience += set.time;
+    else
+        currentExperience += set.time * set.weight;
+      currentExperience += removeXP(set.time, set.weight)
+  }       
+
+  return currentExperience;
 }
 
 
@@ -109,16 +129,7 @@ export const isSuperSet = (restTimes: number[], uniqueExerciseLength: number): b
     return true;
 };
 
-export const calculateNumberOfSets = (sides: string[], uniqueExerciseLength: number, restTimes: number[]): number => {
-    let numberOfSet = 0;
-    for (const side of sides) {
-        if (side === "both")
-            numberOfSet++;
-        else 
-            numberOfSet +=0.5;
-    }
-    return isSuperSet(restTimes, uniqueExerciseLength) ? numberOfSet/uniqueExerciseLength : numberOfSet;
-};
+
 
 export const isDropsSet =(restTimes: number[], repsOrTimes: number[], weights: number[], uniqueExerciseLength: number): boolean => {
   if (restTimes.length === 1 )
@@ -138,7 +149,7 @@ export const isDecreasing = (array: number[]): boolean => {
 export const handleAddButton = (time: number, setTime: Function, reps: number, setReps: Function,
                                  restTime: number, setRestTime: Function, side: string, setSide: Function, 
                                  weight: number, setWeight: Function, currentExercise: ExerciseSelectOption,
-                                 sets: ExerciseSet, setIsEnabled: Function,
+                                 sets: ExerciseLog, setIsEnabled: Function,
                                 selectedExercises:ExerciseSelectOption[]): void => {
     if (currentExercise.isometric && (time === 0 || Number.isNaN(time)))
       alert("Error: time field cannot be empty for isometric exercises");
@@ -276,7 +287,7 @@ export const dateStep = (currentDate: Date, step: number): Date => {
   return newDate
 };
 
-export const handleFinishWorkoutButton = (workout: ExerciseSet[], userID: string | null, date: string, totalXP: number, navigation: NavigationProp<any, any>, week: WeekRange ): void => {    
+export const handleFinishWorkoutButton = (workout: ExerciseLog[], userID: string | null, date: string, totalXP: number, navigation: NavigationProp<any, any>, week: WeekRange ): void => {    
   try {
     if (week !== null) {      
       addWorkout(userID, date, workout, totalXP, week );
@@ -287,7 +298,7 @@ export const handleFinishWorkoutButton = (workout: ExerciseSet[], userID: string
   }
 }
 
-export const handleFinishButton = (userID: string | null, date: string, week: WeekRange, selectedExercises: ExerciseSelectOption[], setSelectedExercises: Function, sets: ExerciseSet, setSets: Function, navigation: NavigationProp<any, any>): void => {
+export const handleFinishButton = (userID: string | null, date: string, week: WeekRange, selectedExercises: ExerciseSelectOption[], setSelectedExercises: Function, sets: ExerciseLog, setSets: Function, navigation: NavigationProp<any, any>): void => {
   if (sets.exercise.length === 0)
    alert("Error: Not enough data");
   else{

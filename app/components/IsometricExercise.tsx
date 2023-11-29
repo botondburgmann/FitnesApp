@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext } from 'react'
-import { removeXP, isDropsSet, isSuperSet, calculateNumberOfSets, showDeleteConfirmation } from '../functions/otherFunctions';
+import { removeXP, isDropsSet, isSuperSet, showDeleteConfirmation, calculateNumberOfSets } from '../functions/otherFunctions';
 import UserContext from '../contexts/UserContext';
 import { Exercise, Outputs } from '../types and interfaces/types';
 import { globalStyles } from '../assets/styles';
@@ -15,16 +15,17 @@ const IsometricExercise = (props: { exercise: Exercise; exerciseID: number; }) =
     const week = useContext(WeekContext);
     const date = useContext(DateContext);
 
-    const exercise: Exercise = props.exercise;
-    const exerciseID: number = props.exerciseID;
+    const exercise= props.exercise;
+    const exerciseID = props.exerciseID;
 
     const uniqueValues = {
         sides: Array.from(new Set<string>(exercise.sides)),
         exercise: Array.from(new Set<string>(exercise.exercise))
         
     };
+
     const numberOfSets = calculateNumberOfSets(exercise.sides, uniqueValues.exercise.length, exercise.restTimes);
-    const unilateral : string = uniqueValues.sides.length === 2 ? "(per side)" : "";
+    const unilateral = uniqueValues.sides.length === 2 ? "(per side)" : "";
 
     const outputs: Outputs = {
         setNumbers: [],
@@ -94,6 +95,10 @@ const IsometricExercise = (props: { exercise: Exercise; exerciseID: number; }) =
             </Pressable>
         </View>)
     )
+
+
+
+
     return (
         <View>
            { isSuperSet(exercise.restTimes,uniqueValues.exercise.length) 

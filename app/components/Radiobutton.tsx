@@ -2,10 +2,10 @@ import React from "react";
 import {  View, StyleSheet, ViewStyle, TextStyle } from "react-native";
 import { RadioButtonGroup, RadioButtonItem } from 'expo-radio-button';
 
-const Radiobutton = (props: { selectedValue: string | undefined; setselectedValue: Function | undefined; options: string[]; }) => {
-    const selectedValue: string | undefined = props.selectedValue;
-    const setselectedValue: Function | undefined = props.setselectedValue;
-    const options: string[] | undefined= props.options;
+const Radiobutton = (props: { selectedValue: string | undefined; setselectedValue: Function; options: string[]; }) => {
+    const selectedValue = props.selectedValue;
+    const setselectedValue = props.setselectedValue;
+    const options = props.options;
 
     const radioButtonItems: React.JSX.Element[] = [];
     if (options !== undefined)

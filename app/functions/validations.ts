@@ -1,4 +1,4 @@
-import { ExerciseSet, SelectItem } from "../types and interfaces/types";
+import { ExerciseLog, SelectItem } from "../types and interfaces/types";
 
 
 export const validateGender = (gender:string) => {
@@ -40,7 +40,7 @@ export const validateActivityLevel = (activityLevel: SelectItem) => {
         throw new Error("please select one of the options");
 }
 
-export const validateExerciseSet = (set: ExerciseSet) => {
+export const validateExerciseSet = (set: ExerciseLog) => {
     for (const key in set){
         if (set[key] === undefined)
             throw new Error(`${key} must be set`); 

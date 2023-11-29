@@ -1,12 +1,8 @@
 import React from 'react';
 import { Modal, View, Text, Pressable } from 'react-native';
+import { MyModalProps } from '../types and interfaces/types';
 
-interface MyModalProps {
-  isVisible: boolean;
-  onClose: () => void;
-  title: string | undefined;
-  information: string | undefined;
-}
+
 
 const Info = ({ isVisible, onClose, title, information }: MyModalProps) => {
   return (

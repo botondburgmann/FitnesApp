@@ -1,17 +1,14 @@
 import { View, StyleSheet } from 'react-native'
-import React, { useState } from 'react'
+import React  from 'react'
 import { Dropdown } from 'react-native-element-dropdown';
 
-const SelectMenu = (props: { setSelectedValue: Function; data: any; title: string; }) => {
+const SelectMenu = (props: { setSelectedValue: Function; data: ({ label: any; } & { value: any; })[]; title: string; }) => {
 
   const setSelectedValue = props.setSelectedValue;    
   const data = props.data
   const title = props.title
   const shouldIncludeSearch = data.length > 10;
 
-  const [isFocus, setIsFocus] = useState(false);
-
-  
   return (
     <View style={styles.container}>
       <Dropdown 
@@ -21,7 +18,6 @@ const SelectMenu = (props: { setSelectedValue: Function; data: any; title: strin
         labelField="label"
         valueField="value"
         onChange={item => {
-          setIsFocus(false);
           setSelectedValue(item);
         }}
       />
