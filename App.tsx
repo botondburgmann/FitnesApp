@@ -2,54 +2,40 @@ import React from "react"
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Login from "./app/screens/Login";
+import Login from "./app/pages/login/Login";
 import { useContext, useEffect, useState } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { FIREBASE_AUTH} from "./FirebaseConfig";
-import Registration from "./app/screens/Registration";
-import Age from "./app/screens/Age";
-import Weight from "./app/screens/Weight";
-import Gender from "./app/screens/Gender";
-import Height from "./app/screens/Height";
-import ActivityLevel from "./app/screens/ActivityLevel";
-import Log from "./app/screens/Log";
-import AddWorkout from "./app/screens/AddWorkout";
-import Account from "./app/screens/Account";
-import Routines from "./app/screens/Routines";
+import Registration from "./app/pages/login/Registration";
+import Age from "./app/pages/setup/Birthday";
+import Weight from "./app/pages/setup/Weight";
+import Gender from "./app/pages/setup/Gender";
+import Height from "./app/pages/setup/Height";
+import ActivityLevel from "./app/pages/setup/ActivityLevel";
+import Log from "./app/pages/workouts/Log";
+import AddWorkout from "./app/pages/workouts/AddWorkout";
+import Account from "./app/pages/profile/Account";
+import Routines from "./app/pages/workouts/Routines";
 import { getSetUpValue } from "./app/functions/firebaseFunctions";
-import Toplist from "./app/screens/Toplist";
-import Exercises from "./app/screens/Exercises";
-import Focus from "./app/screens/Focus";
+import Toplist from "./app/pages/toplist/Toplist";
+import Exercises from "./app/pages/exercises/Exercises";
 import UserContext from "./app/contexts/UserContext";
-import CurrentExercise from "./app/screens/CurrentExercise";
-import CreateExercise from "./app/screens/CreateExercise";
-import EditSet from "./app/screens/EditSet";
-import EditProfile from "./app/screens/EditProfile";
-import Details from "./app/screens/Details";
+import CreateExercise from "./app/pages/exercises/CreateExercise";
+import EditProfile from "./app/pages/profile/EditProfile";
+import Details from "./app/pages/exercises/Details";
 import { FontAwesome5 } from "@expo/vector-icons";
-import Achievements from "./app/screens/Achievements";
+import Achievements from "./app/pages/profile/Achievements";
 import WeekContext from "./app/contexts/WeekContext";
 import { WeekRange } from "./app/types and interfaces/types";
+import SetUpLayout from "./app/pages/setup/SetUplayout";
 
 
-const Stack = createNativeStackNavigator();
 
 const SetupStack = createNativeStackNavigator();
 
 const Tab = createBottomTabNavigator();
 
-function SetUpLayout() {
-  return( 
-      <SetupStack.Navigator>
-        <SetupStack.Screen name="Gender" component={Gender} options={{ headerShown: false }}/>
-        <SetupStack.Screen name="Age" component={Age}  options={{ headerShown: false }}/>
-        <SetupStack.Screen name="Weight" component={Weight}   options={{ headerShown: false }} />
-        <SetupStack.Screen name="Height" component={Height} options={{ headerShown: false }} />
-        <SetupStack.Screen name="ActivityLevel" component={ActivityLevel }options={{ headerShown: false }} />
-        <SetupStack.Screen name="InsideLayout" component={ InsideLayout }  options={{ headerShown: false }} />
-      </SetupStack.Navigator>
-  );
-}
+
 
 function InsideLayout() {
   return( 
@@ -107,18 +93,7 @@ function ProfileLayout() {
   )
 }
 
-function WorkoutsLayout() {
-  return( 
-    <SetupStack.Navigator>
-      <SetupStack.Screen name="Log" component={Log} options={{ headerShown: false }}/>
-      <SetupStack.Screen name="Add" component={AddWorkout}  />
-      <SetupStack.Screen name="Edit set" component={EditSet}  />
-      <SetupStack.Screen name="Routines" component={Routines } />
-      <SetupStack.Screen name="Focus" component={Focus }/>
-      <SetupStack.Screen name="CurrentExercise" component={CurrentExercise }/>
-    </SetupStack.Navigator>
-  )
-}
+
 function ExercisesLayout() {
   return( 
     <SetupStack.Navigator>
@@ -176,9 +151,6 @@ export default function App() {
         moveBack++;
         moveForward--;
       }
-      
-/*       console.log(today);
-      console.log(week); */
       
       return week;
     }

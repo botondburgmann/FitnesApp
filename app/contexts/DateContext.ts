@@ -1,5 +1,5 @@
 import { createContext } from 'react';
 
-const DateContext = createContext<string | null>(null);
+const DateContext = createContext<Date | null>(null);
 
 export default DateContext;

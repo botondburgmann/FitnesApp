@@ -1,8 +1,9 @@
 import { View, StyleSheet } from 'react-native'
 import React  from 'react'
 import { Dropdown } from 'react-native-element-dropdown';
+import { SelectItem } from '../types and interfaces/types';
 
-const SelectMenu = (props: { setSelectedValue: Function; data: ({ label: any; } & { value: any; })[]; title: string; }) => {
+const SelectMenu = (props: { setSelectedValue: Function; data: SelectItem[]; title: string; }) => {
 
   const setSelectedValue = props.setSelectedValue;    
   const data = props.data

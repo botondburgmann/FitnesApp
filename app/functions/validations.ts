@@ -1,45 +1,6 @@
 import { ExerciseLog, SelectItem } from "../types and interfaces/types";
 
 
-export const validateGender = (gender:string) => {
-    if (gender === undefined)
-        throw new Error("gender must be set");
-
-    if (!(gender.toLowerCase() === 'male' || gender.toLowerCase() === 'female'))
-        throw new Error("gender must be set to either male or female");
-}
-
-export const validateAge = (age: number) => {
-    if (age === undefined)
-        throw new Error("Age must be set");
-    else if (typeof(age) !== 'number')
-        throw new Error("Age must be a number");
-    else if (age < 0)
-        throw new Error("Unfortunately this time we cannot sign up time travellers. Sorry for the inconvenience");
-    else if (age >= 0 && age < 12)
-        throw new Error("You need to be at least 12 years old to sign up");
-    else if (age > 120 )
-        throw new Error("Aren't you a bit too old (or dead) to work out?");
-}
-
-export const validateWeight = (weight: number) => {
-    if (Number.isNaN(weight))
-        throw new Error("weight must be set");
-    else if (typeof(weight) !== "number" || weight < 0)
-        throw new Error("weight must be a positive number");
-}
-export const validateHeight = (height: number) => {
-    if (Number.isNaN(height))
-        throw new Error("height must be set");
-    else if (typeof(height) !== "number" || height < 0)
-        throw new Error("height must be a positive number");
-}
-
-export const validateActivityLevel = (activityLevel: SelectItem) => {
-    if (!(activityLevel.value === "beginner" || activityLevel.value === "intermediate" || activityLevel.value === "advanced") )
-        throw new Error("please select one of the options");
-}
-
 export const validateExerciseSet = (set: ExerciseLog) => {
     for (const key in set){
         if (set[key] === undefined)

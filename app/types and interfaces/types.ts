@@ -1,7 +1,26 @@
 import { NavigationProp } from "@react-navigation/native";
 
+export type Exercise = {
+    hidden: boolean;
+    isometric: boolean;
+    name: string;
+    musclesWorked: string[];
+    unilateral: boolean;
+    [key: string]: any;
+}
+export type WeekRange = {
+    start: Date;
+    end: Date;
+}
+
+
+
+
+
+
 export type RouterProps = {
     navigation: NavigationProp<any, any>;
+    route?: any;
 }
 
 export type SelectItem = {
@@ -32,33 +51,17 @@ export type SetChange = {
 
 }
 
-export type Exercise = {
-    hidden: boolean;
-    isometric: boolean;
-    name: string;
-    musclesWorked: string[];
-    unilateral: boolean;
-    [key: string]: any;
-}
 
 
-export type ExerciseLog = {
-    exercise : string[],
-    weights: number[],
-    reps: number[],
-    times: number[],
-    restTimes: number[],
-    sides: string[];
-    [key: string]: any;
-}
+
 
 export type ExerciseSet = {
-    exercise : string,
+    exercise? : string,
     weight: number,
-    reps: number,
+    rep: number,
     time: number,
     restTime: number,
-    side: string;
+    side?: "both" | "left" | "right";
 }
 
 export type MyUser = {
@@ -94,10 +97,7 @@ export type TableState = {
   tableData: TableRow[]; // Use the TableRow type for tableData
 }
 
-export type WeekRange = {
-    start: string;
-    end: string;
-  }
+
 
 export type Achievement = {
     color: string;
@@ -118,24 +118,7 @@ export type Outputs = {
     sides: string[];
 }
 
-export type MuscleGroups = {
-'Full body': string[],
-'Push': string[],
-'Pull': string[],
-'Leg': string[],
-'Back' : string[],
-'Chest' : string[],
-'Bicep' : string[],
-'Tricep' : string[],
-'Shoulder': string[],
-'Ab' : string[],
-'Arm' : string[],
-'Forearm': string[],
-'Upper body': string[],
-'Full body pull' : string[],
-'Full body push' : string[],
-[key: string]: any
-}
+
 
 export type MyModalProps = {
     isVisible: boolean;
