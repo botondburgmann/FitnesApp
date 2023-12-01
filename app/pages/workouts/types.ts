@@ -1,20 +1,3 @@
-export type SelectOption = {
-    label: string;
-    value: string;
-    unilateral: boolean,
-    isometric: boolean
-}
-
-export type ExerciseLogType = {
-    exercise :  any[],
-    weights: number[],
-    reps: number[],
-    times: number[],
-    restTimes: number[],
-    sides: string[];
-    [key: string]: any;
-}
-
 export type WorkoutTypes = {
     'Full body': string[],
     'Push': string[],

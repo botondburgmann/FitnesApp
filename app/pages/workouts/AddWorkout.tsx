@@ -2,11 +2,10 @@ import { ImageBackground, Pressable, ScrollView, StyleSheet, Switch, Text, TextI
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../../components/SelectMenu'
 import UserContext from '../../contexts/UserContext'
-import { Exercise, RouterProps } from '../../types and interfaces/types'
+import { Exercise, RouterProps, Sets } from '../../types and interfaces/types'
 import { backgroundImage, globalStyles } from '../../assets/styles'
 import WeekContext from '../../contexts/WeekContext'
 import { workoutsStyles } from './styles'
-import {  ExerciseLogType, SelectOption } from './types'
 import {  convertFieldsToNumeric, finishExercise} from './workoutsFunction'
 import { collection, Unsubscribe, onSnapshot, query, where } from 'firebase/firestore'
 import { FIRESTORE_DB } from '../../../FirebaseConfig'
@@ -22,14 +21,15 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
 
   const { date }  = route?.params as RouteParamsTypes;
 
-  const [allExercises, setAllExercises] = useState<SelectOption[]>();
-  const [currentExercise, setCurrentExercise] = useState<SelectOption>();
+  const [allExercises, setAllExercises] = useState<Exercise[]>();
+  const [currentExercise, setCurrentExercise] = useState<Exercise>();
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
   const [time, setTime] = useState("");
   const [restTime, setRestTime] = useState("");
-  const [sets, setSets] = useState<ExerciseLogType>({
+  const [sets, setSets] = useState<Sets>({
     exercise : [],
+    dates: [],
     weights: [],
     reps: [],
     times: [],
@@ -53,19 +53,27 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
 
   function addSet (): void {
     try {
-      const numericData = convertFieldsToNumeric(parseFloat(weight), parseFloat(reps), parseFloat(time), parseFloat(restTime));
       
       if (currentExercise === undefined){
         alert("Error: Please select an exercise");
         return;
       }
+      const dataWithStrings = {
+        exercise: currentExercise.label,
+        reps: parseFloat(reps),
+        restTime: parseFloat(restTime),
+        side: side,
+        time: parseFloat(time),
+        weight: parseFloat(weight),
+      }
+      const numericData = convertFieldsToNumeric(dataWithStrings);
       validateData(currentExercise, parseFloat(reps), parseFloat(time), parseFloat(restTime));
       
       setSets((prevSets) => ({
         ...prevSets,
         exercise: [...prevSets.exercise, currentExercise.label],
         weights: [...prevSets.weights, numericData.weight],
-        reps: [...prevSets.reps, numericData.rep],
+        reps: [...prevSets.reps, numericData.reps],
         times: [...prevSets.times, numericData.time],
         restTimes: [...prevSets.restTimes, numericData.restTime*60],
         sides: [...prevSets.sides, side],
@@ -80,7 +88,7 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
 
 
   
-  function validateData(currentExercise:SelectOption, reps: number, time: number, restTime: number): void {
+  function validateData(currentExercise:Exercise, reps: number, time: number, restTime: number): void {
     if (!currentExercise.isometric && Number.isNaN(reps))
       throw new Error("Repetition number is required for non-isometric exercises");
     if (!currentExercise.isometric && reps < 0)
@@ -111,7 +119,8 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
       reps: [],
       times: [],
       restTimes: [],
-      sides: []
+      sides: [],
+      dates: [],
     });
     setSide("both");
     setTime("");
@@ -135,7 +144,8 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
                         exercises.push({
                             hidden: exerciseDoc.data().hidden,
                             isometric: exerciseDoc.data().isometric,
-                            name: exerciseDoc.data().name,
+                            label: exerciseDoc.data().name,
+                            value: exerciseDoc.data().name.toLowerCase(),
                             musclesWorked: exerciseDoc.data().musclesWorked,
                             unilateral: exerciseDoc.data().unilateral
                         })
@@ -157,11 +167,13 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
   
   useEffect(() => {
     const unsubscribeFromAvailableExercises = getAvailableExercises(userID, (exercises: Exercise[]) => {
-      const exerciseData: SelectOption[] = [];
+      const exerciseData: Exercise[] = [];
         exercises.forEach((exercise) => {
           exerciseData.push({
-            label: exercise.name,
-            value: exercise.name,
+            label: exercise.label,
+            value: exercise.value,
+            musclesWorked: exercise.musclesWorked,
+            hidden: exercise.hidden,
             unilateral: exercise.unilateral,
             isometric: exercise.isometric,
           });

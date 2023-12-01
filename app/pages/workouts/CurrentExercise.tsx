@@ -2,12 +2,12 @@ import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View }
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
 import {  getUser } from '../../functions/firebaseFunctions';
-import {  Exercise, RouterProps } from '../../types and interfaces/types';
+import {  Exercise, RouterProps, Sets } from '../../types and interfaces/types';
 import Set from './components/Set';
 import Rest from './components/Rest';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import WeekContext from '../../contexts/WeekContext';
-import { ExerciseLogType, WorkoutTypes } from './types';
+import { WorkoutTypes } from './types';
 import { addXP, calculateNumberOfSet, finishExercise } from './workoutsFunction';
 import { Unsubscribe } from 'firebase/auth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -42,14 +42,15 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
   const [activityLevel, setActivityLevel] = useState("");
   const [loadingUser, setLoadingUser] = useState(true);
   const [workoutComponents, setWorkoutComponents] = useState<React.JSX.Element[]>([]);
-  const workout = useRef<ExerciseLogType[]>([]);
+  const workout = useRef<Sets[]>([]);
   const [endOfWorkout, setEndofWorkout] = useState(false);
   const totalXP = useRef(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [goToNextPage, setGoToNextPage] = useState(false);
 
-  const currentExercise = useRef<ExerciseLogType>({
+  const currentExercise = useRef<Sets>({
     exercise : [],
+    dates: [],
     weights: [],
     reps: [],
     times: [],
@@ -84,7 +85,8 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
                         exercises.push({
                             hidden: exerciseDoc.data().hidden,
                             isometric: exerciseDoc.data().isometric,
-                            name: exerciseDoc.data().name,
+                            label: exerciseDoc.data().name,
+                            value: exerciseDoc.data().name.toLowerCase(),
                             musclesWorked: exerciseDoc.data().musclesWorked,
                             unilateral: exerciseDoc.data().unilateral
                         })
@@ -190,14 +192,14 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
       for (let i = 0; i < selectedExercises.length; i++) {
         for (let j = 0; j < numberOfSets; j++) {
           workoutComponents.push(<Set  
-            key={`set-${selectedExercises[i].name}-${j}`} 
+            key={`set-${selectedExercises[i].value}-${j}`} 
             exercise={selectedExercises[i]} 
             focus={focus}
             setGoToNextPage={setGoToNextPage}
             currentExercise={currentExercise.current}
           />)          
           workoutComponents.push(<Rest 
-            key={`rest-${selectedExercises[i].name}-${j}`} 
+            key={`rest-${selectedExercises[i].value}-${j}`} 
             exercise={selectedExercises[i]} 
             setGoToNextPage={setGoToNextPage} 
             currentExercise={currentExercise.current}
@@ -223,7 +225,8 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
         
       }    
 
-      const newExercise: ExerciseLogType = {
+      const newExercise: Sets = {
+        dates: [],
         exercise: [],
         reps: [],
         restTimes: [],

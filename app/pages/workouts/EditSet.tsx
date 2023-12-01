@@ -9,16 +9,16 @@ import { getWorkoutDocs } from '../../functions/firebaseFunctions';
 import { addTotalExperienceToFirebase, convertFieldsToNumeric, removeXP } from './workoutsFunction';
 import { updateDoc, doc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
-import { ExerciseSet } from '../exercises/types';
+import { SingleSet } from '../exercises/types';
 
 type RouteParamsTypes = {
-    set: ExerciseSet;
+    set: SingleSet;
     exerciseID: number;
     setID: number;
     isIsometric: boolean;
     date: string;
 }
-const EditSet = ({ route, navigation }: RouterProps) => {
+const EditSingleSet = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
     const week = useContext(WeekContext);
 
@@ -26,15 +26,16 @@ const EditSet = ({ route, navigation }: RouterProps) => {
     
     const [weight, setWeight] = useState(set.weight.toString());
     const [time, setTime] = useState(set.time.toString());
-    const [reps, setReps] = isIsometric ? useState("") : useState(set.rep.toString());
+    const [reps, setReps] = isIsometric ? useState("") : useState(set.reps.toString());
     const [restTime, setRestTime] = useState((set.restTime/60).toString());
     const [isEnabled, setIsEnabled] = set.side === "left" ? useState(false) : useState(true);
     const [side, setSide] = useState(set.side);
 
-    const change: ExerciseSet = {
+    const change: SingleSet = {
+        exercise: set.exercise,
         side: side,
         weight : parseFloat(weight) ,
-        rep :  parseFloat(reps),
+        reps :  parseFloat(reps),
         time :  parseFloat(time) ,
         restTime : parseFloat(restTime)*60
     };
@@ -47,15 +48,15 @@ const EditSet = ({ route, navigation }: RouterProps) => {
         setIsEnabled((previousState: boolean) => !previousState);
     }
 
-    function changeXP (isIsometric: boolean, change: ExerciseSet): number {
+    function changeXP (isIsometric: boolean, change: SingleSet): number {
         let currentExperience = 0
         
-        if (!isIsometric && change.rep !== undefined) {
+        if (!isIsometric && change.reps !== undefined) {
             if (change.weight === 0 || Number.isNaN(change.weight))
-                currentExperience += change.rep;
+                currentExperience += change.reps;
             else
-                currentExperience += change.rep * change.weight;
-            currentExperience += removeXP(set.rep, change.weight)
+                currentExperience += change.reps * change.weight;
+            currentExperience += removeXP(set.reps, change.weight)
         }
         else {
             if (change.weight === 0 ||  Number.isNaN(change.weight))
@@ -69,7 +70,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
         return currentExperience;
       }
 
-    function modifySet (): void {        
+    function modifySingleSet (): void {        
         if (userID === null){
             alert("User is not authorized");
             return;
@@ -86,11 +87,11 @@ const EditSet = ({ route, navigation }: RouterProps) => {
             alert("Time field cannot be empty");
             return;
         } 
-        if (!isIsometric && (change.rep === 0 || Number.isNaN(change.rep))){            
+        if (!isIsometric && (change.reps === 0 || Number.isNaN(change.reps))){            
             alert("Reps field cannot be empty"); 
             return;
         }
-        if (change.rep < 0){
+        if (change.reps < 0){
             alert("Reps must be a positive number");
             return;
         }
@@ -102,15 +103,23 @@ const EditSet = ({ route, navigation }: RouterProps) => {
             alert("Rest time must be a positive number");
             return;
         }
-        editSet(userID, new Date(date), week, changeXP(isIsometric, change))
+        editSingleSet(userID, new Date(date), week, changeXP(isIsometric, change))
         navigation.navigate("Log")
     
     }
 
 
-    async function editSet (userID: string, date: Date, week: WeekRange, experience: number): Promise<void> {
+    async function editSingleSet (userID: string, date: Date, week: WeekRange, experience: number): Promise<void> {
         try {   
-            const numericData = convertFieldsToNumeric(change.weight, change.rep, change.time, change.restTime);                            
+            const dataWithStrings = {
+                exercise: set.exercise,
+                reps: parseFloat(reps),
+                restTime: parseFloat(restTime),
+                side: side,
+                time: parseFloat(time),
+                weight: parseFloat(weight),
+              }
+              const numericData = convertFieldsToNumeric(dataWithStrings);                          
             const workoutDocs = await getWorkoutDocs(userID, date);
             if (workoutDocs === undefined){
                 alert("Document doesn't exist");
@@ -121,7 +130,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
             for (let i = 0; i < workoutDocs.data().Workout.length; i++) {   
                 if(workoutDocs.data().Workout[i].exercise[setID] === set.exercise && i === exerciseID){
                     updatedData.Workout[i].weights[setID] = numericData.weight;
-                    updatedData.Workout[i].reps[setID] = numericData.rep;
+                    updatedData.Workout[i].repss[setID] = numericData.reps;
                     updatedData.Workout[i].times[setID] = numericData.time;
                     updatedData.Workout[i].restTimes[setID] = numericData.restTime;
                     updatedData.Workout[i].sides[setID] = change.side;
@@ -195,7 +204,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
                     autoCapitalize='none'
                     onChangeText={(text: string) => setRestTime(text)}
                 />
-                <Pressable style={[globalStyles.button, {width: 100}]} onPress={modifySet}>
+                <Pressable style={[globalStyles.button, {width: 100}]} onPress={modifySingleSet}>
                     <Text style={globalStyles.buttonText}>Modify</Text>
                 </Pressable>
             </View>
@@ -203,7 +212,7 @@ const EditSet = ({ route, navigation }: RouterProps) => {
     )
 }
 
-export default EditSet
+export default EditSingleSet
 
 const styles = StyleSheet.create({
     text:{

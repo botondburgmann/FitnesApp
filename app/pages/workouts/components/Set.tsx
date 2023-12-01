@@ -1,10 +1,9 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
-import { Exercise } from '../../../types and interfaces/types';
+import { Exercise, Sets } from '../../../types and interfaces/types';
 import { globalStyles } from '../../../assets/styles';
-import { ExerciseLogType } from '../types';
 
-const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Function; currentExercise: ExerciseLogType; }) => {
+const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Function; currentExercise: Sets; }) => {
     const exercise = props.exercise;
     const focus = props.focus;
     const setGoToNextPage = props.setGoToNextPage
@@ -38,14 +37,14 @@ const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Functi
             if (Number.isNaN(reps))
                 reps = 0;         
             if (exercise.unilateral) {
-                currentExercise.exercise.push(...[exercise.name, exercise.name])
+                currentExercise.exercise.push(...[exercise.label, exercise.label])
                 currentExercise.reps.push(...[reps, reps])
-                currentExercise.sides.push(...["left", "right"]);
+                currentExercise.sides.push(...["left", "right"] as ("left" | "right")[]);
                 currentExercise.times.push(...[time, time]);
                 currentExercise.weights.push(...[weight, weight]);
             }
             else {
-                currentExercise.exercise.push(exercise.name)
+                currentExercise.exercise.push(exercise.label)
                 currentExercise.reps.push(reps)
                 currentExercise.sides.push("both");
                 currentExercise.times.push(time);
@@ -59,7 +58,7 @@ const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Functi
     }
   return (
     <View>
-        <Text style={[globalStyles.label, {marginVertical: 50}]}>{exercise.name}</Text>
+        <Text style={[globalStyles.label, {marginVertical: 50}]}>{exercise.label}</Text>
         {exercise.isometric
             ? exercise.musclesWorked.length === 1 && focus === "strength"
                 ? exercise.unilateral 

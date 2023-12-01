@@ -1,12 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
-import { Exercise } from '../../../types and interfaces/types'
+import { Exercise, Sets } from '../../../types and interfaces/types'
 import { globalStyles } from '../../../assets/styles'
-import { ExerciseLogType } from '../types'
 
 
-const Rest = (props: { setGoToNextPage: Function; currentExercise: ExerciseLogType; exercise: Exercise }) => {
+const Rest = (props: { setGoToNextPage: Function; currentExercise: Sets; exercise: Exercise }) => {
   const setGoToNextPage = props.setGoToNextPage
   const currentExercise = props.currentExercise;
   const exercise = props.exercise;

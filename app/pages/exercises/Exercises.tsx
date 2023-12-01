@@ -98,7 +98,7 @@ const Exercises = ({navigation}: RouterProps) => {
   exercises.forEach((exercise, index) => {
     exerciseComponentsList.push(
       <View key={index} style={styles.row}>
-        <Pressable style={{width: '50%'}} onPress={()=>navigation.navigate('Details', {exercise: exercise.name})}>
+        <Pressable style={{width: '50%'}} onPress={()=>navigation.navigate('Details', {exercise: exercise.label})}>
           <Text style={{
                     textAlign: 'left',
                     fontSize: 16,
@@ -107,13 +107,13 @@ const Exercises = ({navigation}: RouterProps) => {
                     textTransform: 'uppercase',
                     fontWeight: "600",
                     paddingVertical: 10,
-          }}>{exercise.name}</Text>
+          }}>{exercise.label}</Text>
         </Pressable>
         <Pressable>
           {exercise.hidden 
-            ? <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
+            ? <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.label)
             }>Unhide exercise</Text>
-            : <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.name)
+            : <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.label)
             }>Hide exercise</Text>}
         </Pressable>
       </View>)

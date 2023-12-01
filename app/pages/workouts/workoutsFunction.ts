@@ -1,12 +1,11 @@
 import { collection, query, where, getDocs, updateDoc, Unsubscribe, onSnapshot, addDoc, doc } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../../FirebaseConfig";
-import { Achievement, User, WeekRange } from "../../types and interfaces/types";
-import { ExerciseLogType } from "./types";
+import { Achievement, Sets, User, WeekRange } from "../../types and interfaces/types";
 import { getWorkoutDocs, updateAchievementStatus } from "../../functions/firebaseFunctions";
 import { NavigationProp } from "@react-navigation/native";
-import { ExerciseSet } from "../exercises/types";
+import { SingleSet } from "../exercises/types";
 
-export function addXP (isIsometric: boolean, sets: ExerciseLogType): number | undefined {
+export function addXP (isIsometric: boolean, sets: Sets): number | undefined {
     try {
         let currentExperience = 0;
         if (isIsometric) 
@@ -73,20 +72,22 @@ export async function addTotalExperienceToFirebase  (experience: number, date: D
     }
 };
 
-export function convertFieldsToNumeric(weight:number, reps: number, time: number, restTime: number): ExerciseSet {
+export function convertFieldsToNumeric(set: SingleSet): SingleSet {
     const numericData = {
-      weight: weight,
-      rep: reps,
-      time: time,
-      restTime: restTime
+        exercise: set.exercise,
+        reps: set.reps,
+        restTime: set.restTime,
+        side: set.side,
+        time: set.time,
+        weight: set.weight,
     }
-    if (Number.isNaN(weight))
+    if (Number.isNaN(set.weight))
       numericData.weight = 0
-    if (Number.isNaN(reps))
-      numericData.rep = 0    
-    if (Number.isNaN(time))
+    if (Number.isNaN(set.reps))
+      numericData.reps = 0    
+    if (Number.isNaN(set.time))
       numericData.time = 0     
-    if (Number.isNaN(restTime))
+    if (Number.isNaN(set.restTime))
       numericData.restTime = 0;
     return numericData
   }
@@ -102,10 +103,11 @@ export function getWorkout (userID: string | null, date: Date | null, callback: 
         
         const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
             if (!workoutsSnapshot.empty) {
-                const allExercises: ExerciseLogType[] = [];
+                const allExercises: Sets[] = [];
                 workoutsSnapshot.docs.forEach(workout => {
                     for (let i = 0; i < workout.data().Workout.length; i++) {
-                        let currentExercise: ExerciseLogType = {
+                        let currentExercise: Sets = {
+                            dates:  workout.data().date,
                             exercise :  workout.data().Workout[i].exercise,
                             weights: workout.data().Workout[i].weights,
                             reps: workout.data().Workout[i].reps,
@@ -127,7 +129,7 @@ export function getWorkout (userID: string | null, date: Date | null, callback: 
 };
 
  
-export async function updateStrengthBuilderAchievement (set: ExerciseLogType, userID: string): Promise<Achievement | undefined> {
+export async function updateStrengthBuilderAchievement (set: Sets, userID: string): Promise<Achievement | undefined> {
     try {        
         for (const weight of set.weights) {
             
@@ -194,7 +196,7 @@ export async function updateStrengthBuilderAchievement (set: ExerciseLogType, us
         alert(`Couldn't update achievement: ${error}`)
     }
 };
-export  async function updateEnduranceMasterAchievement (set: ExerciseLogType, userID: string): Promise<Achievement | undefined> {
+export  async function updateEnduranceMasterAchievement (set: Sets, userID: string): Promise<Achievement | undefined> {
     try {
         for (const rep of set.reps) {
             if (rep >= 20 && rep < 50) {
@@ -496,7 +498,7 @@ try {
 }
 };
 
-export async function finishExercise (sets: ExerciseLogType, userID: string | null, date: Date | null, week: WeekRange | null, 
+export async function finishExercise (sets: Sets, userID: string | null, date: Date | null, week: WeekRange | null, 
                                 navigation: NavigationProp<any, any>, setSets?: Function) {
     try {
 
@@ -532,13 +534,14 @@ export async function finishExercise (sets: ExerciseLogType, userID: string | nu
     }
 };
 
-function calculateExperience(sets: ExerciseLogType): number {
+function calculateExperience(sets: Sets): number {
 let experience = 0;
-for (const exercise of sets.exercise) {
-    let result = addXP(exercise.isometric, sets);
+for (let i = 0; i < sets.exercise.length; i++) {
+    let result = addXP(sets.reps[i] === 0, sets);
     if (result !== undefined)
-    experience += result;
+        experience += result;
 }
+
 return experience;
 };
   
@@ -624,7 +627,7 @@ export function calculateNumberOfSet (focus:string, activityLevel: string): numb
     return numberOfSet;
 };
 
-export function isSuperSet (exercise: ExerciseLogType, uniqueExercises: string[]): boolean {
+export function isSuperSet (exercise: Sets, uniqueExercises: string[]): boolean {
     for (let i = 0; i < exercise.restTimes.length; i+= uniqueExercises.length) 
         if (exercise.restTimes[i] > 0) 
             return false;
@@ -635,7 +638,7 @@ export function isSuperSet (exercise: ExerciseLogType, uniqueExercises: string[]
 
 
 
-export function isDropsSet (exercise:ExerciseLogType, uniqueExercises: string[] ): boolean {
+export function isDropsSet (exercise:Sets, uniqueExercises: string[] ): boolean {
     if (exercise.restTimes.length === 1 )
         return false;
     for (let i = 0; i < exercise.restTimes.length-1; i++) 

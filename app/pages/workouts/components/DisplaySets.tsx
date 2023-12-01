@@ -4,8 +4,8 @@ import ExerciseLog from './ExerciseLog';
 import UserContext from '../../../contexts/UserContext';
 import { workoutsStyles } from '../styles';
 import { getWorkout } from '../workoutsFunction';
-import { ExerciseLogType } from '../types';
 import DateContext from '../../../contexts/DateContext';
+import { Sets } from '../../../types and interfaces/types';
 
 
 const DisplaySets = () => {
@@ -14,7 +14,7 @@ const DisplaySets = () => {
     const [allExercises, setAllExercises] = useState<React.JSX.Element[]>([]);
     
     useEffect(() => {
-      const unsubscribeFromWorkouts = getWorkout(userID, date, (exercises: ExerciseLogType[]) => {
+      const unsubscribeFromWorkouts = getWorkout(userID, date, (exercises: Sets[]) => {
         const exerciseComponents: React.JSX.Element[] = [];
         
         exercises.forEach((exercise, index) => {

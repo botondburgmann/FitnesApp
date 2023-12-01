@@ -15,21 +15,25 @@ export type RouterProps = {
     route?: any;
 }
 
-export type BestExercise = {
-    name: string;
-    weights: number;
-    reps: number;
-    [key: string]: any;
-};
-
 export type Exercise = {
-    hidden: boolean;
-    isometric: boolean;
-    name: string;
-    musclesWorked: string[];
-    unilateral: boolean;
-    [key: string]: any;
-};
+	label: string;
+	value: string;
+	unilateral: boolean;
+	musclesWorked: string[];
+	hidden: boolean;
+	isometric: boolean;
+	
+}
+
+export type Sets = {
+	exercise: string[];
+    dates : string[],
+	reps: number[];
+	restTimes: number[];
+	sides: ("both" | "left" | "right")[];
+	times: number[];
+	weights: number[];
+}
 
 export type User = {
     activityLevel: string;

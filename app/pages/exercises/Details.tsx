@@ -7,8 +7,8 @@ import { backgroundImage, globalStyles } from "../../assets/styles";
 import { Unsubscribe } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../../FirebaseConfig";
-import {  ExerciseRecords, TableRow, TableState } from "./types";
-import { BestExercise } from "../../types and interfaces/types";
+import {  SingleSet, TableRow, TableState } from "./types";
+import { Sets } from "../../types and interfaces/types";
 
 
 interface RouterProps {
@@ -28,21 +28,31 @@ const Details = ({ route }: RouterProps) => {
     tableHead: ["Date", "Weight (kg)", "Repetitons", "Time (seconds)"],
     tableData: []
   });
-  const [mostWeight, setMostWeight] = useState<BestExercise>({
-    name: exercise,
-    weights: 0,
-    reps: 0
+  const [mostWeight, setMostWeight] = useState<SingleSet>({
+    exercise: exercise,
+    reps: 0,
+    restTime: 0,
+    side: "both",
+    time: 0,
+    weight: 0,
+
   })
-  const [mostReps, setMostReps] = useState<BestExercise>({
-    name: exercise,
-    weights: 0,
-    reps: 0
+  const [mostReps, setMostReps] = useState<SingleSet>({
+    exercise: exercise,
+    reps: 0,
+    restTime: 0,
+    side: "both",
+    time: 0,
+    weight: 0,
   })
-  const [records, setRecords] = useState<ExerciseRecords>({
-    weights: [],
-    reps: [],
-    times: [],
+  const [records, setRecords] = useState<Sets>({
+    exercise: [],
     dates: [],
+    reps: [],
+    restTimes: [],
+    sides: [],
+    times: [],
+    weights: [],
   })
 
   function getExercise (userID: string | null, exerciseName: string, callback: Function): Unsubscribe | undefined {
@@ -51,18 +61,23 @@ const Details = ({ route }: RouterProps) => {
         const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
     
         const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutSnapshot => {
-            const exerciseRecords: ExerciseRecords = {
-                weights: [],
-                reps: [],
-                times: [],
-                dates: [],
+            const exerciseRecords: Sets = {
+              exercise: [],
+              dates: [],
+              reps: [],
+              restTimes: [],
+              sides: [],
+              times: [],
+              weights: [],
             }
             if (!workoutSnapshot.empty) {
                 workoutSnapshot.docs.forEach(workoutDoc => {
                     for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
                         let set = workoutDoc.data().Workout[i];                    
                         for (let j = set.exercise.length-1; j >= 0 ; j--)
-                            if (set.exercise[j] === exerciseName) {                            
+                            if (set.exercise[j] === exerciseName) {
+                                exerciseRecords.exercise.push(set.exercise[j]);
+                                exerciseRecords.restTimes.push(set.restTimes[j]);                         
                                 exerciseRecords.weights.push(set.weights[j])
                                 exerciseRecords.reps.push(set.reps[j])
                                 exerciseRecords.times.push(set.times[j])
@@ -81,7 +96,7 @@ const Details = ({ route }: RouterProps) => {
 };
 
   useEffect(() => {
-    const unsubscribeFromExercise = getExercise(userID, exercise, (response: React.SetStateAction<ExerciseRecords>) => {
+    const unsubscribeFromExercise = getExercise(userID, exercise, (response: React.SetStateAction<Sets>) => {
       setRecords(response)      
       setLoading(false);
     });
@@ -90,10 +105,13 @@ const Details = ({ route }: RouterProps) => {
     if (unsubscribeFromExercise !== undefined) {
       unsubscribeFromExercise()
       setRecords({
-        weights: [],
-        reps: [],
-        times: [],
+        exercise: [],
         dates: [],
+        reps: [],
+        restTimes: [],
+        sides: [],
+        times: [],
+        weights: [],
       });
     }
     };
@@ -117,7 +135,7 @@ const Details = ({ route }: RouterProps) => {
   }, [records, loading])
   
   
-  function sortRecords(records: ExerciseRecords): ExerciseRecords {
+  function sortRecords(records: Sets): Sets {
     const datesWithIndexes = records.dates.map((date, index) => ({
       date,
       index,
@@ -125,11 +143,14 @@ const Details = ({ route }: RouterProps) => {
   
     datesWithIndexes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
-    const sortedRecords: ExerciseRecords = {
+    const sortedRecords: Sets = {
+      exercise: [],
       dates: [],
-      weights: [],
       reps: [],
+      restTimes: [],
+      sides: [],
       times: [],
+      weights: [],
     };
   
     for (const { date, index } of datesWithIndexes) {
@@ -145,7 +166,7 @@ const Details = ({ route }: RouterProps) => {
   
   
 
-  function fillTable(records: ExerciseRecords, setTable: (table: TableState) => void) {
+  function fillTable(records: Sets, setTable: (table: TableState) => void) {
     const sortedRecords = sortRecords(records);
   
     const newTableData: TableRow[] = sortedRecords.dates.map((date, i) => [
@@ -166,21 +187,24 @@ const Details = ({ route }: RouterProps) => {
   
   
 
-  function findMaxWeight(records:ExerciseRecords, exercise: string): BestExercise {
+  function findMaxWeight(records:Sets, exercise: string): SingleSet {
       let currentMax = {
-        name: exercise,
-        weights: 0,
-        reps: 0
+        exercise: exercise,
+        reps: 0,
+        restTime: 0,
+        side: "both" as "both" | "left" | "right",
+        time: 0,
+        weight: 0,
       }
       
       for (let i = 0; i < records.weights.length; i++) {
-        if (records.weights[i]>currentMax.weights) {
-          currentMax.weights = records.weights[i];
+        if (records.weights[i]>currentMax.weight) {
+          currentMax.weight = records.weights[i];
           currentMax.reps = records.reps[i];
         }
-        else if (records.weights[i] === currentMax.weights){
+        else if (records.weights[i] === currentMax.weight){
           if (records.reps[i] > currentMax.reps) {
-            currentMax.weights = records.weights[i];
+            currentMax.weight = records.weights[i];
             currentMax.reps = records.reps[i];
           }
           
@@ -189,20 +213,23 @@ const Details = ({ route }: RouterProps) => {
       }
       return currentMax;
   }
-  function findMaxReps(records:ExerciseRecords, exercise: string): BestExercise {
+  function findMaxReps(records:Sets, exercise: string): SingleSet {
     let currentMax = {
-      name: exercise,
-      weights: 0,
-      reps: 0
+      exercise: exercise,
+      reps: 0,
+      restTime: 0,
+      side: "both" as "both" | "left" | "right",
+      time: 0,
+      weight: 0,
     }
     for (let i = 0; i < records.weights.length; i++) {
       if (records.reps[i]>currentMax.reps) {
-        currentMax.weights = records.weights[i];
+        currentMax.weight = records.weights[i];
         currentMax.reps = records.reps[i];
       }
       else if (records.reps[i] === currentMax.reps){
-        if (records.weights[i] > currentMax.weights) {
-          currentMax.weights = records.weights[i];
+        if (records.weights[i] > currentMax.weight) {
+          currentMax.weight = records.weights[i];
           currentMax.reps = records.reps[i];
         }
       }
@@ -222,8 +249,8 @@ const Details = ({ route }: RouterProps) => {
         <Text style={[globalStyles.label, {marginTop: 50, marginBottom: 20}]}>No data</Text>
 
         : <ScrollView>
-          <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10, paddingLeft: 10, fontSize: 14, alignSelf: "flex-start"}]}>Maximum weight: {mostWeight.weights} kg for {mostWeight.reps} repetitons</Text>
-          <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10, paddingLeft: 10, fontSize: 14, alignSelf: "flex-start"}]}>Most repetitions: {mostReps.reps} with {mostReps.weights} kg</Text>
+          <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10, paddingLeft: 10, fontSize: 14, alignSelf: "flex-start"}]}>Maximum weight: {mostWeight.weight} kg for {mostWeight.reps} repetitons</Text>
+          <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10, paddingLeft: 10, fontSize: 14, alignSelf: "flex-start"}]}>Most repetitions: {mostReps.reps} with {mostReps.weight} kg</Text>
           <View style={{ backgroundColor: "rgba(255,0,0,0.7)" }}>
             <Table borderStyle={{borderWidth: 1, borderColor: "#fff"}}>
               <Row data={table.tableHead} style={styles.head} textStyle={styles.headText}/>

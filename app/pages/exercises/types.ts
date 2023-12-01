@@ -12,14 +12,15 @@ export type ExerciseRecords = {
     dates: string[],
 };
 
-export type ExerciseSet = {
-    exercise? : string,
-    weight: number,
-    rep: number,
-    time: number,
-    restTime: number,
-    side?: "both" | "left" | "right";
-};
+export type SingleSet = {
+	exercise: string,
+	reps: number;
+	restTime: number;
+	side: "both" | "left" | "right";
+	time: number;
+	weight: number;
+    [key: string]: any,
+}
 
 export type Outputs = {
     setNumbers: string[];

@@ -5,9 +5,8 @@ import Info from '../../components/Info';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
-import { RouterProps } from '../../types and interfaces/types';
 
-const CreateExercise = ({navigation}: RouterProps) => {
+const CreateExercise = () => {
     const userID = useContext(UserContext);
     const [name, setName] = useState<string>()
     const [isUnilateral, setIsUnilateral] = useState(false)

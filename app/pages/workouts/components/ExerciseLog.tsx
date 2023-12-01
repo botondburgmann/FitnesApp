@@ -1,20 +1,19 @@
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext } from 'react'
 import UserContext from '../../../contexts/UserContext';
-import { WeekRange } from '../../../types and interfaces/types';
+import { Sets, WeekRange } from '../../../types and interfaces/types';
 import { globalStyles } from '../../../assets/styles';
 import NavigationContext from '../../../contexts/NavigationContext';
 import WeekContext from '../../../contexts/WeekContext';
 import DateContext from '../../../contexts/DateContext';
 import { getWorkoutDocs } from '../../../functions/firebaseFunctions';
 import { addTotalExperienceToFirebase, isDropsSet, isSuperSet, removeXP } from '../workoutsFunction';
-import {  ExerciseLogType } from '../types';
 import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../../FirebaseConfig';
 import { Outputs } from '../../exercises/types';
 
 
-const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number;}) => {
+const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
 
     const userID = useContext(UserContext);
     const week = useContext(WeekContext);

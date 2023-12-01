@@ -2,11 +2,12 @@ import { ImageBackground, Pressable, Text, View } from "react-native"
 import React, { useContext, useEffect, useState } from "react"
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../../../FirebaseConfig"
 import UserContext from "../../contexts/UserContext";
-import { User, BestExercise, RouterProps, Exercise } from "../../types and interfaces/types";
+import { User, RouterProps, Exercise } from "../../types and interfaces/types";
 import { backgroundImage, globalStyles } from "../../assets/styles";
 import { Unsubscribe } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { getUser } from "../../functions/firebaseFunctions";
+import { SingleSet } from "../exercises/types";
 
 type MaxValueAndIndex = {
   value: number;
@@ -29,25 +30,34 @@ const Account = ({ route, navigation }: RouterProps) => {
     weeklyExperience:0,
     weight: 0
   });
-  const [mostWeightExercise, setmostWeightExercise] = useState<BestExercise>({
-    name: "",
-    weights: 0,
-    reps: 0
+  const [mostWeightExercise, setmostWeightExercise] = useState<SingleSet>({
+    exercise: "",
+    reps: 0,
+    restTime: 0,
+    side: "both",
+    time: 0,
+    weight: 0
 })
-  const [mostRepsExercise, setmostRepsExercise] = useState<BestExercise>({
-    name: "",
-    weights: 0,
-    reps: 0
+  const [mostRepsExercise, setmostRepsExercise] = useState<SingleSet>({
+    exercise: "",
+    reps: 0,
+    restTime: 0,
+    side: "both",
+    time: 0,
+    weight: 0
 })
 
 
 
 function getBestExercise (userID: string | null, field:string, secondaryField:string, callback: Function ): Unsubscribe | undefined {
   try {
-      const bestExercise: BestExercise = {
-          name: "",
-          weights: 0,
-          reps: 0
+      const bestExercise: SingleSet = {
+        exercise: "",
+        reps: 0,
+        restTime: 0,
+        side: "both",
+        time: 0,
+        weight: 0
       };
       const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
       const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
@@ -57,7 +67,7 @@ function getBestExercise (userID: string | null, field:string, secondaryField:st
                   const workoutData = doc.data().Workout;
       
                   if (workoutData) {
-                      workoutData.forEach((exercise: Exercise) => {
+                      workoutData.forEach((exercise: SingleSet) => {
                           const maxField = getMaxValueAndIndexOfArray(exercise[field]);
                           const maxSecondaryField = getMaxValueAndIndexOfArray(exercise[secondaryField]);
                               if (maxField !== undefined && maxField.value > bestExercise[field]) {
@@ -109,10 +119,10 @@ useEffect(() => {
   const unsubscribeFromUser = getUser(userID, (userData: React.SetStateAction<User>) => {
     setUser(userData);
   });
-   const unsubscribeFromMostWeight = getBestExercise(userID, "weights", "reps", (exerciseData: BestExercise) => {    
+   const unsubscribeFromMostWeight = getBestExercise(userID, "weights", "reps", (exerciseData: SingleSet) => {    
     setmostWeightExercise(exerciseData);
   });
-  const unsubscribeFromMostReps = getBestExercise(userID, "reps", "weights", (exerciseData: BestExercise) => {    
+  const unsubscribeFromMostReps = getBestExercise(userID, "reps", "weights", (exerciseData: SingleSet) => {    
     setmostRepsExercise(exerciseData);
   });
 
@@ -136,14 +146,20 @@ useEffect(() => {
       userID: ""
     });
     setmostWeightExercise({
-      name: "",
-      weights: 0,
-      reps: 0
+      exercise: "",
+      reps: 0,
+      restTime: 0,
+      side: "both",
+      time: 0,
+      weight: 0
     });
     setmostRepsExercise({
-      name: "",
-      weights: 0,
-      reps: 0
+      exercise: "",
+      reps: 0,
+      restTime: 0,
+      side: "both",
+      time: 0,
+      weight: 0
     })
   }
 },[userID])
