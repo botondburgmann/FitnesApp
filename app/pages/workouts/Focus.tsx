@@ -27,7 +27,7 @@ const Focus = ({ route, navigation }: RouterProps) => {
           <Radiobutton selectedValue={focus} setselectedValue={setFocus} options={options} />
         </View>
         <Pressable style={globalStyles.button} onPress={() =>{focus !== undefined 
-                                                                ? navigation.navigate('CurrentExercise',{workoutType: workoutType, focus:focus}) 
+                                                                ? navigation.navigate('Current Exercise',{workoutType: workoutType, focus:focus}) 
                                                                 :  alert("Please choose an option");} 
         }>
           <Text style={globalStyles.buttonText}>Start Workout</Text>

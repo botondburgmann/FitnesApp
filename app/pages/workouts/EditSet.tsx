@@ -2,7 +2,7 @@ import { ImageBackground, Pressable, StyleSheet, Switch, Text, TextInput, View }
 import React, { useContext, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
 import { backgroundImage, globalStyles } from '../../assets/styles';
-import { ExerciseSet, RouterProps, WeekRange } from '../../types and interfaces/types';
+import { ExerciseSet, RouterProps, SetChange, WeekRange } from '../../types and interfaces/types';
 import WeekContext from '../../contexts/WeekContext';
 import { workoutsStyles } from './styles';
 import { getWorkoutDocs } from '../../functions/firebaseFunctions';
@@ -22,7 +22,9 @@ const EditSet = ({ route, navigation }: RouterProps) => {
     const week = useContext(WeekContext);
 
     const { set, exerciseID, setID, isIsometric, date} = route?.params as RouteParamsTypes; 
-
+    console.log("Set");
+    console.log(set);
+    
     const [weight, setWeight] = useState(set.weight.toString());
     const [time, setTime] = useState(set.time.toString());
     const [reps, setReps] = isIsometric ? useState("") : useState(set.rep.toString());
@@ -91,6 +93,8 @@ const EditSet = ({ route, navigation }: RouterProps) => {
 
     async function editSet (userID: string, date: Date, week: WeekRange, experience: number): Promise<void> {
         try {       
+            console.log("here");
+            
             const workoutDocs = await getWorkoutDocs(userID, date);
             if (workoutDocs === undefined) 
                 throw new Error("Document doesn't exist");

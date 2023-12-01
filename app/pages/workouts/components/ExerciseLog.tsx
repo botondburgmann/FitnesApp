@@ -1,16 +1,16 @@
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext } from 'react'
 import UserContext from '../../../contexts/UserContext';
-import { Exercise, Outputs, WeekRange } from '../../../types and interfaces/types';
+import {  Outputs, WeekRange } from '../../../types and interfaces/types';
 import { globalStyles } from '../../../assets/styles';
 import NavigationContext from '../../../contexts/NavigationContext';
 import WeekContext from '../../../contexts/WeekContext';
 import DateContext from '../../../contexts/DateContext';
 import { getWorkoutDocs } from '../../../functions/firebaseFunctions';
+import { addTotalExperienceToFirebase, isDropsSet, isSuperSet, removeXP } from '../workoutsFunction';
+import {  ExerciseLogType } from '../types';
 import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../../FirebaseConfig';
-import { addTotalExperienceToFirebase, isDropsSet, isSuperSet, removeXP } from '../workoutsFunction';
-import {  ExerciseLogType, SelectOption } from '../types';
 
 const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number; }) => {
 
@@ -70,11 +70,11 @@ const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number; }) 
         else
             outputs.names.push(` of ${exercise.exercise[i]}`);
         if (exercise.sides[i] === "both") 
-            outputs.sides.push(``) 
+            outputs.sides.push("") 
         else
             outputs.sides.push(`on the ${exercise.sides[i]} side`); 
         if (exercise.reps[i] === 1) 
-            outputs.reps.push(`1 rep`) 
+            outputs.reps.push("1 rep") 
         else    
             outputs.reps.push(`${exercise.reps[i]} reps`);    
         if (exercise.times[i] === 1) 
@@ -140,23 +140,24 @@ const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number; }) 
             for (let i = 0; i < workoutDocs.data().Workout.length; i++) {  
                                  
                 if (workoutDocs.data().Workout[i].exercise[setIndex] === exercise.exercise[0] && i === exerciseID){
-                    
-                    if ( updatedData.Workout[i].exercise.length === 1){
-                        console.log("delete");
-                        
-                        await deleteDoc(workoutDocs.ref);
-                    }
-                    else{
-                        updatedData.Workout[i].exercise.splice(setIndex, 1);
-                        updatedData.Workout[i].weights.splice(setIndex, 1);
-                        updatedData.Workout[i].reps.splice(setIndex, 1);
-                        updatedData.Workout[i].times.splice(setIndex, 1);
-                        updatedData.Workout[i].sides.splice(setIndex, 1);
-                        updatedData.Workout[i].restTimes.splice(setIndex, 1);   
-                        await updateDoc(doc(FIRESTORE_DB, "Workouts", workoutDocs.id), {
-                            Workout: updatedData.Workout
-                        });
-                    }
+                
+                updatedData.Workout[i].exercise.splice(setIndex, 1);
+                updatedData.Workout[i].weights.splice(setIndex, 1);
+                updatedData.Workout[i].reps.splice(setIndex, 1);
+                updatedData.Workout[i].times.splice(setIndex, 1);
+                updatedData.Workout[i].sides.splice(setIndex, 1);
+                updatedData.Workout[i].restTimes.splice(setIndex, 1); 
+                if (updatedData.Workout[i].exercise.length === 0) { 
+                    updatedData.Workout.splice(i,1)
+                }
+                  
+                await updateDoc(doc(FIRESTORE_DB, "Workouts", workoutDocs.id), {
+                    Workout: updatedData.Workout
+                });
+                if ( updatedData.Workout.length === 0){
+
+                    await deleteDoc(workoutDocs.ref);
+                }
                 }
       
             } 
@@ -180,7 +181,7 @@ const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number; }) 
             }
             <Pressable
                 onPress={() => {navigation && navigation.navigate("Edit set",{set: {exercise : exercise.exercise[index],
-                    reps: exercise.reps[index],
+                    rep: exercise.reps[index],
                     restTime: exercise.restTimes[index],
                     side: exercise.sides[index],
                     time: exercise.times[index],
@@ -188,7 +189,7 @@ const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number; }) 
                     }, exerciseID: exerciseID, setID: index, isIsometric: exercise.isometric})}} 
                 onLongPress={() => handleLongPress(index)}                                
             >
-                <Text style={[globalStyles.text, {lineHeight: 35}]}>{second}{outputs.names[index]} {outputs.sides[index]} {outputs.weights[index]}</Text>
+                <Text style={[globalStyles.text, {lineHeight: 35}]}>{second}{outputs.names[index]}{outputs.reps[index]}{outputs.sides[index]} {outputs.seconds[index]}{outputs.weights[index]}</Text>
                 { exercise.restTimes[index] > 0
                     ? <Text style={[globalStyles.text, {lineHeight: 35}]}>{exercise.restTimes[index]/60} minute rest</Text>
                     : <></>

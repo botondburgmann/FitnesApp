@@ -23,7 +23,7 @@ const DisplaySets = (props: { date: Date; }) => {
             alert("Error: Invalid rep number. Reps can't be negative");
           else
             exerciseComponents.push(<ExerciseLog exercise={exercise} exerciseID={index} key={index} />);          
-        });
+        });        
           setAllExercises(exerciseComponents);
       });
   

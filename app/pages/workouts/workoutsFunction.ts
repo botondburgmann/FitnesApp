@@ -103,10 +103,11 @@ export function getWorkout (userID: string | null, date: Date, callback: Functio
 };
 
  
-export function updateStrengthBuilderAchievement (set: ExerciseLogType): Achievement | undefined {
-    try {
+export async function updateStrengthBuilderAchievement (set: ExerciseLogType, userID: string): Promise<Achievement | undefined> {
+    try {        
         for (const weight of set.weights) {
-          if (weight >= 60 && weight < 80) {
+            
+            if (weight >= 60 && weight < 80) {
               const updatedAchievement: Achievement = {
                   color: "#BBC2CC",
                   description: "Lift 80 kg on an exercise to unlock next stage",
@@ -118,30 +119,52 @@ export function updateStrengthBuilderAchievement (set: ExerciseLogType): Achieve
               }
               return updatedAchievement;
           }
-          else if (weight >= 80 && weight < 100) {
-              const updatedAchievement: Achievement = {
-                  color: "#BBC2CC",
-                  description: "Lift 100 kg on an exercise to unlock next stage",
-                  icon: "dumbbell",
-                  level: 2,
-                  name: "Strength Builder",
-                  status: "Intermediate Lifter",
-                  visibility: 1
-              }
-              return updatedAchievement;
+          if (weight >= 80 && weight < 100) {
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Lift 100 kg on an exercise to unlock next stage",
+                icon: "dumbbell",
+                level: 2,
+                name: "Strength Builder",
+                status: "Intermediate Lifter",
+                visibility: 1
+            }
+            return updatedAchievement;
           }
-          else if (weight >= 100) {
-              const updatedAchievement: Achievement = {
-                  color: "#FFDD43",
-                  description: "Max level achieved: Lift 100 kg on an exercise",
-                  icon: "dumbbell",
-                  level: 3,
-                  name: "Strength Builder",
-                  status: "Gym Warrior",
-                  visibility: 1
-              }
-              return updatedAchievement;
+            if (weight >= 100) {
+                const updatedAchievement: Achievement = {
+                    color: "#FFDD43",
+                    description: "Max level achieved: Lift 100 kg on an exercise",
+                    icon: "dumbbell",
+                    level: 3,
+                    name: "Strength Builder",
+                    status: "Gym Warrior",
+                    visibility: 1
+                }
+                return updatedAchievement;
           } 
+
+          const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+          const achievementsQuery = query(achievementsCollectionRef, where("name", "==", "Strength Builder"))
+          const achievementsSnapshot = await getDocs(achievementsQuery);
+          if (!achievementsSnapshot.empty) {
+            const achievementDoc = achievementsSnapshot.docs[0];
+            for (const owner of achievementDoc.data().owners) {
+                if (owner.userID === userID) {
+                    const achievement = {
+                        color: owner.color,
+                        description: owner.description,
+                        icon: achievementDoc.data().icon,
+                        level: owner.level,
+                        name: achievementDoc.data().name,
+                        status: owner.status,
+                        visibility: owner.visibility
+                    };
+                    return achievement
+                }
+                
+            }
+          }
       }
     } catch (error: any) {
         alert(`Couldn't update achievement: ${error}`)
@@ -434,7 +457,7 @@ return experience;
 
 async function addSetToFirebase (experience: number, userID: string, date: Date, week: WeekRange, sets: any): Promise<void>{
     try {
-      const workoutsSnapshot = await getWorkoutDocs(userID,date);
+      const workoutsSnapshot = await getWorkoutDocs(userID,date);      
       const data = {
           exercise : sets.exercise,
           weights: sets.weights,
@@ -460,24 +483,32 @@ async function addSetToFirebase (experience: number, userID: string, date: Date,
         });
       }
 
-      const updatedStrengthBuilderAchievement = updateStrengthBuilderAchievement(sets);
-      if (updatedStrengthBuilderAchievement === undefined)
-        throw new Error("Strength builder achievement is undefined");
+      const updatedStrengthBuilderAchievement = await updateStrengthBuilderAchievement(sets, userID);
+      if (updatedStrengthBuilderAchievement === undefined){
+        alert("Strength builder achievement is undefined");
+        return;
+      }
       updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
 
       const updatedEnduranceMasterAchievement = updateEnduranceMasterAchievement(sets);
-      if (updatedEnduranceMasterAchievement === undefined)
-        throw new Error("Endurance master achievement is undefined");
+      if (updatedEnduranceMasterAchievement === undefined){
+        alert("Endurance master achievement is undefined");
+        return;
+      }
       updateAchievementStatus(userID, updatedEnduranceMasterAchievement);
 
       const updatedConsistencyStreakAchievement = await updateConsistencyStreakAchievement(userID);
-      if (updatedConsistencyStreakAchievement === undefined)
-        throw new Error("Consistency streak achievement is undefined");
+      if (updatedConsistencyStreakAchievement === undefined){
+        alert("Consistency streak achievement is undefined");
+        return;
+      }
       updateAchievementStatus(userID, updatedConsistencyStreakAchievement);
 
       const updatedDedicatedAthleteAchievement = await updateDedicatedAthleteAchievement(userID);
-      if (updatedDedicatedAthleteAchievement === undefined)
-        throw new Error("Dedicated athlete achievement is undefined");
+      if (updatedDedicatedAthleteAchievement === undefined){
+        alert("Dedicated athlete achievement is undefined");
+        return;
+      }
       updateAchievementStatus(userID, updatedDedicatedAthleteAchievement);
 
              

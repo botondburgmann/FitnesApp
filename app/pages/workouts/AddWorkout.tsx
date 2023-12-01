@@ -12,7 +12,7 @@ import { collection, Unsubscribe, onSnapshot, query, where } from 'firebase/fire
 import { FIRESTORE_DB } from '../../../FirebaseConfig'
 
 type RouteParamsTypes = {
-  date: Date;
+  date: string;
 }
 
 const AddWorkout = ( {navigation, route}: RouterProps) => {
@@ -308,7 +308,7 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
               <Pressable style={workoutsStyles.button} onPress={addSet}>
                   <Text style={globalStyles.buttonText}>Add set</Text>
               </Pressable>
-              <Pressable style={workoutsStyles.button} onPress={() => finishExercise(sets, userID, date, week, navigation, setSets)}>
+              <Pressable style={workoutsStyles.button} onPress={() => finishExercise(sets, userID, new Date(date), week, navigation, setSets)}>
                   <Text style={globalStyles.buttonText}>Finish</Text>
               </Pressable>
             </View>

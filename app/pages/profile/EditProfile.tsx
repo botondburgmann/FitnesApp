@@ -46,9 +46,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
     async function saveChanges(): Promise<void> {
         try {
             if (name === "") 
-                throw new Error("Name field cannot be empty!");
-            console.log(userID);
-            
+                throw new Error("Name field cannot be empty!");            
             if (userID === null)
                 throw new Error("User is not verified");
             validateBirthday(date);

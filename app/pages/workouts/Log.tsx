@@ -41,7 +41,7 @@ const Log = ({navigation}: RouterProps) => {
             
         <View style={styles.buttonGroup}>
           { date <= new Date() 
-            ? <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Add Exercise',{ date: date})}>
+            ? <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => navigation.navigate('Add Exercise',{ date: date.toDateString()})}>
                 <Text style={globalStyles.buttonText}>Add new Exercise</Text>
               </Pressable>
             : <></>
