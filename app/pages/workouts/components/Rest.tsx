@@ -3,14 +3,14 @@ import React from 'react'
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 import { Exercise } from '../../../types and interfaces/types'
 import { globalStyles } from '../../../assets/styles'
-import { ExerciseLog } from '../types'
+import { ExerciseLogType } from '../types'
 
 
-const Rest = (props: { setGoToNextPage: Function; currentExercise: ExerciseLog; exercise: Exercise }) => {
+const Rest = (props: { setGoToNextPage: Function; currentExercise: ExerciseLogType; exercise: Exercise }) => {
   const setGoToNextPage = props.setGoToNextPage
   const currentExercise = props.currentExercise;
   const exercise = props.exercise;
-  const duration = exercise.musclesWorked.length > 1 ? 180 : 120;
+  const duration = exercise.musclesWorked.length > 1 ? 1 : 2;
 
   return (
     <View style={styles.container}>

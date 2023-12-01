@@ -6,6 +6,7 @@ import { RouterProps } from '../../types and interfaces/types';
 import NavigationContext from '../../contexts/NavigationContext';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import { AntDesign } from '@expo/vector-icons';
+import DateContext from '../../contexts/DateContext';
 
 
 const Log = ({navigation}: RouterProps) => {
@@ -34,9 +35,11 @@ const Log = ({navigation}: RouterProps) => {
         </View>
           
         <ScrollView contentContainerStyle={styles.log}>
-          <NavigationContext.Provider value={navigation}>
-            <DisplaySets date={date}/>
-          </NavigationContext.Provider>
+          <DateContext.Provider value={date}>
+            <NavigationContext.Provider value={navigation}>
+              <DisplaySets/>
+            </NavigationContext.Provider>
+          </DateContext.Provider>
         </ScrollView>
             
         <View style={styles.buttonGroup}>

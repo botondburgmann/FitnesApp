@@ -6,7 +6,7 @@ import { ExerciseSet, RouterProps, SetChange, WeekRange } from '../../types and 
 import WeekContext from '../../contexts/WeekContext';
 import { workoutsStyles } from './styles';
 import { getWorkoutDocs } from '../../functions/firebaseFunctions';
-import { addTotalExperienceToFirebase, removeXP } from './workoutsFunction';
+import { addTotalExperienceToFirebase, convertFieldsToNumeric, removeXP } from './workoutsFunction';
 import { updateDoc, doc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
 
@@ -15,15 +15,13 @@ type RouteParamsTypes = {
     exerciseID: number;
     setID: number;
     isIsometric: boolean;
-    date: Date;
+    date: string;
 }
 const EditSet = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
     const week = useContext(WeekContext);
 
     const { set, exerciseID, setID, isIsometric, date} = route?.params as RouteParamsTypes; 
-    console.log("Set");
-    console.log(set);
     
     const [weight, setWeight] = useState(set.weight.toString());
     const [time, setTime] = useState(set.time.toString());
@@ -48,65 +46,83 @@ const EditSet = ({ route, navigation }: RouterProps) => {
         setIsEnabled((previousState: boolean) => !previousState);
     }
 
-    function changeXP (isIsometric: boolean, set: ExerciseSet): number {
+    function changeXP (isIsometric: boolean, change: ExerciseSet): number {
         let currentExperience = 0
-        if (!isIsometric && set.rep !== undefined) {
-          if (set.weight === 0 && Number.isNaN(set.weight))
-              currentExperience += set.rep;
-          else
-              currentExperience += set.rep * set.weight;
-          currentExperience += removeXP(set.rep, set.weight)
+        
+        if (!isIsometric && change.rep !== undefined) {
+            if (change.weight === 0 || Number.isNaN(change.weight))
+                currentExperience += change.rep;
+            else
+                currentExperience += change.rep * change.weight;
+            currentExperience += removeXP(set.rep, change.weight)
         }
         else {
-          if (set.weight === 0 && Number.isNaN(set.weight))
-              currentExperience += set.time;
-          else
-              currentExperience += set.time * set.weight;
-            currentExperience += removeXP(set.time, set.weight)
+            if (change.weight === 0 ||  Number.isNaN(change.weight))
+                currentExperience += change.time;
+            else
+                currentExperience += change.time * change.weight;
+            currentExperience += removeXP(set.time, change.weight)
+            
         }       
-      
+        
         return currentExperience;
       }
 
-    function modifySet (): void {
-        if (userID === null)
-            throw new Error("User is not authorized");
-        if (date === null)
-            throw new Error("Date is not set");
-        if (week === null)
-            throw new Error("Week is not set");
-        if (isIsometric && change.time === 0 || Number.isNaN(change.time)) 
-            throw new Error("Time field cannot be empty");
-        if (!isIsometric && change.rep === 0 || Number.isNaN(change.rep))
-            throw new Error("Reps field cannot be empty"); 
-        if (change.rep < 0)
-            throw new Error("Reps must be a positive number")
-        if (change.time < 0)
-            throw new Error("Time must be a positive number")
-        if (change.restTime < 0)
-            throw new Error("Rest time must be a positive number")
-        editSet(userID, date, week, changeXP(isIsometric, change))
+    function modifySet (): void {        
+        if (userID === null){
+            alert("User is not authorized");
+            return;
+        }
+        if (date === null){
+            alert("Date is not set");
+            return;
+        }
+        if (week === null){
+            alert("Week is not set");
+            return
+        }
+        if (isIsometric && (change.time === 0 || Number.isNaN(change.time))){
+            alert("Time field cannot be empty");
+            return;
+        } 
+        if (!isIsometric && (change.rep === 0 || Number.isNaN(change.rep))){            
+            alert("Reps field cannot be empty"); 
+            return;
+        }
+        if (change.rep < 0){
+            alert("Reps must be a positive number");
+            return;
+        }
+        if (change.time < 0){
+            alert("Time must be a positive number");
+            return;
+        }
+        if (change.restTime < 0){
+            alert("Rest time must be a positive number");
+            return;
+        }
+        editSet(userID, new Date(date), week, changeXP(isIsometric, change))
         navigation.navigate("Log")
     
     }
 
 
     async function editSet (userID: string, date: Date, week: WeekRange, experience: number): Promise<void> {
-        try {       
-            console.log("here");
-            
+        try {   
+            const numericData = convertFieldsToNumeric(change.weight, change.rep, change.time, change.restTime);                            
             const workoutDocs = await getWorkoutDocs(userID, date);
-            if (workoutDocs === undefined) 
-                throw new Error("Document doesn't exist");
-                
+            if (workoutDocs === undefined){
+                alert("Document doesn't exist");
+                return;
+            }        
             const updatedData = { ...workoutDocs.data() };
                   
             for (let i = 0; i < workoutDocs.data().Workout.length; i++) {   
                 if(workoutDocs.data().Workout[i].exercise[setID] === set.exercise && i === exerciseID){
-                    updatedData.Workout[i].weights[setID] = change.weight;
-                    updatedData.Workout[i].reps[setID] = change.rep;
-                    updatedData.Workout[i].times[setID] = change.time;
-                    updatedData.Workout[i].restTimes[setID] = change.restTime;
+                    updatedData.Workout[i].weights[setID] = numericData.weight;
+                    updatedData.Workout[i].reps[setID] = numericData.rep;
+                    updatedData.Workout[i].times[setID] = numericData.time;
+                    updatedData.Workout[i].restTimes[setID] = numericData.restTime;
                     updatedData.Workout[i].sides[setID] = change.side;
             
                     await updateDoc(doc(FIRESTORE_DB, "Workouts", workoutDocs.id), {

@@ -7,7 +7,7 @@ import { backgroundImage, globalStyles } from '../../assets/styles'
 import WeekContext from '../../contexts/WeekContext'
 import { workoutsStyles } from './styles'
 import {  ExerciseLogType, SelectOption } from './types'
-import {  finishExercise} from './workoutsFunction'
+import {  convertFieldsToNumeric, finishExercise} from './workoutsFunction'
 import { collection, Unsubscribe, onSnapshot, query, where } from 'firebase/firestore'
 import { FIRESTORE_DB } from '../../../FirebaseConfig'
 
@@ -54,6 +54,7 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
   function addSet (): void {
     try {
       const numericData = convertFieldsToNumeric(parseFloat(weight), parseFloat(reps), parseFloat(time), parseFloat(restTime));
+      
       if (currentExercise === undefined){
         alert("Error: Please select an exercise");
         return;
@@ -77,43 +78,7 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
   };
 
 
-  function convertFieldsToNumeric(weight:number, reps: number, time: number, restTime: number): ExerciseSet {
-    if (Number.isNaN(weight))
-      return {
-        weight: 0,
-        rep: reps,
-        time: time,
-        restTime: restTime
-      }
-    if (Number.isNaN(reps))
-      return {
-        weight: weight,
-        rep: 0,
-        time: time,
-        restTime: restTime
-      }      
-    if (Number.isNaN(time))
-      return {
-        weight: weight,
-        rep: reps,
-        time: 0,
-        restTime: restTime
-      }      
-    if (Number.isNaN(restTime))
-      return {
-        weight: weight,
-        rep: reps,
-        time: time,
-        restTime: 0
-      }
-    return {
-      weight: weight,
-      rep: reps,
-      time: time,
-      restTime: restTime
 
-    }
-  }
   
   function validateData(currentExercise:SelectOption, reps: number, time: number, restTime: number): void {
     if (!currentExercise.isometric && Number.isNaN(reps))

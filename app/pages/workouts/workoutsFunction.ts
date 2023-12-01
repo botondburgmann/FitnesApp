@@ -1,6 +1,6 @@
 import { collection, query, where, getDocs, updateDoc, Unsubscribe, onSnapshot, addDoc, doc } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../../FirebaseConfig";
-import { Achievement, Exercise, MyUser, WeekRange } from "../../types and interfaces/types";
+import { Achievement, ExerciseSet, MyUser, WeekRange } from "../../types and interfaces/types";
 import { ExerciseLogType } from "./types";
 import { getWorkoutDocs, updateAchievementStatus } from "../../functions/firebaseFunctions";
 import { NavigationProp } from "@react-navigation/native";
@@ -29,12 +29,13 @@ export function addXP (isIsometric: boolean, sets: ExerciseLogType): number | un
 };
 
 export function removeXP (repOrTime: number, weight: number): number {
-    let currentExperience = 0;
+    let currentExperience = 0;    
     if (weight === 0)
         currentExperience -= repOrTime;
     else 
         currentExperience -= repOrTime * weight;
-        return currentExperience;
+    
+    return currentExperience;
 };
 export async function addTotalExperienceToFirebase  (experience: number, date: Date, userID: string, week: WeekRange ): Promise<void>  {
     try {        
@@ -71,8 +72,30 @@ export async function addTotalExperienceToFirebase  (experience: number, date: D
     }
 };
 
-export function getWorkout (userID: string | null, date: Date, callback: Function): Unsubscribe | undefined {
+export function convertFieldsToNumeric(weight:number, reps: number, time: number, restTime: number): ExerciseSet {
+    const numericData = {
+      weight: weight,
+      rep: reps,
+      time: time,
+      restTime: restTime
+    }
+    if (Number.isNaN(weight))
+      numericData.weight = 0
+    if (Number.isNaN(reps))
+      numericData.rep = 0    
+    if (Number.isNaN(time))
+      numericData.time = 0     
+    if (Number.isNaN(restTime))
+      numericData.restTime = 0;
+    return numericData
+  }
+
+export function getWorkout (userID: string | null, date: Date | null, callback: Function): Unsubscribe | undefined {
     try {
+        if (date === null){
+            alert("Date is not set")
+            return;
+        }
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
         const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID), where("date", "==", date.toDateString()));
         
@@ -98,7 +121,7 @@ export function getWorkout (userID: string | null, date: Date, callback: Functio
         })
         return unsubscribeFromWorkouts;
     } catch (error: any) {
-        alert(`Error: couldn't fetch workout for ${date.toDateString()}`);
+        alert(`Error: couldn't fetch workout: ${error}`);
     }
 };
 
@@ -170,10 +193,10 @@ export async function updateStrengthBuilderAchievement (set: ExerciseLogType, us
         alert(`Couldn't update achievement: ${error}`)
     }
 };
-export  function updateEnduranceMasterAchievement (set: ExerciseLogType): Achievement | undefined {
+export  async function updateEnduranceMasterAchievement (set: ExerciseLogType, userID: string): Promise<Achievement | undefined> {
     try {
         for (const rep of set.reps) {
-          if (rep >= 20 && rep < 50) {
+            if (rep >= 20 && rep < 50) {
               const updatedAchievement: Achievement = {
                   color: "#BBC2CC",
                   description: "Do 50 repetitions for an exercise to unlock next stage",
@@ -185,42 +208,63 @@ export  function updateEnduranceMasterAchievement (set: ExerciseLogType): Achiev
               }
               return updatedAchievement;
           }
-          else if (rep >= 50 && rep < 75) {
-              const updatedAchievement: Achievement = {
-                  color: "#BBC2CC",
-                  description: "Do 75 repetitions for an exercise to unlock next stage",
-                  icon: "running",
-                  level: 2,
-                  name: "Endurance Master",
-                  status: "Endurance Enthusiast",
-                  visibility: 1
+            if (rep >= 50 && rep < 75) {
+                const updatedAchievement: Achievement = {
+                    color: "#BBC2CC",
+                    description: "Do 75 repetitions for an exercise to unlock next stage",
+                    icon: "running",
+                    level: 2,
+                    name: "Endurance Master",
+                    status: "Endurance Enthusiast",
+                    visibility: 1
+                }
+                return updatedAchievement;
+            }
+            if (rep >= 75 && rep < 100) {
+                const updatedAchievement: Achievement = {
+                    color: "#BBC2CC",
+                    description: "Do 100 repetitions for an exercise to unlock next stage",
+                    icon: "running",
+                    level: 3,
+                    name: "Strength Builder",
+                    status: "Repetition Pro",
+                    visibility: 1
+                }
+                return updatedAchievement;
+            }
+            if (rep >= 100) {
+                const updatedAchievement: Achievement = {
+                    color: "#FFDD43",
+                    description: "Max level achieved: Do 100 repetitions for an exercise to unlock next stage",
+                    icon: "running",
+                    level: 4,
+                    name: "Endurance Master",
+                    status: "Endurance Champion",
+                    visibility: 1
+                }
+                return updatedAchievement;
+            }
+            const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+            const achievementsQuery = query(achievementsCollectionRef, where("name", "==", "Endurance Master"))
+            const achievementsSnapshot = await getDocs(achievementsQuery);
+            if (!achievementsSnapshot.empty) {
+              const achievementDoc = achievementsSnapshot.docs[0];
+              for (const owner of achievementDoc.data().owners) {
+                  if (owner.userID === userID) {
+                      const achievement = {
+                          color: owner.color,
+                          description: owner.description,
+                          icon: achievementDoc.data().icon,
+                          level: owner.level,
+                          name: achievementDoc.data().name,
+                          status: owner.status,
+                          visibility: owner.visibility
+                      };
+                      return achievement
+                  }
+                  
               }
-              return updatedAchievement;
-          }
-          else if (rep >= 75 && rep < 100) {
-              const updatedAchievement: Achievement = {
-                  color: "#BBC2CC",
-                  description: "Do 100 repetitions for an exercise to unlock next stage",
-                  icon: "running",
-                  level: 3,
-                  name: "Strength Builder",
-                  status: "Repetition Pro",
-                  visibility: 1
-              }
-              return updatedAchievement;
-          }
-          else if (rep >= 100) {
-              const updatedAchievement: Achievement = {
-                  color: "#FFDD43",
-                  description: "Max level achieved: Do 100 repetitions for an exercise to unlock next stage",
-                  icon: "running",
-                  level: 4,
-                  name: "Endurance Master",
-                  status: "Endurance Champion",
-                  visibility: 1
-              }
-              return updatedAchievement;
-          }
+            }
       }
     } catch (error: any) {
         alert(`Error: Couldn't update achievement: ${error}`)    
@@ -248,7 +292,7 @@ export async function updateConsistencyStreakAchievement (userID: string | null)
             }
             return updatedAchievement;
         }
-        else if (dates.length === 30) {
+        if (dates.length === 30) {
             const updatedAchievement: Achievement = {
                 color: "#BBC2CC",
                 description: "Work out for 60 days, unlock next stage",
@@ -260,7 +304,7 @@ export async function updateConsistencyStreakAchievement (userID: string | null)
             }
             return updatedAchievement;
         }
-        else if (dates.length === 60) {
+        if (dates.length === 60) {
             const updatedAchievement: Achievement = {
                 color: "#BBC2CC",
                 description: "Work out for 90 days, unlock next stage",
@@ -272,7 +316,7 @@ export async function updateConsistencyStreakAchievement (userID: string | null)
             }
             return updatedAchievement;
         }
-        else if (dates.length === 90) {
+        if (dates.length === 90) {
             const updatedAchievement: Achievement = {
                 color: "#BBC2CC",
                 description: "Work out for 120 days, unlock next stage",
@@ -284,7 +328,7 @@ export async function updateConsistencyStreakAchievement (userID: string | null)
             }
             return updatedAchievement;
         }
-        else if (dates.length === 120) {
+        if (dates.length === 120) {
             const updatedAchievement: Achievement = {
                 color: "#FFDD43",
                 description: "Max level unlocked: Work out for 120 days",
@@ -295,6 +339,27 @@ export async function updateConsistencyStreakAchievement (userID: string | null)
                 visibility: 1
             }
             return updatedAchievement;
+        }
+        const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+        const achievementsQuery = query(achievementsCollectionRef, where("name", "==", "Consistency Streak"))
+        const achievementsSnapshot = await getDocs(achievementsQuery);
+        if (!achievementsSnapshot.empty) {
+            const achievementDoc = achievementsSnapshot.docs[0];
+            for (const owner of achievementDoc.data().owners) {
+                if (owner.userID === userID) {
+                    const achievement = {
+                        color: owner.color,
+                        description: owner.description,
+                        icon: achievementDoc.data().icon,
+                        level: owner.level,
+                        name: achievementDoc.data().name,
+                        status: owner.status,
+                        visibility: owner.visibility
+                    };
+                    return achievement
+                }
+                
+            }
         }
     } catch (error: any) {
         alert(`Error: Couldn't update achievement: ${error}`)
@@ -324,54 +389,75 @@ export async function updateDedicatedAthleteAchievement (userID: string | null):
               }
               return updatedAchievement;
           }
-          else if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 90 && daysBetweenFirstAndlastDates < 182 && sortedDates.length >= 13 && sortedDates.length <= 90) {
-              const updatedAchievement: Achievement = {
-                  color: "#BBC2CC",
-                  description: "Work out for 6 months, consistently to unlock next stage",
-                  icon: "throphy",
-                  level: 2,
-                  name: "Dedicated Athlete",
-                  status: "Gym Devotee",
-                  visibility: 1
+            if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 90 && daysBetweenFirstAndlastDates < 182 && sortedDates.length >= 13 && sortedDates.length <= 90) {
+                const updatedAchievement: Achievement = {
+                    color: "#BBC2CC",
+                    description: "Work out for 6 months, consistently to unlock next stage",
+                    icon: "throphy",
+                    level: 2,
+                    name: "Dedicated Athlete",
+                    status: "Gym Devotee",
+                    visibility: 1
+                }
+                return updatedAchievement;
+            }
+            if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 182 && daysBetweenFirstAndlastDates < 273 && sortedDates.length >= 26 && sortedDates.length <= 182) {
+                const updatedAchievement: Achievement = {
+                    color: "#BBC2CC",
+                    description: "Work out for 9 months, consistently to unlock next stage",
+                    icon: "throphy",
+                    level: 3,
+                    name: "Dedicated Athlete",
+                    status: "Fitness Enthusiast",
+                    visibility: 1
+                }
+                return updatedAchievement;
+            }
+            if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 273 && daysBetweenFirstAndlastDates < 365 && sortedDates.length >= 39 && sortedDates.length <= 273) {
+                const updatedAchievement: Achievement = {
+                    color: "#BBC2CC",
+                    description: "Work out for a year, consistently to unlock next stage",
+                    icon: "throphy",
+                    level: 4,
+                    name: "Dedicated Athlete",
+                    status: "Workout Maestro",
+                    visibility: 1
+                }
+                return updatedAchievement;
+            }
+            if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 365 && sortedDates.length >= 52 && sortedDates.length <= 365) {
+                const updatedAchievement: Achievement = {
+                    color: "#FFDD43",
+                    description: "Max level unlocked: Work out for a year, consistently",
+                    icon: "throphy",
+                    level: 5,
+                    name: "Dedicated Athlete",
+                    status: "Gym God",
+                    visibility: 1
+                }
+                return updatedAchievement;
+            }
+            const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+            const achievementsQuery = query(achievementsCollectionRef, where("name", "==", "Dedicated Athlete"))
+            const achievementsSnapshot = await getDocs(achievementsQuery);
+            if (!achievementsSnapshot.empty) {
+              const achievementDoc = achievementsSnapshot.docs[0];
+              for (const owner of achievementDoc.data().owners) {
+                  if (owner.userID === userID) {
+                      const achievement = {
+                          color: owner.color,
+                          description: owner.description,
+                          icon: achievementDoc.data().icon,
+                          level: owner.level,
+                          name: achievementDoc.data().name,
+                          status: owner.status,
+                          visibility: owner.visibility
+                      };
+                      return achievement
+                  }
+                  
               }
-              return updatedAchievement;
-          }
-          else if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 182 && daysBetweenFirstAndlastDates < 273 && sortedDates.length >= 26 && sortedDates.length <= 182) {
-              const updatedAchievement: Achievement = {
-                  color: "#BBC2CC",
-                  description: "Work out for 9 months, consistently to unlock next stage",
-                  icon: "throphy",
-                  level: 3,
-                  name: "Dedicated Athlete",
-                  status: "Fitness Enthusiast",
-                  visibility: 1
-              }
-              return updatedAchievement;
-          }
-          else if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 273 && daysBetweenFirstAndlastDates < 365 && sortedDates.length >= 39 && sortedDates.length <= 273) {
-              const updatedAchievement: Achievement = {
-                  color: "#BBC2CC",
-                  description: "Work out for a year, consistently to unlock next stage",
-                  icon: "throphy",
-                  level: 4,
-                  name: "Dedicated Athlete",
-                  status: "Workout Maestro",
-                  visibility: 1
-              }
-              return updatedAchievement;
-          }
-          else if (daysBetweenFirstAndlastDates !== undefined && sortedDates !== undefined && daysBetweenFirstAndlastDates >= 365 && sortedDates.length >= 52 && sortedDates.length <= 365) {
-              const updatedAchievement: Achievement = {
-                  color: "#FFDD43",
-                  description: "Max level unlocked: Work out for a year, consistently",
-                  icon: "throphy",
-                  level: 5,
-                  name: "Dedicated Athlete",
-                  status: "Gym God",
-                  visibility: 1
-              }
-              return updatedAchievement;
-          }
+            }
       
       } catch (error: any) {
           alert(`Error: Couldn't update achievement: ${error}`)
@@ -409,9 +495,10 @@ try {
 }
 };
 
-export function finishExercise (sets: ExerciseLogType, userID: string | null, date: Date | null, week: WeekRange | null, 
+export async function finishExercise (sets: ExerciseLogType, userID: string | null, date: Date | null, week: WeekRange | null, 
                                 navigation: NavigationProp<any, any>, setSets?: Function) {
     try {
+
         if (userID === null){
             alert("User is not set");
             return;
@@ -428,8 +515,8 @@ export function finishExercise (sets: ExerciseLogType, userID: string | null, da
             alert("Not enough sets");
             return;
         }
-        const experience = calculateExperience(sets);
-        addSetToFirebase(experience, userID, date, week, sets );
+        const experience = calculateExperience(sets);        
+        await addSetToFirebase(experience, userID, date, week, sets );
         setSets && setSets({
         exercise : [],
         weights: [],
@@ -456,7 +543,7 @@ return experience;
   
 
 async function addSetToFirebase (experience: number, userID: string, date: Date, week: WeekRange, sets: any): Promise<void>{
-    try {
+    try {   
       const workoutsSnapshot = await getWorkoutDocs(userID,date);      
       const data = {
           exercise : sets.exercise,
@@ -490,7 +577,7 @@ async function addSetToFirebase (experience: number, userID: string, date: Date,
       }
       updateAchievementStatus(userID, updatedStrengthBuilderAchievement);
 
-      const updatedEnduranceMasterAchievement = updateEnduranceMasterAchievement(sets);
+      const updatedEnduranceMasterAchievement = await updateEnduranceMasterAchievement(sets, userID);
       if (updatedEnduranceMasterAchievement === undefined){
         alert("Endurance master achievement is undefined");
         return;

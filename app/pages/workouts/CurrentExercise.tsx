@@ -7,7 +7,7 @@ import Set from './components/Set';
 import Rest from './components/Rest';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import WeekContext from '../../contexts/WeekContext';
-import { ExerciseLog, WorkoutTypes } from './types';
+import { ExerciseLogType, WorkoutTypes } from './types';
 import { addXP, calculateNumberOfSet, finishExercise } from './workoutsFunction';
 import { Unsubscribe } from 'firebase/auth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -42,13 +42,13 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
   const [activityLevel, setActivityLevel] = useState("");
   const [loadingUser, setLoadingUser] = useState(true);
   const [workoutComponents, setWorkoutComponents] = useState<React.JSX.Element[]>([]);
-  const workout = useRef<ExerciseLog[]>([]);
+  const workout = useRef<ExerciseLogType[]>([]);
   const [endOfWorkout, setEndofWorkout] = useState(false);
   const totalXP = useRef(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [goToNextPage, setGoToNextPage] = useState(false);
 
-  const currentExercise = useRef<ExerciseLog>({
+  const currentExercise = useRef<ExerciseLogType>({
     exercise : [],
     weights: [],
     reps: [],
@@ -106,8 +106,9 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
 
   async function addWorkout (): Promise<void> {
     try {
-      for (const set of workout.current) 
-        finishExercise(set, userID, new Date(), week, navigation)
+      
+      for (const set of workout.current)
+        await finishExercise(set, userID, new Date(), week, navigation)
     } 
     catch (error: any) {
       alert(`Error: Couldn't add workout: ${error}`)
@@ -222,7 +223,7 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
         
       }    
 
-      const newExercise: ExerciseLog = {
+      const newExercise: ExerciseLogType = {
         exercise: [],
         reps: [],
         restTimes: [],
@@ -232,7 +233,7 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
       };
       for (let i = 0; i < currentExercise.current.exercise.length; i++) {
         if (currentExercise.current.exercise[i] !== currentExercise.current.exercise[i-1] && i > 0) {          
-          workout.current.push(newExercise)                  
+          workout.current.push(newExercise)                            
           currentExercise.current.exercise.splice(0, currentExercise.current.exercise.length-1)
           currentExercise.current.reps.splice(0, currentExercise.current.reps.length-1)
           currentExercise.current.restTimes.splice(0, currentExercise.current.restTimes.length-1)
@@ -252,11 +253,17 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
         }
       
       }
-             
+      
       for (const exercise of workout.current) {
-        let experience = addXP(exercise.exercise[0].isometric, exercise);
+        let experience;
+        for (let i = 0; i < exercise.reps.length; i++) {
+          if (exercise.reps[i] === 0)
+            experience = addXP(true, exercise);
+          else
+            experience = addXP(false, exercise); 
+        }
         if (experience !== undefined)
-          totalXP.current += experience ;
+          totalXP.current += experience 
       }
 
  

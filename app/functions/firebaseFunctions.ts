@@ -60,12 +60,14 @@ export async function getUserDocumentRef(userID:string):Promise<DocumentReferenc
 }
 
 
-export async function getWorkoutDocs(userID:string, date: Date): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | undefined>{
+export async function getWorkoutDocs(userID:string, date: Date): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | undefined>{    
     const collectionRef = collection(FIRESTORE_DB, "Workouts");
+
     const q = query(collectionRef, where("date", "==", date.toDateString()), where("userID", "==", userID) );
     const snapshot = await getDocs(q);
     if (!snapshot.empty){
-        const workoutDocs = snapshot.docs[0];
+        const workoutDocs = snapshot.docs[0]; 
+               
         return workoutDocs;
     }        
 }

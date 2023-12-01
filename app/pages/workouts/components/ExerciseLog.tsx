@@ -12,37 +12,40 @@ import {  ExerciseLogType } from '../types';
 import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../../FirebaseConfig';
 
-const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number; }) => {
+
+const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number;}) => {
 
     const userID = useContext(UserContext);
-    const navigation = useContext(NavigationContext);
     const week = useContext(WeekContext);
     const date = useContext(DateContext);
+    const navigation = useContext(NavigationContext);
 
     const exercise= props.exercise;
     const exerciseID = props.exerciseID;
 
+    
     const uniqueValues = {
         sides: Array.from(new Set<string>(exercise.sides)),
         exercise: Array.from(new Set<string>(exercise.exercise)),
         
     };
-    function calculateNumberOfSets (sides: string[], uniqueExerciseLength: number, restTimes: number[]): number | undefined {
+    function calculateNumberOfSets (sides: string[], uniqueExerciseLength: number): number | undefined {
         try {
-          let numberOfSet = 0;
-          for (const side of sides) {
-              if (side === "both")
-                  numberOfSet++;
-              else 
-                  numberOfSet +=0.5;
-          }
-          return isSuperSet(exercise, uniqueValues.exercise) ? numberOfSet/uniqueExerciseLength : numberOfSet;
-        } catch (error) {
+            
+            let numberOfSet = 0;
+            for (const side of sides) {
+                if (side === "both")
+                    numberOfSet++;
+                else 
+                numberOfSet +=0.5;
+                }
+    return isSuperSet(exercise, uniqueValues.exercise) ? numberOfSet/uniqueExerciseLength : numberOfSet;
+        } catch (error: any) {
           alert(`Error: Couldn't calculate number of sets: ${error}`)
         }
     };
 
-    const numberOfSets = calculateNumberOfSets(exercise.sides, uniqueValues.exercise.length, exercise.restTimes);
+    const numberOfSets = calculateNumberOfSets(exercise.sides, uniqueValues.exercise.length);
     const unilateral = uniqueValues.sides.length === 2 ? "(per side)" : "";
 
     const outputs: Outputs = {
@@ -73,20 +76,22 @@ const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number; }) 
             outputs.sides.push("") 
         else
             outputs.sides.push(`on the ${exercise.sides[i]} side`); 
-        if (exercise.reps[i] === 1) 
+        if (exercise.reps[i] === 0)
+            outputs.reps.push("");
+        else if (exercise.reps[i] === 1) 
             outputs.reps.push("1 rep") 
         else    
-            outputs.reps.push(`${exercise.reps[i]} reps`);    
-        if (exercise.times[i] === 1) 
+            outputs.reps.push(`${exercise.reps[i]} reps`);
+        if (exercise.times[i] === 0)
+            outputs.seconds.push("");    
+        else if (exercise.reps[i] > 0 && exercise.times[i] === 1) 
             outputs.seconds.push('for 1 second') 
-        else if (exercise.times[i] > 1) 
+        else if (exercise.reps[i] > 0 && exercise.times[i] > 1) 
             outputs.seconds.push(`for ${ exercise.times[i]} seconds`)        
-        if (exercise.times[i] === 1) 
+        else if (exercise.times[i] === 1) 
             outputs.seconds.push('1 second hold') 
-        else if (exercise.times[i] > 1) 
-            outputs.seconds.push(`${ exercise.times[i]} seconds hold`)
         else
-        outputs.seconds.push("");
+            outputs.seconds.push(`${ exercise.times[i]} seconds hold`)
     if (exercise.weights[i] == 0)
             outputs.weights.push(`with no weight`)
         else if (exercise.weights[i] < 0)
@@ -102,7 +107,7 @@ const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number; }) 
                 throw new Error("Date is not set");
             if (week === null) 
                 throw new Error("Week is not set");
-            if (exercise.isometric)
+            if (exercise.reps[index] === 0)
                 showDeleteConfirmation(userID, date, week, index, removeXP(exercise.times[index],exercise.weights[index]))
             else
                 showDeleteConfirmation(userID, date, week, index, removeXP(exercise.reps[index],exercise.weights[index]))
@@ -180,16 +185,16 @@ const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number; }) 
                     : <></>
             }
             <Pressable
-                onPress={() => {navigation && navigation.navigate("Edit set",{set: {exercise : exercise.exercise[index],
+                onPress={() => {navigation && date && navigation.navigate("Edit set",{set: {exercise : exercise.exercise[index],
                     rep: exercise.reps[index],
                     restTime: exercise.restTimes[index],
                     side: exercise.sides[index],
                     time: exercise.times[index],
                     weight: exercise.weights[index],
-                    }, exerciseID: exerciseID, setID: index, isIsometric: exercise.isometric})}} 
+                    }, exerciseID: exerciseID, setID: index, isIsometric: exercise.reps[0] === 0, date: date.toDateString()})}} 
                 onLongPress={() => handleLongPress(index)}                                
             >
-                <Text style={[globalStyles.text, {lineHeight: 35}]}>{second}{outputs.names[index]}{outputs.reps[index]}{outputs.sides[index]} {outputs.seconds[index]}{outputs.weights[index]}</Text>
+                <Text style={[globalStyles.text, {lineHeight: 35}]}>{outputs.names[index]} {outputs.reps[index]} {outputs.sides[index]} {second} {outputs.weights[index]}</Text>
                 { exercise.restTimes[index] > 0
                     ? <Text style={[globalStyles.text, {lineHeight: 35}]}>{exercise.restTimes[index]/60} minute rest</Text>
                     : <></>
