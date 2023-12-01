@@ -2,7 +2,7 @@ import { ImageBackground, Pressable, ScrollView, StyleSheet, Switch, Text, TextI
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../../components/SelectMenu'
 import UserContext from '../../contexts/UserContext'
-import { Exercise, ExerciseSet, RouterProps } from '../../types and interfaces/types'
+import { Exercise, RouterProps } from '../../types and interfaces/types'
 import { backgroundImage, globalStyles } from '../../assets/styles'
 import WeekContext from '../../contexts/WeekContext'
 import { workoutsStyles } from './styles'

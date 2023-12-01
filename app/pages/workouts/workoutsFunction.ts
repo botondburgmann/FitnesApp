@@ -1,9 +1,10 @@
 import { collection, query, where, getDocs, updateDoc, Unsubscribe, onSnapshot, addDoc, doc } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../../FirebaseConfig";
-import { Achievement, ExerciseSet, MyUser, WeekRange } from "../../types and interfaces/types";
+import { Achievement, User, WeekRange } from "../../types and interfaces/types";
 import { ExerciseLogType } from "./types";
 import { getWorkoutDocs, updateAchievementStatus } from "../../functions/firebaseFunctions";
 import { NavigationProp } from "@react-navigation/native";
+import { ExerciseSet } from "../exercises/types";
 
 export function addXP (isIsometric: boolean, sets: ExerciseLogType): number | undefined {
     try {
@@ -60,7 +61,7 @@ export async function addTotalExperienceToFirebase  (experience: number, date: D
         
         const secondUsersSnapshot = await getDocs(usersQuery);
         const secondUserDoc = secondUsersSnapshot.docs[0];
-        const secondUserData = secondUserDoc.data() as MyUser;
+        const secondUserData = secondUserDoc.data() as User;
         const secondUpdateData = {
             level: secondUserData.experience < 225 ? 1 : Math.floor(Math.log(secondUserData.experience / 100) / Math.log(1.5)),
         };

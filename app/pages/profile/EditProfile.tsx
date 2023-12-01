@@ -5,7 +5,7 @@ import Datepicker from '../../components/Datepicker';
 import Radiobutton from '../../components/Radiobutton';
 import SelectMenu from '../../components/SelectMenu';
 import { backgroundImage, globalStyles } from '../../assets/styles';
-import { ActivityLevels, MyUser, RouterProps, SelectItem } from '../../types and interfaces/types';
+import { ActivityLevels, RouterProps, SelectItem } from '../../types and interfaces/types';
 import { updateDoc } from 'firebase/firestore';
 import { convertFtToCm, convertLbsToKg, validateBirthday, validateHeight, validateWeight } from '../../functions/globalFunctions';
 import { getUserDocs } from '../../functions/firebaseFunctions';

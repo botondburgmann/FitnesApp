@@ -1,7 +1,7 @@
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useContext } from 'react'
 import UserContext from '../../../contexts/UserContext';
-import {  Outputs, WeekRange } from '../../../types and interfaces/types';
+import { WeekRange } from '../../../types and interfaces/types';
 import { globalStyles } from '../../../assets/styles';
 import NavigationContext from '../../../contexts/NavigationContext';
 import WeekContext from '../../../contexts/WeekContext';
@@ -11,6 +11,7 @@ import { addTotalExperienceToFirebase, isDropsSet, isSuperSet, removeXP } from '
 import {  ExerciseLogType } from '../types';
 import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../../FirebaseConfig';
+import { Outputs } from '../../exercises/types';
 
 
 const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number;}) => {

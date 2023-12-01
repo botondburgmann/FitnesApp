@@ -2,7 +2,7 @@ import { ImageBackground, Pressable, Text, View } from "react-native"
 import React, { useContext, useEffect, useState } from "react"
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../../../FirebaseConfig"
 import UserContext from "../../contexts/UserContext";
-import { MyUser, BestExercise, RouterProps, Exercise } from "../../types and interfaces/types";
+import { User, BestExercise, RouterProps, Exercise } from "../../types and interfaces/types";
 import { backgroundImage, globalStyles } from "../../assets/styles";
 import { Unsubscribe } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
@@ -17,7 +17,7 @@ const Account = ({ route, navigation }: RouterProps) => {
   const loggedInUserID   = useContext(UserContext);
   const { userID } = route?.params;
 
-  const [user, setUser] = useState<MyUser>({
+  const [user, setUser] = useState<User>({
     activityLevel: "",
     dateOfBirth: "",
     experience: 0,
@@ -106,7 +106,7 @@ function getMaxValueAndIndexOfArray (array:number[]): MaxValueAndIndex | undefin
 
 
 useEffect(() => {
-  const unsubscribeFromUser = getUser(userID, (userData: React.SetStateAction<MyUser>) => {
+  const unsubscribeFromUser = getUser(userID, (userData: React.SetStateAction<User>) => {
     setUser(userData);
   });
    const unsubscribeFromMostWeight = getBestExercise(userID, "weights", "reps", (exerciseData: BestExercise) => {    
@@ -165,7 +165,7 @@ useEffect(() => {
               <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Level: {user.level}</Text>
               <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>XP until next level: {experienceNeeded}</Text>
               <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Best records</Text>
-{/*               {
+              {
                 mostWeightExercise.name === ""
                 ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
                    Max weight: No data
@@ -182,7 +182,7 @@ useEffect(() => {
                 : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
                     Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
                   </Text>
-              } */}
+              }
             </View>
       
           <Pressable style={globalStyles.button}>

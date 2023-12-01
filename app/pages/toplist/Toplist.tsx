@@ -2,7 +2,7 @@ import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View, 
 import React, { useContext, useEffect, useState } from 'react'
 import { updateAchievementStatus } from '../../functions/firebaseFunctions';
 import UserContext from '../../contexts/UserContext';
-import { Achievement, MyUser  } from '../../types and interfaces/types';
+import { Achievement, User  } from '../../types and interfaces/types';
 import { RouterProps } from '../../types and interfaces/types';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import WeekContext from '../../contexts/WeekContext';
@@ -15,7 +15,7 @@ import { FIRESTORE_DB } from '../../../FirebaseConfig';
 const Toplist = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
   const week = useContext(WeekContext);
-  const [users, setUsers] = useState<MyUser[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   function getAllUsers (callback: Function): Unsubscribe | undefined { 
@@ -34,7 +34,7 @@ const Toplist = ({navigation}: RouterProps) => {
     }
   };
 
-  function sortUsers (users: MyUser[]): MyUser[] {
+  function sortUsers (users: User[]): User[] {
     const sortedUsers = [...users];
     const n = sortedUsers.length;
   
@@ -49,8 +49,8 @@ const Toplist = ({navigation}: RouterProps) => {
     return sortedUsers;
   };
   
-  function selectLoggedInUser(users:MyUser[], userID: string | null) : MyUser {
-    let loggedInUser:MyUser = users[0];
+  function selectLoggedInUser(users:User[], userID: string | null) : User {
+    let loggedInUser:User = users[0];
     for (const user of users) {
       if (user.userID === userID) {
         loggedInUser = user;
@@ -59,7 +59,7 @@ const Toplist = ({navigation}: RouterProps) => {
     return loggedInUser;
   };
   
-  function selectSimilarUsers (users: MyUser[], loggedInUser: MyUser): MyUser[] {
+  function selectSimilarUsers (users: User[], loggedInUser: User): User[] {
     const similarUsers = [];
     const loggedInUserBMI = loggedInUser.weight / loggedInUser.height**2;
     for (const user of users) {
@@ -70,7 +70,7 @@ const Toplist = ({navigation}: RouterProps) => {
     }
     return similarUsers;
   };
-  function updateClimbingTheRanksAchievement (loggedInUser: MyUser, users: MyUser[]): void  {
+  function updateClimbingTheRanksAchievement (loggedInUser: User, users: User[]): void  {
     try {
         if (users.slice(3,10).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
             const updatedAchievement: Achievement = {
@@ -115,7 +115,7 @@ const Toplist = ({navigation}: RouterProps) => {
 };
 
   useEffect(() => {
-    const unsubscribeFromUers = getAllUsers((users: MyUser[]) => {
+    const unsubscribeFromUers = getAllUsers((users: User[]) => {
       const loggedInUser = selectLoggedInUser(users, userID );
       const similarUsers = selectSimilarUsers(users, loggedInUser);
       const sortedUsers = sortUsers(similarUsers);

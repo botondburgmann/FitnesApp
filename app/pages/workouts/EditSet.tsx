@@ -2,13 +2,14 @@ import { ImageBackground, Pressable, StyleSheet, Switch, Text, TextInput, View }
 import React, { useContext, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
 import { backgroundImage, globalStyles } from '../../assets/styles';
-import { ExerciseSet, RouterProps, SetChange, WeekRange } from '../../types and interfaces/types';
+import { RouterProps, WeekRange } from '../../types and interfaces/types';
 import WeekContext from '../../contexts/WeekContext';
 import { workoutsStyles } from './styles';
 import { getWorkoutDocs } from '../../functions/firebaseFunctions';
 import { addTotalExperienceToFirebase, convertFieldsToNumeric, removeXP } from './workoutsFunction';
 import { updateDoc, doc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
+import { ExerciseSet } from '../exercises/types';
 
 type RouteParamsTypes = {
     set: ExerciseSet;

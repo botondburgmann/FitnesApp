@@ -1,13 +1,14 @@
 import { ActivityIndicator, ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native"
 import React, { useContext, useEffect, useState } from "react"
 import { NavigationProp } from "@react-navigation/native";
-import {BestExercise, ExerciseRecords, TableRow, TableState } from "../../types and interfaces/types";
 import UserContext from "../../contexts/UserContext";
 import {Table, Row, Rows} from "react-native-table-component"
 import { backgroundImage, globalStyles } from "../../assets/styles";
 import { Unsubscribe } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../../FirebaseConfig";
+import {  ExerciseRecords, TableRow, TableState } from "./types";
+import { BestExercise } from "../../types and interfaces/types";
 
 
 interface RouterProps {
@@ -15,7 +16,7 @@ interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-const Details = ({ route, navigation }: RouterProps) => {
+const Details = ({ route }: RouterProps) => {
   const userID = useContext(UserContext);
 
   const { exercise } = route?.params;

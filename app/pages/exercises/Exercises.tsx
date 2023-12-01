@@ -1,8 +1,7 @@
 import {  ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
-import { Exercise } from '../../types and interfaces/types';
-import { RouterProps } from '../../types and interfaces/types';
+import { Exercise, RouterProps } from '../../types and interfaces/types';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import { Unsubscribe } from 'firebase/auth';
 import { collection, query, where, onSnapshot, getDocs, updateDoc } from 'firebase/firestore';
