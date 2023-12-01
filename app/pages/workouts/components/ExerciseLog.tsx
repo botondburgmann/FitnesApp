@@ -10,9 +10,9 @@ import { getWorkoutDocs } from '../../../functions/firebaseFunctions';
 import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../../FirebaseConfig';
 import { addTotalExperienceToFirebase, isDropsSet, isSuperSet, removeXP } from '../workoutsFunction';
-import { ExerciseLog, SelectOption } from '../types';
+import {  ExerciseLogType, SelectOption } from '../types';
 
-const ExerciseLog = (props: { exercise: Exercise; exerciseID: number; }) => {
+const ExerciseLog = (props: { exercise: ExerciseLogType; exerciseID: number; }) => {
 
     const userID = useContext(UserContext);
     const navigation = useContext(NavigationContext);
@@ -24,7 +24,7 @@ const ExerciseLog = (props: { exercise: Exercise; exerciseID: number; }) => {
 
     const uniqueValues = {
         sides: Array.from(new Set<string>(exercise.sides)),
-        exercise: Array.from(new Set<SelectOption>(exercise.exercise)).map(exercise => exercise.label)
+        exercise: Array.from(new Set<string>(exercise.exercise)),
         
     };
     function calculateNumberOfSets (sides: string[], uniqueExerciseLength: number, restTimes: number[]): number | undefined {
@@ -137,10 +137,15 @@ const ExerciseLog = (props: { exercise: Exercise; exerciseID: number; }) => {
                 throw new Error("Couldn't find workout");
              const updatedData = { ...workoutDocs.data() };
     
-            for (let i = 0; i < workoutDocs.data().Workout.length; i++) {   
-                if (workoutDocs.data().Workout[i].exercise[setIndex] === exercise.name && i === exerciseID){
-                    if ( updatedData.Workout[i].exercise.length === 1)
+            for (let i = 0; i < workoutDocs.data().Workout.length; i++) {  
+                                 
+                if (workoutDocs.data().Workout[i].exercise[setIndex] === exercise.exercise[0] && i === exerciseID){
+                    
+                    if ( updatedData.Workout[i].exercise.length === 1){
+                        console.log("delete");
+                        
                         await deleteDoc(workoutDocs.ref);
+                    }
                     else{
                         updatedData.Workout[i].exercise.splice(setIndex, 1);
                         updatedData.Workout[i].weights.splice(setIndex, 1);

@@ -2,9 +2,9 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import { Exercise } from '../../../types and interfaces/types';
 import { globalStyles } from '../../../assets/styles';
-import { ExerciseLog } from '../types';
+import { ExerciseLogType } from '../types';
 
-const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Function; currentExercise: ExerciseLog; }) => {
+const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Function; currentExercise: ExerciseLogType; }) => {
     const exercise = props.exercise;
     const focus = props.focus;
     const setGoToNextPage = props.setGoToNextPage
@@ -13,7 +13,7 @@ const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Functi
     const [time, setTime] = useState("");
     const [reps, setReps] = useState("");
 
-    function completeSet (exercise:ExerciseLog, weight: number, time: number, reps: number): void {
+    function completeSet (exercise: ExerciseLogType, weight: number, time: number, reps: number): void {
         try {
             if (exercise.isometric && (time === 0 || Number.isNaN(time)))
               alert("Error: Time field cannot be empty for isometric exercises");

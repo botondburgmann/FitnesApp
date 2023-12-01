@@ -30,7 +30,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
       if (userDocRef === undefined)
         throw new Error("User doesn't exist in database");
       const newData = {
-        "activityLevel": selectedActivityLevel,
+        "activityLevel": selectedActivityLevel.value,
         "set": true
       };
       await updateDoc(userDocRef, newData);
@@ -44,11 +44,11 @@ const ActivityLevel = ({navigation}: RouterProps) => {
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={setUpStyles.container}>
         <Text style={setUpStyles.label}>Please, select your activity level</Text>
-        <View>
+        <View style={setUpStyles.icon}>
           <MaterialCommunityIcons name="weight-lifter" size={60} color="#FFF" />
         </View>
         <View style={setUpStyles.selectMenuContainer}>
-          <SelectMenu data={activityLevels} setSelectedValue={setSelectedActivityLevel} title={"Activity level"} />
+          <SelectMenu data={activityLevels} setSelectedValue={setSelectedActivityLevel} title={selectedActivityLevel.label} />
         </View>
         <View style={setUpStyles.buttonGroup}>
           <Pressable style={setUpStyles.button} onPress={() => navigation.navigate('Height')}>

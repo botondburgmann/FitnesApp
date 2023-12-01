@@ -19,7 +19,7 @@ const Account = ({ route, navigation }: RouterProps) => {
 
   const [user, setUser] = useState<MyUser>({
     activityLevel: "",
-    age: 0,
+    dateOfBirth: "",
     experience: 0,
     gender: "",
     height: 0,
@@ -125,7 +125,7 @@ useEffect(() => {
     }
     setUser({
       activityLevel: "",
-      age: 0,
+      dateOfBirth: "",
       experience: 0,
       gender: "",
       height: 0,
@@ -165,7 +165,7 @@ useEffect(() => {
               <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Level: {user.level}</Text>
               <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>XP until next level: {experienceNeeded}</Text>
               <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Best records</Text>
-              {
+{/*               {
                 mostWeightExercise.name === ""
                 ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
                    Max weight: No data
@@ -182,7 +182,7 @@ useEffect(() => {
                 : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
                     Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
                   </Text>
-              }
+              } */}
             </View>
       
           <Pressable style={globalStyles.button}>

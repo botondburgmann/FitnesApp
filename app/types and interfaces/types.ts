@@ -66,7 +66,7 @@ export type ExerciseSet = {
 
 export type MyUser = {
     activityLevel: string;
-    age: number;
+    dateOfBirth: string;
     experience: number;
     gender: string;
     height: number;

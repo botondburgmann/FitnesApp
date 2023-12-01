@@ -8,6 +8,7 @@ import { backgroundImage, globalStyles } from '../../assets/styles';
 import { updateDoc } from 'firebase/firestore';
 import { setUpStyles } from './styles';
 import { getUserDocumentRef } from '../../functions/firebaseFunctions';
+import { validateWeight, convertLbsToKg } from '../../functions/globalFunctions';
 
 
 
@@ -44,23 +45,14 @@ const Weight = ({navigation}: RouterProps) => {
     }
   }
 
-  function validateWeight(weight: number): void {
-    if (Number.isNaN(weight))
-      throw new Error("Weight must be set");
-    if (weight < 0)
-      throw new Error("Weight must be a positive number");
-  }
 
-  function convertLbsToKg(weight:number): number {
-    return Math.round((weight*0.453592)*100)/100;
-  }
 
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={setUpStyles.container}>
         <Text style={setUpStyles.label}>Please, select your weight</Text>
-        <View>
+        <View style={setUpStyles.icon}>
           <FontAwesome5 name="weight" size={60} color="#FFF"/>
         </View>
         <View style={setUpStyles.inputGroup}>
@@ -73,11 +65,11 @@ const Weight = ({navigation}: RouterProps) => {
             onChangeText={(text) => setWeight(text)}
           />
           <View style={setUpStyles.selectMenuContainer}>
-            <SelectMenu data={systems} setSelectedValue={setSelectedSystem} title={"System"} />
+            <SelectMenu data={systems} setSelectedValue={setSelectedSystem} title={selectedSystem.label} />
           </View>
           </View>
         <View style={setUpStyles.buttonGroup}>
-          <Pressable style={setUpStyles.button} onPress={() => navigation.navigate("Age")}>
+          <Pressable style={setUpStyles.button} onPress={() => navigation.navigate("Birthday")}>
             <Text style={globalStyles.buttonText}>Go back</Text>
           </Pressable>
           <Pressable style={setUpStyles.button} onPress={setWeightInFirebase}>

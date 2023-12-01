@@ -6,6 +6,7 @@ import { Exercise } from '../../../types and interfaces/types';
 import DateContext from '../../../contexts/DateContext';
 import { workoutsStyles } from '../styles';
 import { getWorkout } from '../workoutsFunction';
+import { ExerciseLogType } from '../types';
 
 
 const DisplaySets = (props: { date: Date; }) => {
@@ -14,7 +15,7 @@ const DisplaySets = (props: { date: Date; }) => {
     const [allExercises, setAllExercises] = useState<React.JSX.Element[]>([]);
 
     useEffect(() => {
-      const unsubscribeFromWorkouts = getWorkout(userID, date, (exercises: Exercise[]) => {
+      const unsubscribeFromWorkouts = getWorkout(userID, date, (exercises: ExerciseLogType[]) => {
         const exerciseComponents: React.JSX.Element[] = [];
         
         exercises.forEach((exercise, index) => {

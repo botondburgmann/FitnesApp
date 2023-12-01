@@ -4,8 +4,9 @@ export const backgroundImage = require("../assets/background.jpg");
 export const globalStyles = StyleSheet.create({
     container: {
         justifyContent: "center",
-        backgroundColor: 'rgba(128,128,128,0.5)' 
+        backgroundColor: "rgba(128,128,128,0.5)" 
     },
+
     input: {
         marginHorizontal: 10,
         marginVertical: 4,
@@ -17,7 +18,7 @@ export const globalStyles = StyleSheet.create({
     },
     image: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: "center",
       },
     button: {
         width: 250,
@@ -57,11 +58,11 @@ export const globalStyles = StyleSheet.create({
       exerciseName: {
         fontSize: 24,
         lineHeight: 50,
-        fontWeight: 'bold',
+        fontWeight: "bold",
         letterSpacing: 0.25,
-        color: 'white',
-        textAlign: 'center',
-        flexWrap: 'wrap',
+        color: "white",
+        textAlign: "center",
+        flexWrap: "wrap",
         textShadowOffset:{
             height: 2,
             width: 2
@@ -71,13 +72,13 @@ export const globalStyles = StyleSheet.create({
     },
     
   label: {
-    alignSelf: 'center',
+    alignSelf: "center",
     fontSize: 20,
     fontWeight: "800",
     color: "#fff",
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     marginVertical: 10,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 40,
     textShadowOffset:{
         height: 2,
@@ -87,10 +88,10 @@ export const globalStyles = StyleSheet.create({
     textShadowRadius: 10
   },
   logo: {
-    alignSelf: 'center',
+    alignSelf: "center",
     fontSize: 50,
     color: "#fff",
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     textShadowOffset:{
       height: 2,
       width: 2

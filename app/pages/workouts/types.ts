@@ -5,8 +5,8 @@ export type SelectOption = {
     isometric: boolean
 }
 
-export type ExerciseLog = {
-    exercise : SelectOption[],
+export type ExerciseLogType = {
+    exercise :  any[],
     weights: number[],
     reps: number[],
     times: number[],

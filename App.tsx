@@ -24,8 +24,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 
 
+const Tab = createBottomTabNavigator();
 function InsideLayout() {
-  const Tab = createBottomTabNavigator();
 
   return( 
     <Tab.Navigator

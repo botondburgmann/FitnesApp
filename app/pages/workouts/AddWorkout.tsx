@@ -6,9 +6,9 @@ import { Exercise, ExerciseSet, RouterProps } from '../../types and interfaces/t
 import { backgroundImage, globalStyles } from '../../assets/styles'
 import WeekContext from '../../contexts/WeekContext'
 import { workoutsStyles } from './styles'
-import { ExerciseLog, SelectOption } from './types'
+import {  ExerciseLogType, SelectOption } from './types'
 import {  finishExercise} from './workoutsFunction'
-import { collection, updateDoc, doc, addDoc, Unsubscribe, onSnapshot, query, where } from 'firebase/firestore'
+import { collection, Unsubscribe, onSnapshot, query, where } from 'firebase/firestore'
 import { FIRESTORE_DB } from '../../../FirebaseConfig'
 
 type RouteParamsTypes = {
@@ -28,7 +28,7 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
   const [reps, setReps] = useState("");
   const [time, setTime] = useState("");
   const [restTime, setRestTime] = useState("");
-  const [sets, setSets] = useState<ExerciseLog>({
+  const [sets, setSets] = useState<ExerciseLogType>({
     exercise : [],
     weights: [],
     reps: [],
@@ -54,17 +54,19 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
   function addSet (): void {
     try {
       const numericData = convertFieldsToNumeric(parseFloat(weight), parseFloat(reps), parseFloat(time), parseFloat(restTime));
-      if (currentExercise === undefined)
-        throw new Error("Please select an exercise");
+      if (currentExercise === undefined){
+        alert("Error: Please select an exercise");
+        return;
+      }
       validateData(currentExercise, parseFloat(reps), parseFloat(time), parseFloat(restTime));
       
       setSets((prevSets) => ({
         ...prevSets,
-        exercise: [...prevSets.exercise, currentExercise],
+        exercise: [...prevSets.exercise, currentExercise.label],
         weights: [...prevSets.weights, numericData.weight],
         reps: [...prevSets.reps, numericData.rep],
         times: [...prevSets.times, numericData.time],
-        restTimes: [...prevSets.restTimes, numericData.restTime],
+        restTimes: [...prevSets.restTimes, numericData.restTime*60],
         sides: [...prevSets.sides, side],
       }));
       resetInputFields();
@@ -114,11 +116,11 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
   }
   
   function validateData(currentExercise:SelectOption, reps: number, time: number, restTime: number): void {
-    if (!currentExercise.isometric && reps === 0)
+    if (!currentExercise.isometric && Number.isNaN(reps))
       throw new Error("Repetition number is required for non-isometric exercises");
     if (!currentExercise.isometric && reps < 0)
       throw new Error("Repetition number must be a positive number");
-    if (currentExercise.isometric && time  === 0 )
+    if (currentExercise.isometric && Number.isNaN(time) )
       throw new Error("Time is required for non-isometric exercises");
     if (currentExercise.isometric && time < 0)
       throw new Error("Time must be a positive number");
@@ -245,15 +247,20 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
                 </View>
               :<></>
             }
-            <Text style={workoutsStyles.text}>weight (kg)</Text>
-            <TextInput
-              keyboardType='numeric'
-              style={globalStyles.input}
-              value={weight}
-              placeholder="Weight (kg)"
-              autoCapitalize='none'
-              onChangeText={(text) => setWeight(text)}
-            />
+            { currentExercise !== undefined 
+              ? <>
+                  <Text style={workoutsStyles.text}>weight (kg)</Text>
+                  <TextInput
+                    keyboardType='numeric'
+                    style={globalStyles.input}
+                    value={weight}
+                    placeholder="Weight (kg)"
+                    autoCapitalize='none'
+                    onChangeText={(text) => setWeight(text)}
+                  />
+                </>
+              : <></>
+              }
             {currentExercise !== undefined && !currentExercise.isometric
               ? <>
                   <Text style={workoutsStyles.text}>reps</Text>
@@ -268,24 +275,35 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
                 </>
               : <></>
             }
-            <Text style={workoutsStyles.text}>time (seconds)</Text>
-            <TextInput
-              keyboardType='numeric'
-              style={globalStyles.input}
-              value={time}
-              placeholder="Time (in seconds)"
-              autoCapitalize='none'
-              onChangeText={(text) => setTime(text)}
-            />
-            <Text style={workoutsStyles.text}>Rest time (minutes)</Text>
-            <TextInput
-              keyboardType='numeric'
-              style={globalStyles.input}
-              value={restTime}
-              placeholder="Rest time (in minutes)"
-              autoCapitalize='none'
-              onChangeText={(text) => setRestTime(text)}
-            />
+            { currentExercise !== undefined
+              ? <>
+                  <Text style={workoutsStyles.text}>time (seconds)</Text>
+                  <TextInput
+                    keyboardType='numeric'
+                    style={globalStyles.input}
+                    value={time}
+                    placeholder="Time (in seconds)"
+                    autoCapitalize='none'
+                    onChangeText={(text) => setTime(text)}
+                  />
+                </>
+              : <></>
+            }
+            { currentExercise !== undefined
+
+              ? <>
+                  <Text style={workoutsStyles.text}>Rest time (minutes)</Text>
+                  <TextInput
+                    keyboardType='numeric'
+                    style={globalStyles.input}
+                    value={restTime}
+                    placeholder="Rest time (in minutes)"
+                    autoCapitalize='none'
+                    onChangeText={(text) => setRestTime(text)}
+                  />      
+                </> 
+                : <></>
+          }
             <View style={styles.gridContainer}>
               <Pressable style={workoutsStyles.button} onPress={addSet}>
                   <Text style={globalStyles.buttonText}>Add set</Text>

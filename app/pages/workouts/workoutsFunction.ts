@@ -1,11 +1,11 @@
 import { collection, query, where, getDocs, updateDoc, Unsubscribe, onSnapshot, addDoc, doc } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../../FirebaseConfig";
 import { Achievement, Exercise, MyUser, WeekRange } from "../../types and interfaces/types";
-import { ExerciseLog } from "./types";
+import { ExerciseLogType } from "./types";
 import { getWorkoutDocs, updateAchievementStatus } from "../../functions/firebaseFunctions";
 import { NavigationProp } from "@react-navigation/native";
 
-export function addXP (isIsometric: boolean, sets: ExerciseLog): number | undefined {
+export function addXP (isIsometric: boolean, sets: ExerciseLogType): number | undefined {
     try {
         let currentExperience = 0;
         if (isIsometric) 
@@ -78,10 +78,10 @@ export function getWorkout (userID: string | null, date: Date, callback: Functio
         
         const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutsSnapshot => {
             if (!workoutsSnapshot.empty) {
-                const allExercises: ExerciseLog[] = [];
+                const allExercises: ExerciseLogType[] = [];
                 workoutsSnapshot.docs.forEach(workout => {
                     for (let i = 0; i < workout.data().Workout.length; i++) {
-                        let currentExercise: ExerciseLog = {
+                        let currentExercise: ExerciseLogType = {
                             exercise :  workout.data().Workout[i].exercise,
                             weights: workout.data().Workout[i].weights,
                             reps: workout.data().Workout[i].reps,
@@ -103,7 +103,7 @@ export function getWorkout (userID: string | null, date: Date, callback: Functio
 };
 
  
-export function updateStrengthBuilderAchievement (set: ExerciseLog): Achievement | undefined {
+export function updateStrengthBuilderAchievement (set: ExerciseLogType): Achievement | undefined {
     try {
         for (const weight of set.weights) {
           if (weight >= 60 && weight < 80) {
@@ -147,7 +147,7 @@ export function updateStrengthBuilderAchievement (set: ExerciseLog): Achievement
         alert(`Couldn't update achievement: ${error}`)
     }
 };
-export  function updateEnduranceMasterAchievement (set: ExerciseLog): Achievement | undefined {
+export  function updateEnduranceMasterAchievement (set: ExerciseLogType): Achievement | undefined {
     try {
         for (const rep of set.reps) {
           if (rep >= 20 && rep < 50) {
@@ -386,17 +386,25 @@ try {
 }
 };
 
-export function finishExercise (sets: ExerciseLog, userID: string | null, date: Date | null, week: WeekRange | null, 
+export function finishExercise (sets: ExerciseLogType, userID: string | null, date: Date | null, week: WeekRange | null, 
                                 navigation: NavigationProp<any, any>, setSets?: Function) {
     try {
-        if (userID === null)
-            throw new Error("User is not set");
-        if (week === null)
-            throw new Error("Week is not set");
-        if (date === null)
-            throw new Error("Date is not set");
-        if (sets.exercise.length === 0)
-        throw new Error("Not enough sets");
+        if (userID === null){
+            alert("User is not set");
+            return;
+        }
+        if (week === null){
+            alert("Week is not set");
+            return
+        }
+        if (date === null){
+            alert("Date is not set");
+            return;
+        }
+        if (sets.exercise.length === 0){
+            alert("Not enough sets");
+            return;
+        }
         const experience = calculateExperience(sets);
         addSetToFirebase(experience, userID, date, week, sets );
         setSets && setSets({
@@ -413,7 +421,7 @@ export function finishExercise (sets: ExerciseLog, userID: string | null, date: 
     }
 };
 
-function calculateExperience(sets: ExerciseLog): number {
+function calculateExperience(sets: ExerciseLogType): number {
 let experience = 0;
 for (const exercise of sets.exercise) {
     let result = addXP(exercise.isometric, sets);
@@ -424,7 +432,7 @@ return experience;
 };
   
 
-async function addSetToFirebase (experience: number, userID: string, date: Date, week: WeekRange, sets: ExerciseLog): Promise<void>{
+async function addSetToFirebase (experience: number, userID: string, date: Date, week: WeekRange, sets: any): Promise<void>{
     try {
       const workoutsSnapshot = await getWorkoutDocs(userID,date);
       const data = {
@@ -497,7 +505,7 @@ export function calculateNumberOfSet (focus:string, activityLevel: string): numb
     return numberOfSet;
 };
 
-export function isSuperSet (exercise: Exercise, uniqueExercises: string[]): boolean {
+export function isSuperSet (exercise: ExerciseLogType, uniqueExercises: string[]): boolean {
     for (let i = 0; i < exercise.restTimes.length; i+= uniqueExercises.length) 
         if (exercise.restTimes[i] > 0) 
             return false;
@@ -508,7 +516,7 @@ export function isSuperSet (exercise: Exercise, uniqueExercises: string[]): bool
 
 
 
-export function isDropsSet (exercise:Exercise, uniqueExercises: string[] ): boolean {
+export function isDropsSet (exercise:ExerciseLogType, uniqueExercises: string[] ): boolean {
     if (exercise.restTimes.length === 1 )
         return false;
     for (let i = 0; i < exercise.restTimes.length-1; i++) 

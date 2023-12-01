@@ -35,7 +35,7 @@ const Gender = ({navigation}: RouterProps) => {
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
-      <View style={setUpStyles.container}>
+      <View style={[setUpStyles.container]}>
         <Text style={setUpStyles.label}>Please, select your gender</Text>
         <Radiobutton selectedValue={gender} setselectedValue={setGender} options={options} />
         <Pressable style={setUpStyles.button} onPress={setGenderInFirebase}>

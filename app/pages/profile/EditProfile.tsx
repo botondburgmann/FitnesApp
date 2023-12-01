@@ -6,18 +6,18 @@ import Radiobutton from '../../components/Radiobutton';
 import SelectMenu from '../../components/SelectMenu';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import { ActivityLevels, MyUser, RouterProps, SelectItem } from '../../types and interfaces/types';
-import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
-import { FIRESTORE_DB } from '../../../FirebaseConfig';
+import { updateDoc } from 'firebase/firestore';
+import { convertFtToCm, convertLbsToKg, validateBirthday, validateHeight, validateWeight } from '../../functions/globalFunctions';
+import { getUserDocs } from '../../functions/firebaseFunctions';
 
 const EditProfile = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
     const { user } = route?.params;
     const [name, setName] = useState<string>(user.name);
-    const [age, setAge] = useState<number>(user.age);
     const [weight, setWeight] = useState<number>(user.weight);
     const [height, setHeight] = useState<number>(user.height);
-    const [birthDate, setBirthDate] = useState(new Date());
-    const [gender, setGender] = useState<string>(user.gender);
+    const [date, setDate] = useState(new Date(user.dateOfBirth));
+    const [gender, setGender] = useState<"Male" | "Female">(user.gender);
     const options = ["Male", "Female"];
     const [systemValueWeight, setSystemValueWeight] = useState<SelectItem>({label: 'Metric (kg)', value: 'kg'});
     const [systemItemsWeight] = useState<SelectItem[]>([
@@ -29,78 +29,40 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
       {label: 'Metric (cm)', value: 'm'},
       {label: 'Imperial (ft)', value: 'ft'}
     ]);
-    const [activityValue, setActivityValue] = useState<ActivityLevels>(user.activityLevel);
+    const [activityValue, setActivityValue] = user.activityLevel === "beginner" 
+                                            ? useState<ActivityLevels>({label: 'Beginner', value: 'beginner'})
+                                            : user.activityLevel === "intermediate"
+                                            ? useState<ActivityLevels>({label: 'Intermediate', value: 'intermediate'})
+                                            : useState<ActivityLevels>({label: 'Advanced', value: 'advanced'})
     const [activityItems] = useState([
       {label: 'Beginner', value: 'beginner'},
       {label: 'Intermediate', value: 'intermediate'},
       {label: 'Advanced', value: 'advanced'}
     ]);
 
-    async function editProfile  (userID:string | null, changes: MyUser): Promise<void> {
-        try {  
-            const usersCollectionRef = collection(FIRESTORE_DB, "Users");    
-            const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-            const usersSnapshot = await getDocs(usersQuery);
-            const usersDoc = usersSnapshot.docs[0];
-            const updateData = {
-                name : changes.name,
-                age: changes.age,
-                gender: changes.gender,
-                weight: changes.weight,
-                height: changes.height,
-                activityLevel: changes.activityLevel
-            };
-            updateDoc(usersDoc.ref, updateData);
-    
-        } 
-        catch (error: any) {
-            alert(`Error: couldn't find fields: ${error.message}`);
-        }
-    };
-    useEffect(() => {
-        const today = new Date();
-        
-
-        if (birthDate.toDateString() === today.toDateString()) {
-            setAge(user.age)
-        }
-        else{
-            setAge(today.getFullYear()-birthDate.getFullYear())
-        }
-    }, [birthDate])
-    
 
 
-    function saveChanges(): void {
-        if (name === "") 
-            alert("Name field cannot be empty!");
-        else if (Number.isNaN(weight)) 
-            alert("Weight field cannot be empty!");
-        else if (Number.isNaN(height)) 
-            alert("Height field cannot be empty!");
-        else if (age < 0)
-            alert("Unfortunately this time we cannot sign up time travellers. Sorry for the inconvenience");
-        else if (age >= 0 && age < 12)
-            alert("You need to be at least 12 years old to sign up");
-        else if (age > 120 )
-            alert("Aren't you a bit too old (or dead) to work out?");
-        else if(typeof(weight) !== 'number')
-            alert("Weight must be a number");
-        else if(weight < 0)
-            alert("Weight can't be a negative number");
-            else if(typeof(height) !== 'number')
-            alert("Height must be a number");
-        else if(height < 0)
-            alert("Height can't be a negative number");
-        else{
-            if (systemValueWeight.value === "lbs")
-                setWeight(weight => Math.round((weight*0.453592)*100)/100);
-            if (systemValueWeight.value === "ft")
-                setHeight(height => Math.round((height*30.48)*100)/100);
+
+    async function saveChanges(): Promise<void> {
+        try {
+            if (name === "") 
+                throw new Error("Name field cannot be empty!");
+            console.log(userID);
             
+            if (userID === null)
+                throw new Error("User is not verified");
+            validateBirthday(date);
+            validateHeight(height);
+            validateWeight(weight);
+            
+            if (systemValueWeight.value === "lbs")
+                setWeight(weight => convertLbsToKg(weight));
+            if (systemValueWeight.value === "ft")
+                setHeight(height => convertFtToCm(height));
+                
             const changes = {
                 name : name,
-                age: age,
+                dateOfBirth: date.toDateString(),
                 gender: gender,
                 weight: weight,
                 height: height,
@@ -108,16 +70,22 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                 experience: user.experience,
                 level: user.level,
                 weeklyExperience: user.weeklyExperience,
-                userID: user.userID
-            }            
-            editProfile(userID,changes)
+                userID: userID
+            }
+            const usersDoc = await getUserDocs(userID);
+            if (usersDoc === undefined)
+                throw new Error("User doesn't exist");
+            updateDoc(usersDoc.ref, changes);    
             navigation.navigate("Account")
+        } catch (error: any) {
+            alert(`Error: couldn't save changes: ${error.message}`);
         }
+        
     }
 
     return (
         <ImageBackground source={backgroundImage} style={globalStyles.image}>
-        <ScrollView contentContainerStyle={[globalStyles.container, {flex: 1, backgroundColor: "rgba(255,0,0,0.7)"}]}>
+            <ScrollView contentContainerStyle={[globalStyles.container, {flex: 1, backgroundColor: "rgba(128,128,128,0.7)"}]}>
                 <View style={styles.gridContainer}>
                     <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>Name</Text>
                     <TextInput
@@ -127,11 +95,11 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                         autoCapitalize='none'
                         onChangeText={(text) => setName(text)}
                     />
-                </View>
+                </View> 
                 <View style={styles.dateGridContainer}>
                     <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>Birthday:</Text>
-                    <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>{birthDate.toDateString()}</Text>
-                    <Datepicker date={birthDate} setDate={setBirthDate} />
+                    <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>{date.toDateString()}</Text>
+                    <Datepicker date={date} setDate={setDate} />
                 </View>
                 <View style={styles.gridContainer}>
                     <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", marginHorizontal: 10, fontSize: 16}]}>Gender</Text>
@@ -148,7 +116,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                         onChangeText={(text) => setWeight(parseFloat(text))}
                     />
                     <View style={styles.systemSelectMenuContainer}>
-                        <SelectMenu data={systemItemsWeight} setSelectedValue={setSystemValueWeight} title={"System"} />
+                        <SelectMenu data={systemItemsWeight} setSelectedValue={setSystemValueWeight} title={systemValueWeight.label} />
                     </View>
                 </View>
                 <View style={styles.gridContainer}>
@@ -162,11 +130,11 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                         onChangeText={(text) => setHeight(parseFloat(text))}
                     />
                     <View style={styles.systemSelectMenuContainer}>
-                        <SelectMenu data={systemItemsHeight} setSelectedValue={setSystemValueHeight} title={"System"} />
+                        <SelectMenu data={systemItemsHeight} setSelectedValue={setSystemValueHeight} title={systemValueHeight.label} />
                     </View>
                 </View>
                 <View style={styles.activitySelectMenuContainer}>
-                    <SelectMenu data={activityItems} setSelectedValue={setActivityValue} title={"Activity level"} />
+                    <SelectMenu data={activityItems} setSelectedValue={setActivityValue} title={activityValue.label} />
                 </View>
                 <Pressable style={[globalStyles.button, {marginTop: 20,width: 150, height: 50,}]} onPress={() => saveChanges()}>
                     <Text style={globalStyles.buttonText}>Modify</Text>

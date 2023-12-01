@@ -59,13 +59,23 @@ export async function getUserDocumentRef(userID:string):Promise<DocumentReferenc
     }
 }
 
+
 export async function getWorkoutDocs(userID:string, date: Date): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | undefined>{
     const collectionRef = collection(FIRESTORE_DB, "Workouts");
-    const q = query(collectionRef, where("date", "==", date), where("userID", "==", userID) );
+    const q = query(collectionRef, where("date", "==", date.toDateString()), where("userID", "==", userID) );
     const snapshot = await getDocs(q);
     if (!snapshot.empty){
         const workoutDocs = snapshot.docs[0];
         return workoutDocs;
+    }        
+}
+export async function getUserDocs(userID:string): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | undefined>{
+    const collectionRef = collection(FIRESTORE_DB, "Users");
+    const q = query(collectionRef, where("userID", "==", userID) );
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty){
+        const userDocs = snapshot.docs[0];
+        return userDocs;
     }        
 }
 
@@ -78,7 +88,7 @@ export function getUser (userID:string | null, callback: Function): Unsubscribe 
                 const userDoc = usersSnapshot.docs[0];
                 const userData = {
                     activityLevel:  userDoc.data().activityLevel,
-                    age:  userDoc.data().age,
+                    dateOfBirth:  userDoc.data().dateOfBirth,
                     experience:  userDoc.data().experience,
                     gender:  userDoc.data().gender,
                     height:  userDoc.data().height,

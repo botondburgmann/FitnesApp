@@ -3,12 +3,11 @@ import React, { useContext, useState } from 'react'
 import Datepicker from '../../components/Datepicker';
 import UserContext from '../../contexts/UserContext';
 import { backgroundImage, globalStyles } from '../../assets/styles';
-import NavigationContext from '../../contexts/NavigationContext';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { FIRESTORE_DB } from '../../../FirebaseConfig';
+import { updateDoc } from 'firebase/firestore';
 import { setUpStyles } from './styles';
 import { getUserDocumentRef } from '../../functions/firebaseFunctions';
 import { RouterProps } from '../../types and interfaces/types';
+import { validateBirthday } from '../../functions/globalFunctions';
 
 
 
@@ -33,21 +32,13 @@ const Birthday = ({navigation}: RouterProps) => {
     }
   }
 
-  function validateBirthday(birthDate:Date): void {
-    const today = new Date();
-    if (today.getFullYear() - birthDate.getFullYear() < 12)
-      throw new Error("You need to be at least 12 years old to use this application");
-    if (today.getFullYear() - birthDate.getFullYear() > 120)
-      throw new Error(`Are you sure you're ${today.getFullYear() - birthDate.getFullYear()} years old?`);
-    if (today.getFullYear() - birthDate.getFullYear() < 0)
-      throw new Error("Unfortunately this time we cannot sign up time travellers. Sorry for the inconvenience");
-  }
+  
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={setUpStyles.container}>
         <Text style={setUpStyles.label}>Please, select your date of birth</Text>
-        <View>
+        <View style={styles.icon}>
           <Datepicker date={birthDate} setDate={setBirthDate} />
         </View>
         <Text style={styles.text}>{birthDate.toDateString()}</Text>
@@ -85,5 +76,9 @@ const styles = StyleSheet.create({
     marginTop: 100,
     flexDirection: 'row',
     justifyContent: 'center'
+  },
+  icon : {
+    marginTop: -60,
+    marginBottom: 30
   },
 });

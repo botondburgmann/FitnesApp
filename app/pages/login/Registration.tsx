@@ -46,7 +46,7 @@ const Registration = ({navigation}: RouterProps) => {
                 userID: response.user.uid, 
                 name: name, 
                 gender: "", 
-                age: 0, 
+                dateOfBirth: "", 
                 weight: 0, 
                 height: 0, 
                 activityLevel: "", 

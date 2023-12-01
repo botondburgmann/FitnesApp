@@ -8,6 +8,7 @@ import { backgroundImage, globalStyles } from '../../assets/styles';
 import { updateDoc } from 'firebase/firestore';
 import { setUpStyles } from './styles';
 import { getUserDocumentRef } from '../../functions/firebaseFunctions';
+import { validateHeight, convertFtToCm } from '../../functions/globalFunctions';
 
 
 const Height = ({navigation}: RouterProps) => {
@@ -29,11 +30,11 @@ const Height = ({navigation}: RouterProps) => {
       if (userDocRef === undefined)
         throw new Error("User doesn't exist in database");
       if (selectedSystem.value === "ft"){
-        const newData = {"weight": convertFtToM(parseFloat(height))};
+        const newData = {"weight": convertFtToCm(parseFloat(height))};
         await updateDoc(userDocRef, newData);
       }
       else{
-        const newData = {"weight": parseFloat(height)};
+        const newData = {"height": parseFloat(height)};
         await updateDoc(userDocRef, newData);
       }      
       navigation.navigate("Activity level");
@@ -43,22 +44,13 @@ const Height = ({navigation}: RouterProps) => {
     }
   }
 
-  function validateHeight(height: number): void {
-    if (Number.isNaN(height))
-      throw new Error("Weight must be set");
-    if (height < 0)
-      throw new Error("Weight must be a positive number");
-  }
-
-  function convertFtToM(height:number): number {
-    return Math.round((height*30.48)*100)/100;
-  }
+  
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={setUpStyles.container}>
       <Text style={setUpStyles.label}>Please, select your height</Text>
-        <View>
+        <View style={setUpStyles.icon}>
           <MaterialCommunityIcons name="human-male-height" size={60} color="#FFF" />
         </View>
         <View style={setUpStyles.inputGroup}>
@@ -71,7 +63,7 @@ const Height = ({navigation}: RouterProps) => {
             onChangeText={(text: string) => setHeight(text)}
           />
           <View style={setUpStyles.selectMenuContainer}>
-            <SelectMenu data={systems} setSelectedValue={setSelectedSystem} title={"System"} />
+            <SelectMenu data={systems} setSelectedValue={setSelectedSystem} title={selectedSystem.label} />
           </View>
         </View>
         <View style={setUpStyles.buttonGroup}>
