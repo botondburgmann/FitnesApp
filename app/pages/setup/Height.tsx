@@ -58,7 +58,7 @@ const Height = ({navigation}: RouterProps) => {
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={setUpStyles.container}>
       <Text style={setUpStyles.label}>Please, select your height</Text>
-        <View style={globalStyles.icon}>
+        <View>
           <MaterialCommunityIcons name="human-male-height" size={60} color="#FFF" />
         </View>
         <View style={setUpStyles.inputGroup}>

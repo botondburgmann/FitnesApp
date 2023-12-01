@@ -1,7 +1,7 @@
 import { View, TextInput, ActivityIndicator, Pressable, Text, ImageBackground } from "react-native"
 import React, { useState } from "react"
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { collection, addDoc, DocumentReference, DocumentData } from "firebase/firestore";
+import { collection, addDoc, DocumentReference, DocumentData, getDocs, updateDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../../../FirebaseConfig";
 import { RouterProps } from "../../types and interfaces/types";
 import { backgroundImage, globalStyles } from "../../assets/styles";
@@ -57,8 +57,80 @@ const Registration = ({navigation}: RouterProps) => {
             };
             const usersCollectionRef = collection(FIRESTORE_DB, "Users");
             const userDocRef = await addDoc(usersCollectionRef, userData);
+            initializeAchievements(response.user.uid);
             return userDocRef;
     }
+    async function initializeAchievements (userID: string | null): Promise<void> {
+        try {
+            const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+            const achievementsSnapshot = await getDocs(achievementsCollectionRef);
+            let newOwner;
+            for (const achievementDoc of achievementsSnapshot.docs) {
+                switch (achievementDoc.data().name) {
+                    case "Consistency Streak":
+                        newOwner = {
+                            color: "#808080",
+                            description: "Workout for 10 days to unlock this achievement",
+                            level: 0,
+                            status: "locked",
+                            userID: userID,
+                            visibility: 0.5
+                        }
+                        break;
+                    case "Endurance Master":
+                        newOwner = {
+                            color: "#808080",
+                            description: "Do 20 repetitions for an exercise to unlock this achievement",
+                            level: 0,
+                            status: "locked",
+                            userID: userID,
+                            visibility: 0.5
+                        }
+                        break;
+                    case "Dedicated Athlete":
+                        newOwner = {
+                            color: "#808080",
+                            description: "Workout for a month consistently to unlock this achievement",
+                            level: 0,
+                            status: "locked",
+                            userID: userID,
+                            visibility: 0.5
+                        }
+                        break;
+                    case "Climbing The Ranks":
+                        newOwner = {
+                            color: "#808080",
+                            description: "Get in the top 10 users to unlock this achievement",
+                            level: 0,
+                            status: "locked",
+                            userID: userID,
+                            visibility: 0.5
+                        }
+                        break;
+                    case "Strength Builder":
+                        newOwner = {
+                            color: "#808080",
+                            description: "Lift 60 kg on an exercise to unlock this achievement",
+                            level: 0,
+                            status: "locked",
+                            userID: userID,
+                            visibility: 0.5
+                        }
+                        break
+                    default:
+                        break;
+                    }
+                    const updatedOwners = [...achievementDoc.data().owners, newOwner];
+                    
+                    const updatedData = {
+                        owners: updatedOwners
+                    }
+                    await updateDoc(achievementDoc.ref, updatedData);
+                }
+        } catch (error: any) {
+            alert(`Couldn't initialize achievements: ${error}`)
+        }
+    };
 
     return (
         <ImageBackground source={backgroundImage} style={globalStyles.image}>

@@ -1,43 +1,32 @@
 import React from "react"
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Login from "./app/pages/login/Login";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
-import { FIREBASE_AUTH} from "./FirebaseConfig";
+import { FIREBASE_AUTH, FIRESTORE_DB} from "./FirebaseConfig";
 import Registration from "./app/pages/login/Registration";
-import Age from "./app/pages/setup/Birthday";
-import Weight from "./app/pages/setup/Weight";
-import Gender from "./app/pages/setup/Gender";
-import Height from "./app/pages/setup/Height";
-import ActivityLevel from "./app/pages/setup/ActivityLevel";
-import Log from "./app/pages/workouts/Log";
-import AddWorkout from "./app/pages/workouts/AddWorkout";
-import Account from "./app/pages/profile/Account";
-import Routines from "./app/pages/workouts/Routines";
-import { getSetUpValue } from "./app/functions/firebaseFunctions";
-import Toplist from "./app/pages/toplist/Toplist";
-import Exercises from "./app/pages/exercises/Exercises";
 import UserContext from "./app/contexts/UserContext";
-import CreateExercise from "./app/pages/exercises/CreateExercise";
-import EditProfile from "./app/pages/profile/EditProfile";
-import Details from "./app/pages/exercises/Details";
 import { FontAwesome5 } from "@expo/vector-icons";
-import Achievements from "./app/pages/profile/Achievements";
 import WeekContext from "./app/contexts/WeekContext";
 import { WeekRange } from "./app/types and interfaces/types";
 import SetUpLayout from "./app/pages/setup/SetUplayout";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import ExercisesLayout from "./app/pages/exercises/ExercisesLayout";
+import ProfileLayout from "./app/pages/profile/ProfileLayout";
+import ToplistLayout from "./app/pages/toplist/ToplistLayout";
+import WorkoutsLayout from "./app/pages/workouts/WorkoutsLayout";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 
 
-const SetupStack = createNativeStackNavigator();
 
-const Tab = createBottomTabNavigator();
 
 
 
 function InsideLayout() {
+  const Tab = createBottomTabNavigator();
+
   return( 
     <Tab.Navigator
     screenOptions={({ route }:any ) => ({
@@ -69,45 +58,28 @@ function InsideLayout() {
   );
 }
 
-function ToplistLayout() {
-  return( 
-    <SetupStack.Navigator>
-        <Tab.Screen name="Leaderboard" component={Toplist} options={{ headerShown: false }}/>
-        <Tab.Screen name="User" component={Account}/>
-        <Tab.Screen name="Achievements" component={Achievements}/>
-
-    </SetupStack.Navigator>
-  )
-}
-
-function ProfileLayout() {
-  const userID   = useContext(UserContext);
-  return( 
-    <SetupStack.Navigator>
-        <Tab.Screen name="Account" component={Account} options={{ headerShown: false }} initialParams={{userID: userID  }}/>
-        <Tab.Screen name="Edit profile" component={EditProfile}/>
-        <Tab.Screen name="Achievements" component={Achievements}/>
 
 
-    </SetupStack.Navigator>
-  )
-}
 
 
-function ExercisesLayout() {
-  return( 
-    <SetupStack.Navigator>
-      <SetupStack.Screen name="Exercise List" component={Exercises} options={{ headerShown: false }}/>
-      <SetupStack.Screen name="Create Exercise" component={CreateExercise}  />
-      <SetupStack.Screen name="Details" component={Details}  />
-    </SetupStack.Navigator>
-  )
-}
+
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [alreadySetUp, setAlreadySetUp] = useState<boolean | null>(null);
-
+  
+  async function getSetUpValue (userID: string): Promise<boolean | undefined> {
+    try {
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        const usersSnapshot = await getDocs(usersQuery);
+        const userDoc = usersSnapshot.docs[0];
+        return userDoc.data().set;
+    } 
+    catch (error: any) {
+        alert(`Error: Couldn't find set field: ${error.message}`);
+    }
+};
   
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, async (user)=>{
@@ -125,8 +97,8 @@ export default function App() {
       userID = user.uid;
     }
     const [week, setWeek] = useState<WeekRange>({
-      start: "",
-      end: ""
+      start: new Date(),
+      end: new Date()
     })
   
     const [today, setToday] = useState(new Date());
@@ -137,15 +109,15 @@ export default function App() {
   
     function calculateWeekRange(today:Date): WeekRange {
       const week = {
-        start: "",
-        end: ""  
+        start: new Date(),
+        end: new Date()  
       };
       let moveBack = 0;
       let moveForward = 6;
       for (let i = 0; i <= 6; i++) {   
         if (today.getDay() === i) {
-          week.start = addDaysToDate(today,-moveBack+1).toDateString()
-          week.end = addDaysToDate(today,moveForward+1).toDateString()
+          week.start = addDaysToDate(today,-moveBack+1)
+          week.end = addDaysToDate(today,moveForward+1)
           break;
         }
         moveBack++;
@@ -160,6 +132,8 @@ export default function App() {
       newDate.setDate(date.getDate() + daysToAdd);
       return newDate;
     }
+    const Stack = createNativeStackNavigator();
+
   return (
     <UserContext.Provider value={userID}>
       <WeekContext.Provider value={week}>

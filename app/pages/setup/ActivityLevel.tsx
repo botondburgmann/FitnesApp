@@ -2,17 +2,14 @@ import { View, Pressable, Text, ImageBackground } from 'react-native'
 import React, { useContext, useState } from 'react'
 import SelectMenu from '../../components/SelectMenu';
 import UserContext from '../../contexts/UserContext';
-import { RouterProps, SelectItem } from '../../types and interfaces/types';
+import { ActivityLevels, RouterProps, SelectItem } from '../../types and interfaces/types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import { setUpStyles } from './styles';
 import { updateDoc } from 'firebase/firestore';
 import { getUserDocumentRef } from '../../functions/firebaseFunctions';
 
-type ActivityLevels =
-  |{label: 'Beginner', value: 'beginner'}
-  |{label: 'Intermediate', value: 'intermediate'}
-  |{label: 'Advanced', value: 'advanced'}
+
 
 
 const ActivityLevel = ({navigation}: RouterProps) => {
@@ -47,7 +44,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={setUpStyles.container}>
         <Text style={setUpStyles.label}>Please, select your activity level</Text>
-        <View style={globalStyles.icon}>
+        <View>
           <MaterialCommunityIcons name="weight-lifter" size={60} color="#FFF" />
         </View>
         <View style={setUpStyles.selectMenuContainer}>

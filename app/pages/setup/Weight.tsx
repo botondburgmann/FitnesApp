@@ -60,7 +60,7 @@ const Weight = ({navigation}: RouterProps) => {
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={setUpStyles.container}>
         <Text style={setUpStyles.label}>Please, select your weight</Text>
-        <View style={globalStyles.icon}>
+        <View>
           <FontAwesome5 name="weight" size={60} color="#FFF"/>
         </View>
         <View style={setUpStyles.inputGroup}>

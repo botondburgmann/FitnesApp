@@ -6,12 +6,15 @@ import { RouterProps } from '../../types and interfaces/types';
 import NavigationContext from '../../contexts/NavigationContext';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import { AntDesign } from '@expo/vector-icons';
-import { dateStep } from '../../functions/otherFunctions';
 
 
 const Log = ({navigation}: RouterProps) => {
   const [date, setDate] = useState(new Date());
-
+  function  dateStep (currentDate: Date, step: number): Date  {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + step);
+    return newDate
+  };
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>

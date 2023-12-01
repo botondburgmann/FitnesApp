@@ -3,9 +3,10 @@ import React, { useEffect, useState } from 'react'
 import { backgroundImage, globalStyles } from '../../assets/styles'
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Achievement } from '../../types and interfaces/types';
-import { getAchievementsForUser } from '../../functions/firebaseFunctions';
 import Info from '../../components/Info';
-
+import { Unsubscribe } from 'firebase/auth';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../../FirebaseConfig';
 
 const Achievements = ({route}: any) => {
     const {userID} = route?.params;
@@ -14,10 +15,44 @@ const Achievements = ({route}: any) => {
     const [isCustomAlertVisible, setCustomAlertVisible] = useState(false);
     const [title, setTitle] = useState<string>();
     const [information, setInformation] = useState<string>();
-    const hideCustomAlert = () => {
+
+    function getAchievementsForUser (userID: string, callback: Function): Unsubscribe  | undefined {
+        try {
+            const achievements: Achievement[] = [];
+    
+            const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+            const unsubscribeFromAchievements = onSnapshot(achievementsCollectionRef, achievementsSnapshot => {
+                if (!achievementsSnapshot.empty) {
+                    achievementsSnapshot.docs.forEach(achievementDoc => {
+                        for (const owner of achievementDoc.data().owners) {
+                            if (owner.userID === userID) {
+                                const achievement = {
+                                    color: owner.color,
+                                    description: owner.description,
+                                    icon: achievementDoc.data().icon,
+                                    level: owner.level,
+                                    name: achievementDoc.data().name,
+                                    status: owner.status,
+                                    visibility: owner.visibility
+                                };
+                                achievements.push(achievement);
+                            }
+                            
+                        }
+                    }) 
+                    callback(achievements)
+                }
+            })
+            return unsubscribeFromAchievements;
+        } catch (error: any) {
+            alert(`Error: couldn't fetch achievements for ${userID}: ${error}`);
+        }
+    };
+
+    function hideCustomAlert () {
         setCustomAlertVisible(false);
     };
-    const showCustomAlert = (title: React.SetStateAction<string | undefined>, information: React.SetStateAction<string | undefined>) => {
+    function showCustomAlert (title: React.SetStateAction<string | undefined>, information: React.SetStateAction<string | undefined>) {
         setCustomAlertVisible(true);
         setTitle(title);
         setInformation(information);

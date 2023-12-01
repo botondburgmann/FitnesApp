@@ -13,6 +13,11 @@ export type WeekRange = {
     end: Date;
 }
 
+export type ActivityLevels =
+  |{label: 'Beginner', value: 'beginner'}
+  |{label: 'Intermediate', value: 'intermediate'}
+  |{label: 'Advanced', value: 'advanced'}
+
 
 
 
@@ -26,11 +31,6 @@ export type RouterProps = {
 export type SelectItem = {
     label: string
     value: string
-}
-
-export type MaxValueAndIndex = {
-    value: number;
-    index: number;
 }
 
 export type BestExercise = {

@@ -1,19 +1,13 @@
 import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
-import { editProfile } from '../../functions/firebaseFunctions';
 import UserContext from '../../contexts/UserContext';
 import Datepicker from '../../components/Datepicker';
 import Radiobutton from '../../components/Radiobutton';
 import SelectMenu from '../../components/SelectMenu';
 import { backgroundImage, globalStyles } from '../../assets/styles';
-
-interface RouterProps {
-    route: any,
-    navigation: NavigationProp<any, any>;
-}
-
-
+import { ActivityLevels, MyUser, RouterProps, SelectItem } from '../../types and interfaces/types';
+import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../../FirebaseConfig';
 
 const EditProfile = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
@@ -25,24 +19,44 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
     const [birthDate, setBirthDate] = useState(new Date());
     const [gender, setGender] = useState<string>(user.gender);
     const options = ["Male", "Female"];
-    const [systemValueWeight, setSystemValueWeight] = useState<string>();
-    const [systemItemsWeight] = useState<object[]>([
+    const [systemValueWeight, setSystemValueWeight] = useState<SelectItem>({label: 'Metric (kg)', value: 'kg'});
+    const [systemItemsWeight] = useState<SelectItem[]>([
       {label: 'Metric (kg)', value: 'kg'},
       {label: 'Imperial (lbs)', value: 'lbs'}
     ]);
-    const [systemValueHeight, setSystemValueHeight] = useState<string>();
-    const [systemItemsHeight] = useState<object[]>([
+    const [systemValueHeight, setSystemValueHeight] = useState<SelectItem>({label: 'Metric (cm)', value: 'm'});
+    const [systemItemsHeight] = useState<SelectItem[]>([
       {label: 'Metric (cm)', value: 'm'},
       {label: 'Imperial (ft)', value: 'ft'}
     ]);
-    const [activityValue, setActivityValue] = useState<string>(user.activityLevel);
+    const [activityValue, setActivityValue] = useState<ActivityLevels>(user.activityLevel);
     const [activityItems] = useState([
       {label: 'Beginner', value: 'beginner'},
       {label: 'Intermediate', value: 'intermediate'},
       {label: 'Advanced', value: 'advanced'}
     ]);
 
-
+    async function editProfile  (userID:string | null, changes: MyUser): Promise<void> {
+        try {  
+            const usersCollectionRef = collection(FIRESTORE_DB, "Users");    
+            const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+            const usersSnapshot = await getDocs(usersQuery);
+            const usersDoc = usersSnapshot.docs[0];
+            const updateData = {
+                name : changes.name,
+                age: changes.age,
+                gender: changes.gender,
+                weight: changes.weight,
+                height: changes.height,
+                activityLevel: changes.activityLevel
+            };
+            updateDoc(usersDoc.ref, updateData);
+    
+        } 
+        catch (error: any) {
+            alert(`Error: couldn't find fields: ${error.message}`);
+        }
+    };
     useEffect(() => {
         const today = new Date();
         
@@ -57,7 +71,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
     
 
 
-    function handleModifyButton(): void {
+    function saveChanges(): void {
         if (name === "") 
             alert("Name field cannot be empty!");
         else if (Number.isNaN(weight)) 
@@ -79,9 +93,9 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
         else if(height < 0)
             alert("Height can't be a negative number");
         else{
-            if (systemValueWeight === "lbs")
+            if (systemValueWeight.value === "lbs")
                 setWeight(weight => Math.round((weight*0.453592)*100)/100);
-            if (systemValueWeight === "ft")
+            if (systemValueWeight.value === "ft")
                 setHeight(height => Math.round((height*30.48)*100)/100);
             
             const changes = {
@@ -90,7 +104,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                 gender: gender,
                 weight: weight,
                 height: height,
-                activityLevel: activityValue,
+                activityLevel: activityValue.value,
                 experience: user.experience,
                 level: user.level,
                 weeklyExperience: user.weeklyExperience,
@@ -129,7 +143,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                         keyboardType='numeric'
                         value={weight.toString()}
                         style={globalStyles.input}
-                        placeholder={systemValueWeight === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
+                        placeholder={systemValueWeight.value === "lbs" ? "Weight (lbs)" : "Weight (kg)" }
                         autoCapitalize='none'
                         onChangeText={(text) => setWeight(parseFloat(text))}
                     />
@@ -143,7 +157,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                         keyboardType='numeric'
                         value={height.toString()}
                         style={globalStyles.input}
-                        placeholder={systemValueHeight === "ft" ? "height (ft)" : "height (cm)" }
+                        placeholder={systemValueHeight.value === "ft" ? "height (ft)" : "height (cm)" }
                         autoCapitalize='none'
                         onChangeText={(text) => setHeight(parseFloat(text))}
                     />
@@ -154,7 +168,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                 <View style={styles.activitySelectMenuContainer}>
                     <SelectMenu data={activityItems} setSelectedValue={setActivityValue} title={"Activity level"} />
                 </View>
-                <Pressable style={[globalStyles.button, {marginTop: 20,width: 150, height: 50,}]} onPress={() => handleModifyButton()}>
+                <Pressable style={[globalStyles.button, {marginTop: 20,width: 150, height: 50,}]} onPress={() => saveChanges()}>
                     <Text style={globalStyles.buttonText}>Modify</Text>
                 </Pressable>
             </ScrollView>

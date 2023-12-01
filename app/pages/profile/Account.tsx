@@ -1,15 +1,16 @@
 import { ImageBackground, Pressable, Text, View } from "react-native"
 import React, { useContext, useEffect, useState } from "react"
-import { FIREBASE_AUTH } from "../../../FirebaseConfig"
-import { getUser, getBestExercise } from "../../functions/firebaseFunctions"
+import { FIREBASE_AUTH, FIRESTORE_DB } from "../../../FirebaseConfig"
 import UserContext from "../../contexts/UserContext";
-import { NavigationProp } from "@react-navigation/native";
-import { MyUser, BestExercise } from "../../types and interfaces/types";
+import { MyUser, BestExercise, RouterProps, Exercise } from "../../types and interfaces/types";
 import { backgroundImage, globalStyles } from "../../assets/styles";
+import { Unsubscribe } from "firebase/auth";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { getUser } from "../../functions/firebaseFunctions";
 
-interface RouterProps {
-  route: any,
-  navigation: NavigationProp<any, any>;
+type MaxValueAndIndex = {
+  value: number;
+  index: number;
 }
 
 const Account = ({ route, navigation }: RouterProps) => {
@@ -39,6 +40,71 @@ const Account = ({ route, navigation }: RouterProps) => {
     reps: 0
 })
 
+
+
+function getBestExercise (userID: string | null, field:string, secondaryField:string, callback: Function ): Unsubscribe | undefined {
+  try {
+      const bestExercise: BestExercise = {
+          name: "",
+          weights: 0,
+          reps: 0
+      };
+      const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+      const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+      const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, (snapshot) => {
+          if (!snapshot.empty) {
+              snapshot.docs.forEach((doc) => {
+                  const workoutData = doc.data().Workout;
+      
+                  if (workoutData) {
+                      workoutData.forEach((exercise: Exercise) => {
+                          const maxField = getMaxValueAndIndexOfArray(exercise[field]);
+                          const maxSecondaryField = getMaxValueAndIndexOfArray(exercise[secondaryField]);
+                              if (maxField !== undefined && maxField.value > bestExercise[field]) {
+                                  bestExercise[field] = maxField.value;
+                                  bestExercise.name = exercise.exercise[maxField.index];
+                                  bestExercise[secondaryField] = exercise[secondaryField][maxField.index];
+                              } else if (maxField !== undefined && maxSecondaryField !== undefined && maxField.value === bestExercise[field] && maxSecondaryField.value > bestExercise[secondaryField]) {
+                                  bestExercise[secondaryField] = maxSecondaryField.value;
+                                  bestExercise.name = exercise.exercise[maxSecondaryField.index];
+                                  bestExercise[field] = exercise[field][maxSecondaryField.index];
+                              }
+                          
+                      });
+                  }
+              });
+              callback(bestExercise)
+          }
+      });
+  
+      return unsubscribeFromWorkouts;
+  } catch (error: any) {
+      alert(`Error: Couldn't fetch best exercises for ${field}: ${error}`)
+  }
+};
+
+function getMaxValueAndIndexOfArray (array:number[]): MaxValueAndIndex | undefined {
+  try {
+      const max = {
+          value : 0,
+          index: 0
+      };
+      if (array !== undefined) {
+          for (let i = 0; i < array.length; i++)
+              if (array[i] > max.value) {
+                  max.value = array[i];
+                  max.index = i;
+              }
+      }
+      return max;
+  } catch (error) {
+      alert(`Error: Couldn't find max of ${array}: ${error}`)
+  }
+}
+
+
+
+
 useEffect(() => {
   const unsubscribeFromUser = getUser(userID, (userData: React.SetStateAction<MyUser>) => {
     setUser(userData);
@@ -52,9 +118,11 @@ useEffect(() => {
 
 
   return () => {
-    unsubscribeFromUser();
-    unsubscribeFromMostWeight();
-    unsubscribeFromMostReps();
+    if (unsubscribeFromUser !== undefined && unsubscribeFromMostWeight !== undefined && unsubscribeFromMostReps !== undefined) {
+      unsubscribeFromUser();
+      unsubscribeFromMostWeight();
+      unsubscribeFromMostReps();
+    }
     setUser({
       activityLevel: "",
       age: 0,

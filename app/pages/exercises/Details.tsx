@@ -2,10 +2,12 @@ import { ActivityIndicator, ImageBackground, ScrollView, StyleSheet, Text, View 
 import React, { useContext, useEffect, useState } from "react"
 import { NavigationProp } from "@react-navigation/native";
 import {BestExercise, ExerciseRecords, TableRow, TableState } from "../../types and interfaces/types";
-import { getExercise } from "../../functions/firebaseFunctions";
 import UserContext from "../../contexts/UserContext";
 import {Table, Row, Rows} from "react-native-table-component"
 import { backgroundImage, globalStyles } from "../../assets/styles";
+import { Unsubscribe } from "firebase/auth";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { FIRESTORE_DB } from "../../../FirebaseConfig";
 
 
 interface RouterProps {
@@ -40,7 +42,43 @@ const Details = ({ route, navigation }: RouterProps) => {
     reps: [],
     times: [],
     dates: [],
-})
+  })
+
+  function getExercise (userID: string | null, exerciseName: string, callback: Function): Unsubscribe | undefined {
+    try {
+        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
+        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+    
+        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutSnapshot => {
+            const exerciseRecords: ExerciseRecords = {
+                weights: [],
+                reps: [],
+                times: [],
+                dates: [],
+            }
+            if (!workoutSnapshot.empty) {
+                workoutSnapshot.docs.forEach(workoutDoc => {
+                    for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
+                        let set = workoutDoc.data().Workout[i];                    
+                        for (let j = set.exercise.length-1; j >= 0 ; j--)
+                            if (set.exercise[j] === exerciseName) {                            
+                                exerciseRecords.weights.push(set.weights[j])
+                                exerciseRecords.reps.push(set.reps[j])
+                                exerciseRecords.times.push(set.times[j])
+                                exerciseRecords.dates.push(workoutDoc.data().date)
+                            }
+                    }
+                })
+                            
+            }
+            callback(exerciseRecords);    
+        })
+        return unsubscribeFromWorkouts;
+    } catch (error: any) {
+        alert(`Error: Couldn't fetch data for ${exerciseName}: ${error} `)
+    }
+};
+
   useEffect(() => {
     const unsubscribeFromExercise = getExercise(userID, exercise, (response: React.SetStateAction<ExerciseRecords>) => {
       setRecords(response)      

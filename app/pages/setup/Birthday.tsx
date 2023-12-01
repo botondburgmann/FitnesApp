@@ -47,7 +47,7 @@ const Birthday = ({navigation}: RouterProps) => {
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
       <View style={setUpStyles.container}>
         <Text style={setUpStyles.label}>Please, select your date of birth</Text>
-        <View style={globalStyles.icon}>
+        <View>
           <Datepicker date={birthDate} setDate={setBirthDate} />
         </View>
         <Text style={styles.text}>{birthDate.toDateString()}</Text>

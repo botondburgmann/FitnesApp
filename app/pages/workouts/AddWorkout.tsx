@@ -1,15 +1,14 @@
 import { ImageBackground, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import SelectMenu from '../../components/SelectMenu'
-import {getAvailableExercises, getWorkoutDocs, updateAchievementStatus } from '../../functions/firebaseFunctions'
 import UserContext from '../../contexts/UserContext'
 import { Exercise, ExerciseSet, RouterProps } from '../../types and interfaces/types'
 import { backgroundImage, globalStyles } from '../../assets/styles'
 import WeekContext from '../../contexts/WeekContext'
 import { workoutsStyles } from './styles'
 import { ExerciseLog, SelectOption } from './types'
-import { addTotalExperienceToFirebase, addXP, finishExercise, updateConsistencyStreakAchievement, updateDedicatedAthleteAchievement, updateEnduranceMasterAchievement, updateStrengthBuilderAchievement } from './workoutsFunction'
-import { collection, updateDoc, doc, addDoc } from 'firebase/firestore'
+import {  finishExercise} from './workoutsFunction'
+import { collection, updateDoc, doc, addDoc, Unsubscribe, onSnapshot, query, where } from 'firebase/firestore'
 import { FIRESTORE_DB } from '../../../FirebaseConfig'
 
 type RouteParamsTypes = {
@@ -153,6 +152,39 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
   }
 
   
+  function getAvailableExercises (userID: string | null, callback: Function): Unsubscribe | undefined {
+    try {
+        const exercises: Exercise[] = [];
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        
+        const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
+            if (!usersSnapshot.empty) {
+                const userDocRef = usersSnapshot.docs[0].ref;
+                const exercisesCollectionRef = collection(userDocRef, "exercises");
+                const exercisesQuery = query(exercisesCollectionRef, where("hidden", "==", false));
+                const unsubscribeFromExercises = onSnapshot(exercisesQuery, exercisesSnapshot => {
+                    exercisesSnapshot.docs.forEach(exerciseDoc => {
+                        exercises.push({
+                            hidden: exerciseDoc.data().hidden,
+                            isometric: exerciseDoc.data().isometric,
+                            name: exerciseDoc.data().name,
+                            musclesWorked: exerciseDoc.data().musclesWorked,
+                            unilateral: exerciseDoc.data().unilateral
+                        })
+                    }) 
+                    callback(exercises);                   
+                })
+                unsubscribeFromExercises;
+            }
+            else 
+                throw new Error("user doesn't exist");
+        })
+        return unsubscribeFromUsers;
+    } catch (error: any) {
+        alert(`Error: Couldn't fetch exercises: ${error}`)
+    }
+};
 
   
   

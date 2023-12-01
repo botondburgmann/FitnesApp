@@ -1,14 +1,11 @@
 import { StyleSheet, Text, TextInput, View, Switch, Pressable, ImageBackground } from 'react-native'
 import React, { useContext, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
-import { NavigationProp } from '@react-navigation/native';
 import Info from '../../components/Info';
-import { createNewExercise } from '../../functions/firebaseFunctions';
 import { backgroundImage, globalStyles } from '../../assets/styles';
-
-interface RouterProps {
-    navigation: NavigationProp<any, any>;
-  }
+import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../../FirebaseConfig';
+import { RouterProps } from '../../types and interfaces/types';
 
 const CreateExercise = ({navigation}: RouterProps) => {
     const userID = useContext(UserContext);
@@ -21,13 +18,32 @@ const CreateExercise = ({navigation}: RouterProps) => {
     const [title, setTitle] = useState<string>();
     const [information, setInformation] = useState<string>();
 
-    const showCustomAlert = (title: React.SetStateAction<string | undefined>, information: React.SetStateAction<string | undefined>) => {
+    async function createNewExercise (userID: string, name: string, isUnilateral: boolean, isIsometric: boolean): Promise<void> {
+        try {  
+            const usersCollectionRef = collection(FIRESTORE_DB, "Users" )
+            const usersQuery = query(usersCollectionRef,where("userID", "==", userID))
+            const usersSnapshot = await getDocs(usersQuery);
+            const usersDoc = usersSnapshot.docs[0];
+            const exercisesCollectionRef = collection(usersDoc.ref, "exercises");
+            await addDoc(exercisesCollectionRef, {
+                hidden: false,
+                isometric: isIsometric,
+                name: name,
+                unilateral: isUnilateral
+            });   
+        } 
+        catch (error: any) {
+            alert(`Error: Couldn't create exercise: ${error.message}`);
+        }
+    };
+
+    function showCustomAlert (title: React.SetStateAction<string | undefined>, information: React.SetStateAction<string | undefined>) {
         setCustomAlertVisible(true);
         setTitle(title);
         setInformation(information);
     };
     
-    const hideCustomAlert = () => {
+    function hideCustomAlert () {
         setCustomAlertVisible(false);
     };
 

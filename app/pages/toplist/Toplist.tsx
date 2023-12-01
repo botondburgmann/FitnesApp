@@ -1,12 +1,14 @@
-import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View } from 'react-native'
+import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View, StyleSheet } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { getAllUsers, updateClimbingTheRanksAchievement } from '../../functions/firebaseFunctions';
+import { updateAchievementStatus } from '../../functions/firebaseFunctions';
 import UserContext from '../../contexts/UserContext';
-import { MyUser  } from '../../types and interfaces/types';
+import { Achievement, MyUser  } from '../../types and interfaces/types';
 import { RouterProps } from '../../types and interfaces/types';
-import { selectLoggedInUser, selectSimilarUsers, sortUsers } from '../../functions/otherFunctions';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import WeekContext from '../../contexts/WeekContext';
+import { Unsubscribe } from 'firebase/auth';
+import { collection, onSnapshot, DocumentData } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../../FirebaseConfig';
 
 
 
@@ -15,8 +17,105 @@ const Toplist = ({navigation}: RouterProps) => {
   const week = useContext(WeekContext);
   const [users, setUsers] = useState<MyUser[]>([]);
   const [loading, setLoading] = useState(true);
+
+  function getAllUsers (callback: Function): Unsubscribe | undefined { 
+    try {    
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const unsubscribeFromUsers = onSnapshot(usersCollectionRef, usersSnapshot => {
+            const users: DocumentData[] = [];
+            usersSnapshot.docs.forEach(usersDoc => {
+                users.push(usersDoc.data())
+            })        
+            callback(users);    
+        })
+        return unsubscribeFromUsers;
+    } catch (error: any) {
+        alert(`Error: Couldn't fetch users: ${error}`)
+    }
+  };
+
+  function sortUsers (users: MyUser[]): MyUser[] {
+    const sortedUsers = [...users];
+    const n = sortedUsers.length;
+  
+    for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+            if (sortedUsers[j].weeklyExperience < sortedUsers[j + 1].weeklyExperience) {
+                [sortedUsers[j], sortedUsers[j + 1]] = [sortedUsers[j + 1], sortedUsers[j]];
+            }
+        }
+    }
+  
+    return sortedUsers;
+  };
+  
+  function selectLoggedInUser(users:MyUser[], userID: string | null) : MyUser {
+    let loggedInUser:MyUser = users[0];
+    for (const user of users) {
+      if (user.userID === userID) {
+        loggedInUser = user;
+      }
+    }
+    return loggedInUser;
+  };
+  
+  function selectSimilarUsers (users: MyUser[], loggedInUser: MyUser): MyUser[] {
+    const similarUsers = [];
+    const loggedInUserBMI = loggedInUser.weight / loggedInUser.height**2;
+    for (const user of users) {
+      let userBMI = user.weight / user.height**2;
+      if (user.gender === loggedInUser.gender && userBMI >= loggedInUserBMI-5 && userBMI <= loggedInUserBMI+ 5) {
+        similarUsers.push(user);
+      }
+    }
+    return similarUsers;
+  };
+  function updateClimbingTheRanksAchievement (loggedInUser: MyUser, users: MyUser[]): void  {
+    try {
+        if (users.slice(3,10).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Reach the top 3 place in the leaderboard to unlock next stage",
+                icon: "arrow-up",
+                level: 1,
+                name: "Climbing The Ranks",
+                status: "Top 10 Challenger",
+                visibility: 1
+            }
+            updateAchievementStatus(loggedInUser.userID, updatedAchievement);
+        }
+        else if (users.slice(1,3).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
+            const updatedAchievement: Achievement = {
+                color: "#BBC2CC",
+                description: "Reach the top 1 place in the leaderboard to unlock next stage",
+                icon: "arrow-up",
+                level: 2,
+                name: "Climbing The Ranks",
+                status: "Top 3 Contender",
+                visibility: 1
+            }
+            updateAchievementStatus(loggedInUser.userID, updatedAchievement);
+        }
+        if (users[0] === loggedInUser && loggedInUser.weeklyExperience > 0){
+            
+            const updatedAchievement: Achievement = {
+                color: "#FFDD43",
+                description: "Max level achieved: Reach top 1 place in the leaderboard",
+                icon: "arrow-up",
+                level: 3,
+                name: "Climbing The Ranks",
+                status: "Leaderboard Dominator",
+                visibility: 1
+            }
+            updateAchievementStatus(loggedInUser.userID, updatedAchievement);
+        }
+    } catch (error: any) {
+        alert(`Error: Couldn't update achievement: ${error}`)
+    }
+};
+
   useEffect(() => {
-    const unsubscribe = getAllUsers((users: MyUser[]) => {
+    const unsubscribeFromUers = getAllUsers((users: MyUser[]) => {
       const loggedInUser = selectLoggedInUser(users, userID );
       const similarUsers = selectSimilarUsers(users, loggedInUser);
       const sortedUsers = sortUsers(similarUsers);
@@ -31,7 +130,8 @@ const Toplist = ({navigation}: RouterProps) => {
   
   
     return () => {
-      unsubscribe();
+      if (unsubscribeFromUers !== undefined)
+        unsubscribeFromUers();
       setUsers([])
     }
   }, []);
@@ -40,13 +140,13 @@ const Toplist = ({navigation}: RouterProps) => {
   const components: React.JSX.Element[] = [];
   users.forEach((user, index) => {
     components.push(
-      <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, flexWrap:'wrap'}}>
-        <Text style={[globalStyles.text, {textTransform: "uppercase", fontSize: 14, fontWeight: "600", paddingVertical: 10, paddingHorizontal: 5}]}>{index + 1}</Text>
+      <View key={index} style={styles.row}>
+        <Text style={styles.text}>{index + 1}</Text>
         <Pressable onPress={()=>navigation.navigate('User', {userID: user.userID})}>
-          <Text style={[globalStyles.text, {textTransform: "uppercase", fontSize: 14, fontWeight: "600", paddingVertical: 10, paddingHorizontal: 5}]}>{user.name}</Text>
+          <Text style={styles.text}>{user.name}</Text>
         </Pressable>
-        <Text style={[globalStyles.text, {textTransform: "uppercase", fontSize: 14, fontWeight: "600", paddingVertical: 10, paddingHorizontal: 5}]}>level {user.level}</Text>
-        <Text style={[globalStyles.text, {textTransform: "uppercase", fontSize: 14, fontWeight: "600", paddingVertical: 10, paddingHorizontal: 5}]}>{user.weeklyExperience} XP</Text>
+        <Text style={styles.text}>level {user.level}</Text>
+        <Text style={styles.text}>{user.weeklyExperience} XP</Text>
 
       </View>)
   })
@@ -58,8 +158,8 @@ const Toplist = ({navigation}: RouterProps) => {
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
-      <View style={[globalStyles.container, {flex: 1}]}>
-        {week !== null && <Text style={[globalStyles.label, {marginTop: 100, marginBottom: 20, fontSize: 17}]}>{week.start} - {week.end}</Text>}
+      <View style={styles.container}>
+        {week !== null && <Text style={styles.label}>{week.start.toDateString()} - {week.end.toDateString()}</Text>}
         {loading
         ? <ActivityIndicator/>
         :  <ScrollView contentContainerStyle={{ backgroundColor: "rgba(255,0,0,0.7)" }}>
@@ -72,3 +172,44 @@ const Toplist = ({navigation}: RouterProps) => {
 }
 
 export default Toplist
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'rgba(128,128,128,0.5)',
+    flex:1,
+    justifyContent: "center",
+  },
+  label: {
+    alignSelf: 'center',
+    fontSize: 17,
+    fontWeight: "800",
+    color: "#fff",
+    textTransform: 'uppercase',
+    marginTop: 100,
+    marginBottom: 20,
+    textAlign: 'center',
+    lineHeight: 40,
+    textShadowOffset:{
+        height: 2,
+        width: 2
+    },
+    textShadowColor: "#000",
+    textShadowRadius: 10
+  },
+  row: { 
+    flexDirection: 'row', 
+    flexWrap:'wrap',
+    justifyContent: 'space-between', 
+    marginHorizontal: 20, 
+  },
+
+  text:{
+    alignSelf: 'center',
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",  
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+    textTransform: 'uppercase',
+  },
+});

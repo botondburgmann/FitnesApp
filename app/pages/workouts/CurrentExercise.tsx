@@ -1,21 +1,18 @@
 import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
-import { getExercisesByFocus, getUser } from '../../functions/firebaseFunctions';
-import {  Exercise } from '../../types and interfaces/types';
+import {  getUser } from '../../functions/firebaseFunctions';
+import {  Exercise, RouterProps } from '../../types and interfaces/types';
 import Set from './components/Set';
 import Rest from './components/Rest';
-import { NavigationProp } from '@react-navigation/native';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import WeekContext from '../../contexts/WeekContext';
 import { ExerciseLog, WorkoutTypes } from './types';
 import { addXP, calculateNumberOfSet, finishExercise } from './workoutsFunction';
+import { Unsubscribe } from 'firebase/auth';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../../FirebaseConfig';
 
-
-type RouterProps = {
-  route: any,
-  navigation: NavigationProp<any, any>;
-}
 
 const CurrentExercise = ({ route, navigation }: RouterProps) => {
   const userID = useContext(UserContext)
@@ -70,6 +67,42 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
       alert(`Error: Couldn't finish workout: ${error}`)
     }
   }
+
+  function getExercisesByFocus (userID: string | null, musclesWorked: string[], callback: Function): Unsubscribe | undefined {
+    try {
+        const exercises: Exercise[] = [];
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+        
+        const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
+            if (!usersSnapshot.empty) {
+                const userDocRef = usersSnapshot.docs[0].ref;
+                const exercisesCollectionRef = collection(userDocRef, "exercises");
+                const exercisesQuery = query(exercisesCollectionRef, where("hidden", "==", false), where("musclesWorked", "array-contains-any", musclesWorked));
+                const unsubscribeFromExercises = onSnapshot(exercisesQuery, exercisesSnapshot => {
+                    exercisesSnapshot.docs.forEach(exerciseDoc => {
+                        exercises.push({
+                            hidden: exerciseDoc.data().hidden,
+                            isometric: exerciseDoc.data().isometric,
+                            name: exerciseDoc.data().name,
+                            musclesWorked: exerciseDoc.data().musclesWorked,
+                            unilateral: exerciseDoc.data().unilateral
+                        })
+                    }) 
+                    callback(exercises);                   
+                })
+                unsubscribeFromExercises;
+            }
+            else 
+                throw new Error("user doesn't exist");
+        })
+        return unsubscribeFromUsers;
+        
+    } catch (error: any) {
+        alert(`Error: couldn't fetch exercises for ${[...musclesWorked]}: ${error.message}`);
+    }
+};
+
 
   async function addWorkout (): Promise<void> {
     try {
