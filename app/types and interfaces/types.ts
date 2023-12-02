@@ -7,7 +7,7 @@ export type Achievement = {
     level: number;
     name: string;
     status: string;
-    visibility: number;
+    visibility: 0.5 | 1;
 }
 
 export type RouterProps = {
@@ -39,7 +39,7 @@ export type User = {
     activityLevel: string;
     dateOfBirth: string;
     experience: number;
-    gender: string;
+    gender: "Male" | "Female";
     height: number;
     level: number;
     name: string;

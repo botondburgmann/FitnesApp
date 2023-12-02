@@ -5,13 +5,6 @@ export type TableState = {
   tableData: TableRow[];
 };
 
-export type ExerciseRecords = {
-    weights: number[],
-    reps: number[],
-    times: number[],
-    dates: string[],
-};
-
 export type SingleSet = {
 	exercise: string,
 	reps: number;

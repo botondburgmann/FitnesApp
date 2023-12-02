@@ -9,7 +9,7 @@ const Rest = (props: { setGoToNextPage: Function; currentExercise: Sets; exercis
   const setGoToNextPage = props.setGoToNextPage
   const currentExercise = props.currentExercise;
   const exercise = props.exercise;
-  const duration = exercise.musclesWorked.length > 1 ? 1 : 2;
+  const duration = exercise.musclesWorked.length > 1 ? 180 : 120;
 
   return (
     <View style={styles.container}>
