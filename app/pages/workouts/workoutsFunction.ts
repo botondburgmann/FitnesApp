@@ -1,9 +1,8 @@
 import { collection, query, where, getDocs, updateDoc, Unsubscribe, onSnapshot, addDoc, doc } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../../FirebaseConfig";
-import { Achievement, Sets, User, WeekRange } from "../../types and interfaces/types";
+import { Achievement, Sets, SingleSet, User, WeekRange } from "../../types and interfaces/types";
 import { getWorkoutDocs, updateAchievementStatus } from "../../functions/firebaseFunctions";
 import { NavigationProp } from "@react-navigation/native";
-import { SingleSet } from "../exercises/types";
 
 export function addXP (isIsometric: boolean, sets: Sets): number | undefined {
     try {
@@ -26,7 +25,7 @@ export function addXP (isIsometric: boolean, sets: Sets): number | undefined {
     }   catch (error: any) {
         alert(`Error: Couldn't add experience point: ${error}`);
     }
-};
+}
 
 export function removeXP (repOrTime: number, weight: number): number {
     let currentExperience = 0;    
@@ -36,7 +35,7 @@ export function removeXP (repOrTime: number, weight: number): number {
         currentExperience -= repOrTime * weight;
     
     return currentExperience;
-};
+}
 export async function addTotalExperienceToFirebase  (experience: number, date: Date, userID: string, week: WeekRange ): Promise<void>  {
     try {        
         const usersCollectionRef = collection(FIRESTORE_DB,"Users");
@@ -70,7 +69,7 @@ export async function addTotalExperienceToFirebase  (experience: number, date: D
     catch (error) {
         alert(`Error: Couldn't update experience and level fields: ${error}`)
     }
-};
+}
 
 export function convertFieldsToNumeric(set: SingleSet): SingleSet {
     const numericData = {
@@ -89,8 +88,9 @@ export function convertFieldsToNumeric(set: SingleSet): SingleSet {
       numericData.time = 0     
     if (Number.isNaN(set.restTime))
       numericData.restTime = 0;
+
     return numericData
-  }
+}
 
 export function getWorkout (userID: string | null, date: Date | null, callback: Function): Unsubscribe | undefined {
     try {
@@ -126,7 +126,7 @@ export function getWorkout (userID: string | null, date: Date | null, callback: 
     } catch (error: any) {
         alert(`Error: couldn't fetch workout: ${error}`);
     }
-};
+}
 
  
 export async function updateStrengthBuilderAchievement (set: Sets, userID: string): Promise<Achievement | undefined> {
@@ -195,7 +195,7 @@ export async function updateStrengthBuilderAchievement (set: Sets, userID: strin
     } catch (error: any) {
         alert(`Couldn't update achievement: ${error}`)
     }
-};
+}
 export  async function updateEnduranceMasterAchievement (set: Sets, userID: string): Promise<Achievement | undefined> {
     try {
         for (const rep of set.reps) {
@@ -272,7 +272,7 @@ export  async function updateEnduranceMasterAchievement (set: Sets, userID: stri
     } catch (error: any) {
         alert(`Error: Couldn't update achievement: ${error}`)    
     }
-};
+}
 
 export async function updateConsistencyStreakAchievement (userID: string | null): Promise<Achievement | undefined>{
     try {
@@ -368,7 +368,7 @@ export async function updateConsistencyStreakAchievement (userID: string | null)
         alert(`Error: Couldn't update achievement: ${error}`)
     }
 
-};
+}
 export async function updateDedicatedAthleteAchievement (userID: string | null): Promise<Achievement | undefined> {
       try {
           const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
@@ -465,7 +465,7 @@ export async function updateDedicatedAthleteAchievement (userID: string | null):
       } catch (error: any) {
           alert(`Error: Couldn't update achievement: ${error}`)
       }
-};
+}
 
 function sortDates (dates: string[]): string[] | undefined{
     try {
@@ -496,28 +496,15 @@ try {
 } catch (error: any) {
     alert(`Error: Couldn't calculate days between two dates: ${error}`)
 }
-};
+}
 
-export async function finishExercise (sets: Sets, userID: string | null, date: Date | null, week: WeekRange | null, 
-                                navigation: NavigationProp<any, any>, setSets?: Function) {
+export async function finishExercise (sets: Sets, userID: string | null, date: Date | null, week: WeekRange | null, navigation: NavigationProp<any, any>, setSets?: Function) {
     try {
-
-        if (userID === null){
-            alert("User is not set");
-            return;
-        }
-        if (week === null){
-            alert("Week is not set");
-            return
-        }
-        if (date === null){
-            alert("Date is not set");
-            return;
-        }
-        if (sets.exercise.length === 0){
-            alert("Not enough sets");
-            return;
-        }
+        if (userID === null) throw new Error("User is not authorized");   
+        if (date === null) throw new Error("Date is not set");
+        if (week === null) throw new Error("Week is not set");
+        if (sets.exercise.length === 0)throw new Error("Not enough sets");
+        
         const experience = calculateExperience(sets);        
         await addSetToFirebase(experience, userID, date, week, sets );
         setSets && setSets({
@@ -532,7 +519,7 @@ export async function finishExercise (sets: Sets, userID: string | null, date: D
     } catch (error:any) {
         throw new Error(`Error: Couldn't add sets to database: ${error}`);
     }
-};
+}
 
 function calculateExperience(sets: Sets): number {
 let experience = 0;
@@ -543,7 +530,7 @@ for (let i = 0; i < sets.exercise.length; i++) {
 }
 
 return experience;
-};
+}
   
 
 async function addSetToFirebase (experience: number, userID: string, date: Date, week: WeekRange, sets: any): Promise<void>{
@@ -608,24 +595,7 @@ async function addSetToFirebase (experience: number, userID: string, date: Date,
   catch (error: any) {
       alert(`Error: Couldn't add set: ${error.message}`)
   } 
-};
-
-export function calculateNumberOfSet (focus:string, activityLevel: string): number {
-    let numberOfSet = 0;
-    switch (activityLevel) {
-      case "beginner":
-        numberOfSet = focus === "strength" ?  1 : Math.floor(Math.random() * (3 - 2 + 1) + 2);
-        break;
-      case "intermediate":
-        numberOfSet =  focus === "strength" ? 2 : Math.floor(Math.random() * (3 - 2 + 1) + 2);
-        break;
-      case "advanced":
-        numberOfSet = focus === "strength" ?  numberOfSet = Math.floor(Math.random() * (3 - 2 + 1) + 2): Math.floor(Math.random() * (4 - 3 + 1) + 3);
-      default:
-        throw new Error("invalid activity level");
-    }
-    return numberOfSet;
-};
+}
 
 export function isSuperSet (exercise: Sets, uniqueExercises: string[]): boolean {
     for (let i = 0; i < exercise.restTimes.length; i+= uniqueExercises.length) 
@@ -634,7 +604,7 @@ export function isSuperSet (exercise: Sets, uniqueExercises: string[]): boolean 
     if (uniqueExercises.length === 1)
         return false;
     return true;
-};
+}
 
 
 
@@ -645,11 +615,21 @@ export function isDropsSet (exercise:Sets, uniqueExercises: string[] ): boolean 
         if (!(uniqueExercises.length === 1 &&  isDecreasing(exercise.weights) && exercise.restTimes[i] === 0))
             return false;
     return true;
-};
+}
 
 function isDecreasing (array: number[]): boolean{  
     for (let i = 1; i <= array.length; i++)
         if (array[i-1] <= array[i] )
             return false;
     return true;
-};
+}
+
+
+
+export function validateData(isIsometric:boolean, reps: number, time: number, restTime: number): void {
+    if (!isIsometric && reps === 0) throw new Error("Repetition number is required for non-isometric exercises");
+    if (reps < 0) throw new Error("Repetition number must be a positive number");
+    if (isIsometric && time === 0 ) throw new Error("Time is required for non-isometric exercises");
+    if (time < 0) throw new Error("Time must be a positive number");
+    if (restTime < 0) throw new Error("Rest time must be a positive number");
+}

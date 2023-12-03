@@ -6,7 +6,7 @@ import { RouterProps, WeekRange } from '../../types and interfaces/types';
 import WeekContext from '../../contexts/WeekContext';
 import { workoutsStyles } from './styles';
 import { getWorkoutDocs } from '../../functions/firebaseFunctions';
-import { addTotalExperienceToFirebase, convertFieldsToNumeric, removeXP } from './workoutsFunction';
+import { addTotalExperienceToFirebase, convertFieldsToNumeric, removeXP, validateData } from './workoutsFunction';
 import { updateDoc, doc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
 import { SingleSet } from '../exercises/types';
@@ -40,107 +40,57 @@ const EditSingleSet = ({ route, navigation }: RouterProps) => {
         restTime : parseFloat(restTime)*60
     };
 
-    function switchSides (): void {
-        if (isEnabled)
-            setSide('left');
-        else
-            setSide('right');
-        setIsEnabled((previousState: boolean) => !previousState);
-    }
+    function toggleSwitch(): void {
+        try {
+          if (isEnabled) setSide('left');
+          else setSide('right');
+          
+          setIsEnabled(previousState => !previousState);
+        } catch (error: any) {
+          alert(`Error: Couldn't toggle switch: ${error}`)
+        }
+    };
 
     function changeXP (isIsometric: boolean, change: SingleSet): number {
-        let currentExperience = 0
+
+        if (!isIsometric && change.weight === 0 || Number.isNaN(change.weight)) return change.reps + removeXP(set.reps, change.weight);
+        if (isIsometric && change.weight === 0 || Number.isNaN(change.weight)) return change.time + removeXP(set.time, change.weight);
+
+        if (!isIsometric) return change.reps * change.weight + removeXP(set.reps, change.weight);
         
-        if (!isIsometric && change.reps !== undefined) {
-            if (change.weight === 0 || Number.isNaN(change.weight))
-                currentExperience += change.reps;
-            else
-                currentExperience += change.reps * change.weight;
-            currentExperience += removeXP(set.reps, change.weight)
-        }
-        else {
-            if (change.weight === 0 ||  Number.isNaN(change.weight))
-                currentExperience += change.time;
-            else
-                currentExperience += change.time * change.weight;
-            currentExperience += removeXP(set.time, change.weight)
-            
-        }       
-        
-        return currentExperience;
+        return  change.time * change.weight + removeXP(set.time, change.weight);
       }
 
-    function modifySingleSet (): void {        
-        if (userID === null){
-            alert("User is not authorized");
-            return;
-        }
-        if (date === null){
-            alert("Date is not set");
-            return;
-        }
-        if (week === null){
-            alert("Week is not set");
-            return
-        }
-        if (isIsometric && (change.time === 0 || Number.isNaN(change.time))){
-            alert("Time field cannot be empty");
-            return;
-        } 
-        if (!isIsometric && (change.reps === 0 || Number.isNaN(change.reps))){            
-            alert("Reps field cannot be empty"); 
-            return;
-        }
-        if (change.reps < 0){
-            alert("Reps must be a positive number");
-            return;
-        }
-        if (change.time < 0){
-            alert("Time must be a positive number");
-            return;
-        }
-        if (change.restTime < 0){
-            alert("Rest time must be a positive number");
-            return;
-        }
-        editSingleSet(userID, new Date(date), week, changeXP(isIsometric, change))
-        navigation.navigate("Log")
-    
-    }
-
-
-    async function editSingleSet (userID: string, date: Date, week: WeekRange, experience: number): Promise<void> {
+    async function editSingleSet (userID: string | null, date: Date | null, week: WeekRange | null, experience: number): Promise<void> {
         try {   
-            const dataWithStrings = {
-                exercise: set.exercise,
-                reps: parseFloat(reps),
-                restTime: parseFloat(restTime),
-                side: side,
-                time: parseFloat(time),
-                weight: parseFloat(weight),
-              }
-              const numericData = convertFieldsToNumeric(dataWithStrings);                          
+            if (userID === null) throw new Error("User is not authorized");   
+            if (date === null) throw new Error("Date is not set");
+            if (week === null) throw new Error("Week is not set");
+
+            
+            const numericData = convertFieldsToNumeric(change);              
+            validateData(isIsometric, numericData.reps, numericData.time, numericData.restTime);    
+
             const workoutDocs = await getWorkoutDocs(userID, date);
-            if (workoutDocs === undefined){
-                alert("Document doesn't exist");
-                return;
-            }        
+            if (workoutDocs === undefined) throw new Error("Document doesn't exist");      
+            
             const updatedData = { ...workoutDocs.data() };
                   
             for (let i = 0; i < workoutDocs.data().Workout.length; i++) {   
                 if(workoutDocs.data().Workout[i].exercise[setID] === set.exercise && i === exerciseID){
                     updatedData.Workout[i].weights[setID] = numericData.weight;
-                    updatedData.Workout[i].repss[setID] = numericData.reps;
+                    updatedData.Workout[i].reps[setID] = numericData.reps;
                     updatedData.Workout[i].times[setID] = numericData.time;
                     updatedData.Workout[i].restTimes[setID] = numericData.restTime;
-                    updatedData.Workout[i].sides[setID] = change.side;
-            
+                    updatedData.Workout[i].sides[setID] = numericData.side; 
+
                     await updateDoc(doc(FIRESTORE_DB, "Workouts", workoutDocs.id), {
                         Workout: updatedData.Workout
                     });
                 }  
             }    
-            addTotalExperienceToFirebase(experience, date, userID, week);   
+            await addTotalExperienceToFirebase(experience, date, userID, week);   
+            navigation.navigate("Log")
         } catch (error: any) {
             alert(`Error: couldn't update set fields: ${error.message}`);
        }
@@ -156,7 +106,7 @@ const EditSingleSet = ({ route, navigation }: RouterProps) => {
                         <Switch
                             trackColor={{ false: "#808080", true: "#fff" }}
                             ios_backgroundColor="#3e3e3e"
-                            onValueChange={switchSides}
+                            onValueChange={toggleSwitch}
                             value={isEnabled}
                         />
                     </View>
@@ -204,7 +154,7 @@ const EditSingleSet = ({ route, navigation }: RouterProps) => {
                     autoCapitalize='none'
                     onChangeText={(text: string) => setRestTime(text)}
                 />
-                <Pressable style={[globalStyles.button, {width: 100}]} onPress={modifySingleSet}>
+                <Pressable style={[globalStyles.button, {width: 100}]} onPress={async () => await editSingleSet(userID, new Date(date), week, changeXP(isIsometric, change))}>
                     <Text style={globalStyles.buttonText}>Modify</Text>
                 </Pressable>
             </View>

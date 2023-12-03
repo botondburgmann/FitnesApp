@@ -2,13 +2,13 @@ import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View }
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
 import {  getUser } from '../../functions/firebaseFunctions';
-import {  Exercise, RouterProps, Sets } from '../../types and interfaces/types';
+import {  ActivityLevelOption, Exercise, RouterProps, Sets } from '../../types and interfaces/types';
 import Set from './components/Set';
 import Rest from './components/Rest';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import WeekContext from '../../contexts/WeekContext';
 import { WorkoutTypes } from './types';
-import { addXP, calculateNumberOfSet, finishExercise } from './workoutsFunction';
+import { addXP, finishExercise } from './workoutsFunction';
 import { Unsubscribe } from 'firebase/auth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
@@ -39,7 +39,7 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
   }
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loadingExercises, setLoadingExercises] = useState(true);
-  const [activityLevel, setActivityLevel] = useState("");
+  const [activityLevel, setActivityLevel] = useState<ActivityLevelOption>({label: 'Beginner', value: 'beginner'});
   const [loadingUser, setLoadingUser] = useState(true);
   const [workoutComponents, setWorkoutComponents] = useState<React.JSX.Element[]>([]);
   const workout = useRef<Sets[]>([]);
@@ -58,66 +58,56 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
     sides: []
   })
 
-  function handleFinishWorkoutButton (): void  {    
-    try {
-      if (week !== null) {      
-        addWorkout();
-        navigation.navigate("Log");
-      }
-    } catch (error) {
-      alert(`Error: Couldn't finish workout: ${error}`)
-    }
-  }
 
-  function getExercisesByFocus (userID: string | null, musclesWorked: string[], callback: Function): Unsubscribe | undefined {
+function getExercisesByFocus (callback: Function): Unsubscribe | undefined {
     try {
-        const exercises: Exercise[] = [];
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        
-        const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
-            if (!usersSnapshot.empty) {
-                const userDocRef = usersSnapshot.docs[0].ref;
-                const exercisesCollectionRef = collection(userDocRef, "exercises");
-                const exercisesQuery = query(exercisesCollectionRef, where("hidden", "==", false), where("musclesWorked", "array-contains-any", musclesWorked));
-                const unsubscribeFromExercises = onSnapshot(exercisesQuery, exercisesSnapshot => {
-                    exercisesSnapshot.docs.forEach(exerciseDoc => {
-                        exercises.push({
-                            hidden: exerciseDoc.data().hidden,
-                            isometric: exerciseDoc.data().isometric,
-                            label: exerciseDoc.data().name,
-                            value: exerciseDoc.data().name.toLowerCase(),
-                            musclesWorked: exerciseDoc.data().musclesWorked,
-                            unilateral: exerciseDoc.data().unilateral
-                        })
-                    }) 
-                    callback(exercises);                   
-                })
-                unsubscribeFromExercises;
-            }
-            else 
-                throw new Error("user doesn't exist");
-        })
-        return unsubscribeFromUsers;
-        
-    } catch (error: any) {
-        alert(`Error: couldn't fetch exercises for ${[...musclesWorked]}: ${error.message}`);
-    }
-};
-
-
-  async function addWorkout (): Promise<void> {
-    try {
+      const exercises: Exercise[] = [];
+      const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+      const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
       
-      for (const set of workout.current)
-        await finishExercise(set, userID, new Date(), week, navigation)
+      const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
+        if (usersSnapshot.empty) throw new Error("User doesn't exist");
+        
+        const userDocRef = usersSnapshot.docs[0].ref;
+        const exercisesCollectionRef = collection(userDocRef, "exercises")      
+        const exercisesQuery = query(exercisesCollectionRef, where("hidden", "==", false), where("musclesWorked", "array-contains-any", muscles[workoutType]));
+        const unsubscribeFromExercises = onSnapshot(exercisesQuery, exercisesSnapshot => {
+          exercisesSnapshot.docs.forEach(exerciseDoc => {
+            exercises.push({
+              hidden: exerciseDoc.data().hidden,
+              isometric: exerciseDoc.data().isometric,
+              label: exerciseDoc.data().name,
+              value: exerciseDoc.data().name.toLowerCase(),
+              musclesWorked: exerciseDoc.data().musclesWorked,
+              unilateral: exerciseDoc.data().unilateral
+            })
+          }) 
+          callback(exercises);                   
+        })
+        
+        unsubscribeFromExercises;
+
+      })
+      return unsubscribeFromUsers;   
     } 
     catch (error: any) {
-      alert(`Error: Couldn't add workout: ${error}`)
-    }  
-  }
+        alert(`Error: couldn't fetch exercises for ${[...muscles[workoutType]]}: ${error.message}`);
+    }
+}
 
-  function shuffleArray (array: any[]): any[] {
+
+async function addWorkout (): Promise<void> {
+  try {
+    for (const set of workout.current) 
+      await finishExercise(set, userID, new Date(), week, navigation)
+    navigation.navigate("Log");
+    } 
+  catch (error: any) {
+    alert(`Error: Couldn't add workout: ${error}`)
+  }  
+}
+
+function shuffleArray (array: any[]): any[] {
     const shuffledArray = [...array];
   
     for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -127,11 +117,12 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
     }
   
     return shuffledArray;
-};
-  function chooseExercises (): Exercise[] {    
+}
+
+function chooseExercises (exercises: Exercise[]): Exercise[] {    
     const shuffledExercises: Exercise[] = shuffleArray(exercises);
     const selectedExercises: Exercise[] = [];
-    switch (activityLevel) {
+    switch (activityLevel.value) {
       case "beginner":
         for (const exercise of shuffledExercises)
           if (exercise.musclesWorked.length > 1 && selectedExercises.length < 3)
@@ -157,36 +148,55 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
         throw new Error("invalid activityLevel");
       }      
       return selectedExercises;
-};
-   useEffect(() => {
-    const unsubscribeFromGetExerciseByFocus = getExercisesByFocus(userID, muscles[workoutType], (exercises: React.SetStateAction<Exercise[]>) => {
+}
+
+function calculateNumberOfSet (focus:string, activityLevel: string): number {
+  let numberOfSet = 0;
+  switch (activityLevel) {
+    case "beginner":
+      numberOfSet = focus === "strength" ?  1 : Math.floor(Math.random() * (3 - 2 + 1) + 2);
+      break;
+    case "intermediate":
+      numberOfSet =  focus === "strength" ? 2 : Math.floor(Math.random() * (3 - 2 + 1) + 2);
+      break;
+    case "advanced":
+      numberOfSet = focus === "strength" ?  numberOfSet = Math.floor(Math.random() * (3 - 2 + 1) + 2): Math.floor(Math.random() * (4 - 3 + 1) + 3);
+    default:
+      throw new Error("invalid activity level");
+  }
+  return numberOfSet;
+}
+  useEffect(() => {
+    const unsubscribeFromGetExerciseByFocus = getExercisesByFocus((exercises: React.SetStateAction<Exercise[]>) => {
       setExercises(exercises);
       setLoadingExercises(false);
     })
   
     return () => {
-      if (unsubscribeFromGetExerciseByFocus !== undefined)
-        unsubscribeFromGetExerciseByFocus();
+      if (unsubscribeFromGetExerciseByFocus !== undefined) unsubscribeFromGetExerciseByFocus();
     }
   }, [userID, workoutType]);
  
   useEffect(() => {
     const unsubscribe = getUser(userID, (user: { activityLevel: React.SetStateAction<string>; }) => {
-      setActivityLevel(user.activityLevel);
+      user.activityLevel === "beginner" 
+        ? setActivityLevel({label: 'Beginner', value: 'beginner'})
+        : user.activityLevel === "intermediate"
+        ? setActivityLevel({label: 'Intermediate', value: 'intermediate'})
+        : setActivityLevel({label: 'Advanced', value: 'advanced'})
       setLoadingUser(false);
     })
     
     return () => {
-      if (unsubscribe !== undefined) 
-        unsubscribe();
+      if (unsubscribe !== undefined) unsubscribe();
     }
   }, [userID]);
    
 
   useEffect(() => {
     if (!loadingUser && !loadingExercises) {
-      const selectedExercises: Exercise[] = chooseExercises();
-      const numberOfSets = calculateNumberOfSet(focus, activityLevel);
+      const selectedExercises: Exercise[] = chooseExercises(exercises);
+      const numberOfSets = calculateNumberOfSet(focus, activityLevel.value);
       const workoutComponents: React.JSX.Element[] = []
     
       for (let i = 0; i < selectedExercises.length; i++) {
@@ -216,13 +226,10 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
 
   useEffect(() => {
     if (goToNextPage) {
-      if (currentIndex < workoutComponents.length-1)
-        setCurrentIndex(currentIndex+1);
+      if (currentIndex < workoutComponents.length-1) setCurrentIndex(currentIndex+1);
       else if (currentIndex === workoutComponents.length-1){
         setEndofWorkout(true)
-        workout.current.push(currentExercise.current)       
-
-        
+        workout.current.push(currentExercise.current)
       }    
 
       const newExercise: Sets = {
@@ -234,6 +241,7 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
         times: [],
         weights: []
       };
+
       for (let i = 0; i < currentExercise.current.exercise.length; i++) {
         if (currentExercise.current.exercise[i] !== currentExercise.current.exercise[i-1] && i > 0) {          
           workout.current.push(newExercise)                            
@@ -242,11 +250,9 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
           currentExercise.current.restTimes.splice(0, currentExercise.current.restTimes.length-1)
           currentExercise.current.sides.splice(0, currentExercise.current.sides.length-1)
           currentExercise.current.times.splice(0, currentExercise.current.times.length-1)
-          currentExercise.current.weights.splice(0, currentExercise.current.weights.length-1)        
-                  
+          currentExercise.current.weights.splice(0, currentExercise.current.weights.length-1)               
         }
         else{
-          
           newExercise.exercise.push(currentExercise.current.exercise[i])
           newExercise.reps.push(currentExercise.current.reps[i])
           newExercise.restTimes.push(currentExercise.current.restTimes[i])
@@ -259,19 +265,14 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
       
       for (const exercise of workout.current) {
         let experience;
+        
         for (let i = 0; i < exercise.reps.length; i++) {
-          if (exercise.reps[i] === 0)
-            experience = addXP(true, exercise);
-          else
-            experience = addXP(false, exercise); 
+          if (exercise.reps[i] === 0) experience = addXP(true, exercise);
+          else experience = addXP(false, exercise); 
         }
-        if (experience !== undefined)
-          totalXP.current += experience 
+        
+        if (experience !== undefined) totalXP.current += experience 
       }
-
- 
-      
-      
       
       setGoToNextPage(false)
     }
@@ -293,7 +294,7 @@ const CurrentExercise = ({ route, navigation }: RouterProps) => {
               : <View>
                   <Text style={globalStyles.label}>Congratulations!</Text>
                   <Text style={globalStyles.label}>You completed the workout.</Text>
-                  <Pressable style={[globalStyles.button, {width: 200}]} onPress={() =>{week !== null && handleFinishWorkoutButton()}}>
+                  <Pressable style={[globalStyles.button, {width: 200}]} onPress={async() => await addWorkout()}>
                       <Text style={globalStyles.buttonText}>Go to homepage</Text>
                   </Pressable>
                 </View>

@@ -12,7 +12,7 @@ import { RouterProps } from "../../types and interfaces/types";
 const Gender = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
   const [gender, setGender] = useState<"Male" | "Female">("Male");
-  const options = ["Male", "Female"];
+  const options:  ["Male", "Female"] = ["Male", "Female"];
   async function setGenderInFirebase(): Promise<void> {
     try {
       if (userID === null) 

@@ -1,13 +1,12 @@
-import { DocumentData, DocumentReference, QueryDocumentSnapshot, Unsubscribe, addDoc, collection, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
+import { DocumentData, DocumentReference, QueryDocumentSnapshot, Unsubscribe, collection, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import {   Achievement } from "../types and interfaces/types";
-
-
 
 export const updateAchievementStatus =async (userID:string | null, updatedAchievement: Achievement): Promise<void> => {
     try {
         const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
         const achievementsSnapshot = await getDocs(achievementsCollectionRef);
+        
         for (const achievementDoc of achievementsSnapshot.docs) {
             const owners = achievementDoc.data().owners;
             for (let i = 0; i < owners.length; i++) {
@@ -25,7 +24,7 @@ export const updateAchievementStatus =async (userID:string | null, updatedAchiev
                     const updatedAchievementDoc = {
                         owners: owners
                     }
-                    await updateDoc(achievementDoc.ref, updatedAchievementDoc);
+                    updateDoc(achievementDoc.ref, updatedAchievementDoc);
                 }            
             }
         }
@@ -34,51 +33,50 @@ export const updateAchievementStatus =async (userID:string | null, updatedAchiev
     }
 }
 
-
-export async function initializeExercisesForUser(userDocRef: DocumentReference<DocumentData, DocumentData>) {
-    try {
-        const exercisesCollectionRef = collection(FIRESTORE_DB, "Exercises");
-        const exercisesQuerySnapshot = await getDocs(exercisesCollectionRef);
-        exercisesQuerySnapshot.forEach(async (exerciseDoc) => {
-            const exerciseData = exerciseDoc.data();
-            const userSubcollectionRef = collection(userDocRef, "exercises");
-            await addDoc(userSubcollectionRef, exerciseData);
-        })
-    } catch (error) {
-        
-    }
-}
-
 export async function getUserDocumentRef(userID:string):Promise<DocumentReference<DocumentData, DocumentData> | undefined>  {
-    const collectionRef = collection(FIRESTORE_DB, "Users");
-    const q = query(collectionRef, where("userID", "==", userID));
-    const snapshot = await getDocs(q);
-    if (!snapshot.empty) {
+    try {
+        const collectionRef = collection(FIRESTORE_DB, "Users");
+        const q = query(collectionRef, where("userID", "==", userID));
+        const snapshot = await getDocs(q);
+    
+        if (snapshot.empty) throw new Error("User doesn't exist");
+        
         const userDocRef = doc(FIRESTORE_DB, "Users", snapshot.docs[0].id);
         return userDocRef;
+    } catch (error: any) {
+        alert(`Error: Couldn't fetch document reference: ${error.message}`)
     }
 }
 
-
 export async function getWorkoutDocs(userID:string, date: Date): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | undefined>{    
-    const collectionRef = collection(FIRESTORE_DB, "Workouts");
+    try {
+        const collectionRef = collection(FIRESTORE_DB, "Workouts");
+        const q = query(collectionRef, where("date", "==", date.toDateString()), where("userID", "==", userID) );
+        const snapshot = await getDocs(q);
 
-    const q = query(collectionRef, where("date", "==", date.toDateString()), where("userID", "==", userID) );
-    const snapshot = await getDocs(q);
-    if (!snapshot.empty){
-        const workoutDocs = snapshot.docs[0]; 
-               
+        if (snapshot.empty) throw new Error("Workout doesn' exist");
+        
+        const workoutDocs = snapshot.docs[0];        
         return workoutDocs;
-    }        
+    } catch (error: any) {
+        alert(`Error: Couldn't fetch document for workout: ${error.message}`)
+    }
 }
+
 export async function getUserDocs(userID:string): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | undefined>{
-    const collectionRef = collection(FIRESTORE_DB, "Users");
-    const q = query(collectionRef, where("userID", "==", userID) );
-    const snapshot = await getDocs(q);
-    if (!snapshot.empty){
+    try {
+        const collectionRef = collection(FIRESTORE_DB, "Users");
+        const q = query(collectionRef, where("userID", "==", userID) );
+        const snapshot = await getDocs(q);
+        
+        if (snapshot.empty) throw new Error("User doesn't exist");
+        
         const userDocs = snapshot.docs[0];
         return userDocs;
-    }        
+    } catch (error: any) {
+        alert(`Error: Couldn't fetch document for user: ${error.mssage}`)    
+    }
+            
 }
 
 export function getUser (userID:string | null, callback: Function): Unsubscribe | undefined  {
@@ -86,27 +84,27 @@ export function getUser (userID:string | null, callback: Function): Unsubscribe 
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
         const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
         const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
-            if (!usersSnapshot.empty) {
-                const userDoc = usersSnapshot.docs[0];
-                const userData = {
-                    activityLevel:  userDoc.data().activityLevel,
-                    dateOfBirth:  userDoc.data().dateOfBirth,
-                    experience:  userDoc.data().experience,
-                    gender:  userDoc.data().gender,
-                    height:  userDoc.data().height,
-                    level:  userDoc.data().level,
-                    name:  userDoc.data().name,
-                    userID: userDoc.data().userID,
-                    weeklyExperience: userDoc.data().weeklyExperience,
-                    weight:  userDoc.data().weight
-                };
-    
-                callback(userData);
-            }
+            if (usersSnapshot.empty) throw new Error("User doesn't exist");
+        
+            const userDoc = usersSnapshot.docs[0];
+            const userData = {
+                activityLevel:  userDoc.data().activityLevel,
+                dateOfBirth:  userDoc.data().dateOfBirth,
+                experience:  userDoc.data().experience,
+                gender:  userDoc.data().gender,
+                height:  userDoc.data().height,
+                level:  userDoc.data().level,
+                name:  userDoc.data().name,
+                userID: userDoc.data().userID,
+                weeklyExperience: userDoc.data().weeklyExperience,
+                weight:  userDoc.data().weight
+            };
+
+            callback(userData);
         })
     
         return unsubscribeFromUsers;
     } catch (error: any) {
         alert(`Error: Couldn't fetch user: ${error}`)
     }
-  };
+}

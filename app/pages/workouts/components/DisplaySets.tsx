@@ -18,18 +18,15 @@ const DisplaySets = () => {
         const exerciseComponents: React.JSX.Element[] = [];
         
         exercises.forEach((exercise, index) => {
-          if (exercise.reps[0] < 0)
-            alert("Error: Invalid rep number. Reps can't be negative");
-          else
-            exerciseComponents.push(<ExerciseLog exercise={exercise} exerciseID={index}  key={index} />);          
+          exerciseComponents.push(<ExerciseLog exercise={exercise} exerciseID={index}  key={index} />);          
         });        
-          setAllExercises(exerciseComponents);
+        
+        setAllExercises(exerciseComponents);
       });
   
       return () => {       
-        if (unsubscribeFromWorkouts !== undefined) {
-          unsubscribeFromWorkouts();          
-        } 
+        if (unsubscribeFromWorkouts !== undefined) unsubscribeFromWorkouts();          
+        
         setAllExercises([]);
       };
     }, [userID, date]);

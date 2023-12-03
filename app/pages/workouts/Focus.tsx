@@ -3,20 +3,17 @@ import React, { useState } from 'react'
 import Radiobutton from '../../components/Radiobutton';
 import { NavigationProp } from '@react-navigation/native';
 import { backgroundImage, globalStyles } from '../../assets/styles';
+import { RouterProps } from '../../types and interfaces/types';
 
-type RouterProps = {
-  route: any,
-  navigation: NavigationProp<any, any>;
-}
 
 type RouteParamsTypes = {
-  workoutType: "Strength" | "Hypertrophy"
+  workoutType: string
 }
 
 const Focus = ({ route, navigation }: RouterProps) => {
   const { workoutType } = route?.params as RouteParamsTypes;
-  const [focus, setFocus] = useState<string>();
-  const options = ["Strength", "Hypertrophy"];
+  const [focus, setFocus] = useState<"Strength" | "Hypertrophy">("Strength");
+  const options: ("Strength" | "Hypertrophy")[]  = ["Strength", "Hypertrophy"];
 
 
   return (
@@ -26,10 +23,7 @@ const Focus = ({ route, navigation }: RouterProps) => {
         <View style={styles.radioButtonContainer}>
           <Radiobutton selectedValue={focus} setselectedValue={setFocus} options={options} />
         </View>
-        <Pressable style={globalStyles.button} onPress={() =>{focus !== undefined 
-                                                                ? navigation.navigate('Current Exercise',{workoutType: workoutType, focus:focus}) 
-                                                                :  alert("Please choose an option");} 
-        }>
+        <Pressable style={globalStyles.button} onPress={() =>{ navigation.navigate('Current Exercise',{workoutType: workoutType, focus:focus} ) } }>
           <Text style={globalStyles.buttonText}>Start Workout</Text>
         </Pressable>
       </View>

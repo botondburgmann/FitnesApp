@@ -5,7 +5,6 @@ import { collection, addDoc, DocumentReference, DocumentData, getDocs, updateDoc
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../../../FirebaseConfig";
 import { RouterProps } from "../../types and interfaces/types";
 import { backgroundImage, globalStyles } from "../../assets/styles";
-import { initializeExercisesForUser } from "../../functions/firebaseFunctions";
 
 
 
@@ -19,47 +18,63 @@ const Registration = ({navigation}: RouterProps) => {
     async function signUp(): Promise<void> {
         try {
             validateData(name, email, password, confirmPassword);
+            
             setLoading(true);
             const userDocRef = await registerUserInFirebase();
             initializeExercisesForUser(userDocRef);
             alert("Registered successfully!");
-        }   
-        catch (error:any) {
+        } catch (error:any) {
             alert(`Error: Registration failed: ${error.message}`);
-        }   
-        finally{
+        } finally{
             setLoading(false);
         }
     }
 
     function validateData(name:string, email: string, password: string, confirmPassword: string): void {
-        if (name === "" || email === "" || password === "" || confirmPassword === "")
-            throw new Error("Please fill out all the fields")
-        if (password !== confirmPassword)
-            throw new Error("Passwords do not match");  
+        try {
+            if (name === "" || email === "" || password === "" || confirmPassword === "") throw new Error("Please fill out all the fields")
+            if (password !== confirmPassword) throw new Error("Passwords do not match");
+        } catch (error: any) {
+            alert(`Error: Invalid data: ${error.message}`)
+        }  
     }
 
     async function registerUserInFirebase(): Promise<DocumentReference<DocumentData, DocumentData>> {
         const auth = FIREBASE_AUTH;
-            const response = await createUserWithEmailAndPassword(auth, email,password);
-            const userData = {
-                userID: response.user.uid, 
-                name: name, 
-                gender: "", 
-                dateOfBirth: "", 
-                weight: 0, 
-                height: 0, 
-                activityLevel: "", 
-                set: false, 
-                level: 1, 
-                experience: 0,
-                weeklyExperience: 0
-            };
-            const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-            const userDocRef = await addDoc(usersCollectionRef, userData);
-            initializeAchievements(response.user.uid);
-            return userDocRef;
+        const response = await createUserWithEmailAndPassword(auth, email,password);
+        const userData = {
+            userID: response.user.uid, 
+            name: name, 
+            gender: "", 
+            dateOfBirth: "", 
+            weight: 0, 
+            height: 0, 
+            activityLevel: "", 
+            set: false, 
+            level: 1, 
+            experience: 0,
+            weeklyExperience: 0
+        };
+        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+        const userDocRef = await addDoc(usersCollectionRef, userData);
+        initializeAchievements(response.user.uid);
+        return userDocRef;
     }
+
+    async function initializeExercisesForUser(userDocRef: DocumentReference<DocumentData, DocumentData>): Promise<void> {
+        try {
+            const exercisesCollectionRef = collection(FIRESTORE_DB, "Exercises");
+            const exercisesQuerySnapshot = await getDocs(exercisesCollectionRef);
+            exercisesQuerySnapshot.forEach(async (exerciseDoc) => {
+                const exerciseData = exerciseDoc.data();
+                const userSubcollectionRef = collection(userDocRef, "exercises");
+                addDoc(userSubcollectionRef, exerciseData);
+            })
+        } catch (error: any) {
+            alert(`Error: couldn't initialize exercises for user: ${error.any}`);
+        }
+    }
+
     async function initializeAchievements (userID: string | null): Promise<void> {
         try {
             const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
@@ -125,12 +140,12 @@ const Registration = ({navigation}: RouterProps) => {
                     const updatedData = {
                         owners: updatedOwners
                     }
-                    await updateDoc(achievementDoc.ref, updatedData);
+                    updateDoc(achievementDoc.ref, updatedData);
                 }
         } catch (error: any) {
             alert(`Couldn't initialize achievements: ${error}`)
         }
-    };
+    }
 
     return (
         <ImageBackground source={backgroundImage} style={globalStyles.image}>

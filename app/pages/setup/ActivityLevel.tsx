@@ -2,7 +2,7 @@ import { View, Pressable, Text, ImageBackground } from 'react-native'
 import React, { useContext, useState } from 'react'
 import SelectMenu from '../../components/SelectMenu';
 import UserContext from '../../contexts/UserContext';
-import { ActivityLevels, RouterProps, SelectItem } from '../../types and interfaces/types';
+import { ActivityLevelOption, RouterProps } from '../../types and interfaces/types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import { setUpStyles } from './styles';
@@ -15,8 +15,8 @@ import { getUserDocumentRef } from '../../functions/firebaseFunctions';
 const ActivityLevel = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
 
-  const [selectedActivityLevel, setSelectedActivityLevel] = useState<ActivityLevels>({label: 'Beginner', value: 'beginner'});
-  const [activityLevels] = useState([
+  const [selectedActivityLevel, setSelectedActivityLevel] = useState<ActivityLevelOption>({label: 'Beginner', value: 'beginner'});
+  const [activityLevels] = useState<ActivityLevelOption[]>([
     {label: 'Beginner', value: 'beginner'},
     {label: 'Intermediate', value: 'intermediate'},
     {label: 'Advanced', value: 'advanced'}

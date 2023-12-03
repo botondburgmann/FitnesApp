@@ -6,8 +6,8 @@ import { backgroundImage, globalStyles } from "../../assets/styles";
 import { Unsubscribe } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../../FirebaseConfig";
-import {  SingleSet, TableRow, TableState } from "./types";
-import { RouterProps, Sets } from "../../types and interfaces/types";
+import {  TableRow, TableState } from "./types";
+import { RouterProps, Sets, SingleSet } from "../../types and interfaces/types";
 
 
 
@@ -52,43 +52,43 @@ const Details = ({ route }: RouterProps) => {
 
   function getExercise (userID: string | null, exerciseName: string, callback: Function): Unsubscribe | undefined {
     try {
-        const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
-        const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-    
-        const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutSnapshot => {
-            const exerciseRecords: Sets = {
-              exercise: [],
-              dates: [],
-              reps: [],
-              restTimes: [],
-              sides: [],
-              times: [],
-              weights: [],
-            }
-            if (!workoutSnapshot.empty) {
-                workoutSnapshot.docs.forEach(workoutDoc => {
-                    for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
-                        let set = workoutDoc.data().Workout[i];                    
-                        for (let j = set.exercise.length-1; j >= 0 ; j--)
-                            if (set.exercise[j] === exerciseName) {
-                                exerciseRecords.exercise.push(set.exercise[j]);
-                                exerciseRecords.restTimes.push(set.restTimes[j]);                         
-                                exerciseRecords.weights.push(set.weights[j])
-                                exerciseRecords.reps.push(set.reps[j])
-                                exerciseRecords.times.push(set.times[j])
-                                exerciseRecords.dates.push(workoutDoc.data().date)
-                            }
-                    }
-                })
-                            
-            }
-            callback(exerciseRecords);    
+      const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
+      const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+  
+      const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, workoutSnapshot => {
+        const exerciseRecords: Sets = {
+          exercise: [],
+          dates: [],
+          reps: [],
+          restTimes: [],
+          sides: [],
+          times: [],
+          weights: [],
+        }
+        if (workoutSnapshot.empty) return
+        
+        workoutSnapshot.docs.forEach(workoutDoc => {
+          for (let i = 0; i < workoutDoc.data().Workout.length; i++) {
+            let set = workoutDoc.data().Workout[i];                    
+            for (let j = set.exercise.length-1; j >= 0 ; j--)
+              if (set.exercise[j] === exerciseName) {
+                exerciseRecords.exercise.push(set.exercise[j]);
+                exerciseRecords.restTimes.push(set.restTimes[j]);                         
+                exerciseRecords.weights.push(set.weights[j])
+                exerciseRecords.reps.push(set.reps[j])
+                exerciseRecords.times.push(set.times[j])
+                exerciseRecords.dates.push(workoutDoc.data().date)
+              }
+          }
         })
-        return unsubscribeFromWorkouts;
+        callback(exerciseRecords);    
+      })
+
+      return unsubscribeFromWorkouts;
     } catch (error: any) {
-        alert(`Error: Couldn't fetch data for ${exerciseName}: ${error} `)
+      alert(`Error: Couldn't fetch data for ${exerciseName}: ${error} `)
     }
-};
+  }
 
   useEffect(() => {
     const unsubscribeFromExercise = getExercise(userID, exercise, (response: React.SetStateAction<Sets>) => {
@@ -116,9 +116,8 @@ const Details = ({ route }: RouterProps) => {
   useEffect(() => {
     fillTable(records, setTable);
     if (!loading) {
-          setMostWeight(findMaxWeight(records, exercise));
-          setMostReps(findMaxReps(records, exercise));
-          
+      setMostWeight(findMaxWeight(records, exercise));
+      setMostReps(findMaxReps(records, exercise));     
     }
 
     return () => {
@@ -131,10 +130,7 @@ const Details = ({ route }: RouterProps) => {
   
   
   function sortRecords(records: Sets): Sets {
-    const datesWithIndexes = records.dates.map((date, index) => ({
-      date,
-      index,
-    }));
+    const datesWithIndexes = records.dates.map((date, index) => ( {date,index} ));
   
     datesWithIndexes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
@@ -164,12 +160,9 @@ const Details = ({ route }: RouterProps) => {
   function fillTable(records: Sets, setTable: (table: TableState) => void) {
     const sortedRecords = sortRecords(records);
   
-    const newTableData: TableRow[] = sortedRecords.dates.map((date, i) => [
-      date,
-      sortedRecords.weights[i],
-      sortedRecords.reps[i],
-      sortedRecords.times[i],
-    ]);
+    const newTableData: TableRow[] = sortedRecords.dates.map((date, i) => 
+      [date, sortedRecords.weights[i], sortedRecords.reps[i], sortedRecords.times[i]]
+    );
   
     const newTableState: TableState = {
       tableHead: ["Date", "Weight (kg)", "Repetitions", "Time (seconds)"],
@@ -179,35 +172,31 @@ const Details = ({ route }: RouterProps) => {
     setTable(newTableState);
   }
   
-  
-  
-
   function findMaxWeight(records:Sets, exercise: string): SingleSet {
-      let currentMax = {
-        exercise: exercise,
-        reps: 0,
-        restTime: 0,
-        side: "both" as "both" | "left" | "right",
-        time: 0,
-        weight: 0,
-      }
+    let currentMax = {
+      exercise: exercise,
+      reps: 0,
+      restTime: 0,
+      side: "both" as "both" | "left" | "right",
+      time: 0,
+      weight: 0,
+    }
       
-      for (let i = 0; i < records.weights.length; i++) {
-        if (records.weights[i]>currentMax.weight) {
+    for (let i = 0; i < records.weights.length; i++) {
+      if (records.weights[i]>currentMax.weight) {
+        currentMax.weight = records.weights[i];
+        currentMax.reps = records.reps[i];
+      }
+      else if (records.weights[i] === currentMax.weight){
+        if (records.reps[i] > currentMax.reps) {
           currentMax.weight = records.weights[i];
           currentMax.reps = records.reps[i];
-        }
-        else if (records.weights[i] === currentMax.weight){
-          if (records.reps[i] > currentMax.reps) {
-            currentMax.weight = records.weights[i];
-            currentMax.reps = records.reps[i];
-          }
-          
-        }
-      
-      }
-      return currentMax;
+        } 
+      }  
+    }
+    return currentMax;
   }
+
   function findMaxReps(records:Sets, exercise: string): SingleSet {
     let currentMax = {
       exercise: exercise,
@@ -217,6 +206,7 @@ const Details = ({ route }: RouterProps) => {
       time: 0,
       weight: 0,
     }
+
     for (let i = 0; i < records.weights.length; i++) {
       if (records.reps[i]>currentMax.reps) {
         currentMax.weight = records.weights[i];
@@ -229,6 +219,7 @@ const Details = ({ route }: RouterProps) => {
         }
       }
     }
+    
     return currentMax;
   }
 

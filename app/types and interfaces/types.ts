@@ -35,6 +35,16 @@ export type Sets = {
 	weights: number[];
 }
 
+export type SingleSet = {
+	exercise: string,
+	reps: number;
+	restTime: number;
+	side: "both" | "left" | "right";
+	time: number;
+	weight: number;
+    [key: string]: any,
+}
+
 export type User = {
     activityLevel: string;
     dateOfBirth: string;
@@ -53,7 +63,7 @@ export type SelectItem = {
     value: string
 };
 
-export type ActivityLevels =
+export type ActivityLevelOption =
   |{label: 'Beginner', value: 'beginner'}
   |{label: 'Intermediate', value: 'intermediate'}
   |{label: 'Advanced', value: 'advanced'}

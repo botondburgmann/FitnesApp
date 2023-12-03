@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import { Exercise, Sets } from '../../../types and interfaces/types';
 import { globalStyles } from '../../../assets/styles';
+import { convertFieldsToNumeric, validateData } from '../workoutsFunction';
 
 const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Function; currentExercise: Sets; }) => {
     const exercise = props.exercise;
@@ -14,45 +15,28 @@ const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Functi
 
     function completeSet (exercise: Exercise, weight: number, time: number, reps: number): void {
         try {
-            if (exercise.isometric && (time === 0 || Number.isNaN(time))){
-                alert("Error: Time field cannot be empty for isometric exercises");
-                return;
-            }
-            if (!exercise.isometric && (reps === 0 || Number.isNaN(reps))){
-                alert("Error: Reps field cannot be empty for non-isometric exercises");
-                return;
-            } 
-            if (time < 0){
-                alert("Error: Time must be a positive number");
-                return;
-            } 
-            if (reps < 0){
-                alert("Error: Rep number must be a positive number");
-                return;
-            }
-            if (Number.isNaN(weight))
-                weight = 0;
-            if (Number.isNaN(time))
-                time = 0;            
-            if (Number.isNaN(reps))
-                reps = 0;         
+            const numericData = convertFieldsToNumeric({exercise: exercise.label, reps: reps, restTime: 1, side: "both", time: time, weight: weight})
+
+            validateData(exercise.isometric, numericData.reps, numericData.time, numericData.restTime);
+  
             if (exercise.unilateral) {
                 currentExercise.exercise.push(...[exercise.label, exercise.label])
-                currentExercise.reps.push(...[reps, reps])
+                currentExercise.reps.push(...[numericData.reps, numericData.reps])
                 currentExercise.sides.push(...["left", "right"] as ("left" | "right")[]);
-                currentExercise.times.push(...[time, time]);
-                currentExercise.weights.push(...[weight, weight]);
+                currentExercise.times.push(...[numericData.time, numericData.time]);
+                currentExercise.weights.push(...[numericData.weight, numericData.weight]);
             }
             else {
                 currentExercise.exercise.push(exercise.label)
-                currentExercise.reps.push(reps)
+                currentExercise.reps.push(numericData.reps)
                 currentExercise.sides.push("both");
-                currentExercise.times.push(time);
-                currentExercise.weights.push(weight);                
+                currentExercise.times.push(numericData.time);
+                currentExercise.weights.push(numericData.weight);                
             }
             setGoToNextPage(true)
         
-        } catch (error: any) {
+        } 
+        catch (error: any) {
             alert(`Error: Couldn't complete set: ${error}`)
         }
     }
@@ -113,9 +97,7 @@ const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Functi
         </>
         }
         <Text style={[globalStyles.text, { fontWeight: "600", marginHorizontal: 10}]}>For maximum efficency choose a weight that makes you fail in these repetiton ranges</Text>
-        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => completeSet(exercise, parseFloat(weight), 
-                                                                                parseFloat(time),
-                                                                                parseFloat(reps))}>
+        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => completeSet(exercise, parseFloat(weight), parseFloat(time), parseFloat(reps))}>
             <Text style={globalStyles.buttonText}>Next</Text>                   
         </Pressable>
   </View>

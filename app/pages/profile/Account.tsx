@@ -2,12 +2,11 @@ import { ImageBackground, Pressable, Text, View } from "react-native"
 import React, { useContext, useEffect, useState } from "react"
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../../../FirebaseConfig"
 import UserContext from "../../contexts/UserContext";
-import { User, RouterProps, Exercise } from "../../types and interfaces/types";
+import { User, RouterProps, Exercise, SingleSet } from "../../types and interfaces/types";
 import { backgroundImage, globalStyles } from "../../assets/styles";
 import { Unsubscribe } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { getUser } from "../../functions/firebaseFunctions";
-import { SingleSet } from "../exercises/types";
 
 type MaxValueAndIndex = {
   value: number;
@@ -51,62 +50,64 @@ const Account = ({ route, navigation }: RouterProps) => {
 
 function getBestExercise (userID: string | null, field:string, secondaryField:string, callback: Function ): Unsubscribe | undefined {
   try {
-      const bestExercise: SingleSet = {
-        exercise: "",
-        reps: 0,
-        restTime: 0,
-        side: "both",
-        time: 0,
-        weight: 0
-      };
-      const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
-      const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
-      const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, (snapshot) => {
-          if (!snapshot.empty) {
-              snapshot.docs.forEach((doc) => {
-                  const workoutData = doc.data().Workout;
-      
-                  if (workoutData) {
-                      workoutData.forEach((exercise: SingleSet) => {
-                          const maxField = getMaxValueAndIndexOfArray(exercise[field]);
-                          const maxSecondaryField = getMaxValueAndIndexOfArray(exercise[secondaryField]);
-                              if (maxField !== undefined && maxField.value > bestExercise[field]) {
-                                  bestExercise[field] = maxField.value;
-                                  bestExercise.name = exercise.exercise[maxField.index];
-                                  bestExercise[secondaryField] = exercise[secondaryField][maxField.index];
-                              } else if (maxField !== undefined && maxSecondaryField !== undefined && maxField.value === bestExercise[field] && maxSecondaryField.value > bestExercise[secondaryField]) {
-                                  bestExercise[secondaryField] = maxSecondaryField.value;
-                                  bestExercise.name = exercise.exercise[maxSecondaryField.index];
-                                  bestExercise[field] = exercise[field][maxSecondaryField.index];
-                              }
-                          
-                      });
-                  }
-              });
-              callback(bestExercise)
+    const bestExercise: SingleSet = {
+      exercise: "",
+      reps: 0,
+      restTime: 0,
+      side: "both",
+      time: 0,
+      weight: 0
+    };
+    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+    const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+    const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, (snapshot) => {
+      if (snapshot.empty) return;
+
+      snapshot.docs.forEach((doc) => {
+        const workoutData = doc.data().Workout;
+
+        if (!workoutData) return;
+
+        workoutData.forEach((exercise: SingleSet) => {
+          const maxField = getMaxValueAndIndexOfArray(exercise[field]);
+          const maxSecondaryField = getMaxValueAndIndexOfArray(exercise[secondaryField]);
+          
+          if (maxField !== undefined && maxField.value > bestExercise[field]) {
+            bestExercise[field] = maxField.value;
+            bestExercise.name = exercise.exercise[maxField.index];
+            bestExercise[secondaryField] = exercise[secondaryField][maxField.index];
+          } else if (maxField !== undefined && maxSecondaryField !== undefined && maxField.value === bestExercise[field] && maxSecondaryField.value > bestExercise[secondaryField]) {
+            bestExercise[secondaryField] = maxSecondaryField.value;
+            bestExercise.name = exercise.exercise[maxSecondaryField.index];
+            bestExercise[field] = exercise[field][maxSecondaryField.index];
           }
+                    
+        });
       });
+      callback(bestExercise)
+    });
   
-      return unsubscribeFromWorkouts;
+    return unsubscribeFromWorkouts;
   } catch (error: any) {
       alert(`Error: Couldn't fetch best exercises for ${field}: ${error}`)
   }
-};
+}
 
 function getMaxValueAndIndexOfArray (array:number[]): MaxValueAndIndex | undefined {
   try {
-      const max = {
-          value : 0,
-          index: 0
-      };
-      if (array !== undefined) {
-          for (let i = 0; i < array.length; i++)
-              if (array[i] > max.value) {
-                  max.value = array[i];
-                  max.index = i;
-              }
+    const max = {
+        value : 0,
+        index: 0
+    };
+    if (array === undefined) return
+    
+    for (let i = 0; i < array.length; i++)
+      if (array[i] > max.value) {
+        max.value = array[i];
+        max.index = i;
       }
-      return max;
+    
+    return max;
   } catch (error) {
       alert(`Error: Couldn't find max of ${array}: ${error}`)
   }

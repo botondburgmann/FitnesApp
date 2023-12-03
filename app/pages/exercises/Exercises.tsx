@@ -6,6 +6,7 @@ import { backgroundImage, globalStyles } from '../../assets/styles';
 import { Unsubscribe } from 'firebase/auth';
 import { collection, query, where, onSnapshot, getDocs, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
+import { getUserDocs } from '../../functions/firebaseFunctions';
 
 const Exercises = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
@@ -16,70 +17,67 @@ const Exercises = ({navigation}: RouterProps) => {
 
   function getAllExercises (userID: string | null, callback: Function): Unsubscribe[] | undefined {
     try {
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        const unsubscribeFunctions = [];
-        const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
-            if (!usersSnapshot.empty) {
-                const userDocRef = usersSnapshot.docs[0].ref;
-                const exercisesCollectionRef = collection(userDocRef, "exercises");
+      const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+      const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+      const unsubscribeFunctions = [];
+      const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
+        if (usersSnapshot.empty) throw new Error("User doesn't exist");
 
-                const unsubscribeFromExercises = onSnapshot(exercisesCollectionRef, exercisesSnapshot => {
-                    const updatedExercises = exercisesSnapshot.docs.map(exerciseDoc => ({
-                        hidden: exerciseDoc.data().hidden,
-                        isometric: exerciseDoc.data().isometric,
-                        name: exerciseDoc.data().name,
-                        musclesWorked: exerciseDoc.data().musclesWorked,
-                        unilateral: exerciseDoc.data().unilateral
-                    }));
-                
-                    callback(updatedExercises);
-                });
-                
+        const userDocRef = usersSnapshot.docs[0].ref;
+        const exercisesCollectionRef = collection(userDocRef, "exercises");
 
-                
-                unsubscribeFunctions.push(unsubscribeFromExercises);
-                
-            } else {
-                throw new Error("User doesn't exist");
-            }
+        const unsubscribeFromExercises = onSnapshot(exercisesCollectionRef, exercisesSnapshot => {
+          const updatedExercises = exercisesSnapshot.docs.map(exerciseDoc => ({
+            hidden: exerciseDoc.data().hidden,
+            isometric: exerciseDoc.data().isometric,
+            label: exerciseDoc.data().name,
+            value: exerciseDoc.data().value,
+            musclesWorked: exerciseDoc.data().musclesWorked,
+            unilateral: exerciseDoc.data().unilateral
+          }));
+      
+          callback(updatedExercises);
         });
+                            
+        unsubscribeFunctions.push(unsubscribeFromExercises);
+      });
 
-        unsubscribeFunctions.push(unsubscribeFromUsers);
-        return unsubscribeFunctions;
+      unsubscribeFunctions.push(unsubscribeFromUsers);
+      return unsubscribeFunctions;
 
     } catch (error: any) {
-        alert(`Error: Couldn't fetch exercises: ${error}`);
+      alert(`Error: Couldn't fetch exercises: ${error}`);
     }
-  };
+  }
 
   async function toggleExerciseVisibilty (userID: string | null, exerciseName: string): Promise<void> {
     try {
-        const usersCollectionRef = collection(FIRESTORE_DB, "Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        const usersSnapshot = await getDocs(usersQuery);
-        const userDoc = usersSnapshot.docs[0];
+      if (userID === null) throw new Error("User is not authorized");
+      
+      const userDoc = await getUserDocs(userID)
 
-        const exercisesCollectionRef = collection(userDoc.ref, "exercises");
-        const exercisesQuery = query(exercisesCollectionRef, where("name", "==", exerciseName));
-        const exercisesSnapshot = await getDocs(exercisesQuery);
-        exercisesSnapshot.docs.forEach((exercisesDoc) => {
-            const updateData = {
-                hidden: !exercisesDoc.data().hidden
-            };
+      if (userDoc === undefined) throw new Error("User doesn't exist");
+
+      const exercisesCollectionRef = collection(userDoc.ref, "exercises");
+      const exercisesQuery = query(exercisesCollectionRef, where("name", "==", exerciseName));
+      const exercisesSnapshot = await getDocs(exercisesQuery);
+      
+      exercisesSnapshot.docs.forEach((exercisesDoc) => {
+        const updateData = {
+            hidden: !exercisesDoc.data().hidden
+        };
             
-            updateDoc(exercisesDoc.ref, updateData);
-        })
-
+        updateDoc(exercisesDoc.ref, updateData);
+      })
     } catch (error: any) {
-        alert(`Error: Couldn't change visibility for ${exerciseName}: ${error.message}`)
+      alert(`Error: Couldn't change visibility for ${exerciseName}: ${error.message}`)
     }
-};
+  }
 
   useEffect(() => {
-    const unsubscribeFunctions = getAllExercises(userID, (receivedExercises: React.SetStateAction<Exercise[]>) => {                    
+    const unsubscribeFunctions = getAllExercises(userID, (receivedExercises: React.SetStateAction<Exercise[]>) => { 
         setExercises(receivedExercises);
-        setLoading(false);
+        setLoading(false);        
     });
 
     return () => {

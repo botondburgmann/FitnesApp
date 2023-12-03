@@ -20,10 +20,8 @@ const Rest = (props: { setGoToNextPage: Function; currentExercise: Sets; exercis
         colors={['#FF0000', '#FF0000', '#FF0000', '#FF0000']}
         colorsTime={[30, 25, 10, 0]}
         onComplete={() => {
-          if (exercise.unilateral)
-            currentExercise.restTimes.push(...[0, duration]);
-          else                
-            currentExercise.restTimes.push(duration);
+          if (exercise.unilateral) currentExercise.restTimes.push(...[0, duration]);
+          else currentExercise.restTimes.push(duration);
           setGoToNextPage(true)
         }}
       >

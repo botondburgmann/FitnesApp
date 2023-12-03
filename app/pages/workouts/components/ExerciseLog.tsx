@@ -29,21 +29,6 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
         exercise: Array.from(new Set<string>(exercise.exercise)),
         
     };
-    function calculateNumberOfSets (sides: string[], uniqueExerciseLength: number): number | undefined {
-        try {
-            
-            let numberOfSet = 0;
-            for (const side of sides) {
-                if (side === "both")
-                    numberOfSet++;
-                else 
-                numberOfSet +=0.5;
-                }
-    return isSuperSet(exercise, uniqueValues.exercise) ? numberOfSet/uniqueExerciseLength : numberOfSet;
-        } catch (error: any) {
-          alert(`Error: Couldn't calculate number of sets: ${error}`)
-        }
-    };
 
     const numberOfSets = calculateNumberOfSets(exercise.sides, uniqueValues.exercise.length);
     const unilateral = uniqueValues.sides.length === 2 ? "(per side)" : "";
@@ -57,65 +42,60 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
         sides: []
     };
     
-    
+    function calculateNumberOfSets (sides: string[], uniqueExerciseLength: number): number | undefined {
+        try {
+            let numberOfSet = 0;
+            for (const side of sides) {
+                if (side === "both") numberOfSet++;
+                else numberOfSet +=0.5;
+            }
+        return isSuperSet(exercise, uniqueValues.exercise) ? numberOfSet/uniqueExerciseLength : numberOfSet;
+        } 
+        catch (error: any) {
+          alert(`Error: Couldn't calculate number of sets: ${error}`)
+        }
+    }
 
     for (let i = 0; i < exercise.sides.length; i++) {
-        if (isDropsSet(exercise, uniqueValues.exercise) || (isSuperSet(exercise, uniqueValues.exercise) && exercise.exercise[i] !== exercise.exercise[0]) && exercise.sides[i] !== "both")
-            outputs.setNumbers.push("");
-        else if (exercise.sides[i] === "both")
-            outputs.setNumbers.push(`Set ${i+1}`);
-        else if(exercise.sides[i] !== "both" && i % 2 === 0)
-            i === 0 ? outputs.setNumbers.push(`Set ${i+1}`) : outputs.setNumbers.push(`Set ${i}`);
-        else
-            outputs.setNumbers.push("");
-        if (!(isDropsSet(exercise, uniqueValues.exercise) ||isSuperSet(exercise, uniqueValues.exercise) ) || isDropsSet(exercise, uniqueValues.exercise))
-            outputs.names.push("")
-        else
-            outputs.names.push(` of ${exercise.exercise[i]}`);
-        if (exercise.sides[i] === "both") 
-            outputs.sides.push("") 
-        else
-            outputs.sides.push(`on the ${exercise.sides[i]} side`); 
-        if (exercise.reps[i] === 0)
-            outputs.reps.push("");
-        else if (exercise.reps[i] === 1) 
-            outputs.reps.push("1 rep") 
-        else    
-            outputs.reps.push(`${exercise.reps[i]} reps`);
-        if (exercise.times[i] === 0)
-            outputs.seconds.push("");    
-        else if (exercise.reps[i] > 0 && exercise.times[i] === 1) 
-            outputs.seconds.push('for 1 second') 
-        else if (exercise.reps[i] > 0 && exercise.times[i] > 1) 
-            outputs.seconds.push(`for ${ exercise.times[i]} seconds`)        
-        else if (exercise.times[i] === 1) 
-            outputs.seconds.push('1 second hold') 
-        else
-            outputs.seconds.push(`${ exercise.times[i]} seconds hold`)
-    if (exercise.weights[i] == 0)
-            outputs.weights.push(`with no weight`)
-        else if (exercise.weights[i] < 0)
-            outputs.weights.push(`with ${-exercise.weights[i]} kg assisted`)
-        else
-        outputs.weights.push(`with ${exercise.weights[i]} kg`);
+        if (exercise.sides[i] === "both" && !(isDropsSet(exercise, uniqueValues.exercise) || (isSuperSet(exercise, uniqueValues.exercise) ))) outputs.setNumbers.push(`Set ${i+1}`);
+        else if (exercise.sides[i] !== "both" && i % 2 === 0) i === 0 ? outputs.setNumbers.push(`Set ${i+1}`) : outputs.setNumbers.push(`Set ${i}`);
+        else outputs.setNumbers.push("");
+
+        if (!(isDropsSet(exercise, uniqueValues.exercise) ||isSuperSet(exercise, uniqueValues.exercise) ) || isDropsSet(exercise, uniqueValues.exercise)) outputs.names.push("")
+        else outputs.names.push(`${exercise.exercise[i]}`);
+
+        if (exercise.sides[i] === "both") outputs.sides.push("") 
+        else outputs.sides.push(`on the ${exercise.sides[i]} side`); 
+
+        if (exercise.reps[i] === 0) outputs.reps.push("");
+        else if (exercise.reps[i] === 1) outputs.reps.push("1 rep") 
+        else outputs.reps.push(`${exercise.reps[i]} reps`);
+
+        if (exercise.times[i] === 0) outputs.seconds.push("");    
+        else if (exercise.reps[i] > 0 && exercise.times[i] === 1) outputs.seconds.push('for 1 second') 
+        else if (exercise.reps[i] > 0 && exercise.times[i] > 1) outputs.seconds.push(`for ${ exercise.times[i]} seconds`)        
+        else if (exercise.times[i] === 1) outputs.seconds.push('1 second hold') 
+        else outputs.seconds.push(`${ exercise.times[i]} seconds hold`)
+
+        if (exercise.weights[i] == 0) outputs.weights.push(`with no weight`)
+        else if (exercise.weights[i] < 0) outputs.weights.push(`with ${-exercise.weights[i]} kg assisted`)
+        else outputs.weights.push(`with ${exercise.weights[i]} kg`);
+
     }
-    function handleLongPress(index:number) {
+
+    function handleLongPress(index:number): void {
         try {
-            if (userID === null)
-                throw new Error("User is Not authorized")
-            if (date === null)
-                throw new Error("Date is not set");
-            if (week === null) 
-                throw new Error("Week is not set");
-            if (exercise.reps[index] === 0)
-                showDeleteConfirmation(userID, date, week, index, removeXP(exercise.times[index],exercise.weights[index]))
-            else
-                showDeleteConfirmation(userID, date, week, index, removeXP(exercise.reps[index],exercise.weights[index]))
-            
+            if (userID === null) throw new Error("User is Not authorized")
+            if (date === null) throw new Error("Date is not set");
+            if (week === null)  throw new Error("Week is not set");
+
+            if (exercise.reps[index] === 0) showDeleteConfirmation(userID, date, week, index, removeXP(exercise.times[index],exercise.weights[index]))
+            else showDeleteConfirmation(userID, date, week, index, removeXP(exercise.reps[index],exercise.weights[index]))
         } catch (error: any) {
             alert(`Error showing confirmation message: ${error}`)
         }
     }
+
     function showDeleteConfirmation(userID: string, date: Date, week: WeekRange, setIndex: number, xpDelete: number): void{
         Alert.alert(
             'Delete Item',
@@ -126,48 +106,39 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
             },
             {
               text: 'Delete',
-              onPress: () => { deleteSet(userID, date, week, setIndex, xpDelete)}
+              onPress: async () => {await  deleteSet(userID, date, week, setIndex, xpDelete)}
             }],
             { cancelable: false }
           );
     };
+    
     async function deleteSet (userID:string, date:Date, week: WeekRange, setIndex: number, xpToDelete: number): Promise<void> {
         try { 
-            if (week === null) 
-                throw new Error("Week is not set");
-                 
             const workoutDocs = await getWorkoutDocs(userID,date);
                   
-            if (workoutDocs === undefined)
-                throw new Error("Couldn't find workout");
-             const updatedData = { ...workoutDocs.data() };
+            if (workoutDocs === undefined) throw new Error("Couldn't find workout");
+            
+            const updatedData = { ...workoutDocs.data() };
     
             for (let i = 0; i < workoutDocs.data().Workout.length; i++) {  
-                                 
-                if (workoutDocs.data().Workout[i].exercise[setIndex] === exercise.exercise[0] && i === exerciseID){
-                
-                updatedData.Workout[i].exercise.splice(setIndex, 1);
-                updatedData.Workout[i].weights.splice(setIndex, 1);
-                updatedData.Workout[i].reps.splice(setIndex, 1);
-                updatedData.Workout[i].times.splice(setIndex, 1);
-                updatedData.Workout[i].sides.splice(setIndex, 1);
-                updatedData.Workout[i].restTimes.splice(setIndex, 1); 
-                if (updatedData.Workout[i].exercise.length === 0) { 
-                    updatedData.Workout.splice(i,1)
-                }
-                  
+                if (workoutDocs.data().Workout[i].exercise[setIndex] === exercise.exercise[0] && i === exerciseID){    
+                    updatedData.Workout[i].exercise.splice(setIndex, 1);
+                    updatedData.Workout[i].weights.splice(setIndex, 1);
+                    updatedData.Workout[i].reps.splice(setIndex, 1);
+                    updatedData.Workout[i].times.splice(setIndex, 1);
+                    updatedData.Workout[i].sides.splice(setIndex, 1);
+                    updatedData.Workout[i].restTimes.splice(setIndex, 1); 
+                    if (updatedData.Workout[i].exercise.length === 0) { 
+                        updatedData.Workout.splice(i,1)
+                    }
                 await updateDoc(doc(FIRESTORE_DB, "Workouts", workoutDocs.id), {
                     Workout: updatedData.Workout
                 });
-                if ( updatedData.Workout.length === 0){
 
-                    await deleteDoc(workoutDocs.ref);
+                if ( updatedData.Workout.length === 0) await deleteDoc(workoutDocs.ref);
                 }
-                }
-      
             } 
-          
-        addTotalExperienceToFirebase(xpToDelete,date,userID,week);
+            addTotalExperienceToFirebase(xpToDelete,date,userID,week);
     
         } 
         catch (error: any) {
@@ -186,7 +157,7 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
             }
             <Pressable
                 onPress={() => {navigation && date && navigation.navigate("Edit set",{set: {exercise : exercise.exercise[index],
-                    rep: exercise.reps[index],
+                    reps: exercise.reps[index],
                     restTime: exercise.restTimes[index],
                     side: exercise.sides[index],
                     time: exercise.times[index],
@@ -211,7 +182,7 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
            ? <View>
                 { numberOfSets === 1
                     ? <Text style={globalStyles.exerciseName}>1 superset of</Text>
-                    : <Text style={globalStyles.exerciseName}>{numberOfSets} supersets</Text>
+                    : <Text style={globalStyles.exerciseName}>{numberOfSets} supersets of</Text>
                 }     
                 <View>
                     {uniqueValues.exercise.map((exercise,index) =>  
@@ -231,7 +202,7 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
             :
             <View>
                 { numberOfSets === 1
-                    ? <Text style={globalStyles.exerciseName}>1 set of {uniqueValues.exercise[0]}</Text>
+                    ? <Text style={globalStyles.exerciseName}>1 set of {uniqueValues.exercise[0]} {unilateral}</Text>
                     : uniqueValues.exercise[0][uniqueValues.exercise[0].length-1] === "s" 
                     ? <Text style={globalStyles.exerciseName}>{numberOfSets} sets of {uniqueValues.exercise[0]}es {unilateral}</Text>
                     : <Text style={globalStyles.exerciseName}>{numberOfSets} sets of {uniqueValues.exercise[0]}s {unilateral}</Text>

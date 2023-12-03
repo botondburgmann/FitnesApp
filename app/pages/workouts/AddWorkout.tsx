@@ -6,7 +6,7 @@ import { Exercise, RouterProps, Sets } from '../../types and interfaces/types'
 import { backgroundImage, globalStyles } from '../../assets/styles'
 import WeekContext from '../../contexts/WeekContext'
 import { workoutsStyles } from './styles'
-import {  convertFieldsToNumeric, finishExercise} from './workoutsFunction'
+import {  convertFieldsToNumeric, finishExercise, validateData} from './workoutsFunction'
 import { collection, Unsubscribe, onSnapshot, query, where } from 'firebase/firestore'
 import { FIRESTORE_DB } from '../../../FirebaseConfig'
 
@@ -41,10 +41,9 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
 
   function toggleSwitch(): void {
     try {
-      if (isEnabled)
-          setSide('left');
-      else
-          setSide('right')
+      if (isEnabled) setSide('left');
+      else setSide('right');
+      
       setIsEnabled(previousState => !previousState);
     } catch (error: any) {
       alert(`Error: Couldn't toggle switch: ${error}`)
@@ -67,7 +66,7 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
         weight: parseFloat(weight),
       }
       const numericData = convertFieldsToNumeric(dataWithStrings);
-      validateData(currentExercise, parseFloat(reps), parseFloat(time), parseFloat(restTime));
+      validateData(currentExercise.isometric, numericData.reps, numericData.time, numericData.restTime);                        
       
       setSets((prevSets) => ({
         ...prevSets,
@@ -88,26 +87,15 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
 
 
   
-  function validateData(currentExercise:Exercise, reps: number, time: number, restTime: number): void {
-    if (!currentExercise.isometric && Number.isNaN(reps))
-      throw new Error("Repetition number is required for non-isometric exercises");
-    if (!currentExercise.isometric && reps < 0)
-      throw new Error("Repetition number must be a positive number");
-    if (currentExercise.isometric && Number.isNaN(time) )
-      throw new Error("Time is required for non-isometric exercises");
-    if (currentExercise.isometric && time < 0)
-      throw new Error("Time must be a positive number");
-    if (restTime < 0)
-      throw new Error("Rest time must be a positive number");
-  }
 
-  function resetInputFields() {
+
+  function resetInputFields(): void {
     setWeight("");
     setReps("");
     setTime("");
     setRestTime("");
   }
-  function resetAllFields() {
+  function resetAllFields(): void {
     setAllExercises([]);
     setCurrentExercise(undefined);
     setIsEnabled(false);
@@ -128,7 +116,7 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
   }
 
   
-  function getAvailableExercises (userID: string | null, callback: Function): Unsubscribe | undefined {
+  function getAvailableExercises ( callback: Function): Unsubscribe | undefined {
     try {
         const exercises: Exercise[] = [];
         const usersCollectionRef = collection(FIRESTORE_DB, "Users");
@@ -166,7 +154,7 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
   
   
   useEffect(() => {
-    const unsubscribeFromAvailableExercises = getAvailableExercises(userID, (exercises: Exercise[]) => {
+    const unsubscribeFromAvailableExercises = getAvailableExercises((exercises: Exercise[]) => {
       const exerciseData: Exercise[] = [];
         exercises.forEach((exercise) => {
           exerciseData.push({

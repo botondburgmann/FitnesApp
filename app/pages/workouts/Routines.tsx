@@ -15,7 +15,7 @@ const Routines = ({navigation}: RouterProps) => {
                           'Arm', 'Forearm','Upper body', 'Full body pull', 
                           'Full body push'];
 
-    const routineComponents = [];
+    const routineComponents: React.JSX.Element[] = [];
     for (let i = 0; i < workoutTypes.length; i++) {
       routineComponents.push(
         <Routine key={i} workoutType={workoutTypes[i]}/>

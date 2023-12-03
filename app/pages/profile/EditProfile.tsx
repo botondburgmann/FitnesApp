@@ -5,7 +5,7 @@ import Datepicker from '../../components/Datepicker';
 import Radiobutton from '../../components/Radiobutton';
 import SelectMenu from '../../components/SelectMenu';
 import { backgroundImage, globalStyles } from '../../assets/styles';
-import { ActivityLevels, RouterProps, SelectItem } from '../../types and interfaces/types';
+import { ActivityLevelOption, RouterProps, SelectItem } from '../../types and interfaces/types';
 import { updateDoc } from 'firebase/firestore';
 import { convertFtToCm, convertLbsToKg, validateBirthday, validateHeight, validateWeight } from '../../functions/globalFunctions';
 import { getUserDocs } from '../../functions/firebaseFunctions';
@@ -30,10 +30,10 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
       {label: 'Imperial (ft)', value: 'ft'}
     ]);
     const [activityValue, setActivityValue] = user.activityLevel === "beginner" 
-                                            ? useState<ActivityLevels>({label: 'Beginner', value: 'beginner'})
+                                            ? useState<ActivityLevelOption>({label: 'Beginner', value: 'beginner'})
                                             : user.activityLevel === "intermediate"
-                                            ? useState<ActivityLevels>({label: 'Intermediate', value: 'intermediate'})
-                                            : useState<ActivityLevels>({label: 'Advanced', value: 'advanced'})
+                                            ? useState<ActivityLevelOption>({label: 'Intermediate', value: 'intermediate'})
+                                            : useState<ActivityLevelOption>({label: 'Advanced', value: 'advanced'})
     const [activityItems] = useState([
       {label: 'Beginner', value: 'beginner'},
       {label: 'Intermediate', value: 'intermediate'},

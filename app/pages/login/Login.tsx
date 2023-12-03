@@ -16,15 +16,13 @@ const Login = ({navigation}: RouterProps) => {
 
   async function signIn(): Promise<void> {
     try {
-      if (email === undefined || password == undefined)
-        throw new Error("Please fill out all the fields!");
+      if (email === undefined || password == undefined) throw new Error("Please fill out all the fields!");
+      
       setLoading(true);
-      await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
-    }
-    catch (error:any) {
+      signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
+    } catch (error:any) {
       alert(`Error: Sign in failed: ${error.message}`);
-    }
-    finally {
+    } finally {
       setLoading(false);
     } 
   }

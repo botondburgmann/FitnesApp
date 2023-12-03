@@ -3,8 +3,8 @@ import React, { useContext, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
 import Info from '../../components/Info';
 import { backgroundImage, globalStyles } from '../../assets/styles';
-import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
-import { FIRESTORE_DB } from '../../../FirebaseConfig';
+import { collection, addDoc } from 'firebase/firestore';
+import { getUserDocs } from '../../functions/firebaseFunctions';
 
 const CreateExercise = () => {
     const userID = useContext(UserContext);
@@ -19,61 +19,59 @@ const CreateExercise = () => {
 
     async function createNewExercise (userID: string, name: string, isUnilateral: boolean, isIsometric: boolean): Promise<void> {
         try {  
-            const usersCollectionRef = collection(FIRESTORE_DB, "Users" )
-            const usersQuery = query(usersCollectionRef,where("userID", "==", userID))
-            const usersSnapshot = await getDocs(usersQuery);
-            const usersDoc = usersSnapshot.docs[0];
-            const exercisesCollectionRef = collection(usersDoc.ref, "exercises");
-            await addDoc(exercisesCollectionRef, {
+            const userDoc = await getUserDocs(userID)
+            
+            if (userDoc === undefined) throw new Error("User doesn't exist");
+            
+            const exercisesCollectionRef = collection(userDoc.ref, "exercises");
+            addDoc(exercisesCollectionRef, {
                 hidden: false,
                 isometric: isIsometric,
                 name: name,
                 unilateral: isUnilateral
             });   
-        } 
-        catch (error: any) {
+        } catch (error: any) {
             alert(`Error: Couldn't create exercise: ${error.message}`);
         }
-    };
+    }
 
-    function showCustomAlert (title: React.SetStateAction<string | undefined>, information: React.SetStateAction<string | undefined>) {
+    function showCustomAlert (title: string, information: string) {
         setCustomAlertVisible(true);
         setTitle(title);
         setInformation(information);
-    };
+    }
     
     function hideCustomAlert () {
         setCustomAlertVisible(false);
-    };
+    }
 
     function toggleUnilateralitySwitch() {
-        if (isUnilateral) {
-            setUnilaterality('bilateral');
-        }
-        else {
-            setUnilaterality('unilateral')
-        }
+        if (isUnilateral) setUnilaterality('bilateral');
+        else setUnilaterality('unilateral')
+
         setIsUnilateral(previousState => !previousState);
     }
 
     function toggleIsometricitySwitch() {
-        if (isIsometric) {
-            setIsometricity('not isometric');
-        }
-        else {
-            setIsometricity('isometric')
-        }
+        if (isIsometric) setIsometricity('not isometric');
+        else setIsometricity('isometric')
+
         setIsIsometric(previousState => !previousState);
     }
 
     function handleButtonClick() {
-        if (userID !== null && name !== undefined) {
+        try {
+            if (userID === null) throw new Error("User is not authorized");
+            if (name === undefined) throw new Error("Please choose a name for your exercise!");
+            
             createNewExercise(userID, name, isUnilateral, isIsometric)
             setName("");
             setIsIsometric(false);
             setIsUnilateral(false);
             setUnilaterality("");
             setIsometricity("");
+        } catch (error: any) {
+            alert(`Error: Couldn't save exercise: ${error.message}`)
         }
     }
 
