@@ -22,26 +22,44 @@ const Achievements = ({route}: any) => {
     
             const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
             const unsubscribeFromAchievements = onSnapshot(achievementsCollectionRef, achievementsSnapshot => {
-                if (!achievementsSnapshot.empty) {
-                    achievementsSnapshot.docs.forEach(achievementDoc => {
-                        for (const owner of achievementDoc.data().owners) {
-                            if (owner.userID === userID) {
-                                const achievement = {
-                                    color: owner.color,
-                                    description: owner.description,
-                                    icon: achievementDoc.data().icon,
-                                    level: owner.level,
-                                    name: achievementDoc.data().name,
-                                    status: owner.status,
-                                    visibility: owner.visibility
-                                };
-                                achievements.push(achievement);
-                            }
-                            
-                        }
-                    }) 
-                    callback(achievements)
+            
+            if (achievementsSnapshot.empty) return;
+
+            achievementsSnapshot.docs.forEach(achievementDoc => {
+                const statuses = achievementDoc.data().statuses;
+                for (let i = 0; i < statuses.length; i++) {
+                    if (statuses[i].userIDs.includes(userID)) {
+                        const achievement = {
+                            color: achievementDoc.data().colors[i],
+                            description: achievementDoc.data().descriptions[i],
+                            icon: achievementDoc.data().icon,
+                            level: i,
+                            name: achievementDoc.data().name,
+                            status: achievementDoc.data().statuses[i].name,
+                            visibility: i === 0 ? 0.5 : 1 as 0.5 | 1
+                        };
+                        achievements.push(achievement);
+                    }
+                    
                 }
+                
+/*                 for (const owner of achievementDoc.data().owners) {
+                    if (owner.userID === userID) {
+                        const achievement = {
+                            color: owner.color,
+                            description: owner.description,
+                            icon: achievementDoc.data().icon,
+                            level: owner.level,
+                            name: achievementDoc.data().name,
+                            status: owner.status,
+                            visibility: owner.visibility
+                        };
+                        achievements.push(achievement);
+                    }
+                    
+                } */
+            }) 
+            callback(achievements)
             })
             return unsubscribeFromAchievements;
         } catch (error: any) {

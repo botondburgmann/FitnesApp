@@ -19,15 +19,16 @@ const Birthday = ({navigation}: RouterProps) => {
     try {
       if (userID === null)
         throw new Error("User is not authorized");
+
       validateBirthday(birthDate);
+    
       const userDocRef = await getUserDocumentRef(userID);
       if (userDocRef === undefined) 
         throw new Error("User doesn't exist in database");
       const newData = {"dateOfBirth": birthDate.toDateString()};
-      await updateDoc(userDocRef, newData);
+      updateDoc(userDocRef, newData);
       navigation.navigate("Weight");
-    } 
-    catch (error: any) {
+    } catch (error: any) {
       alert(`Errpr: Couldn't set your date of birth: ${error}`)
     }
   }

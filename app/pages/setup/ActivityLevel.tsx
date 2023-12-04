@@ -26,6 +26,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
     try {
       if (userID === null)
         throw new Error("User is not authorized");
+
       const userDocRef = await getUserDocumentRef(userID);
       if (userDocRef === undefined)
         throw new Error("User doesn't exist in database");
@@ -33,10 +34,9 @@ const ActivityLevel = ({navigation}: RouterProps) => {
         "activityLevel": selectedActivityLevel.value,
         "set": true
       };
-      await updateDoc(userDocRef, newData);
+      updateDoc(userDocRef, newData);
       navigation.navigate("WorkoutsLayout");
-    } 
-    catch (error: any) {
+    } catch (error: any) {
       alert(`Error: Couldn't set your activity level: ${error}`)
     }
   }

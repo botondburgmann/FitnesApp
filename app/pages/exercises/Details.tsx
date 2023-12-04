@@ -50,7 +50,7 @@ const Details = ({ route }: RouterProps) => {
     weights: [],
   })
 
-  function getExercise (userID: string | null, exerciseName: string, callback: Function): Unsubscribe | undefined {
+  function getExercise (userID: string, exerciseName: string, callback: Function): Unsubscribe | undefined {
     try {
       const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
       const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
@@ -91,7 +91,8 @@ const Details = ({ route }: RouterProps) => {
   }
 
   useEffect(() => {
-    const unsubscribeFromExercise = getExercise(userID, exercise, (response: React.SetStateAction<Sets>) => {
+    if (userID === null) return
+    const unsubscribeFromExercise = getExercise(userID, exercise, (response: Sets) => {
       setRecords(response)      
       setLoading(false);
     });
@@ -114,8 +115,8 @@ const Details = ({ route }: RouterProps) => {
   
 
   useEffect(() => {
-    fillTable(records, setTable);
     if (!loading) {
+      setTable(fillTable(records));
       setMostWeight(findMaxWeight(records, exercise));
       setMostReps(findMaxReps(records, exercise));     
     }
@@ -157,7 +158,7 @@ const Details = ({ route }: RouterProps) => {
   
   
 
-  function fillTable(records: Sets, setTable: (table: TableState) => void) {
+  function fillTable(records: Sets): TableState {
     const sortedRecords = sortRecords(records);
   
     const newTableData: TableRow[] = sortedRecords.dates.map((date, i) => 
@@ -169,7 +170,7 @@ const Details = ({ route }: RouterProps) => {
       tableData: newTableData,
     };
   
-    setTable(newTableState);
+    return(newTableState);
   }
   
   function findMaxWeight(records:Sets, exercise: string): SingleSet {
@@ -187,11 +188,9 @@ const Details = ({ route }: RouterProps) => {
         currentMax.weight = records.weights[i];
         currentMax.reps = records.reps[i];
       }
-      else if (records.weights[i] === currentMax.weight){
-        if (records.reps[i] > currentMax.reps) {
-          currentMax.weight = records.weights[i];
-          currentMax.reps = records.reps[i];
-        } 
+      else if (records.weights[i] === currentMax.weight && records.reps[i] > currentMax.reps){
+        currentMax.weight = records.weights[i];
+        currentMax.reps = records.reps[i];
       }  
     }
     return currentMax;
@@ -212,11 +211,9 @@ const Details = ({ route }: RouterProps) => {
         currentMax.weight = records.weights[i];
         currentMax.reps = records.reps[i];
       }
-      else if (records.reps[i] === currentMax.reps){
-        if (records.weights[i] > currentMax.weight) {
-          currentMax.weight = records.weights[i];
-          currentMax.reps = records.reps[i];
-        }
+      else if (records.reps[i] === currentMax.reps && records.weights[i] > currentMax.weight){
+        currentMax.weight = records.weights[i];
+        currentMax.reps = records.reps[i];
       }
     }
     

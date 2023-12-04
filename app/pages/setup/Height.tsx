@@ -25,21 +25,21 @@ const Height = ({navigation}: RouterProps) => {
     try {
       if (userID === null)
         throw new Error("User is not authorized");
+
       validateHeight(parseFloat(height));
       const userDocRef = await getUserDocumentRef(userID);
       if (userDocRef === undefined)
         throw new Error("User doesn't exist in database");
       if (selectedSystem.value === "ft"){
         const newData = {"weight": convertFtToCm(parseFloat(height))};
-        await updateDoc(userDocRef, newData);
+        updateDoc(userDocRef, newData);
       }
       else{
         const newData = {"height": parseFloat(height)};
-        await updateDoc(userDocRef, newData);
+        updateDoc(userDocRef, newData);
       }      
       navigation.navigate("Activity level");
-    } 
-    catch (error: any) {
+    } catch (error: any) {
       alert(`Error: Couldn't set your weight: ${error}`)
     }
   }

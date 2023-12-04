@@ -25,22 +25,22 @@ const Weight = ({navigation}: RouterProps) => {
     try {
       if (userID === null)
         throw new Error("User is not authorized");
+
       validateWeight(parseFloat(weight));
       const userDocRef = await getUserDocumentRef(userID);
       if (userDocRef === undefined)
         throw new Error("User doesn't exist in database");
       if (selectedSystem.value === "lbs"){
         const newData = {"weight": convertLbsToKg(parseFloat(weight))};
-        await updateDoc(userDocRef, newData);
+        updateDoc(userDocRef, newData);
       }
       else{
         const newData = {"weight": parseFloat(weight)};
-        await updateDoc(userDocRef, newData);
+        updateDoc(userDocRef, newData);
       }      
       navigation.navigate("Height");
 
-    } 
-    catch (error: any) {
+    } catch (error: any) {
       alert(`Error: Couldn't set your weight: ${error}`)
     }
   }

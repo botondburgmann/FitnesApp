@@ -2,36 +2,6 @@ import { DocumentData, DocumentReference, QueryDocumentSnapshot, Unsubscribe, co
 import { FIRESTORE_DB } from "../../FirebaseConfig";
 import {   Achievement } from "../types and interfaces/types";
 
-export const updateAchievementStatus =async (userID:string | null, updatedAchievement: Achievement): Promise<void> => {
-    try {
-        const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
-        const achievementsSnapshot = await getDocs(achievementsCollectionRef);
-        
-        for (const achievementDoc of achievementsSnapshot.docs) {
-            const owners = achievementDoc.data().owners;
-            for (let i = 0; i < owners.length; i++) {
-                if (owners[i].userID === userID && owners[i].level < updatedAchievement.level && achievementDoc.data().name === updatedAchievement.name){
-                    const updatedOwner = {
-                        color: updatedAchievement.color,
-                        description: updatedAchievement.description,
-                        level: updatedAchievement.level,
-                        status: updatedAchievement.status,
-                        userID: userID,
-                        visibility: updatedAchievement.visibility
-                    };
-                    owners[i] = updatedOwner;
-                    alert(`New achievement unlocked: ${updatedAchievement.name}: ${updatedAchievement.status}`);
-                    const updatedAchievementDoc = {
-                        owners: owners
-                    }
-                    updateDoc(achievementDoc.ref, updatedAchievementDoc);
-                }            
-            }
-        }
-    } catch (error: any) {
-        alert(`Errror: Couldn't update achievement status: ${error}`)
-    }
-}
 
 export async function getUserDocumentRef(userID:string):Promise<DocumentReference<DocumentData, DocumentData> | undefined>  {
     try {
@@ -39,13 +9,31 @@ export async function getUserDocumentRef(userID:string):Promise<DocumentReferenc
         const q = query(collectionRef, where("userID", "==", userID));
         const snapshot = await getDocs(q);
     
-        if (snapshot.empty) throw new Error("User doesn't exist");
+        if (snapshot.empty) 
+            throw new Error("User doesn't exist");
         
         const userDocRef = doc(FIRESTORE_DB, "Users", snapshot.docs[0].id);
         return userDocRef;
-    } catch (error: any) {
+    }   catch (error: any) {
         alert(`Error: Couldn't fetch document reference: ${error.message}`)
     }
+}
+
+export async function getUserDocument(userID:string): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | undefined>{
+    try {
+        const collectionRef = collection(FIRESTORE_DB, "Users");
+        const q = query(collectionRef, where("userID", "==", userID) );
+        const snapshot = await getDocs(q);
+        
+        if (snapshot.empty) 
+            throw new Error("User doesn't exist");
+        
+        const userDocs = snapshot.docs[0];
+        return userDocs;
+    }   catch (error: any) {
+        alert(`Error: Couldn't fetch document for user: ${error.mssage}`)    
+    }
+            
 }
 
 export async function getWorkoutDocs(userID:string, date: Date): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | undefined>{    
@@ -63,21 +51,7 @@ export async function getWorkoutDocs(userID:string, date: Date): Promise<QueryDo
     }
 }
 
-export async function getUserDocs(userID:string): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | undefined>{
-    try {
-        const collectionRef = collection(FIRESTORE_DB, "Users");
-        const q = query(collectionRef, where("userID", "==", userID) );
-        const snapshot = await getDocs(q);
-        
-        if (snapshot.empty) throw new Error("User doesn't exist");
-        
-        const userDocs = snapshot.docs[0];
-        return userDocs;
-    } catch (error: any) {
-        alert(`Error: Couldn't fetch document for user: ${error.mssage}`)    
-    }
-            
-}
+
 
 export function getUser (userID:string | null, callback: Function): Unsubscribe | undefined  {
     try {
@@ -107,4 +81,75 @@ export function getUser (userID:string | null, callback: Function): Unsubscribe 
     } catch (error: any) {
         alert(`Error: Couldn't fetch user: ${error}`)
     }
+}
+
+/* export const updateAchievementStatus =async (userID:string | null, updatedAchievement: Achievement): Promise<void> => {
+    try {
+        const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+        const achievementsSnapshot = await getDocs(achievementsCollectionRef);
+        
+        for (const achievementDoc of achievementsSnapshot.docs) {
+            const owners = achievementDoc.data().owners;
+            for (let i = 0; i < owners.length; i++) {
+                if (owners[i].userID === userID && owners[i].level < updatedAchievement.level && achievementDoc.data().name === updatedAchievement.name){
+                    const updatedOwner = {
+                        color: updatedAchievement.color,
+                        description: updatedAchievement.description,
+                        level: updatedAchievement.level,
+                        status: updatedAchievement.status,
+                        userID: userID,
+                        visibility: updatedAchievement.visibility
+                    };
+                    owners[i] = updatedOwner;
+                    alert(`New achievement unlocked: ${updatedAchievement.name}: ${updatedAchievement.status}`);
+                    const updatedAchievementDoc = {
+                        owners: owners
+                    }
+                    updateDoc(achievementDoc.ref, updatedAchievementDoc);
+                }            
+            }
+        }
+    } catch (error: any) {
+        alert(`Errror: Couldn't update achievement status: ${error}`)
+    }
+} */
+
+export async function updateAchievement(userID:string, achievementName: string, level: number) {
+    try {
+        const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
+        const q = query(achievementsCollectionRef, where("name", "==", achievementName));
+        const achievementsSnapshot = await getDocs(q);
+        const achievementDoc = achievementsSnapshot.docs[0];
+        
+        const statuses = achievementDoc.data().statuses
+        for (let i = 0; i < statuses.length; i++) {
+            if (statuses[i].userIDs.includes(userID) && i >= level) return;  
+
+            if (statuses[i].userIDs.includes(userID) && i < level) {
+                const removedUserIds: string[] = statuses[i].userIDs.filter((currentUserID: string) => currentUserID !== userID );
+
+                const updatedUserIDs = [...statuses[level].userIDs,userID];
+
+                const updatedStatuses:{name: string, userIDs: string[]}[] = statuses.map((item:{name: string, userIDs: string[]}, index: number) =>
+                    index === i ? 
+                        {name: item.name, userIDs: removedUserIds}     
+                    : index === level ? 
+                        {name: item.name, userIDs: updatedUserIDs} 
+                        : item
+                );   
+                
+                alert(`New achievement unlocked: ${achievementName}: ${statuses[level].name}`);
+                const updatedAchievementDoc = {
+                    statuses: updatedStatuses
+                };
+                updateDoc(achievementDoc.ref, updatedAchievementDoc);
+            }
+
+        }
+
+    }   catch (error: any) {
+        alert(`Error: Couldn't update achievement: ${error.message}`);
+        
+    }
+    
 }

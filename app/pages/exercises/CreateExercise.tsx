@@ -4,7 +4,7 @@ import UserContext from '../../contexts/UserContext';
 import Info from '../../components/Info';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import { collection, addDoc } from 'firebase/firestore';
-import { getUserDocs } from '../../functions/firebaseFunctions';
+import { getUserDocument } from '../../functions/firebaseFunctions';
 
 const CreateExercise = () => {
     const userID = useContext(UserContext);
@@ -19,9 +19,10 @@ const CreateExercise = () => {
 
     async function createNewExercise (userID: string, name: string, isUnilateral: boolean, isIsometric: boolean): Promise<void> {
         try {  
-            const userDoc = await getUserDocs(userID)
+            const userDoc = await getUserDocument(userID)
             
-            if (userDoc === undefined) throw new Error("User doesn't exist");
+            if (userDoc === undefined) 
+                throw new Error("User doesn't exist");
             
             const exercisesCollectionRef = collection(userDoc.ref, "exercises");
             addDoc(exercisesCollectionRef, {
@@ -30,7 +31,7 @@ const CreateExercise = () => {
                 name: name,
                 unilateral: isUnilateral
             });   
-        } catch (error: any) {
+        }   catch (error: any) {
             alert(`Error: Couldn't create exercise: ${error.message}`);
         }
     }
@@ -46,23 +47,29 @@ const CreateExercise = () => {
     }
 
     function toggleUnilateralitySwitch() {
-        if (isUnilateral) setUnilaterality('bilateral');
-        else setUnilaterality('unilateral')
+        if (isUnilateral) 
+            setUnilaterality('bilateral');
+        else 
+            setUnilaterality('unilateral')
 
         setIsUnilateral(previousState => !previousState);
     }
 
     function toggleIsometricitySwitch() {
-        if (isIsometric) setIsometricity('not isometric');
-        else setIsometricity('isometric')
+        if (isIsometric) 
+            setIsometricity('not isometric');
+        else 
+            setIsometricity('isometric')
 
         setIsIsometric(previousState => !previousState);
     }
 
     function handleButtonClick() {
         try {
-            if (userID === null) throw new Error("User is not authorized");
-            if (name === undefined) throw new Error("Please choose a name for your exercise!");
+            if (userID === null) 
+                throw new Error("User is not authorized");
+            if (name === undefined) 
+                throw new Error("Please choose a name for your exercise!");
             
             createNewExercise(userID, name, isUnilateral, isIsometric)
             setName("");
@@ -70,7 +77,7 @@ const CreateExercise = () => {
             setIsUnilateral(false);
             setUnilaterality("");
             setIsometricity("");
-        } catch (error: any) {
+        }   catch (error: any) {
             alert(`Error: Couldn't save exercise: ${error.message}`)
         }
     }

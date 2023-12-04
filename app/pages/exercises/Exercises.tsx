@@ -15,19 +15,20 @@ const Exercises = ({navigation}: RouterProps) => {
   const [loading, setLoading] = useState(true);
 
 
-  function getAllExercises (userID: string | null, callback: Function): Unsubscribe[] | undefined {
+  function getAllExercises (userID: string, callback: Function): Unsubscribe[] | undefined {
     try {
       const usersCollectionRef = collection(FIRESTORE_DB, "Users");
       const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-      const unsubscribeFunctions = [];
+      const unsubscribeFunctions: Unsubscribe[] = [];
       const unsubscribeFromUsers = onSnapshot(usersQuery, usersSnapshot => {
-        if (usersSnapshot.empty) throw new Error("User doesn't exist");
+        if (usersSnapshot.empty) 
+          throw new Error("User doesn't exist");
 
         const userDocRef = usersSnapshot.docs[0].ref;
         const exercisesCollectionRef = collection(userDocRef, "exercises");
 
         const unsubscribeFromExercises = onSnapshot(exercisesCollectionRef, exercisesSnapshot => {
-          const updatedExercises = exercisesSnapshot.docs.map(exerciseDoc => ({
+          const exercises: Exercise[] = exercisesSnapshot.docs.map(exerciseDoc => ({
             hidden: exerciseDoc.data().hidden,
             isometric: exerciseDoc.data().isometric,
             label: exerciseDoc.data().name,
@@ -36,7 +37,7 @@ const Exercises = ({navigation}: RouterProps) => {
             unilateral: exerciseDoc.data().unilateral
           }));
       
-          callback(updatedExercises);
+          callback(exercises);
         });
                             
         unsubscribeFunctions.push(unsubscribeFromExercises);
@@ -50,14 +51,12 @@ const Exercises = ({navigation}: RouterProps) => {
     }
   }
 
-  async function toggleExerciseVisibilty (userID: string | null, exerciseName: string): Promise<void> {
+  async function toggleExerciseVisibilty (userID: string, exerciseName: string): Promise<void> {
     try {
-      if (userID === null) throw new Error("User is not authorized");
-      
       const userDoc = await getUserDocs(userID)
 
-      if (userDoc === undefined) throw new Error("User doesn't exist");
-
+      if (userDoc === undefined) 
+        throw new Error("User doesn't exist");
       const exercisesCollectionRef = collection(userDoc.ref, "exercises");
       const exercisesQuery = query(exercisesCollectionRef, where("name", "==", exerciseName));
       const exercisesSnapshot = await getDocs(exercisesQuery);
@@ -75,7 +74,8 @@ const Exercises = ({navigation}: RouterProps) => {
   }
 
   useEffect(() => {
-    const unsubscribeFunctions = getAllExercises(userID, (receivedExercises: React.SetStateAction<Exercise[]>) => { 
+    if (userID === null) return;
+    const unsubscribeFunctions = getAllExercises(userID, (receivedExercises: Exercise[]) => { 
         setExercises(receivedExercises);
         setLoading(false);        
     });
@@ -85,7 +85,7 @@ const Exercises = ({navigation}: RouterProps) => {
         unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
       }
         
-        setExercises([]);
+      setExercises([]);
     };
 }, [userID]);
 
@@ -109,10 +109,12 @@ const Exercises = ({navigation}: RouterProps) => {
         </Pressable>
         <Pressable>
           {exercise.hidden 
-            ? <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.label)
-            }>Unhide exercise</Text>
-            : <Text style={styles.text} onPress={() => toggleExerciseVisibilty(userID, exercise.label)
-            }>Hide exercise</Text>}
+            ? <Text style={styles.text} onPress={() => {userID !== null && toggleExerciseVisibilty(userID, exercise.label)}}>
+                Unhide exercise
+              </Text>
+            : <Text style={styles.text} onPress={() => {userID !== null && toggleExerciseVisibilty(userID, exercise.label)}}>
+                Hide exercise
+              </Text>}
         </Pressable>
       </View>)
   })

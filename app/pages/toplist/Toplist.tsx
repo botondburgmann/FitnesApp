@@ -1,6 +1,6 @@
 import { ActivityIndicator, ImageBackground, Pressable, ScrollView, Text, View, StyleSheet } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { updateAchievementStatus } from '../../functions/firebaseFunctions';
+import { updateAchievement } from '../../functions/firebaseFunctions';
 import UserContext from '../../contexts/UserContext';
 import { Achievement, User  } from '../../types and interfaces/types';
 import { RouterProps } from '../../types and interfaces/types';
@@ -66,8 +66,14 @@ const Toplist = ({navigation}: RouterProps) => {
     return similarUsers;
   }
   function updateClimbingTheRanksAchievement (loggedInUser: User, users: User[]): void  {
-    try {
-        if (users.slice(3,10).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
+    if (users.slice(3,10).includes(loggedInUser) && loggedInUser.weeklyExperience > 0)
+      updateAchievement(loggedInUser.userID,"Climbing The Ranks", 1);
+    else if (users.slice(1,3).includes(loggedInUser) && loggedInUser.weeklyExperience > 0)
+      updateAchievement(loggedInUser.userID,"Climbing The Ranks", 2);
+    else if (users[0] === loggedInUser && loggedInUser.weeklyExperience > 0)
+      updateAchievement(loggedInUser.userID,"Climbing The Ranks", 3);
+
+        /* if (users.slice(3,10).includes(loggedInUser) && loggedInUser.weeklyExperience > 0){
             const updatedAchievement: Achievement = {
                 color: "#BBC2CC",
                 description: "Reach the top 3 place in the leaderboard to unlock next stage",
@@ -103,10 +109,7 @@ const Toplist = ({navigation}: RouterProps) => {
                 visibility: 1
             }
             updateAchievementStatus(loggedInUser.userID, updatedAchievement);
-        }
-    } catch (error: any) {
-        alert(`Error: Couldn't update achievement: ${error}`)
-    }
+        } */
   }
 
   useEffect(() => {
