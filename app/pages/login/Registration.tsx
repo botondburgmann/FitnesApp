@@ -64,7 +64,7 @@ const Registration = ({navigation}: RouterProps) => {
             };
             const usersCollectionRef = collection(FIRESTORE_DB, "Users");
             const userDocRef = await addDoc(usersCollectionRef, userData);
-           // initializeAchievements(response.user.uid);
+            initializeAchievements(response.user.uid);
             return userDocRef;
         }   catch (error: any) {
             alert(`Error: Couldn't register user: ${error.message}`);
@@ -85,10 +85,26 @@ const Registration = ({navigation}: RouterProps) => {
         }
     }
 
-/*     async function initializeAchievements (userID: string | null): Promise<void> {
+    async function initializeAchievements (userID: string | null): Promise<void> {
         try {
             const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
             const achievementsSnapshot = await getDocs(achievementsCollectionRef);
+
+            for (const achievementDoc of achievementsSnapshot.docs){
+                const statuses = achievementDoc.data().statuses
+                const updatedUserIds = [...statuses[0].userIDs, userID];
+                const updatedStatuses:{name: string, userIDs: string[]}[] = statuses.map((item:{name: string, userIDs: string[]}, index: number) =>
+                    index === 0 ? 
+                        {name: item.name, userIDs: updatedUserIds}     
+                    : item
+                );  
+                const updatedAchievementDoc = {
+                    statuses: updatedStatuses
+                };
+                updateDoc(achievementDoc.ref, updatedAchievementDoc);
+            }
+
+            /*
             let newOwner;
             for (const achievementDoc of achievementsSnapshot.docs) {
                 switch (achievementDoc.data().name) {
@@ -151,11 +167,11 @@ const Registration = ({navigation}: RouterProps) => {
                         owners: updatedOwners
                     }
                     updateDoc(achievementDoc.ref, updatedData);
-                }
+                } */
         }   catch (error: any) {
             alert(`Couldn't initialize achievements: ${error}`)
         }
-    } */
+    }
 
     return (
         <ImageBackground source={backgroundImage} style={globalStyles.image}>
