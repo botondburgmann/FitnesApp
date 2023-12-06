@@ -7,7 +7,7 @@ import NavigationContext from '../../../contexts/NavigationContext';
 import WeekContext from '../../../contexts/WeekContext';
 import DateContext from '../../../contexts/DateContext';
 import { getWorkoutDocs } from '../../../functions/firebaseFunctions';
-import { addTotalExperienceToFirebase, isDropsSet, isSuperSet, removeXP } from '../workoutsFunction';
+import { addTotalExperienceToFirebase, isDropSet, isSuperSet, removeXP } from '../workoutsFunction';
 import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../../FirebaseConfig';
 import { Outputs } from '../../exercises/types';
@@ -57,11 +57,11 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
     }
 
     for (let i = 0; i < exercise.sides.length; i++) {
-        if (exercise.sides[i] === "both" && !(isDropsSet(exercise, uniqueValues.exercise) || (isSuperSet(exercise, uniqueValues.exercise) ))) outputs.setNumbers.push(`Set ${i+1}`);
+        if (exercise.sides[i] === "both" && !(isDropSet(exercise, uniqueValues.exercise) || (isSuperSet(exercise, uniqueValues.exercise) ))) outputs.setNumbers.push(`Set ${i+1}`);
         else if (exercise.sides[i] !== "both" && i % 2 === 0) i === 0 ? outputs.setNumbers.push(`Set ${i+1}`) : outputs.setNumbers.push(`Set ${i}`);
         else outputs.setNumbers.push("");
 
-        if (!(isDropsSet(exercise, uniqueValues.exercise) ||isSuperSet(exercise, uniqueValues.exercise) ) || isDropsSet(exercise, uniqueValues.exercise)) outputs.names.push("")
+        if (!(isDropSet(exercise, uniqueValues.exercise) ||isSuperSet(exercise, uniqueValues.exercise) ) || isDropSet(exercise, uniqueValues.exercise)) outputs.names.push("")
         else outputs.names.push(`${exercise.exercise[i]}`);
 
         if (exercise.sides[i] === "both") outputs.sides.push("") 
@@ -193,7 +193,7 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
                 </View>
                 {sets}
            </View>
-            : isDropsSet(exercise, uniqueValues.exercise) 
+            : isDropSet(exercise, uniqueValues.exercise) 
             ?
                 <View>
                     <Text style={globalStyles.exerciseName}>1 dropset of {uniqueValues.exercise} {unilateral}</Text>

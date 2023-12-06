@@ -1,12 +1,12 @@
 import { ImageBackground, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import SelectMenu from '../../components/SelectMenu'
 import UserContext from '../../contexts/UserContext'
 import { Exercise, RouterProps, Sets } from '../../types and interfaces/types'
 import { backgroundImage, globalStyles } from '../../assets/styles'
 import WeekContext from '../../contexts/WeekContext'
 import { workoutsStyles } from './styles'
-import {  convertFieldsToNumeric, finishExercise, validateData} from './workoutsFunction'
+import {  addXP, finishExercise, validateData} from './workoutsFunction'
 import { collection, Unsubscribe, onSnapshot, query, where } from 'firebase/firestore'
 import { FIRESTORE_DB } from '../../../FirebaseConfig'
 
@@ -19,14 +19,18 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
   const week = useContext(WeekContext);
 
 
+  
   const { date }  = route?.params as RouteParamsTypes;
 
-  const [allExercises, setAllExercises] = useState<Exercise[]>();
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [currentExercise, setCurrentExercise] = useState<Exercise>();
+
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
   const [time, setTime] = useState("");
   const [restTime, setRestTime] = useState("");
+  const [isEnabled, setIsEnabled] =  useState(false);
+  const [side, setSide] = useState<"both" | "left" | "right">("both");
   const [sets, setSets] = useState<Sets>({
     exercise : [],
     dates: [],
@@ -36,86 +40,39 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
     restTimes: [],
     sides: []
   });
-  const [isEnabled, setIsEnabled] =  useState(false);
-  const [side, setSide] = useState<"both" | "left" | "right">("both")
+  const totalXP = useRef(0);
 
-  function toggleSwitch(): void {
-    try {
-      if (isEnabled) setSide('left');
-      else setSide('right');
-      
-      setIsEnabled(previousState => !previousState);
-    } catch (error: any) {
-      alert(`Error: Couldn't toggle switch: ${error}`)
-    }
-  };
+  useEffect(() => {
+    const unsubscribeFromAvailableExercises = getAvailableExercises((exercises: Exercise[]) => {
+      const exerciseData: Exercise[] = [];
+        exercises.forEach((exercise) => {
+          exerciseData.push({
+            label: exercise.label,
+            value: exercise.value,
+            musclesWorked: exercise.musclesWorked,
+            hidden: exercise.hidden,
+            unilateral: exercise.unilateral,
+            isometric: exercise.isometric,
+          });
+        });
 
-  function addSet (): void {
-    try {
-      
-      if (currentExercise === undefined){
-        alert("Error: Please select an exercise");
-        return;
-      }
-      const dataWithStrings = {
-        exercise: currentExercise.label,
-        reps: parseFloat(reps),
-        restTime: parseFloat(restTime),
-        side: side,
-        time: parseFloat(time),
-        weight: parseFloat(weight),
-      }
-      const numericData = convertFieldsToNumeric(dataWithStrings);
-      validateData(currentExercise.isometric, numericData.reps, numericData.time, numericData.restTime);                        
-      
-      setSets((prevSets) => ({
-        ...prevSets,
-        exercise: [...prevSets.exercise, currentExercise.label],
-        weights: [...prevSets.weights, numericData.weight],
-        reps: [...prevSets.reps, numericData.reps],
-        times: [...prevSets.times, numericData.time],
-        restTimes: [...prevSets.restTimes, numericData.restTime*60],
-        sides: [...prevSets.sides, side],
-      }));
-      resetInputFields();
-    } catch (error: any) {
-      alert(`Error: Couldn't add set: ${error}`)
-    }
-    
-  };
-
-
-
-  
-
-
-  function resetInputFields(): void {
-    setWeight("");
-    setReps("");
-    setTime("");
-    setRestTime("");
-  }
-  function resetAllFields(): void {
-    setAllExercises([]);
-    setCurrentExercise(undefined);
-    setIsEnabled(false);
-    setReps("");
-    setRestTime("");
-    setSets({
-      exercise : [],
-      weights: [],
-      reps: [],
-      times: [],
-      restTimes: [],
-      sides: [],
-      dates: [],
+        setExercises(exerciseData);
     });
-    setSide("both");
-    setTime("");
-    setWeight("");
-  }
-
   
+    return () => {
+      if (unsubscribeFromAvailableExercises !== undefined)
+        unsubscribeFromAvailableExercises();
+    };
+  }, [userID]);
+
+  useEffect(() => {
+    if (currentExercise?.unilateral)
+      setSide("left");
+    else
+      setSide("both");
+    
+  }, [currentExercise])
+
   function getAvailableExercises ( callback: Function): Unsubscribe | undefined {
     try {
         const exercises: Exercise[] = [];
@@ -149,56 +106,69 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
     } catch (error: any) {
         alert(`Error: Couldn't fetch exercises: ${error}`)
     }
-};
+  }
+
+  function toggleSwitch(): void {
+    try {
+      if (isEnabled) setSide('left');
+      else setSide('right');
+      
+      setIsEnabled(previousState => !previousState);
+    } catch (error: any) {
+      alert(`Error: Couldn't toggle switch: ${error}`)
+    }
+  }
 
   
-  
-  useEffect(() => {
-    const unsubscribeFromAvailableExercises = getAvailableExercises((exercises: Exercise[]) => {
-      const exerciseData: Exercise[] = [];
-        exercises.forEach((exercise) => {
-          exerciseData.push({
-            label: exercise.label,
-            value: exercise.value,
-            musclesWorked: exercise.musclesWorked,
-            hidden: exercise.hidden,
-            unilateral: exercise.unilateral,
-            isometric: exercise.isometric,
-          });
-        });
+  function addSet (currentExercise: Exercise, weight: string, reps: string, time: string, restTime: string, side: string): void {
+    try {
+      const numericData = {
+        exercise: currentExercise.label,
+        reps: parseFloat(reps) | 0,
+        restTime: parseFloat(restTime) | 0,
+        side: side as "both" | "left" | "right",
+        time: parseFloat(time) | 0,
+        weight: parseFloat(weight) | 0,
+      }
+      validateData(currentExercise.isometric, numericData.reps, numericData.time, numericData.restTime);                        
+      
+      setSets((prevSets) => ({
+        ...prevSets,
+        exercise: [...prevSets.exercise, currentExercise.label],
+        weights: [...prevSets.weights, numericData.weight],
+        reps: [...prevSets.reps, numericData.reps],
+        times: [...prevSets.times, numericData.time],
+        restTimes: [...prevSets.restTimes, numericData.restTime*60],
+        sides: [...prevSets.sides, side as "both" | "left" | "right"],
+      }));
+      totalXP.current += addXP(currentExercise.isometric, numericData);      
+      resetInputFields();
+    } catch (error: any) {
+      alert(`Error: Couldn't add set: ${error}`)
+    }
+    
+  }
 
-        setAllExercises(exerciseData);
-    });
   
-    return () => {
-      if (unsubscribeFromAvailableExercises !== undefined)
-        unsubscribeFromAvailableExercises();
-      resetAllFields();
-
-    };
-  }, [userID]);
-  
-
-  useEffect(() => {
-    if (currentExercise !== undefined && currentExercise.unilateral)
-      setSide("left");
-    else if (currentExercise !== undefined && currentExercise.unilateral)
-      setSide("both");
-  }, [currentExercise])
-  
+  function resetInputFields(): void {
+    setWeight("");
+    setReps("");
+    setTime("");
+    setRestTime("");
+  }
 
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
     <ScrollView contentContainerStyle={workoutsStyles.container}>
-        <Text style={workoutsStyles.label}>Add new execise</Text>
-        <View style={styles.selectMenuContainer} >
-          <SelectMenu
-            data={allExercises || []}
-            setSelectedValue={ setCurrentExercise }
-            title="Exercise"
-          />
-        </View>
-        {allExercises
+      <Text style={workoutsStyles.label}>Add new execise</Text>
+      <View style={styles.selectMenuContainer} >
+        <SelectMenu
+          data={exercises || []}
+          setSelectedValue={ setCurrentExercise }
+          title="Exercise"
+        />
+      </View>
+        {exercises
         && <View>
             {currentExercise !== undefined && currentExercise.unilateral
               ? <View style={styles.gridContainer}>
@@ -270,10 +240,10 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
                 : <></>
           }
             <View style={styles.gridContainer}>
-              <Pressable style={workoutsStyles.button} onPress={addSet}>
+              <Pressable style={workoutsStyles.button} onPress={() => { currentExercise ? addSet(currentExercise, weight, reps, time, restTime, side) : alert("Error: Please select an exercise") }}>
                   <Text style={globalStyles.buttonText}>Add set</Text>
               </Pressable>
-              <Pressable style={workoutsStyles.button} onPress={() => finishExercise(sets, userID, new Date(date), week, navigation, setSets)}>
+              <Pressable style={workoutsStyles.button} onPress={() => {sets.exercise.length > 0 ? finishExercise(sets, userID, new Date(date), week, totalXP.current, navigation) : alert("Error: Not enough sets")}}>
                   <Text style={globalStyles.buttonText}>Finish</Text>
               </Pressable>
             </View>

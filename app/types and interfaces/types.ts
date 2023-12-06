@@ -4,7 +4,6 @@ export type Achievement = {
     color: string;
     description: string;
     icon: string;
-    level: number;
     name: string;
     status: string;
     visibility: 0.5 | 1;

@@ -6,7 +6,7 @@ import { backgroundImage, globalStyles } from '../../assets/styles';
 import { Unsubscribe } from 'firebase/auth';
 import { collection, query, where, onSnapshot, getDocs, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
-import { getUserDocs } from '../../functions/firebaseFunctions';
+import { getUserDocument } from '../../functions/firebaseFunctions';
 
 const Exercises = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
@@ -53,7 +53,7 @@ const Exercises = ({navigation}: RouterProps) => {
 
   async function toggleExerciseVisibilty (userID: string, exerciseName: string): Promise<void> {
     try {
-      const userDoc = await getUserDocs(userID)
+      const userDoc = await getUserDocument(userID)
 
       if (userDoc === undefined) 
         throw new Error("User doesn't exist");
@@ -75,7 +75,7 @@ const Exercises = ({navigation}: RouterProps) => {
 
   useEffect(() => {
     if (userID === null) return;
-    const unsubscribeFunctions = getAllExercises(userID, (receivedExercises: Exercise[]) => { 
+     const unsubscribeFunctions = getAllExercises(userID, (receivedExercises: Exercise[]) => { 
         setExercises(receivedExercises);
         setLoading(false);        
     });

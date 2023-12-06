@@ -8,7 +8,7 @@ import { backgroundImage, globalStyles } from '../../assets/styles';
 import { ActivityLevelOption, RouterProps, SelectItem } from '../../types and interfaces/types';
 import { updateDoc } from 'firebase/firestore';
 import { convertFtToCm, convertLbsToKg, validateBirthday, validateHeight, validateWeight } from '../../functions/globalFunctions';
-import { getUserDocs } from '../../functions/firebaseFunctions';
+import { getUserDocument } from '../../functions/firebaseFunctions';
 
 const EditProfile = ({ route, navigation }: RouterProps) => {
     const userID = useContext(UserContext);
@@ -70,7 +70,7 @@ const EditProfile = ({ route, navigation }: RouterProps) => {
                 weeklyExperience: user.weeklyExperience,
                 userID: userID
             }
-            const usersDoc = await getUserDocs(userID);
+            const usersDoc = await getUserDocument(userID);
             if (usersDoc === undefined)
                 throw new Error("User doesn't exist");
             updateDoc(usersDoc.ref, changes);    

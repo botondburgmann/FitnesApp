@@ -1,6 +1,5 @@
 import { DocumentData, DocumentReference, QueryDocumentSnapshot, Unsubscribe, collection, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { FIRESTORE_DB } from "../../FirebaseConfig";
-import {   Achievement } from "../types and interfaces/types";
 
 
 export async function getUserDocumentRef(userID:string):Promise<DocumentReference<DocumentData, DocumentData> | undefined>  {
@@ -42,7 +41,7 @@ export async function getWorkoutDocs(userID:string, date: Date): Promise<QueryDo
         const q = query(collectionRef, where("date", "==", date.toDateString()), where("userID", "==", userID) );
         const snapshot = await getDocs(q);
 
-        if (snapshot.empty) throw new Error("Workout doesn' exist");
+        if (snapshot.empty) return;
         
         const workoutDocs = snapshot.docs[0];        
         return workoutDocs;
@@ -50,7 +49,6 @@ export async function getWorkoutDocs(userID:string, date: Date): Promise<QueryDo
         alert(`Error: Couldn't fetch document for workout: ${error.message}`)
     }
 }
-
 
 
 export function getUser (userID:string | null, callback: Function): Unsubscribe | undefined  {
@@ -82,37 +80,6 @@ export function getUser (userID:string | null, callback: Function): Unsubscribe 
         alert(`Error: Couldn't fetch user: ${error}`)
     }
 }
-
-/* export const updateAchievementStatus =async (userID:string | null, updatedAchievement: Achievement): Promise<void> => {
-    try {
-        const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
-        const achievementsSnapshot = await getDocs(achievementsCollectionRef);
-        
-        for (const achievementDoc of achievementsSnapshot.docs) {
-            const owners = achievementDoc.data().owners;
-            for (let i = 0; i < owners.length; i++) {
-                if (owners[i].userID === userID && owners[i].level < updatedAchievement.level && achievementDoc.data().name === updatedAchievement.name){
-                    const updatedOwner = {
-                        color: updatedAchievement.color,
-                        description: updatedAchievement.description,
-                        level: updatedAchievement.level,
-                        status: updatedAchievement.status,
-                        userID: userID,
-                        visibility: updatedAchievement.visibility
-                    };
-                    owners[i] = updatedOwner;
-                    alert(`New achievement unlocked: ${updatedAchievement.name}: ${updatedAchievement.status}`);
-                    const updatedAchievementDoc = {
-                        owners: owners
-                    }
-                    updateDoc(achievementDoc.ref, updatedAchievementDoc);
-                }            
-            }
-        }
-    } catch (error: any) {
-        alert(`Errror: Couldn't update achievement status: ${error}`)
-    }
-} */
 
 export async function updateAchievement(userID:string, achievementName: string, level: number) {
     try {

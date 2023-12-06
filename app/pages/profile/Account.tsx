@@ -48,7 +48,7 @@ const Account = ({ route, navigation }: RouterProps) => {
 
 
 
-function getBestExercise (userID: string | null, field:string, secondaryField:string, callback: Function ): Unsubscribe | undefined {
+function getBestExercise (userID: string, field:string, secondaryField:string, callback: Function ): Unsubscribe | undefined {
   try {
     const bestExercise: SingleSet = {
       exercise: "",
@@ -177,30 +177,30 @@ useEffect(() => {
   return (
     <ImageBackground source={backgroundImage} style={globalStyles.image}>
     <View style={[globalStyles.container, {flex: 1}]}>
-         <View>
-              <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>{user.name}</Text>
-              <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Level: {user.level}</Text>
-              <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>XP until next level: {experienceNeeded}</Text>
-              <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Best records</Text>
-              {
-                mostWeightExercise.name === ""
-                ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
-                   Max weight: No data
-                  </Text>
-                : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
-                    Max weight: {( mostWeightExercise).name} {( mostWeightExercise).weights} kg ({(mostWeightExercise).reps} repetitions)
-                  </Text>
-              }
-              {
-                mostRepsExercise.name === ""
-                ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
-                   Most repetitions: No data
-                  </Text>
-                : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
-                    Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
-                  </Text>
-              }
-            </View>
+        <View>
+            <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>{user.name}</Text>
+            <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Level: {user.level}</Text>
+            <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>XP until next level: {experienceNeeded}</Text>
+            <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Best records</Text>
+            {
+            mostWeightExercise.name === ""
+            ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
+                Max weight: No data
+              </Text>
+            : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
+                Max weight: {( mostWeightExercise).name} {( mostWeightExercise).weights} kg ({(mostWeightExercise).reps} repetitions)
+              </Text>
+          }
+          {
+            mostRepsExercise.name === ""
+            ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
+                Most repetitions: No data
+              </Text>
+            : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
+                Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
+              </Text>
+            }
+        </View>
       
           <Pressable style={globalStyles.button}>
               <Text style={globalStyles.buttonText} onPress={() => navigation.navigate("Achievements", {userID: userID})}>Achievements</Text>
@@ -208,10 +208,10 @@ useEffect(() => {
         {userID === loggedInUserID &&
         <View>
           <Pressable style={globalStyles.button}>
-              <Text style={globalStyles.buttonText} onPress={() => navigation.navigate("Edit profile", {user: user})}>Edit profile</Text>
+            <Text style={globalStyles.buttonText} onPress={() => navigation.navigate("Edit profile", {user: user})}>Edit profile</Text>
           </Pressable>
           <Pressable style={globalStyles.button}>
-              <Text style={globalStyles.buttonText} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>
+            <Text style={globalStyles.buttonText} onPress={() => FIREBASE_AUTH.signOut()}>Log out</Text>
           </Pressable>
         </View>
         }

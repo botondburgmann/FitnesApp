@@ -1,39 +1,50 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
-import { Exercise, Sets } from '../../../types and interfaces/types';
+import { Exercise, Sets, SingleSet } from '../../../types and interfaces/types';
 import { globalStyles } from '../../../assets/styles';
-import { convertFieldsToNumeric, validateData } from '../workoutsFunction';
+import { addXP, validateData } from '../workoutsFunction';
 
-const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Function; currentExercise: Sets; }) => {
+const Set = (props: { exercise: Exercise; focus: string; setCompletedSet: Function; sets: Sets;  }) => {
     const exercise = props.exercise;
     const focus = props.focus;
-    const setGoToNextPage = props.setGoToNextPage
-    const currentExercise = props.currentExercise
+    const setCompletedSet = props.setCompletedSet
+    const sets = props.sets;
     const [weight, setWeight] = useState("");
     const [time, setTime] = useState("");
     const [reps, setReps] = useState("");
 
-    function completeSet (exercise: Exercise, weight: number, time: number, reps: number): void {
+    function completeSet (exercise: Exercise, weight: string, time: string, reps: string): void {
         try {
-            const numericData = convertFieldsToNumeric({exercise: exercise.label, reps: reps, restTime: 1, side: "both", time: time, weight: weight})
+            
+            const numericData = {
+                exercise: exercise.label, 
+                reps: parseFloat(reps) | 0, 
+                restTime: 1, 
+                side: "both" as "both" | "left" | "right", 
+                time: parseFloat(time) | 0, 
+                weight: parseFloat(weight) | 0
+            };
 
             validateData(exercise.isometric, numericData.reps, numericData.time, numericData.restTime);
   
             if (exercise.unilateral) {
-                currentExercise.exercise.push(...[exercise.label, exercise.label])
-                currentExercise.reps.push(...[numericData.reps, numericData.reps])
-                currentExercise.sides.push(...["left", "right"] as ("left" | "right")[]);
-                currentExercise.times.push(...[numericData.time, numericData.time]);
-                currentExercise.weights.push(...[numericData.weight, numericData.weight]);
+                sets.exercise.push(...[exercise.label, exercise.label])
+                sets.reps.push(...[numericData.reps, numericData.reps])
+                sets.sides.push(...["left", "right"] as ("left" | "right")[]);
+                sets.times.push(...[numericData.time, numericData.time]);
+                sets.weights.push(...[numericData.weight, numericData.weight]);
+                
             }
             else {
-                currentExercise.exercise.push(exercise.label)
-                currentExercise.reps.push(numericData.reps)
-                currentExercise.sides.push("both");
-                currentExercise.times.push(numericData.time);
-                currentExercise.weights.push(numericData.weight);                
+                sets.exercise.push(exercise.label)
+                sets.reps.push(numericData.reps)
+                sets.sides.push("both");
+                sets.times.push(numericData.time);
+                sets.weights.push(numericData.weight);
+
+             
             }
-            setGoToNextPage(true)
+            setCompletedSet(true)
         
         } 
         catch (error: any) {
@@ -97,7 +108,7 @@ const Set = (props: { exercise: Exercise; focus: string; setGoToNextPage: Functi
         </>
         }
         <Text style={[globalStyles.text, { fontWeight: "600", marginHorizontal: 10}]}>For maximum efficency choose a weight that makes you fail in these repetiton ranges</Text>
-        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => completeSet(exercise, parseFloat(weight), parseFloat(time), parseFloat(reps))}>
+        <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => completeSet(exercise, weight, time, reps)}>
             <Text style={globalStyles.buttonText}>Next</Text>                   
         </Pressable>
   </View>

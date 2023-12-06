@@ -33,7 +33,6 @@ const Achievements = ({route}: any) => {
                             color: achievementDoc.data().colors[i],
                             description: achievementDoc.data().descriptions[i],
                             icon: achievementDoc.data().icon,
-                            level: i,
                             name: achievementDoc.data().name,
                             status: achievementDoc.data().statuses[i].name,
                             visibility: i === 0 ? 0.5 : 1 as 0.5 | 1
@@ -67,10 +66,10 @@ const Achievements = ({route}: any) => {
         }
     };
 
-    function hideCustomAlert () {
+    function hideCustomAlert (): void {
         setCustomAlertVisible(false);
     };
-    function showCustomAlert (title: React.SetStateAction<string | undefined>, information: React.SetStateAction<string | undefined>) {
+    function showCustomAlert (title: string, information: string): void {
         setCustomAlertVisible(true);
         setTitle(title);
         setInformation(information);
@@ -96,18 +95,18 @@ const Achievements = ({route}: any) => {
                     <Pressable  onPress={() => showCustomAlert(achievements[i].name,achievements[i].description )}>
                         <View style={[globalStyles.gridContainer,{backgroundColor: achievements[i].color, margin: 10, opacity: achievements[i].visibility}]}>
                             <FontAwesome5 name={achievements[i].icon} size={50} color="#FFF" />
-                            <View>
-                            <Text style={[globalStyles.text, {fontSize: 20, fontWeight: "600"}]}>{achievements[i].name}</Text>
-                            <Text style={[globalStyles.text, {fontSize: 20, fontWeight: "600"}]}>{achievements[i].status}</Text>
-                        </View>
+                             <View>
+                                <Text style={[globalStyles.text, {fontSize: 20, fontWeight: "600"}]}>{achievements[i].name}</Text>
+                                <Text style={[globalStyles.text, {fontSize: 20, fontWeight: "600"}]}>{achievements[i].status}</Text>
+                            </View>
                         </View> 
                     </Pressable>
                     <Info
-                isVisible={isCustomAlertVisible}
-                onClose={hideCustomAlert}
-                title={title}
-                information={information}
-            />
+                        isVisible={isCustomAlertVisible}
+                        onClose={hideCustomAlert}
+                        title={title}
+                        information={information}
+                    />
                 </View>
             
             );
@@ -116,7 +115,7 @@ const Achievements = ({route}: any) => {
     
     return (
         <ImageBackground source={backgroundImage} style={globalStyles.image}>
-        <View style={[globalStyles.container, {flex: 1,  backgroundColor: 'rgba(128,128,128,0.5)' }]}>
+            <View style={[globalStyles.container, {flex: 1,  backgroundColor: 'rgba(128,128,128,0.5)' }]}>
                 {achievementComponents.length === 0 ? <ActivityIndicator/> : achievementComponents}
             </View>
         </ImageBackground>

@@ -2,14 +2,13 @@ import { ImageBackground, Pressable, StyleSheet, Switch, Text, TextInput, View }
 import React, { useContext, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
 import { backgroundImage, globalStyles } from '../../assets/styles';
-import { RouterProps, WeekRange } from '../../types and interfaces/types';
+import { RouterProps, SingleSet } from '../../types and interfaces/types';
 import WeekContext from '../../contexts/WeekContext';
 import { workoutsStyles } from './styles';
 import { getWorkoutDocs } from '../../functions/firebaseFunctions';
-import { addTotalExperienceToFirebase, convertFieldsToNumeric, removeXP, validateData } from './workoutsFunction';
+import { addTotalExperienceToFirebase, addXP, removeXP, validateData } from './workoutsFunction';
 import { updateDoc, doc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
-import { SingleSet } from '../exercises/types';
 
 type RouteParamsTypes = {
     set: SingleSet;
@@ -31,14 +30,7 @@ const EditSingleSet = ({ route, navigation }: RouterProps) => {
     const [isEnabled, setIsEnabled] = set.side === "left" ? useState(false) : useState(true);
     const [side, setSide] = useState(set.side);
 
-    const change: SingleSet = {
-        exercise: set.exercise,
-        side: side,
-        weight : parseFloat(weight) ,
-        reps :  parseFloat(reps),
-        time :  parseFloat(time) ,
-        restTime : parseFloat(restTime)*60
-    };
+
 
     function toggleSwitch(): void {
         try {
@@ -51,27 +43,26 @@ const EditSingleSet = ({ route, navigation }: RouterProps) => {
         }
     };
 
-    function changeXP (isIsometric: boolean, change: SingleSet): number {
-
-        if (!isIsometric && change.weight === 0 || Number.isNaN(change.weight)) return change.reps + removeXP(set.reps, change.weight);
-        if (isIsometric && change.weight === 0 || Number.isNaN(change.weight)) return change.time + removeXP(set.time, change.weight);
-
-        if (!isIsometric) return change.reps * change.weight + removeXP(set.reps, change.weight);
-        
-        return  change.time * change.weight + removeXP(set.time, change.weight);
-      }
-
-    async function editSingleSet (userID: string | null, date: Date | null, week: WeekRange | null, experience: number): Promise<void> {
+    async function editSet (weight: string, reps: string, time: string, restTime: string, side: string): Promise<void> {
         try {   
-            if (userID === null) throw new Error("User is not authorized");   
-            if (date === null) throw new Error("Date is not set");
-            if (week === null) throw new Error("Week is not set");
+            if (userID === null) 
+                throw new Error("Error: User not authorized");
+            if (date === null)
+                throw new Error("Date is not set");
+            if (week === null)
+                throw new Error("Week is not set");
 
-            
-            const numericData = convertFieldsToNumeric(change);              
-            validateData(isIsometric, numericData.reps, numericData.time, numericData.restTime);    
+            const numericData = {
+                exercise: set.exercise,
+                reps: parseFloat(reps) | 0,
+                restTime: parseFloat(restTime)*60 | 0,
+                side: side as "both" | "left" | "right",
+                time: parseFloat(time) | 0,
+                weight: parseFloat(weight) | 0,
+              }
+              validateData(isIsometric, numericData.reps, numericData.time, numericData.restTime);      
 
-            const workoutDocs = await getWorkoutDocs(userID, date);
+            const workoutDocs = await getWorkoutDocs(userID, new Date(date));
             if (workoutDocs === undefined) throw new Error("Document doesn't exist");      
             
             const updatedData = { ...workoutDocs.data() };
@@ -89,7 +80,8 @@ const EditSingleSet = ({ route, navigation }: RouterProps) => {
                     });
                 }  
             }    
-            await addTotalExperienceToFirebase(experience, date, userID, week);   
+            let experience = addXP(isIsometric, numericData)+removeXP(isIsometric ? set.time : set.reps, set.weight);
+            addTotalExperienceToFirebase(experience, new Date(date), userID, week);   
             navigation.navigate("Log")
         } catch (error: any) {
             alert(`Error: couldn't update set fields: ${error.message}`);
@@ -154,7 +146,7 @@ const EditSingleSet = ({ route, navigation }: RouterProps) => {
                     autoCapitalize='none'
                     onChangeText={(text: string) => setRestTime(text)}
                 />
-                <Pressable style={[globalStyles.button, {width: 100}]} onPress={async () => await editSingleSet(userID, new Date(date), week, changeXP(isIsometric, change))}>
+                <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => editSet(weight, reps, time, restTime, side)}>
                     <Text style={globalStyles.buttonText}>Modify</Text>
                 </Pressable>
             </View>

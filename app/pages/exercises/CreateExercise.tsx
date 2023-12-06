@@ -36,17 +36,17 @@ const CreateExercise = () => {
         }
     }
 
-    function showCustomAlert (title: string, information: string) {
+    function showCustomAlert (title: string, information: string): void {
         setCustomAlertVisible(true);
         setTitle(title);
         setInformation(information);
     }
     
-    function hideCustomAlert () {
+    function hideCustomAlert (): void {
         setCustomAlertVisible(false);
     }
 
-    function toggleUnilateralitySwitch() {
+    function toggleUnilateralitySwitch(): void {
         if (isUnilateral) 
             setUnilaterality('bilateral');
         else 
@@ -55,7 +55,7 @@ const CreateExercise = () => {
         setIsUnilateral(previousState => !previousState);
     }
 
-    function toggleIsometricitySwitch() {
+    function toggleIsometricitySwitch(): void {
         if (isIsometric) 
             setIsometricity('not isometric');
         else 
@@ -64,7 +64,7 @@ const CreateExercise = () => {
         setIsIsometric(previousState => !previousState);
     }
 
-    function handleButtonClick() {
+    function handleButtonClick(): void {
         try {
             if (userID === null) 
                 throw new Error("User is not authorized");
@@ -104,14 +104,14 @@ const CreateExercise = () => {
                     information={information}
                 />
             </View>
-                <View style={styles.switch}>
-                    <Switch
-                        trackColor={{ false: "#000", true: "#fff" }}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={toggleUnilateralitySwitch}
-                        value={isUnilateral}
-                    />
-                </View>
+            <View style={styles.switch}>
+                <Switch
+                    trackColor={{ false: "#000", true: "#fff" }}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={toggleUnilateralitySwitch}
+                    value={isUnilateral}
+                />
+            </View>
         
             <View style={styles.gridContainer}>
                 <Text style={[globalStyles.text, {fontWeight: "600"}]}>This exercise is {isometricity}</Text>
@@ -125,15 +125,15 @@ const CreateExercise = () => {
                     information={information}
                 />
             </View>
-                <View style={styles.switch}>
-                    <Switch
-                        trackColor={{ false: "#000", true: "#fff" }}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={toggleIsometricitySwitch}
-                        value={isIsometric}
+            <View style={styles.switch}>
+                <Switch
+                    trackColor={{ false: "#000", true: "#fff" }}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={toggleIsometricitySwitch}
+                    value={isIsometric}
 
-                    />
-                </View>
+                />
+            </View>
         
             <Pressable style={[globalStyles.button, {marginTop: 125}]} onPress={handleButtonClick} >
                 <Text style={globalStyles.buttonText}>Create new exercise</Text>
