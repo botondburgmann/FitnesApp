@@ -183,7 +183,7 @@ useEffect(() => {
             <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>XP until next level: {experienceNeeded}</Text>
             <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>Best records</Text>
             {
-            mostWeightExercise.name === ""
+            mostWeightExercise.exercise === ""
             ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
                 Max weight: No data
               </Text>
@@ -192,7 +192,7 @@ useEffect(() => {
               </Text>
           }
           {
-            mostRepsExercise.name === ""
+            mostRepsExercise.exercise === ""
             ? <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
                 Most repetitions: No data
               </Text>
