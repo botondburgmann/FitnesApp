@@ -14,13 +14,8 @@ const Gender = ({navigation}: RouterProps) => {
   const [gender, setGender] = useState<"Male" | "Female">("Male");
   const options:  ["Male", "Female"] = ["Male", "Female"];
   
-  async function setGenderInFirebase(): Promise<void> {
+  async function setGenderInFirebase(userID: string, gender: "Male" | "Female"): Promise<void> {
     try {
-      if (userID === null) 
-        throw new Error("User is not authorized");
-      if (gender.trim().toLowerCase() !== "male" && gender.trim().toLowerCase() !== "female") 
-        throw new Error("Gender must be either male or female");
-      
       const userDocRef = await getUserDocumentRef(userID);
       if (userDocRef === undefined)
         throw new Error("User doesn't exist in database");
@@ -28,7 +23,7 @@ const Gender = ({navigation}: RouterProps) => {
       updateDoc(userDocRef, newData);
       navigation.navigate("Birthday");
     } catch (error: any) {
-      alert(`Error: Couldn't set your gender: ${error}`)
+      alert(`Error: Couldn't set your gender: ${error.message}`)
     }
   }
 
@@ -38,7 +33,7 @@ const Gender = ({navigation}: RouterProps) => {
       <View style={[setUpStyles.container]}>
         <Text style={setUpStyles.label}>Please, select your gender</Text>
         <Radiobutton selectedValue={gender} setselectedValue={setGender} options={options} />
-        <Pressable style={setUpStyles.button} onPress={setGenderInFirebase}>
+        <Pressable style={setUpStyles.button} onPress={() => userID && setGenderInFirebase(userID, gender)}>
             <Text style={globalStyles.buttonText}>Next</Text>
         </Pressable>
       </View>

@@ -12,9 +12,7 @@ import DateContext from '../../contexts/DateContext';
 const Log = ({navigation}: RouterProps) => {
   const [date, setDate] = useState(new Date());
   function  dateStep (currentDate: Date, step: number): Date  {
-    const newDate = new Date(currentDate);
-    newDate.setDate(newDate.getDate() + step);
-    return newDate
+    return new Date(new Date(currentDate).setDate(new Date(currentDate).getDate() + step));
   };
 
   return (

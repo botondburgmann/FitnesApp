@@ -15,12 +15,12 @@ const Registration = ({navigation}: RouterProps) => {
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [loading, setLoading] = useState(false);
     
-    async function signUp(): Promise<void> {
+    async function signUp(name: string, email: string, password: string, confirmPassword: string): Promise<void> {
         try {
             validateData(name, email, password, confirmPassword);
             
             setLoading(true);
-            const userDocRef = await registerUserInFirebase();
+            const userDocRef = await registerUserInFirebase(email, password);
 
             if (userDocRef === undefined) return;
 
@@ -45,10 +45,10 @@ const Registration = ({navigation}: RouterProps) => {
         }  
     }
 
-    async function registerUserInFirebase(): Promise<DocumentReference<DocumentData, DocumentData> | undefined> {
+    async function registerUserInFirebase(email: string, password: string): Promise<DocumentReference<DocumentData, DocumentData> | undefined> {
         try {
             const auth = FIREBASE_AUTH;
-            const response = await createUserWithEmailAndPassword(auth, email,password);
+            const response = await createUserWithEmailAndPassword(auth, email, password);
             const userData = {
                 userID: response.user.uid, 
                 name: name, 
@@ -85,7 +85,7 @@ const Registration = ({navigation}: RouterProps) => {
         }
     }
 
-    async function initializeAchievements (userID: string | null): Promise<void> {
+    async function initializeAchievements (userID: string): Promise<void> {
         try {
             const achievementsCollectionRef = collection(FIRESTORE_DB, "Achievements");
             const achievementsSnapshot = await getDocs(achievementsCollectionRef);
@@ -103,71 +103,6 @@ const Registration = ({navigation}: RouterProps) => {
                 };
                 updateDoc(achievementDoc.ref, updatedAchievementDoc);
             }
-
-            /*
-            let newOwner;
-            for (const achievementDoc of achievementsSnapshot.docs) {
-                switch (achievementDoc.data().name) {
-                    case "Consistency Streak":
-                        newOwner = {
-                            color: "#808080",
-                            description: "Workout for 10 days to unlock this achievement",
-                            level: 0,
-                            status: "locked",
-                            userID: userID,
-                            visibility: 0.5
-                        }
-                        break;
-                    case "Endurance Master":
-                        newOwner = {
-                            color: "#808080",
-                            description: "Do 20 repetitions for an exercise to unlock this achievement",
-                            level: 0,
-                            status: "locked",
-                            userID: userID,
-                            visibility: 0.5
-                        }
-                        break;
-                    case "Dedicated Athlete":
-                        newOwner = {
-                            color: "#808080",
-                            description: "Workout for a month consistently to unlock this achievement",
-                            level: 0,
-                            status: "locked",
-                            userID: userID,
-                            visibility: 0.5
-                        }
-                        break;
-                    case "Climbing The Ranks":
-                        newOwner = {
-                            color: "#808080",
-                            description: "Get in the top 10 users to unlock this achievement",
-                            level: 0,
-                            status: "locked",
-                            userID: userID,
-                            visibility: 0.5
-                        }
-                        break;
-                    case "Strength Builder":
-                        newOwner = {
-                            color: "#808080",
-                            description: "Lift 60 kg on an exercise to unlock this achievement",
-                            level: 0,
-                            status: "locked",
-                            userID: userID,
-                            visibility: 0.5
-                        }
-                        break
-                    default:
-                        break;
-                    }
-                    const updatedOwners = [...achievementDoc.data().owners, newOwner];
-                    
-                    const updatedData = {
-                        owners: updatedOwners
-                    }
-                    updateDoc(achievementDoc.ref, updatedData);
-                } */
         }   catch (error: any) {
             alert(`Couldn't initialize achievements: ${error}`)
         }
@@ -213,7 +148,7 @@ const Registration = ({navigation}: RouterProps) => {
                     <ActivityIndicator size="large" color="#0000ff"/>
                 :
                 <>
-                    <Pressable style={globalStyles.button} onPress={signUp}>
+                    <Pressable style={globalStyles.button} onPress={() => signUp(name, email, password, confirmPassword)}>
                         <Text style={globalStyles.buttonText}>Create new account</Text>
                     </Pressable>
                     <Text style={[globalStyles.text, {marginTop: 30, fontSize: 18, textTransform: "uppercase"}]}>Already have an account</Text>

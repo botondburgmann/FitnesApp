@@ -2,7 +2,7 @@ import { ActivityIndicator, ImageBackground, Pressable, Text, View } from 'react
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
 import {  getUser } from '../../functions/firebaseFunctions';
-import {  ActivityLevelOption, Exercise, RouterProps, Sets, SingleSet } from '../../types and interfaces/types';
+import {  ActivityLevelOption, Exercise, RouterProps, Sets, SingleSet, WeekRange } from '../../types and interfaces/types';
 import Set from './components/Set';
 import Rest from './components/Rest';
 import { backgroundImage, globalStyles } from '../../assets/styles';
@@ -206,7 +206,8 @@ function calculateNumberOfSet (focus:string, activityLevel: string): number {
   return focus === "strength" ?  Math.floor(Math.random() * (6 - 4 + 1) + 4): Math.floor(Math.random() * (5 - 4 + 1) + 4);
 }
    
-function finishWorkout() {
+function finishWorkout(userID: string, week: WeekRange, sets: React.MutableRefObject<Sets>, totalXP: React.MutableRefObject<number>, 
+                      selectedExercises: Exercise[], currentSetIndex: React.MutableRefObject<number>): void {
   const lastSet: SingleSet = {
     exercise: sets.current.exercise[sets.current.exercise.length-1],
     reps: sets.current.reps[sets.current.reps.length-1],
@@ -253,7 +254,7 @@ function finishWorkout() {
               : <View>
                   <Text style={globalStyles.label}>Congratulations!</Text>
                   <Text style={globalStyles.label}>You completed the workout.</Text>
-                  <Pressable style={[globalStyles.button, {width: 200}]} onPress={finishWorkout}>
+                  <Pressable style={[globalStyles.button, {width: 200}]} onPress={() => userID && week && finishWorkout(userID, week, sets, totalXP, selectedExercises, currentSetIndex)}>
                       <Text style={globalStyles.buttonText}>Go to homepage</Text>
                   </Pressable>
                 </View>

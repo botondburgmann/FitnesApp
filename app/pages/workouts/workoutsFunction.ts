@@ -6,17 +6,20 @@ import { NavigationProp } from "@react-navigation/native";
 
 
 export function addXP(isIsometric:boolean, set: SingleSet): number {
-    if (!isIsometric && set.weight === 0) return set.reps;
-    if (!isIsometric && set.weight !== 0) return set.reps * set.weight;
-    if (isIsometric && set.weight === 0) return set.time;
-    return set.time * set.weight;
+    return !isIsometric && set.weight === 0 ? 
+        set.reps :
+    !isIsometric && set.weight !== 0 ?
+        set.reps * set.weight :
+    isIsometric && set.weight === 0 ?
+        set.time:
+        set.time * set.weight;
 
 }
 
 export function removeXP (repOrTime: number, weight: number): number {
-    if (weight === 0) return -repOrTime;
-    return -(repOrTime * weight);
+    return weight === 0 ? -repOrTime : -(repOrTime * weight);
 }
+
 export async function addTotalExperienceToFirebase  (experience: number, date: Date, userID: string, week: WeekRange ): Promise<void>  {
     try {        
         const usersCollectionRef = collection(FIRESTORE_DB,"Users");
@@ -52,12 +55,8 @@ export async function addTotalExperienceToFirebase  (experience: number, date: D
     }
 }
 
-export function getWorkout (userID: string | null, date: Date | null, callback: Function): Unsubscribe | undefined {
+export function getWorkout (userID: string, date: Date, callback: Function): Unsubscribe | undefined {
     try {
-        if (date === null){
-            alert("Date is not set")
-            return;
-        }
         const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
         const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID), where("date", "==", date.toDateString()));
         
@@ -169,49 +168,25 @@ export async function updateDedicatedAthleteAchievement (userID: string):Promise
       }
 }
 
-function sortDates (dates: string[]): string[] | undefined{
-    try {
-        const dateObjects = dates.map(dateString => new Date(dateString));
-        dateObjects.sort((a, b) => a.getTime() - b.getTime());
-        const sortedDates = dateObjects.map(dateObject => dateObject.toString());
-        return sortedDates;
-    } catch (error: any) {
-        alert(`Error: Couldn't sort dates`);
-    }
-};
-function calculateDaysBetweenDates (dates:string[] | undefined): number | undefined {
-try {
-    let timeDifferenceInDays = 0;
-    if (dates !== undefined && dates.length >= 2) {
-        const firstDate = dates[0];
-        const lastDate = dates[dates.length - 1];
-        
-        const firstDateObject = new Date(firstDate);
-        const lastDateObject = new Date(lastDate);
-        
-        const timeDifferenceInMilliseconds = lastDateObject.getTime() - firstDateObject.getTime();
-        
-        timeDifferenceInDays = timeDifferenceInMilliseconds / (1000 * 60 * 60 * 24);
-        
-    } 
-    return timeDifferenceInDays;
-} catch (error: any) {
-    alert(`Error: Couldn't calculate days between two dates: ${error}`)
+function sortDates (dates: string[]): string[]{
+    return dates.map(dateString => new Date(dateString)).
+        sort((a, b) => a.getTime() - b.getTime()).
+            map(dateObject => dateObject.toISOString());
 }
+function calculateDaysBetweenDates (dates:string[]): number {
+    return dates.length >= 2 ?
+        Math.floor(( new Date(dates[dates.length - 1]).getTime() - new Date(dates[0]).getTime() ) / (1000 * 60 * 60 * 24)) :
+        0; 
 }
 
-export async function finishExercise (sets: Sets, userID: string | null, date: Date | null, week: WeekRange | null,  totalXP: number, navigation?: NavigationProp<any, any>,): Promise<void> {
+export async function finishExercise (sets: Sets, userID: string, date: Date, week: WeekRange,  totalXP: number, navigation?: NavigationProp<any, any>,): Promise<void> {
     try {
-        if (userID === null) throw new Error("User is not authorized");   
-        if (date === null) throw new Error("Date is not set");
-        if (week === null) throw new Error("Week is not set");
-            
         await addSetsToFirebase(totalXP, userID, date, week, sets );
         if (navigation) {
             navigation.navigate("Log")
         }
     } catch (error:any) {
-        throw new Error(`Error: Couldn't add sets to database: ${error}`);
+        throw new Error(`Error: Couldn't add sets to database: ${error.message}`);
     }
 }
 
@@ -248,10 +223,13 @@ async function addSetsToFirebase (experience: number, userID: string, date: Date
 }
 
 export function isSuperSet (exercise: Sets, uniqueExercises: string[]): boolean {
-    for (let i = 0; i < exercise.restTimes.length; i+= uniqueExercises.length) 
-        if (exercise.restTimes[i] > 0) 
+    const restTimes = [...exercise.restTimes];
+    const length = uniqueExercises.length;
+
+    for (let i = 0; i < restTimes.length; i+= length) 
+        if (restTimes[i] > 0) 
             return false;
-    if (uniqueExercises.length === 1)
+    if (length === 1)
         return false;
     return true;
 }
@@ -259,16 +237,19 @@ export function isSuperSet (exercise: Sets, uniqueExercises: string[]): boolean 
 
 
 export function isDropSet (exercise:Sets, uniqueExercises: string[] ): boolean {
-    if (exercise.restTimes.length === 1 )
+    const restTimes = [...exercise.restTimes];
+    const weights = [...exercise.weights];
+    const length = uniqueExercises.length;
+    if (restTimes.length === 1 )
         return false;
-    for (let i = 0; i < exercise.restTimes.length-1; i++) 
-        if (!(uniqueExercises.length === 1 &&  isDecreasing(exercise.weights) && exercise.restTimes[i] === 0))
+    for (let i = 0; i < restTimes.length-1; i++) 
+        if (!(length === 1 &&  isDecreasing(weights) && restTimes[i] === 0))
             return false;
     return true;
 }
 
 function isDecreasing (array: number[]): boolean{  
-    for (let i = 1; i <= array.length; i++)
+    for (let i = 1; i < array.length; i++)
         if (array[i-1] <= array[i] )
             return false;
     return true;

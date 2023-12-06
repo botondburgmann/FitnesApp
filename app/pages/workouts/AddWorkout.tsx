@@ -243,7 +243,7 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
               <Pressable style={workoutsStyles.button} onPress={() => { currentExercise ? addSet(currentExercise, weight, reps, time, restTime, side) : alert("Error: Please select an exercise") }}>
                   <Text style={globalStyles.buttonText}>Add set</Text>
               </Pressable>
-              <Pressable style={workoutsStyles.button} onPress={() => {sets.exercise.length > 0 ? finishExercise(sets, userID, new Date(date), week, totalXP.current, navigation) : alert("Error: Not enough sets")}}>
+              <Pressable style={workoutsStyles.button} onPress={() => {sets.exercise.length > 0 ? userID && week && finishExercise(sets, userID, new Date(date), week, totalXP.current, navigation) : alert("Error: Not enough sets")}}>
                   <Text style={globalStyles.buttonText}>Finish</Text>
               </Pressable>
             </View>

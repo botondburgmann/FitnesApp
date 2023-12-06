@@ -2,7 +2,7 @@ import { View, StyleSheet, TextInput, ActivityIndicator, Pressable, Text, ImageB
 import React, { useState } from 'react'
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import { RouterProps } from '../../types and interfaces/types';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
 import { FIREBASE_AUTH } from '../../../FirebaseConfig';
 
 
@@ -14,9 +14,10 @@ const Login = ({navigation}: RouterProps) => {
 
 
 
-  async function signIn(): Promise<void> {
+  async function signIn(FIREBASE_AUTH: Auth, email: string, password: string ): Promise<void> {
     try {
-      if (email === undefined || password == undefined) throw new Error("Please fill out all the fields!");
+      if (email === undefined || password == undefined) 
+        throw new Error("Please fill out all the fields!");
       
       setLoading(true);
       signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
@@ -53,7 +54,7 @@ const Login = ({navigation}: RouterProps) => {
           <ActivityIndicator size="large" color="#0000ff"/>
         :
           <>
-            <Pressable style={globalStyles.button} onPress={signIn}>
+            <Pressable style={globalStyles.button} onPress={() => signIn(FIREBASE_AUTH, email, password)}>
               <Text  style={globalStyles.buttonText}>Login</Text>
             </Pressable>
             <Text style={[globalStyles.text, {marginTop: 30, fontSize: 18, textTransform: "uppercase"}]}>Not registered yet</Text>

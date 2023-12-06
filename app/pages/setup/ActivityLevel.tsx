@@ -22,11 +22,8 @@ const ActivityLevel = ({navigation}: RouterProps) => {
     {label: 'Advanced', value: 'advanced'}
   ]);
 
-  async function setActivityLevelInFirebase(): Promise<void> {
+  async function setActivityLevelInFirebase(userID: string, selectedActivityLevel: ActivityLevelOption): Promise<void> {
     try {
-      if (userID === null)
-        throw new Error("User is not authorized");
-
       const userDocRef = await getUserDocumentRef(userID);
       if (userDocRef === undefined)
         throw new Error("User doesn't exist in database");
@@ -37,7 +34,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
       updateDoc(userDocRef, newData);
       navigation.navigate("WorkoutsLayout");
     } catch (error: any) {
-      alert(`Error: Couldn't set your activity level: ${error}`)
+      alert(`Error: Couldn't set your activity level: ${error.message}`)
     }
   }
   return (
@@ -54,7 +51,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
           <Pressable style={setUpStyles.button} onPress={() => navigation.navigate('Height')}>
             <Text style={globalStyles.buttonText}>Go back</Text>
           </Pressable>
-          <Pressable style={setUpStyles.button} onPress={setActivityLevelInFirebase}>
+          <Pressable style={setUpStyles.button} onPress={() => userID && setActivityLevelInFirebase(userID, selectedActivityLevel)}>
             <Text style={globalStyles.buttonText}>Finish</Text>
           </Pressable>
         </View>

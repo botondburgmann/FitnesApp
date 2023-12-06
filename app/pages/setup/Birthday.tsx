@@ -15,11 +15,8 @@ const Birthday = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
   const [birthDate, setBirthDate] = useState(new Date());
 
-  async function setBirthDateInFirebase(): Promise<void> {
+  async function setBirthDateInFirebase(userID: string, birthDate: Date): Promise<void> {
     try {
-      if (userID === null)
-        throw new Error("User is not authorized");
-
       validateBirthday(birthDate);
     
       const userDocRef = await getUserDocumentRef(userID);
@@ -29,7 +26,7 @@ const Birthday = ({navigation}: RouterProps) => {
       updateDoc(userDocRef, newData);
       navigation.navigate("Weight");
     } catch (error: any) {
-      alert(`Errpr: Couldn't set your date of birth: ${error}`)
+      alert(`Errpr: Couldn't set your date of birth: ${error.message}`)
     }
   }
 
@@ -47,7 +44,7 @@ const Birthday = ({navigation}: RouterProps) => {
           <Pressable style={setUpStyles.button} onPress={() => navigation.navigate('Gender')}>
             <Text style={globalStyles.buttonText}>Go back</Text>
           </Pressable>
-          <Pressable style={setUpStyles.button} onPress={setBirthDateInFirebase}>
+          <Pressable style={setUpStyles.button} onPress={() => userID && setBirthDateInFirebase(userID, birthDate)}>
             <Text style={globalStyles.buttonText}>Next</Text>
           </Pressable>
         </View>

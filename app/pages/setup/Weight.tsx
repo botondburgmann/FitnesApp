@@ -21,27 +21,24 @@ const Weight = ({navigation}: RouterProps) => {
     {label: 'Imperial (lbs)', value: 'lbs'}
   ]);
 
-  async function setWeightInFirebase(): Promise<void>{
+  async function setWeightInFirebase(userID: string, weight: number, selectedSystem: SelectItem): Promise<void>{
     try {
-      if (userID === null)
-        throw new Error("User is not authorized");
-
-      validateWeight(parseFloat(weight));
+      validateWeight(weight);
       const userDocRef = await getUserDocumentRef(userID);
       if (userDocRef === undefined)
         throw new Error("User doesn't exist in database");
       if (selectedSystem.value === "lbs"){
-        const newData = {"weight": convertLbsToKg(parseFloat(weight))};
+        const newData = {"weight": convertLbsToKg(weight)};
         updateDoc(userDocRef, newData);
       }
       else{
-        const newData = {"weight": parseFloat(weight)};
+        const newData = {"weight": weight};
         updateDoc(userDocRef, newData);
       }      
       navigation.navigate("Height");
 
     } catch (error: any) {
-      alert(`Error: Couldn't set your weight: ${error}`)
+      alert(`Error: Couldn't set your weight: ${error.message}`)
     }
   }
 
@@ -72,7 +69,7 @@ const Weight = ({navigation}: RouterProps) => {
           <Pressable style={setUpStyles.button} onPress={() => navigation.navigate("Birthday")}>
             <Text style={globalStyles.buttonText}>Go back</Text>
           </Pressable>
-          <Pressable style={setUpStyles.button} onPress={setWeightInFirebase}>
+          <Pressable style={setUpStyles.button} onPress={() => userID && setWeightInFirebase(userID, parseFloat(weight), selectedSystem)}>
             <Text style={globalStyles.buttonText}>Next</Text>
           </Pressable>
         </View>

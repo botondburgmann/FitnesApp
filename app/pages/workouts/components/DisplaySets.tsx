@@ -14,6 +14,7 @@ const DisplaySets = () => {
     const [allExercises, setAllExercises] = useState<React.JSX.Element[]>([]);
     
     useEffect(() => {
+      if (!userID || !date) return;
       const unsubscribeFromWorkouts = getWorkout(userID, date, (exercises: Sets[]) => {
         const exerciseComponents: React.JSX.Element[] = [];
         

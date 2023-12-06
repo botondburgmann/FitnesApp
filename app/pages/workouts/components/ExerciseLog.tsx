@@ -52,7 +52,7 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
         return isSuperSet(exercise, uniqueValues.exercise) ? numberOfSet/uniqueExerciseLength : numberOfSet;
         } 
         catch (error: any) {
-          alert(`Error: Couldn't calculate number of sets: ${error}`)
+          alert(`Error: Couldn't calculate number of sets: ${error.message}`)
         }
     }
 
@@ -83,16 +83,12 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
 
     }
 
-    function handleLongPress(index:number): void {
+    function handleLongPress(userID: string, date: Date, week: WeekRange, index:number): void {
         try {
-            if (userID === null) throw new Error("User is Not authorized")
-            if (date === null) throw new Error("Date is not set");
-            if (week === null)  throw new Error("Week is not set");
-
             if (exercise.reps[index] === 0) showDeleteConfirmation(userID, date, week, index, removeXP(exercise.times[index],exercise.weights[index]))
             else showDeleteConfirmation(userID, date, week, index, removeXP(exercise.reps[index],exercise.weights[index]))
         } catch (error: any) {
-            alert(`Error showing confirmation message: ${error}`)
+            alert(`Error showing confirmation message: ${error.message}`)
         }
     }
 
@@ -163,7 +159,7 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
                     time: exercise.times[index],
                     weight: exercise.weights[index],
                     }, exerciseID: exerciseID, setID: index, isIsometric: exercise.reps[0] === 0, date: date.toDateString()})}} 
-                onLongPress={() => handleLongPress(index)}                                
+                onLongPress={() => userID && date && week && handleLongPress(userID, date, week, index)}                                
             >
                 <Text style={[globalStyles.text, {lineHeight: 35}]}>{outputs.names[index]} {outputs.reps[index]} {outputs.sides[index]} {second} {outputs.weights[index]}</Text>
                 { exercise.restTimes[index] > 0

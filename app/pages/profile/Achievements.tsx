@@ -41,22 +41,6 @@ const Achievements = ({route}: any) => {
                     }
                     
                 }
-                
-/*                 for (const owner of achievementDoc.data().owners) {
-                    if (owner.userID === userID) {
-                        const achievement = {
-                            color: owner.color,
-                            description: owner.description,
-                            icon: achievementDoc.data().icon,
-                            level: owner.level,
-                            name: achievementDoc.data().name,
-                            status: owner.status,
-                            visibility: owner.visibility
-                        };
-                        achievements.push(achievement);
-                    }
-                    
-                } */
             }) 
             callback(achievements)
             })
