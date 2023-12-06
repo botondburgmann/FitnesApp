@@ -2,7 +2,7 @@ import { ImageBackground, Pressable, Text, View } from "react-native"
 import React, { useContext, useEffect, useState } from "react"
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../../../FirebaseConfig"
 import UserContext from "../../contexts/UserContext";
-import { User, RouterProps, Exercise, SingleSet } from "../../types and interfaces/types";
+import { User, RouterProps, SingleSet, Sets } from "../../types and interfaces/types";
 import { backgroundImage, globalStyles } from "../../assets/styles";
 import { Unsubscribe } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
@@ -68,24 +68,24 @@ function getBestExercise (userID: string, field:string, secondaryField:string, c
 
         if (!workoutData) return;
 
-        workoutData.forEach((exercise: SingleSet) => {
+        workoutData.forEach((exercise: Sets) => {
           const maxField = getMaxValueAndIndexOfArray(exercise[field]);
           const maxSecondaryField = getMaxValueAndIndexOfArray(exercise[secondaryField]);
           
-          if (maxField !== undefined && maxField.value > bestExercise[field]) {
-            bestExercise[field] = maxField.value;
-            bestExercise.name = exercise.exercise[maxField.index];
-            bestExercise[secondaryField] = exercise[secondaryField][maxField.index];
-          } else if (maxField !== undefined && maxSecondaryField !== undefined && maxField.value === bestExercise[field] && maxSecondaryField.value > bestExercise[secondaryField]) {
-            bestExercise[secondaryField] = maxSecondaryField.value;
-            bestExercise.name = exercise.exercise[maxSecondaryField.index];
-            bestExercise[field] = exercise[field][maxSecondaryField.index];
+          if (maxField !== undefined && maxField.value > (field === "weights" ? bestExercise.weight : bestExercise.reps) ) {
+            field === "weights" ? bestExercise.weight = maxField.value : bestExercise.reps = maxField.value;
+            bestExercise.exercise = exercise.exercise[maxField.index];
+            secondaryField === "weights" ? bestExercise.weight = exercise.weights[maxField.index] : bestExercise.reps = exercise.reps[maxField.index] ;
+          } else if (maxField !== undefined && maxSecondaryField !== undefined && maxField.value === (field === "weights" ? bestExercise.weight : bestExercise.reps)  && maxSecondaryField.value > (secondaryField === "weights" ? bestExercise.weight : bestExercise.reps) ) {
+            secondaryField === "weights" ?  bestExercise.weight = maxSecondaryField.value : bestExercise.reps = maxSecondaryField.value;
+            bestExercise.exercise = exercise.exercise[maxSecondaryField.index];
+            field === "weights" ? bestExercise.weight = exercise.weights[maxSecondaryField.index] : bestExercise.reps = exercise.reps[maxSecondaryField.index] ;
           }
-                    
+          
         });
       });
-      callback(bestExercise)
     });
+    callback(bestExercise)
   
     return unsubscribeFromWorkouts;
   } catch (error: any) {
@@ -188,7 +188,7 @@ useEffect(() => {
                 Max weight: No data
               </Text>
             : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
-                Max weight: {( mostWeightExercise).name} {( mostWeightExercise).weights} kg ({(mostWeightExercise).reps} repetitions)
+                Max weight: { mostWeightExercise.exercise} { mostWeightExercise.weight} kg ({mostWeightExercise.reps} repetitions)
               </Text>
           }
           {
@@ -197,7 +197,7 @@ useEffect(() => {
                 Most repetitions: No data
               </Text>
             : <Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>
-                Most repetitions: {( mostRepsExercise).name} {( mostRepsExercise).reps} repetitions ({( mostRepsExercise).weights} kg)
+                Most repetitions: {mostRepsExercise.exercise} { mostRepsExercise.reps} repetitions ({ mostRepsExercise.weight} kg)
               </Text>
             }
         </View>

@@ -32,6 +32,8 @@ export type Sets = {
 	sides: ("both" | "left" | "right")[];
 	times: number[];
 	weights: number[];
+    [key: string]: any,
+
 }
 
 export type SingleSet = {
