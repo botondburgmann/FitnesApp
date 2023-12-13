@@ -5,8 +5,9 @@ import Info from '../../components/Info';
 import { backgroundImage, globalStyles } from '../../assets/styles';
 import { collection, addDoc } from 'firebase/firestore';
 import { getUserDocument } from '../../functions/firebaseFunctions';
+import { RouterProps } from '../../types and interfaces/types';
 
-const CreateExercise = () => {
+const CreateExercise = ({navigation}: RouterProps) => {
     const userID = useContext(UserContext);
     const [name, setName] = useState<string>()
     const [isUnilateral, setIsUnilateral] = useState(false)
@@ -72,11 +73,7 @@ const CreateExercise = () => {
                 throw new Error("Please choose a name for your exercise!");
             
             createNewExercise(userID, name, isUnilateral, isIsometric)
-            setName("");
-            setIsIsometric(false);
-            setIsUnilateral(false);
-            setUnilaterality("");
-            setIsometricity("");
+            navigation.navigate("Exercise List");
         }   catch (error: any) {
             alert(`Error: Couldn't save exercise: ${error.message}`)
         }

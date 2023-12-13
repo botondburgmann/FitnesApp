@@ -5,6 +5,7 @@ import Gender from "./Gender";
 import Height from "./Height";
 import Weight from "./Weight";
 import WorkoutsLayout from "../workouts/WorkoutsLayout";
+import { InsideLayout } from "../../../App";
 
 const SetUpLayout = ()  => {
     const Stack = createNativeStackNavigator();
@@ -16,7 +17,7 @@ const SetUpLayout = ()  => {
           <Stack.Screen name="Weight" component={Weight}   options={{ headerShown: false }} />
           <Stack.Screen name="Height" component={Height} options={{ headerShown: false }} />
           <Stack.Screen name="Activity level" component={ActivityLevel }options={{ headerShown: false }} />
-          <Stack.Screen name="WorkoutsLayout" component={ WorkoutsLayout }  options={{ headerShown: false }} />
+          <Stack.Screen name="Inside" component={ InsideLayout }  options={{ headerShown: false }} />
         </Stack.Navigator>
     );
 }

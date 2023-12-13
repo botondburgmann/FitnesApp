@@ -2,9 +2,7 @@ import { StyleSheet} from "react-native"
 
 export const setUpStyles = StyleSheet.create({
     container: {
-        //backgroundColor: "rgba(255,0,0,0.5)",
         backgroundColor: "rgba(128,128,128,0.5)",
-        //flex: 1,
         justifyContent: "center",
         paddingHorizontal: 20,
         paddingVertical: 20,
@@ -49,7 +47,7 @@ export const setUpStyles = StyleSheet.create({
     selectMenuContainer: {
         backgroundColor: "#FFF",
         flex: 0.7,
-        paddingVertical: 20,
+        paddingVertical: 10,
     },
     icon : {
         alignSelf: "center",

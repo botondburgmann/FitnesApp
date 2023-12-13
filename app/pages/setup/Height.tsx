@@ -28,7 +28,7 @@ const Height = ({navigation}: RouterProps) => {
       if (userDocRef === undefined)
         throw new Error("User doesn't exist in database");
       if (selectedSystem.value === "ft"){
-        const newData = {"weight": convertFtToCm(height)};
+        const newData = {"height": convertFtToCm(height)};
         updateDoc(userDocRef, newData);
       }
       else{
@@ -37,7 +37,7 @@ const Height = ({navigation}: RouterProps) => {
       }      
       navigation.navigate("Activity level");
     } catch (error: any) {
-      alert(`Error: Couldn't set your weight: ${error.message}`)
+      alert(`Error: Couldn't set your height: ${error.message}`)
     }
   }
 
@@ -67,7 +67,7 @@ const Height = ({navigation}: RouterProps) => {
           <Pressable style={setUpStyles.button} onPress={() => navigation.navigate('Weight')}>
             <Text style={globalStyles.buttonText}>Go back</Text>
           </Pressable>
-          <Pressable style={setUpStyles.button} onPress={() => userID && setHeightInFirebase(userID, parseFloat(userID), selectedSystem)}>
+          <Pressable style={setUpStyles.button} onPress={() => userID && setHeightInFirebase(userID, parseFloat(height), selectedSystem)}>
             <Text style={globalStyles.buttonText}>Next</Text>
           </Pressable>
         </View>

@@ -32,7 +32,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
         "set": true
       };
       updateDoc(userDocRef, newData);
-      navigation.navigate("WorkoutsLayout");
+      navigation.navigate("Inside");
     } catch (error: any) {
       alert(`Error: Couldn't set your activity level: ${error.message}`)
     }
@@ -44,7 +44,7 @@ const ActivityLevel = ({navigation}: RouterProps) => {
         <View style={setUpStyles.icon}>
           <MaterialCommunityIcons name="weight-lifter" size={60} color="#FFF" />
         </View>
-        <View style={setUpStyles.selectMenuContainer}>
+        <View style={[setUpStyles.selectMenuContainer, {paddingVertical: 20}]}>
           <SelectMenu data={activityLevels} setSelectedValue={setSelectedActivityLevel} title={selectedActivityLevel.label} />
         </View>
         <View style={setUpStyles.buttonGroup}>

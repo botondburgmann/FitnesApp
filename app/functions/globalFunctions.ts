@@ -23,9 +23,9 @@ export function convertLbsToKg(weight:number): number {
 
 export function validateHeight(height: number): void {
   if (Number.isNaN(height))   
-    throw new Error("Invalid height: Weight must be set");
+    throw new Error("Invalid height: Height must be set");
   if (height < 0) 
-    throw new Error("Invalid height: Weight must be a positive number");
+    throw new Error("Invalid height: Height must be a positive number");
 }
 
 export function convertFtToCm(height:number): number {

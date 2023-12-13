@@ -19,7 +19,7 @@ const Gender = ({navigation}: RouterProps) => {
       const userDocRef = await getUserDocumentRef(userID);
       if (userDocRef === undefined)
         throw new Error("User doesn't exist in database");
-      const newData = {"gender": gender.trim().toLowerCase()};
+      const newData = {"gender": gender};
       updateDoc(userDocRef, newData);
       navigation.navigate("Birthday");
     } catch (error: any) {
