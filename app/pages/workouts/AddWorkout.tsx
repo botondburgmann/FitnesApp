@@ -124,12 +124,13 @@ const AddWorkout = ( {navigation, route}: RouterProps) => {
     try {
       const numericData = {
         exercise: currentExercise.label,
-        reps: parseFloat(reps) | 0,
-        restTime: parseFloat(restTime) | 0,
+        reps: parseFloat(reps) || 0,
+        restTime: parseFloat(restTime) || 0,
         side: side as "both" | "left" | "right",
-        time: parseFloat(time) | 0,
-        weight: parseFloat(weight) | 0,
+        time: parseFloat(time) || 0,
+        weight: parseFloat(weight) || 0,
       }
+
       validateData(currentExercise.isometric, numericData.reps, numericData.time, numericData.restTime);                        
       
       setSets((prevSets) => ({

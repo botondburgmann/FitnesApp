@@ -192,7 +192,7 @@ export async function finishExercise (sets: Sets, userID: string, date: Date, we
 
 async function addSetsToFirebase (experience: number, userID: string, date: Date, week: WeekRange, sets: Sets): Promise<void>{
     try {   
-      const workoutsSnapshot = await getWorkoutDocs(userID,date);      
+      const workoutsSnapshot = await getWorkoutDocs(userID,date);            
       if (workoutsSnapshot === undefined){
         const workout = [];
         workout.push(sets);

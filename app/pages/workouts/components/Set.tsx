@@ -18,11 +18,11 @@ const Set = (props: { exercise: Exercise; focus: string; setCompletedSet: Functi
             
             const numericData = {
                 exercise: exercise.label, 
-                reps: parseFloat(reps) | 0, 
+                reps: parseFloat(reps) || 0, 
                 restTime: 1, 
                 side: "both" as "both" | "left" | "right", 
-                time: parseFloat(time) | 0, 
-                weight: parseFloat(weight) | 0
+                time: parseFloat(time) || 0, 
+                weight: parseFloat(weight) || 0
             };
 
             validateData(exercise.isometric, numericData.reps, numericData.time, numericData.restTime);

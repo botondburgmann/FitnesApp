@@ -54,11 +54,11 @@ const EditSingleSet = ({ route, navigation }: RouterProps) => {
 
             const numericData = {
                 exercise: set.exercise,
-                reps: parseFloat(reps) | 0,
-                restTime: parseFloat(restTime)*60 | 0,
+                reps: parseFloat(reps) || 0,
+                restTime: parseFloat(restTime)*60 || 0,
                 side: side as "both" | "left" | "right",
-                time: parseFloat(time) | 0,
-                weight: parseFloat(weight) | 0,
+                time: parseFloat(time) || 0,
+                weight: parseFloat(weight) || 0,
               }
               validateData(isIsometric, numericData.reps, numericData.time, numericData.restTime);      
 
