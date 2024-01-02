@@ -58,7 +58,7 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
 
     for (let i = 0; i < exercise.sides.length; i++) {
         if (exercise.sides[i] === "both" && !(isDropSet(exercise, uniqueValues.exercise) || (isSuperSet(exercise, uniqueValues.exercise) ))) outputs.setNumbers.push(`Set ${i+1}`);
-        else if (exercise.sides[i] !== "both" && i % 2 === 0) i === 0 ? outputs.setNumbers.push(`Set ${i+1}`) : outputs.setNumbers.push(`Set ${i}`);
+        else if (exercise.sides[i] !== "both" && i % 2 === 0 ) outputs.setNumbers.push(`Set ${Math.ceil((i+1)/2)}`) ;
         else outputs.setNumbers.push("");
 
         if (!(isDropSet(exercise, uniqueValues.exercise) ||isSuperSet(exercise, uniqueValues.exercise) ) || isDropSet(exercise, uniqueValues.exercise)) outputs.names.push("")

@@ -84,7 +84,7 @@ function getBestExercise (userID: string, field:string, secondaryField:string, c
           
         });
       });
-    });
+    });    
     callback(bestExercise)
   
     return unsubscribeFromWorkouts;

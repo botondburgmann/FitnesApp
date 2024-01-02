@@ -16,7 +16,7 @@ const Rest = (props: { setCompletedSet: Function; sets:  React.MutableRefObject<
   const totalXP = props.totalXP;
   const exercise = props.exercise;
   const isLastSetOfExercise = props.isLastSetOfExercise;
-  const duration = exercise.musclesWorked.length > 1 ? 3 : 2;
+  const duration = exercise.musclesWorked.length > 1 ? 180 : 120;
 
   return (
     <View style={styles.container}>
