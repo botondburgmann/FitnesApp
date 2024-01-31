@@ -26,6 +26,7 @@ export async function addTotalExperienceToFirebase  (experience: number, date: D
         const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
         const firstUsersSnapshot = await getDocs(usersQuery);
         const firstUserDoc = firstUsersSnapshot.docs[0];
+        date = new Date(date.setDate(date.getDate()+ 1))
         
         if (week.start <= date && date <= week.end) {            
             const firstUpdatedData = {
@@ -182,8 +183,6 @@ function calculateDaysBetweenDates (dates:string[]): number {
 
 export async function finishExercise (sets: Sets, userID: string, date: Date, week: WeekRange,  totalXP: number, navigation?: NavigationProp<any, any>,): Promise<void> {
     try {
-        date = new Date(date.setDate(date.getDate() + 1));
-        
         await addSetsToFirebase(totalXP, userID, date, week, sets );
         if (navigation) {
             navigation.navigate("Log")
