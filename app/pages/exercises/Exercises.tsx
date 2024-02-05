@@ -1,4 +1,4 @@
-import {  ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {  ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import UserContext from '../../contexts/UserContext';
 import { Exercise, RouterProps } from '../../types and interfaces/types';
@@ -7,12 +7,18 @@ import { Unsubscribe } from 'firebase/auth';
 import { collection, query, where, onSnapshot, getDocs, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
 import { getUserDocument } from '../../functions/firebaseFunctions';
+import { ListItem, SearchBar } from "react-native-elements"; 
+
 
 const Exercises = ({navigation}: RouterProps) => {
   const userID = useContext(UserContext);
 
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
+
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+
 
 
   function getAllExercises (userID: string, callback: Function): Unsubscribe[] | undefined {
@@ -89,11 +95,16 @@ const Exercises = ({navigation}: RouterProps) => {
     };
 }, [userID]);
 
-
+  useEffect(() => {
+    const filtered = exercises.filter((item) =>
+      item.label.includes(search.toLowerCase())
+    );
+    setFilteredExercises(filtered);
+  }, [search, exercises]);
 
 
   const exerciseComponentsList: React.JSX.Element[] = [];
-  exercises.forEach((exercise, index) => {
+  filteredExercises.forEach((exercise, index) => {
     exerciseComponentsList.push(
       <View key={index} style={styles.row}>
         <Pressable style={{width: '50%'}} onPress={()=>navigation.navigate('Details', {exercise: exercise.label})}>
@@ -128,7 +139,12 @@ const Exercises = ({navigation}: RouterProps) => {
         <Text style={styles.label}>My exercises</Text>
         {loading
         ? <ActivityIndicator/>
-        :  <ScrollView>
+        : <ScrollView>
+            <TextInput
+              placeholder="Type Here..."
+              onChangeText={(text: string) => setSearch(text)}
+              value={search}
+            />
             { exerciseComponentsList}
           </ScrollView>
         }
