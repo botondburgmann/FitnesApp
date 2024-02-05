@@ -1,5 +1,5 @@
 import {  ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react';
 import UserContext from '../../contexts/UserContext';
 import { Exercise, RouterProps } from '../../types and interfaces/types';
 import { backgroundImage, globalStyles } from '../../assets/styles';
@@ -96,7 +96,7 @@ const Exercises = ({navigation}: RouterProps) => {
 }, [userID]);
 
   useEffect(() => {
-    const filtered = exercises.filter((item) =>
+    const filtered = exercises.filter((item: Exercise) =>
       item.label.includes(search.toLowerCase())
     );
     setFilteredExercises(filtered);
@@ -104,7 +104,7 @@ const Exercises = ({navigation}: RouterProps) => {
 
 
   const exerciseComponentsList: React.JSX.Element[] = [];
-  filteredExercises.forEach((exercise, index) => {
+  filteredExercises.forEach((exercise: { label: string; hidden: any; }, index: any) => {
     exerciseComponentsList.push(
       <View key={index} style={styles.row}>
         <Pressable style={{width: '50%'}} onPress={()=>navigation.navigate('Details', {exercise: exercise.label})}>
