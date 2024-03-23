@@ -1,8 +1,4 @@
 {
-  "cli": {
-    "version": ">= 5.9.1",
-    "requireCommit": true
-  },
   "build": {
     "preview": {
       "android": {
@@ -20,9 +16,6 @@
     "preview4": {
       "distribution": "internal"
     },
-    "production": {}
-  },
-  "submit": {
     "production": {}
   }
 }
