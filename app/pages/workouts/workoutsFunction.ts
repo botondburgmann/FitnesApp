@@ -20,42 +20,44 @@ export function removeXP (repOrTime: number, weight: number): number {
     return weight === 0 ? -repOrTime : -(repOrTime * weight);
 }
 
-export async function addTotalExperienceToFirebase  (experience: number, date: Date, userID: string, week: WeekRange ): Promise<void>  {
-    try {        
-        const usersCollectionRef = collection(FIRESTORE_DB,"Users");
-        const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
-        const firstUsersSnapshot = await getDocs(usersQuery);
-        const firstUserDoc = firstUsersSnapshot.docs[0];
-        date = new Date(date.setDate(date.getDate()+ 1))
-        
-        if (week.start <= date && date <= week.end) {            
-            const firstUpdatedData = {
-                experience: firstUserDoc.data().experience+experience,
-                weeklyExperience: firstUserDoc.data().weeklyExperience+experience,
-            }
-            await updateDoc(firstUserDoc.ref, firstUpdatedData);
-            
-        }
-        else{
-            const firstUpdatedData = {
-                experience: firstUserDoc.data().experience+experience,
-            }
-            await updateDoc(firstUserDoc.ref, firstUpdatedData);
-        }
-        
-        const secondUsersSnapshot = await getDocs(usersQuery);
-        const secondUserDoc = secondUsersSnapshot.docs[0];
-        const secondUserData = secondUserDoc.data() as User;
-        const secondUpdateData = {
-            level: secondUserData.experience < 225 ? 1 : Math.floor(Math.log(secondUserData.experience / 100) / Math.log(1.5)),
+export async function addTotalExperienceToFirebase(
+    experience: number,
+    date: Date,
+    userID: string,
+    week: WeekRange
+  ): Promise<void> {
+    try {
+      const usersCollectionRef = collection(FIRESTORE_DB, "Users");
+      const usersQuery = query(usersCollectionRef, where("userID", "==", userID));
+      const firstUsersSnapshot = await getDocs(usersQuery);
+      const firstUserDoc = firstUsersSnapshot.docs[0];
+      
+      if (week.start <= date && date <= week.end) {
+        const firstUpdatedData = {
+          experience: firstUserDoc.data().experience + experience,
+          weeklyExperience: firstUserDoc.data().weeklyExperience + experience,
         };
-        
-        updateDoc(secondUserDoc.ref, secondUpdateData);
-    } 
-    catch (error: any) {
-        alert(`Error: Couldn't update experience and level fields: ${error.message}`)
+        await updateDoc(firstUserDoc.ref, firstUpdatedData);
+      } else {
+        const firstUpdatedData = {
+          experience: firstUserDoc.data().experience + experience,
+        };
+        await updateDoc(firstUserDoc.ref, firstUpdatedData);
+      }
+  
+      const secondUsersSnapshot = await getDocs(usersQuery);
+      const secondUserDoc = secondUsersSnapshot.docs[0];
+      const secondUserData = secondUserDoc.data() as User;
+      const secondUpdateData = {
+        level: secondUserData.experience < 225 ? 1 : Math.floor(Math.log(secondUserData.experience / 100) / Math.log(1.5)),
+      };
+  
+      updateDoc(secondUserDoc.ref, secondUpdateData);
+    } catch (error: any) {
+      alert(`Error: Couldn't update experience and level fields: ${error.message}`);
     }
-}
+  }
+  
 
 export function getWorkout (userID: string, date: Date, callback: Function): Unsubscribe | undefined {
     try {
@@ -216,7 +218,7 @@ async function addSetsToFirebase (experience: number, userID: string, date: Date
       updateEnduranceMasterAchievement(sets, userID);
       updateConsistencyStreakAchievement(userID);
       updateDedicatedAthleteAchievement(userID);
-      
+            
       addTotalExperienceToFirebase(experience, date, userID, week);
   } 
   catch (error: any) {

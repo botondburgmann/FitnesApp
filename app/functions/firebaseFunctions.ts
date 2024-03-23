@@ -36,7 +36,7 @@ export async function getUserDocument(userID:string): Promise<QueryDocumentSnaps
 }
 
 export async function getWorkoutDocs(userID:string, date: Date): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | undefined>{    
-    try {
+    try {        
         const collectionRef = collection(FIRESTORE_DB, "Workouts");
         const q = query(collectionRef, where("date", "==", date.toDateString()), where("userID", "==", userID) );
         const snapshot = await getDocs(q);

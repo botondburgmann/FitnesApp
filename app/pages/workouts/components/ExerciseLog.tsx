@@ -84,7 +84,7 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
     }
 
     function handleLongPress(userID: string, date: Date, week: WeekRange, index:number): void {
-        try {
+        try {            
             if (exercise.reps[index] === 0) showDeleteConfirmation(userID, date, week, index, removeXP(exercise.times[index],exercise.weights[index]))
             else showDeleteConfirmation(userID, date, week, index, removeXP(exercise.reps[index],exercise.weights[index]))
         } catch (error: any) {
@@ -102,7 +102,7 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
             },
             {
               text: 'Delete',
-              onPress: async () => {await  deleteSet(userID, date, week, setIndex, xpDelete)}
+              onPress:  () => {deleteSet(userID, date, week, setIndex, xpDelete)}
             }],
             { cancelable: false }
           );
@@ -112,12 +112,11 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
         try { 
             const workoutDocs = await getWorkoutDocs(userID,date);
                   
-            if (workoutDocs === undefined) throw new Error("Couldn't find workout");
-            
+            if (workoutDocs === undefined) throw new Error("Couldn't find workout");           
             const updatedData = { ...workoutDocs.data() };
     
-            for (let i = 0; i < workoutDocs.data().Workout.length; i++) {  
-                if (workoutDocs.data().Workout[i].exercise[setIndex] === exercise.exercise[0] && i === exerciseID){    
+            for (let i = 0; i < workoutDocs.data().Workout.length; i++) {                  
+                 if (workoutDocs.data().Workout[i].exercise[setIndex] === exercise.exercise[0] && i === exerciseID){    
                     updatedData.Workout[i].exercise.splice(setIndex, 1);
                     updatedData.Workout[i].weights.splice(setIndex, 1);
                     updatedData.Workout[i].reps.splice(setIndex, 1);
@@ -126,16 +125,16 @@ const ExerciseLog = (props: { exercise: Sets; exerciseID: number;}) => {
                     updatedData.Workout[i].restTimes.splice(setIndex, 1); 
                     if (updatedData.Workout[i].exercise.length === 0) { 
                         updatedData.Workout.splice(i,1)
-                    }
-                await updateDoc(doc(FIRESTORE_DB, "Workouts", workoutDocs.id), {
+                    }                    
+                  updateDoc(doc(FIRESTORE_DB, "Workouts", workoutDocs.id), {
                     Workout: updatedData.Workout
                 });
 
-                if ( updatedData.Workout.length === 0) await deleteDoc(workoutDocs.ref);
+                if ( updatedData.Workout.length === 0)  deleteDoc(workoutDocs.ref);
                 }
             } 
             addTotalExperienceToFirebase(xpToDelete,date,userID,week);
-    
+     
         } 
         catch (error: any) {
             alert(`Error: Couldn't delete fields: ${error.message}`);
