@@ -112,26 +112,18 @@ export default function App() {
         start: new Date(),
         end: new Date()  
       };
-      let moveBack = 0;
-      let moveForward = 6;
-      for (let i = 0; i <= 6; i++) {   
-        if (today.getDay() === i) {
-          week.start = addDaysToDate(today,-moveBack+1)
-          week.end = addDaysToDate(today,moveForward+1)
-          break;
-        }
-        moveBack++;
-        moveForward--;
-      }
-      
+      const currentDayOfWeek = today.getDay()
+      const millisecondsInDay = 86400000;
+      const daysUntilMonday = (currentDayOfWeek === 0) ? 6 : currentDayOfWeek - 1;
+      const millisecondsUntilMonday = daysUntilMonday * millisecondsInDay;
+      week.start = new Date(today.getTime() - millisecondsUntilMonday);
+      week.start.setHours(0, 0, 0, 0);
+
+      week.end = new Date(week.start.getTime() + 6 * millisecondsInDay);
+      week.end.setHours(23, 59, 59, 999);
       return week;
     }
-  
-    function addDaysToDate(date:Date, daysToAdd:number) {
-      const newDate = new Date(date);
-      newDate.setDate(date.getDate() + daysToAdd);
-      return newDate;
-    }
+
     const Stack = createNativeStackNavigator();
 
   return (
