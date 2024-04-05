@@ -7,7 +7,6 @@ import { Unsubscribe } from 'firebase/auth';
 import { collection, query, where, onSnapshot, getDocs, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../FirebaseConfig';
 import { getUserDocument } from '../../functions/firebaseFunctions';
-import { ListItem, SearchBar } from "react-native-elements"; 
 
 
 const Exercises = ({navigation}: RouterProps) => {

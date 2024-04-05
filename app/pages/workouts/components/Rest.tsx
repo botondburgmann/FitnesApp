@@ -60,7 +60,7 @@ const Rest = (props: { setCompletedSet: Function; sets:  React.MutableRefObject<
   return (
     <View style={styles.container}>
       <Text style={[globalStyles.label, {marginVertical: 50}]}>Rest</Text>
-      {/* <CountdownCircleTimer
+      <CountdownCircleTimer
         isPlaying
         duration={duration}
         colors={['#FF0000', '#FF0000', '#FF0000', '#FF0000']}
@@ -103,10 +103,10 @@ const Rest = (props: { setCompletedSet: Function; sets:  React.MutableRefObject<
         }}
       >
         {({ remainingTime }) =><Text style={[globalStyles.text, {textTransform: "uppercase", fontWeight: "600", paddingVertical: 10}]}>{Math.floor(remainingTime / 60)}:{remainingTime % 60}</Text>}
-      </CountdownCircleTimer> */}
-              <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => completeRest()}>
+      </CountdownCircleTimer> 
+{/*         <Pressable style={[globalStyles.button, {width: 100}]} onPress={() => completeRest()}>
             <Text style={globalStyles.buttonText}>Next</Text>                   
-        </Pressable>
+        </Pressable> */}
     </View>
   )
 }
