@@ -97,7 +97,7 @@ const Exercises = ({navigation}: RouterProps) => {
 
   useEffect(() => {
     const filtered = exercises.filter((item: Exercise) =>
-      item.label.includes(search.toLowerCase())
+      item.label.toLowerCase().includes(search.toLowerCase())
     );
     setFilteredExercises(filtered);
   }, [search, exercises]);
@@ -141,7 +141,8 @@ const Exercises = ({navigation}: RouterProps) => {
         ? <ActivityIndicator/>
         : <ScrollView>
             <TextInput
-              placeholder="Type Here..."
+              style={styles.search}
+              placeholder="Search for exercise..."
               onChangeText={(text: string) => setSearch(text)}
               value={search}
             />
@@ -217,5 +218,18 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     alignSelf: 'center'
+  },
+  search: {
+    fontSize: 18,
+    color: "#fff",
+    textShadowOffset:{
+        height: 2,
+        width: 2
+    },
+    textShadowColor: "#000",
+    textShadowRadius: 10,
+    fontWeight: "600", 
+    paddingVertical: 10,
+    paddingLeft: 20
   }
 });
