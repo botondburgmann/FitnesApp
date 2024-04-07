@@ -48,7 +48,7 @@ const Account = ({ route, navigation }: RouterProps) => {
 
 
 
-function getBestExercise (userID: string, field:string, secondaryField:string, callback: Function ): Unsubscribe | undefined {
+function getMostWeightExercise (userID: string, callback: Function ): Unsubscribe | undefined {
   try {
     const bestExercise: SingleSet = {
       exercise: "",
@@ -58,38 +58,82 @@ function getBestExercise (userID: string, field:string, secondaryField:string, c
       time: 0,
       weight: 0
     };
-    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");
+    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
     const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
     const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, (snapshot) => {
       if (snapshot.empty) return;
-
+      
       snapshot.docs.forEach((doc) => {
         const workoutData = doc.data().Workout;
-
         if (!workoutData) return;
-
         workoutData.forEach((exercise: Sets) => {
-          const maxField = getMaxValueAndIndexOfArray(exercise[field]);
-          const maxSecondaryField = getMaxValueAndIndexOfArray(exercise[secondaryField]);
-          
-          if (maxField !== undefined && maxField.value > (field === "weights" ? bestExercise.weight : bestExercise.reps) ) {
-            field === "weights" ? bestExercise.weight = maxField.value : bestExercise.reps = maxField.value;
+          const maxField = getMaxValueAndIndexOfArray(exercise.weights);
+
+          if (maxField !== undefined && ( (maxField.value > bestExercise.weight) ||
+                                          ( maxField.value === bestExercise.weight && exercise.reps[maxField.index] > bestExercise.reps) )) {
             bestExercise.exercise = exercise.exercise[maxField.index];
-            secondaryField === "weights" ? bestExercise.weight = exercise.weights[maxField.index] : bestExercise.reps = exercise.reps[maxField.index] ;
-          } else if (maxField !== undefined && maxSecondaryField !== undefined && maxField.value === (field === "weights" ? bestExercise.weight : bestExercise.reps)  && maxSecondaryField.value > (secondaryField === "weights" ? bestExercise.weight : bestExercise.reps) ) {
-            secondaryField === "weights" ?  bestExercise.weight = maxSecondaryField.value : bestExercise.reps = maxSecondaryField.value;
-            bestExercise.exercise = exercise.exercise[maxSecondaryField.index];
-            field === "weights" ? bestExercise.weight = exercise.weights[maxSecondaryField.index] : bestExercise.reps = exercise.reps[maxSecondaryField.index] ;
+            bestExercise.reps = exercise.reps[maxField.index];
+            bestExercise.restTime = exercise.restTimes[maxField.index];
+            bestExercise.side = exercise.sides[maxField.index];
+            bestExercise.time = exercise.times[maxField.index];
+            bestExercise.weight = exercise.weights[maxField.index];
           }
+          
+          
+          
           
         });
       });
-    });    
-    callback(bestExercise)
-  
-    return unsubscribeFromWorkouts;
+      callback(bestExercise)
+    });
+    
+    return unsubscribeFromWorkouts; 
   } catch (error: any) {
-      alert(`Error: Couldn't fetch best exercises for ${field}: ${error}`)
+      alert(`Error: Couldn't fetch best exercises for most weight: ${error}`)
+  }
+}
+function getMostRepsExercise (userID: string, callback: Function ): Unsubscribe | undefined {
+  try {
+    const bestExercise: SingleSet = {
+      exercise: "",
+      reps: 0,
+      restTime: 0,
+      side: "both",
+      time: 0,
+      weight: 0
+    };
+    const workoutsCollectionRef = collection(FIRESTORE_DB, "Workouts");    
+    const workoutsQuery = query(workoutsCollectionRef, where("userID", "==", userID));
+    const unsubscribeFromWorkouts = onSnapshot(workoutsQuery, (snapshot) => {
+      if (snapshot.empty) return;
+      
+      snapshot.docs.forEach((doc) => {
+        const workoutData = doc.data().Workout;
+        if (!workoutData) return;
+        workoutData.forEach((exercise: Sets) => {
+          const maxField = getMaxValueAndIndexOfArray(exercise.reps);
+
+          if (maxField !== undefined && ( (maxField.value > bestExercise.reps) ||
+                                          ( maxField.value === bestExercise.reps && exercise.weights[maxField.index] > bestExercise.weight) )) {
+            bestExercise.exercise = exercise.exercise[maxField.index];
+            bestExercise.reps = exercise.reps[maxField.index];
+            bestExercise.restTime = exercise.restTimes[maxField.index];
+            bestExercise.side = exercise.sides[maxField.index];
+            bestExercise.time = exercise.times[maxField.index];
+            bestExercise.weight = exercise.weights[maxField.index];
+          }
+          
+          
+          
+          
+        });
+      });
+      callback(bestExercise)
+    });
+    
+    return unsubscribeFromWorkouts; 
+  } catch (error: any) {
+      alert(`Error: Couldn't fetch best exercises for most reps: ${error}`)
   }
 }
 
@@ -120,16 +164,16 @@ useEffect(() => {
   const unsubscribeFromUser = getUser(userID, (userData: React.SetStateAction<User>) => {
     setUser(userData);
   });
-   const unsubscribeFromMostWeight = getBestExercise(userID, "weights", "reps", (exerciseData: SingleSet) => {    
+   const unsubscribeFromMostWeight = getMostWeightExercise(userID, (exerciseData: SingleSet) => {    
     setmostWeightExercise(exerciseData);
   });
-  const unsubscribeFromMostReps = getBestExercise(userID, "reps", "weights", (exerciseData: SingleSet) => {    
+   const unsubscribeFromMostReps = getMostRepsExercise(userID, (exerciseData: SingleSet) => {    
     setmostRepsExercise(exerciseData);
   });
 
 
   return () => {
-    if (unsubscribeFromUser !== undefined && unsubscribeFromMostWeight !== undefined && unsubscribeFromMostReps !== undefined) {
+    if (unsubscribeFromUser !== undefined && unsubscribeFromMostWeight !== undefined  && unsubscribeFromMostReps !== undefined) {
       unsubscribeFromUser();
       unsubscribeFromMostWeight();
       unsubscribeFromMostReps();
